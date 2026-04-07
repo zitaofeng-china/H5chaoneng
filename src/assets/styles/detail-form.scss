@@ -1,0 +1,103 @@
+.details-card {
+  :deep(.el-form-item) {
+    align-items: center;
+
+    &.textarea-item {
+      align-items: flex-start;
+    }
+  }
+
+  :deep(.el-form-item__label) {
+    height: 44px;
+    color: var(--theme-text-muted);
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 100%;
+    align-items: center;
+  }
+
+  :deep(.el-input__inner) {
+    height: 44px;
+    color: var(--theme-text-muted);
+    font-weight: 600;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input__suffix) {
+    color: var(--theme-text-muted);
+  }
+}
+
+.card-title {
+  font-size: 18px;
+  text-align: center;
+  color: var(--theme-text-dark);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.btn-wrap {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rent-btn {
+  flex: 1;
+  margin-top: 15px;
+  width: 100%;
+  height: 50px;
+  background: var(--theme-bg-orange);
+  border: none;
+  color: var(--theme-text-white);
+  font-weight: 600;
+
+  &.buy-btn {
+    background: var(--theme-bg-blue);
+  }
+}
+
+@media (max-width: 768px) {
+  .details-card {
+    :deep(.el-form-item__label) {
+      display: none;
+    }
+
+    :deep(.el-form-item__content) {
+      margin-left: 0 !important;
+    }
+  }
+
+  .card-title {
+    margin-bottom: 16px;
+  }
+
+  .derail-form-m {
+    :deep(.el-input__prefix) {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--theme-text-muted);
+    }
+
+    .m-input {
+      :deep(.el-input__inner) {
+        padding-right: 5px;
+        text-align: right;
+      }
+    }
+
+    :deep(.el-input__inner) {
+      --el-input-placeholder-color: var(--theme-text-muted);
+
+      &::placeholder {
+        font-weight: 600;
+      }
+    }
+
+    :deep(.el-select__placeholder) {
+      --el-text-color-placeholder: var(--theme-text-muted);
+      font-weight: 600;
+    }
+  }
+}

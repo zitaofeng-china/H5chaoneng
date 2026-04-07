@@ -1,0 +1,24 @@
+@mixin dialog-style() {
+  :deep(.el-dialog) {
+    margin: 0 auto;
+    border-radius: 0;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 0;
+    display: block;
+
+    .el-dialog__headerbtn {
+      width: 32px;
+      height: 32px;
+      top: 16px;
+      right: 16px;
+      border-radius: 6px;
+      background: var(--theme-gray-bg-light);
+
+      .el-dialog__close {
+        color: var(--theme-text-white);
+      }
+    }
+  }
+}
