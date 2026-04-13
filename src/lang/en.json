@@ -21,6 +21,7 @@
     "trx": "TRX",
     "usdt": "USDT",
     "day": "Day",
+    "hour": "Hour",
     "purchase": "Count",
     "w": "W",
     "65000": "65000",
@@ -167,10 +168,11 @@
     "byTime": "Rent by Time",
     "byCount": "Rent by Count",
     "selectCount1Hour": "Please select count, valid for 1 hour",
-    "selectCount3Days": "Please select count, valid for 3 days",
+    "selectCount3Hours": "Please select count, valid for 3 hours",
     "selectCount1Day": "Please select count, valid for 1 day",
+    "selectCount3Days": "Please select count, valid for 3 days",
     "selectCount7Days": "Please select count, valid for 7 days",
-    "selectCount15Hours": "Please select count, valid for 15 hours",
+    "selectCount15Days": "Please select count, valid for 15 days",
     "selectCount30Days": "Please select count, valid for 30 days",
     "rentalDetails": "Rental Details",
     "unitPrice": "Unit Price",
@@ -327,6 +329,27 @@
     "newPassword": "New Password",
     "newPasswordPlaceholder": "Please enter new password",
     "button": "Change Password"
+  },
+  "error": {
+    "unknown": "Unknown error",
+    "badRequest": "Bad request parameters",
+    "badGateway": "Bad gateway",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "maintenance": "System under maintenance, please try again later",
+    "paramsError": "Parameter error",
+    "notFound": "Requested resource not found"
+  },
+  "network": {
+    "error": "Network connection failed, please check your network settings",
+    "timeout": "Request timeout, please try again later"
+  },
+  "server": {
+    "error": "Server error, please try again later"
+  },
+  "auth": {
+    "tokenExpired": "Login expired, please login again",
+    "tokenInvalid": "Invalid login information, please login again",
+    "permissionDenied": "Insufficient permissions, access denied"
   },
   "formValidation": {
     "unitPriceRequired": "Please enter unit price",

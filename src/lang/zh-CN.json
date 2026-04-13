@@ -21,6 +21,7 @@
     "trx": "TRX",
     "usdt": "USDT",
     "day": "天",
+    "hour": "小时",
     "purchase": "笔",
     "w": "W",
     "65000": "65000",
@@ -167,10 +168,11 @@
     "byTime": "按时间租用",
     "byCount": "按笔数租用",
     "selectCount1Hour": "请选择笔数，有效1小时",
-    "selectCount3Days": "请选择笔数，有效3天",
+    "selectCount3Hours": "请选择笔数，有效3小时",
     "selectCount1Day": "请选择笔数，有效1天",
+    "selectCount3Days": "请选择笔数，有效3天",
     "selectCount7Days": "请选择笔数，有效7天",
-    "selectCount15Hours": "请选择笔数，有效15小时",
+    "selectCount15Days": "请选择笔数，有效15天",
     "selectCount30Days": "请选择笔数，有效30天",
     "rentalDetails": "租用详情",
     "unitPrice": "单笔",
@@ -327,6 +329,27 @@
     "newPassword": "新密码",
     "newPasswordPlaceholder": "请输入新密码",
     "button": "修改密码"
+  },
+  "error": {
+    "unknown": "未知错误",
+    "badRequest": "请求参数错误",
+    "badGateway": "网关错误",
+    "serviceUnavailable": "服务暂时不可用",
+    "maintenance": "系统维护中，请稍后再试",
+    "paramsError": "参数错误",
+    "notFound": "请求的资源不存在"
+  },
+  "network": {
+    "error": "网络连接失败，请检查网络设置",
+    "timeout": "请求超时，请稍后重试"
+  },
+  "server": {
+    "error": "服务器错误，请稍后重试"
+  },
+  "auth": {
+    "tokenExpired": "登录已过期，请重新登录",
+    "tokenInvalid": "登录信息无效，请重新登录",
+    "permissionDenied": "权限不足，无法访问"
   },
   "formValidation": {
     "unitPriceRequired": "请输入单价",

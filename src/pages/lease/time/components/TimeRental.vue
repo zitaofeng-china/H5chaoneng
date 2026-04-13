@@ -64,10 +64,11 @@
           </el-form-item>
 
           <el-form-item :label="t('lease.validity')" prop="validity">
-            <el-input :model-value="validity" :class="{ 'm-input': isMobile }" disabled>
-              <template #prefix v-if="isMobile">{{ t('lease.validity') }}</template>
-              <template #suffix> {{ t('common.day') }} </template>
+            <el-input v-model="validity" disabled class="m-input" v-if="isMobile">
+              <template #prefix>{{ t('lease.validity') }}</template>
+              <template #suffix> {{ validityUnit }} </template>
             </el-input>
+            <el-input :model-value="validity + ' ' + validityUnit" disabled v-else />
           </el-form-item>
 
           <el-form-item :label="t('lease.walletAddress')" prop="wallet">
@@ -138,6 +139,32 @@ const { isMobile } = storeToRefs(commonStore)
 const rows = computed(() => [
   {
     label: t('lease.selectCount1Hour'),
+    validity: 1,
+    validityUnit: 'hour', // 小时
+    options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
+      `10${t('common.purchase')}`,
+      t('lease.custom'),
+    ],
+  },
+  {
+    label: t('lease.selectCount3Hours'),
+    validity: 3,
+    validityUnit: 'hour', // 小时
+    options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
+      `10${t('common.purchase')}`,
+      t('lease.custom'),
+    ],
+  },
+  {
+    label: t('lease.selectCount1Day'),
+    validity: 1,
+    validityUnit: 'day', // 天
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -148,61 +175,49 @@ const rows = computed(() => [
   },
   {
     label: t('lease.selectCount3Days'),
+    validity: 3,
+    validityUnit: 'day', // 天
     options: [
+      `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      t('lease.custom'),
-    ],
-  },
-  {
-    label: t('lease.selectCount1Day'),
-    options: [
-      `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
-      t('lease.custom'),
-    ],
-  },
-  {
-    label: t('lease.selectCount3Days'),
-    options: [
-      `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
       t('lease.custom'),
     ],
   },
   {
     label: t('lease.selectCount7Days'),
+    validity: 7,
+    validityUnit: 'day', // 天
     options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
       t('lease.custom'),
     ],
   },
   {
-    label: t('lease.selectCount15Hours'),
+    label: t('lease.selectCount15Days'),
+    validity: 15,
+    validityUnit: 'day', // 天
     options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
       t('lease.custom'),
     ],
   },
   {
     label: t('lease.selectCount30Days'),
+    validity: 30,
+    validityUnit: 'day', // 天
     options: [
+      `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
       t('lease.custom'),
     ],
   },
@@ -237,7 +252,15 @@ const count = computed(() => {
 })
 
 const energy = ref(13.0)
-const validity = ref(3)
+const validity = computed(() => {
+  const [rowIdx] = selecteIndex.value
+  return rows.value[rowIdx]?.validity || 1
+})
+const validityUnit = computed(() => {
+  const [rowIdx] = selecteIndex.value
+  const unit = rows.value[rowIdx]?.validityUnit || 'day'
+  return unit === 'hour' ? t('common.hour') : t('common.day')
+})
 const wallet = ref('')
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
