@@ -320,6 +320,29 @@
     "minTransfer": "1TRXより大きい金額は自由に送金可能",
     "checkAddress": "送金时请核对地址"
   },
+  "error": {
+    "unknown": "不明なエラー",
+    "badRequest": "リクエストパラメータエラー",
+    "badGateway": "ゲートウェイエラー",
+    "serviceUnavailable": "サービス一時的に利用不可",
+    "maintenance": "システムメンテナンス中、後ほどお試しください",
+    "paramsError": "パラメータエラー",
+    "notFound": "リクエストされたリソースが見つかりません",
+    "pageNotFound": "ページが見つかりません",
+    "pageNotFoundDesc": "申し訳ございません、お探しのページは存在しないか、代理リンクを通じてアクセスする必要があります"
+  },
+  "network": {
+    "error": "ネットワーク接続に失敗しました、ネットワーク設定を確認してください",
+    "timeout": "リクエストタイムアウト、後ほどお試しください"
+  },
+  "server": {
+    "error": "サーバーエラー、後ほどお試しください"
+  },
+  "auth": {
+    "tokenExpired": "ログインが期限切れです、再度ログインしてください",
+    "tokenInvalid": "ログイン情報が無効です、再度ログインしてください",
+    "permissionDenied": "権限不足、アクセスできません"
+  },
   "revisePassword": {
     "title": "パスワード変更",
     "account": "アカウント",

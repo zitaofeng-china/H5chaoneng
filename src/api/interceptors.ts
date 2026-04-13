@@ -15,6 +15,7 @@ import {
   SHOW_SUCCESS_URLS,
 } from './config'
 import type { ApiResponse } from './types'
+import { getAgentCode } from '@/utils/invite'
 
 /**
  * 判断是否需要 Token
@@ -52,9 +53,9 @@ function getToken(): string | null {
  */
 export function requestInterceptor(url: string, config: RequestInit): RequestInit {
   // 构建请求头
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     ...REQUEST_HEADERS,
-    ...(config.headers || {}),
+    ...(config.headers as Record<string, string> || {}),
   }
 
   // 添加 Token
@@ -63,6 +64,12 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
     if (token) {
       headers['Authorization'] = `Bearer ${token}`
     }
+  }
+
+  // 添加代理标识到请求头
+  const agentCode = getAgentCode()
+  if (agentCode) {
+    headers['X-Agent-Code'] = agentCode
   }
 
   // 添加时间戳（防止缓存）

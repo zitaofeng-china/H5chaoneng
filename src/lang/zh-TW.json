@@ -318,6 +318,29 @@
     "minTransfer": "可轉入大於1TRX的任意金額",
     "checkAddress": "轉帳時請核對地址"
   },
+  "error": {
+    "unknown": "未知錯誤",
+    "badRequest": "請求參數錯誤",
+    "badGateway": "網關錯誤",
+    "serviceUnavailable": "服務暫時不可用",
+    "maintenance": "系統維護中，請稍後再試",
+    "paramsError": "參數錯誤",
+    "notFound": "請求的資源不存在",
+    "pageNotFound": "頁面未找到",
+    "pageNotFoundDesc": "抱歉，您訪問的頁面不存在或需要通過代理鏈接訪問"
+  },
+  "network": {
+    "error": "網絡連接失敗，請檢查網絡設置",
+    "timeout": "請求超時，請稍後重試"
+  },
+  "server": {
+    "error": "服務器錯誤，請稍後重試"
+  },
+  "auth": {
+    "tokenExpired": "登入已過期，請重新登入",
+    "tokenInvalid": "登入信息無效，請重新登入",
+    "permissionDenied": "權限不足，無法訪問"
+  },
   "revisePassword": {
     "title": "修改密碼",
     "account": "帳號",

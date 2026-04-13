@@ -320,6 +320,29 @@
     "minTransfer": "1TRX'den büyük herhangi bir miktar transfer edilebilir",
     "checkAddress": "Transfer yaparken lütfen adresi doğrulayın"
   },
+  "error": {
+    "unknown": "Bilinmeyen hata",
+    "badRequest": "Hatalı istek parametreleri",
+    "badGateway": "Ağ geçidi hatası",
+    "serviceUnavailable": "Hizmet geçici olarak kullanılamıyor",
+    "maintenance": "Sistem bakımda, lütfen daha sonra tekrar deneyin",
+    "paramsError": "Parametre hatası",
+    "notFound": "İstenen kaynak bulunamadı",
+    "pageNotFound": "Sayfa bulunamadı",
+    "pageNotFoundDesc": "Üzgünüz, aradığınız sayfa mevcut değil veya bir acente bağlantısı üzerinden erişim gerektirir"
+  },
+  "network": {
+    "error": "Ağ bağlantısı başarısız, ağ ayarlarını kontrol edin",
+    "timeout": "İstek zaman aşımı, lütfen daha sonra tekrar deneyin"
+  },
+  "server": {
+    "error": "Sunucu hatası, lütfen daha sonra tekrar deneyin"
+  },
+  "auth": {
+    "tokenExpired": "Oturum süresi doldu, lütfen tekrar giriş yapın",
+    "tokenInvalid": "Geçersiz giriş bilgisi, lütfen tekrar giriş yapın",
+    "permissionDenied": "Yetersiz izin, erişim reddedildi"
+  },
   "revisePassword": {
     "title": "Şifre Değiştir",
     "account": "Hesap",

@@ -320,6 +320,29 @@
     "minTransfer": "Se puede transferir cualquier monto mayor a 1TRX",
     "checkAddress": "Por favor verifique la dirección durante la transferencia"
   },
+  "error": {
+    "unknown": "Error desconocido",
+    "badRequest": "Parámetros de solicitud incorrectos",
+    "badGateway": "Error de puerta de enlace",
+    "serviceUnavailable": "Servicio temporalmente no disponible",
+    "maintenance": "Sistema en mantenimiento, inténtelo más tarde",
+    "paramsError": "Error de parámetros",
+    "notFound": "Recurso solicitado no encontrado",
+    "pageNotFound": "Página no encontrada",
+    "pageNotFoundDesc": "Lo sentimos, la página que busca no existe o requiere acceso a través de un enlace de agente"
+  },
+  "network": {
+    "error": "Error de conexión de red, verifique la configuración de red",
+    "timeout": "Tiempo de espera de solicitud agotado, inténtelo más tarde"
+  },
+  "server": {
+    "error": "Error del servidor, inténtelo más tarde"
+  },
+  "auth": {
+    "tokenExpired": "Sesión expirada, inicie sesión nuevamente",
+    "tokenInvalid": "Información de inicio de sesión no válida, inicie sesión nuevamente",
+    "permissionDenied": "Permisos insuficientes, acceso denegado"
+  },
   "revisePassword": {
     "title": "Cambiar Contraseña",
     "account": "Cuenta",
