@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. 모든 권리 보유"
+    "copyright": "© 2026 GAS711. 모든 권리 보유",
+    "rightsReserved": "모든 권리 보유"
   },
   "lease": {
     "byTime": "시간당 대여",
@@ -188,6 +189,8 @@
     "100Count": "100건",
     "200Count": "200건",
     "custom": "사용자 지정",
+    "customCount": "사용자 지정 수량",
+    "enterCustomCount": "사용자 지정 수량을 입력해주세요",
     "trxUnit": "TRX",
     "dayUnit": "일",
     "wUnit": "W"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "에너지는 0보다 커야 합니다",
     "validityMustBePositive": "유효기간은 0보다 커야 합니다",
     "countMustBePositive": "건수는 0보다 커야 합니다",
+    "countRequired": "수량을 입력해주세요",
+    "countMustBeNumber": "수량은 숫자여야 합니다",
+    "countTooLarge": "수량은 1000을 초과할 수 없습니다",
     "unitMustBePositive": "단위는 0보다 커야 합니다",
     "rentalSuccess": "대여 시작, 지불",
     "addressSaveSuccess": "주소가 성공적으로 저장되었습니다",
     "enterAddressToSave": "저장할 주소를 입력해주세요",
     "enterOrSelectAddress": "주소를 입력하거나 선택해주세요",
     "renting": "{energy} 에너지 대여 중...",
-    "energyAdded": "{energy} 에너지가 성공적으로 주소에 추가되었습니다"
+    "energyAdded": "{energy} 에너지가 성공적으로 주소에 추가되었습니다",
+    "customCountSet": "사용자 지정 수량이 성공적으로 설정되었습니다"
   }
 }

@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. Tüm hakları saklıdır"
+    "copyright": "© 2026 GAS711. Tüm hakları saklıdır",
+    "rightsReserved": "Tüm hakları saklıdır"
   },
   "lease": {
     "byTime": "Zamana Göre Kiralama",
@@ -188,6 +189,8 @@
     "100Count": "100 Adet",
     "200Count": "200 Adet",
     "custom": "Özel",
+    "customCount": "Özel Miktar",
+    "enterCustomCount": "Lütfen özel miktar girin",
     "trxUnit": "TRX",
     "dayUnit": "Gün",
     "wUnit": "W"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "Enerji 0'dan büyük olmalıdır",
     "validityMustBePositive": "Geçerlilik 0'dan büyük olmalıdır",
     "countMustBePositive": "Adet 0'dan büyük olmalıdır",
+    "countRequired": "Lütfen miktar girin",
+    "countMustBeNumber": "Miktar sayı olmalıdır",
+    "countTooLarge": "Miktar 1000'i aşamaz",
     "unitMustBePositive": "Birim 0'dan büyük olmalıdır",
     "rentalSuccess": "Kiralama başlat, öde",
     "addressSaveSuccess": "Adres başarıyla kaydedildi",
     "enterAddressToSave": "Lütfen kaydedilecek adresi girin",
     "enterOrSelectAddress": "Lütfen adresi girin veya seçin",
     "renting": "{energy} enerjisi kiralanıyor...",
-    "energyAdded": "{energy} enerjisi adresinize başarıyla eklendi"
+    "energyAdded": "{energy} enerjisi adresinize başarıyla eklendi",
+    "customCountSet": "Özel miktar başarıyla ayarlandı"
   }
 }

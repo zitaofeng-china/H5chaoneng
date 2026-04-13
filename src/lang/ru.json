@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. Все права защищены"
+    "copyright": "© 2026 GAS711. Все права защищены",
+    "rightsReserved": "Все права защищены"
   },
   "lease": {
     "byTime": "Аренда по времени",
@@ -188,6 +189,8 @@
     "100Count": "100 штук",
     "200Count": "200 штук",
     "custom": "Настраиваемый",
+    "customCount": "Настраиваемое Количество",
+    "enterCustomCount": "Пожалуйста, введите настраиваемое количество",
     "trxUnit": "TRX",
     "dayUnit": "День",
     "wUnit": "W"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "Энергия должна быть больше 0",
     "validityMustBePositive": "Срок действия должен быть больше 0",
     "countMustBePositive": "Количество должно быть больше 0",
+    "countRequired": "Пожалуйста, введите количество",
+    "countMustBeNumber": "Количество должно быть числом",
+    "countTooLarge": "Количество не может превышать 1000",
     "unitMustBePositive": "Единица должна быть больше 0",
     "rentalSuccess": "Инициировать аренду, оплатить",
     "addressSaveSuccess": "Адрес успешно сохранён",
     "enterAddressToSave": "Пожалуйста, введите адрес для сохранения",
     "enterOrSelectAddress": "Пожалуйста, введите или выберите адрес",
     "renting": "Аренда энергии {energy}...",
-    "energyAdded": "Энергия {energy} успешно добавлена на ваш адрес"
+    "energyAdded": "Энергия {energy} успешно добавлена на ваш адрес",
+    "customCountSet": "Настраиваемое количество успешно установлено"
   }
 }

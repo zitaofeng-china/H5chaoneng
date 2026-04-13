@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. 保留所有权利"
+    "copyright": "© 2026 GAS711. 保留所有权利",
+    "rightsReserved": "保留所有权利"
   },
   "lease": {
     "byTime": "按时间租用",
@@ -188,6 +189,8 @@
     "100Count": "100笔",
     "200Count": "200笔",
     "custom": "自定义",
+    "customCount": "自定义数量",
+    "enterCustomCount": "请输入自定义数量",
     "trxUnit": "TRX",
     "dayUnit": "天",
     "wUnit": "W"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "能量必须大于 0",
     "validityMustBePositive": "有效期必须大于 0",
     "countMustBePositive": "笔数必须大于 0",
+    "countRequired": "请输入数量",
+    "countMustBeNumber": "数量必须是数字",
+    "countTooLarge": "数量不能超过1000",
     "unitMustBePositive": "单笔必须大于 0",
     "rentalSuccess": "发起租用，支付",
     "addressSaveSuccess": "地址保存成功",
     "enterAddressToSave": "请输入要保存的地址",
     "enterOrSelectAddress": "请输入或选择地址",
     "renting": "正在租用 {energy} 能量...",
-    "energyAdded": "{energy} 能量已成功添加到您的地址"
+    "energyAdded": "{energy} 能量已成功添加到您的地址",
+    "customCountSet": "自定义数量设置成功"
   }
 }

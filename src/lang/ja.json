@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. 無断複写・転載を禁じます"
+    "copyright": "© 2026 GAS711. 無断複写・転載を禁じます",
+    "rightsReserved": "無断複写・転載を禁じます"
   },
   "lease": {
     "byTime": "時間レンタル",
@@ -188,6 +189,8 @@
     "100Count": "100件",
     "200Count": "200件",
     "custom": "カスタム",
+    "customCount": "カスタム数量",
+    "enterCustomCount": "カスタム数量を入力してください",
     "trxUnit": "TRX",
     "dayUnit": "日",
     "wUnit": "W"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "エネルギーは0より大きい必要があります",
     "validityMustBePositive": "有効期間は0より大きい必要があります",
     "countMustBePositive": "件数は0より大きい必要があります",
+    "countRequired": "数量を入力してください",
+    "countMustBeNumber": "数量は数字である必要があります",
+    "countTooLarge": "数量は1000を超えることはできません",
     "unitMustBePositive": "単価は0より大きい必要があります",
     "rentalSuccess": "レンタル開始、支払い",
     "addressSaveSuccess": "住所が正常に保存されました",
     "enterAddressToSave": "保存する住所を入力してください",
     "enterOrSelectAddress": "住所を入力或は選択してください",
     "renting": "{energy} エネルギーをレンタル中...",
-    "energyAdded": "{energy} エネルギーが正常にご使用の住所に追加されました"
+    "energyAdded": "{energy} エネルギーが正常にご使用の住所に追加されました",
+    "customCountSet": "カスタム数量が正常に設定されました"
   }
 }

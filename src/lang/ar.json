@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. جميع الحقوق محفوظة"
+    "copyright": "© 2026 GAS711. جميع الحقوق محفوظة",
+    "rightsReserved": "جميع الحقوق محفوظة"
   },
   "lease": {
     "byTime": "التأجير بالوقت",
@@ -188,6 +189,8 @@
     "100Count": "100 وحدة",
     "200Count": "200 وحدة",
     "custom": "مخصص",
+    "customCount": "كمية مخصصة",
+    "enterCustomCount": "الرجاء إدخال كمية مخصصة",
     "trxUnit": "TRX",
     "dayUnit": "يوم",
     "wUnit": "واط"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "الطاقة يجب أن تكون أكبر من 0",
     "validityMustBePositive": "فترة الصلاحية يجب أن تكون أكبر من 0",
     "countMustBePositive": "العدد يجب أن يكون أكبر من 0",
+    "countRequired": "الرجاء إدخال الكمية",
+    "countMustBeNumber": "الكمية يجب أن تكون رقمًا",
+    "countTooLarge": "الكمية لا يمكن أن تتجاوز 1000",
     "unitMustBePositive": "الوحدة يجب أن تكون أكبر من 0",
     "rentalSuccess": "بدء التأجير، دفع",
     "addressSaveSuccess": "تم حفظ العنوان بنجاح",
     "enterAddressToSave": "الرجاء إدخال العنوان للحفظ",
     "enterOrSelectAddress": "الرجاء إدخال أو اختيار العنوان",
     "renting": "جاري تأجير طاقة {energy}...",
-    "energyAdded": "تم إضافة طاقة {energy} إلى عنوانك بنجاح"
+    "energyAdded": "تم إضافة طاقة {energy} إلى عنوانك بنجاح",
+    "customCountSet": "تم تعيين الكمية المخصصة بنجاح"
   }
 }

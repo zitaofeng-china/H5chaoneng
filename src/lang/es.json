@@ -160,7 +160,8 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. Todos los derechos reservados"
+    "copyright": "© 2026 GAS711. Todos los derechos reservados",
+    "rightsReserved": "Todos los derechos reservados"
   },
   "lease": {
     "byTime": "Alquilar por Tiempo",
@@ -188,6 +189,8 @@
     "100Count": "100 Unidades",
     "200Count": "200 Unidades",
     "custom": "Personalizado",
+    "customCount": "Cantidad Personalizada",
+    "enterCustomCount": "Por favor ingrese cantidad personalizada",
     "trxUnit": "TRX",
     "dayUnit": "Día",
     "wUnit": "W"
@@ -338,12 +341,16 @@
     "energyMustBePositive": "La energía debe ser mayor a 0",
     "validityMustBePositive": "La validez debe ser mayor a 0",
     "countMustBePositive": "La cantidad debe ser mayor a 0",
+    "countRequired": "Por favor ingrese cantidad",
+    "countMustBeNumber": "La cantidad debe ser un número",
+    "countTooLarge": "La cantidad no puede exceder 1000",
     "unitMustBePositive": "La unidad debe ser mayor a 0",
     "rentalSuccess": "Iniciar alquiler, pagar",
     "addressSaveSuccess": "Dirección guardada exitosamente",
     "enterAddressToSave": "Por favor ingrese la dirección a guardar",
     "enterOrSelectAddress": "Por favor ingrese o seleccione la dirección",
     "renting": "Alquilando energía {energy}...",
-    "energyAdded": "La energía {energy} ha sido agregada exitosamente a su dirección"
+    "energyAdded": "La energía {energy} ha sido agregada exitosamente a su dirección",
+    "customCountSet": "Cantidad personalizada establecida exitosamente"
   }
 }

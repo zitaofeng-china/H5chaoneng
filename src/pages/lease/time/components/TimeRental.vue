@@ -12,7 +12,7 @@
               v-for="(opt, idx) in row.options"
               :key="idx"
               :class="['pill', selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
-              @click="onSelect(rIdx, idx)"
+              @click="onSelect(rIdx, idx, opt)"
             >
               {{ opt }}
             </button>
@@ -82,6 +82,33 @@
         </el-form>
       </div>
     </div>
+
+    <!-- 自定义数量对话框 -->
+    <el-dialog
+      v-model="customDialogVisible"
+      :title="t('lease.customCount')"
+      width="400px"
+      :close-on-click-modal="false"
+      align-center
+    >
+      <el-form :model="customForm" :rules="customRules" ref="customFormRef" label-width="80px">
+        <el-form-item :label="t('lease.count')" prop="count">
+          <el-input
+            v-model.number="customForm.count"
+            type="number"
+            :placeholder="t('lease.enterCustomCount')"
+            clearable
+            @keyup.enter="confirmCustomCount"
+          >
+            <template #suffix>{{ t('common.purchase') }}</template>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="customDialogVisible = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="confirmCustomCount">{{ t('common.confirm') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -183,11 +210,29 @@ const rows = computed(() => [
 
 const selecteIndex = ref<[number, number]>([0, 0])
 
+// 自定义对话框状态
+const customDialogVisible = ref(false)
+const customFormRef = ref<FormInstance>()
+const customForm = reactive({
+  count: 1,
+})
+const customRowIndex = ref<number>(0)
+
+// 存储自定义数量
+const customCounts = ref<Record<number, number>>({})
+
 const unitPrice = ref(1.9)
 const count = computed(() => {
-  const first =
-    rows.value[selecteIndex.value[0]]?.options[selecteIndex.value[1]] || `1${t('common.purchase')}`
-  const num = parseInt(String(first).replace(/[^0-9]/g, '')) || 1
+  const [rowIdx, colIdx] = selecteIndex.value
+  const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
+
+  // 如果是自定义，使用保存的自定义数量
+  if (opt === t('lease.custom')) {
+    return customCounts.value[rowIdx] || 1
+  }
+
+  // 否则从选项文本中提取数字
+  const num = parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
   return num
 })
 
@@ -280,6 +325,26 @@ const rules = computed<FormRules<RentalForm>>(() => ({
   ],
 }))
 
+// 自定义表单验证规则
+const customRules = computed<FormRules>(() => ({
+  count: [
+    { required: true, message: t('formValidation.countRequired'), trigger: 'blur' },
+    { type: 'number', message: t('formValidation.countMustBeNumber'), trigger: 'blur' },
+    {
+      validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
+        if (value <= 0) {
+          callback(new Error(t('formValidation.countMustBePositive')))
+        } else if (value > 1000) {
+          callback(new Error(t('formValidation.countTooLarge')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+}))
+
 watch([unitPrice, count, total, energy, validity], () => {
   form.unitPrice = unitPrice.value
   form.count = count.value
@@ -290,8 +355,30 @@ watch([unitPrice, count, total, energy, validity], () => {
 
 watch(wallet, (v) => (form.wallet = v))
 
-function onSelect(rowIdx: number, idx: number) {
+function onSelect(rowIdx: number, idx: number, opt: string) {
   selecteIndex.value = [rowIdx, idx]
+
+  // 判断是否点击了"自定义"
+  if (opt === t('lease.custom')) {
+    customRowIndex.value = rowIdx
+    customForm.count = customCounts.value[rowIdx] || 1
+    customDialogVisible.value = true
+  }
+}
+
+// 确认自定义数量
+const confirmCustomCount = async () => {
+  if (!customFormRef.value) return
+
+  try {
+    await customFormRef.value.validate()
+    // 保存自定义数量
+    customCounts.value[customRowIndex.value] = customForm.count
+    customDialogVisible.value = false
+    ElMessage.success(t('formValidation.customCountSet'))
+  } catch (error) {
+    console.error('Validation failed:', error)
+  }
 }
 
 const rentNow = async () => {
