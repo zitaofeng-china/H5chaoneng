@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="navbar-container">
-      <div class="logo-section" @click.stop="handleToRouter('')">
+      <div class="logo-section" @click.stop="handleToRouter('/')">
         <div class="logo-icon">
           <img src="@/assets/images/logo.png" alt="Logo" />
         </div>
@@ -22,8 +22,8 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('') }"
-                  @click="handleToRouter('')"
+                  :class="{ 'is-active': isActive('/') }"
+                  @click="handleToRouter('/')"
                 >
                   {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
@@ -79,25 +79,25 @@
               <el-dropdown-menu>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#question') }"
-                  @click.stop="handleToRouter('', '#question')"
+                  @click.stop="handleToRouter('/', '#question')"
                 >
                   {{ $t('nav.faq') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#feature') }"
-                  @click.stop="handleToRouter('', '#feature')"
+                  @click.stop="handleToRouter('/', '#feature')"
                 >
                   {{ $t('nav.features') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#howItWorks') }"
-                  @click.stop="handleToRouter('', '#howItWorks')"
+                  @click.stop="handleToRouter('/', '#howItWorks')"
                 >
                   {{ $t('nav.howItWorks') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#fee') }"
-                  @click.stop="handleToRouter('', '#fee')"
+                  @click.stop="handleToRouter('/', '#fee')"
                 >
                   {{ $t('nav.fee') }}
                 </el-dropdown-item>
@@ -196,8 +196,8 @@
         <div class="menu-wrap">
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('') }"
-            @click="handleToRouter('')"
+            :class="{ 'is-active': isActive('/') }"
+            @click="handleToRouter('/')"
           >
             {{ $t('nav.quickRent') }}
           </div>
@@ -246,28 +246,28 @@
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#question') }"
-            @click.stop="handleToRouter('', '#question')"
+            @click.stop="handleToRouter('/', '#question')"
           >
             {{ $t('nav.faq') }}
           </div>
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#feature') }"
-            @click.stop="handleToRouter('', '#feature')"
+            @click.stop="handleToRouter('/', '#feature')"
           >
             {{ $t('nav.features') }}
           </div>
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#howItWorks') }"
-            @click.stop="handleToRouter('', '#howItWorks')"
+            @click.stop="handleToRouter('/', '#howItWorks')"
           >
             {{ $t('nav.howItWorks') }}
           </div>
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#fee') }"
-            @click.stop="handleToRouter('', '#fee')"
+            @click.stop="handleToRouter('/', '#fee')"
           >
             {{ $t('nav.fee') }}
           </div>
@@ -322,7 +322,7 @@ const lang = reactive({
 
 const isActiveHome = computed(() => {
   const site = getSite()
-  const homePaths = [`/${site}`, `/${site}/lease/time`, `/${site}/lease/count`]
+  const homePaths = [`/${site}/`, `/${site}/lease/time`, `/${site}/lease/count`]
   return homePaths.includes(route.path as string)
 })
 
@@ -341,7 +341,8 @@ const { logout } = userStore
 
 const isActive = (path: string) => {
   const site = getSite()
-  const fullPath = site ? `/${site}${path}` : path
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const fullPath = `/${site}${normalizedPath}`
   return route.path === fullPath
 }
 
@@ -353,9 +354,11 @@ const handleToRouter = (path: string, hash?: string) => {
   const site = getSite()
   
   // 构建完整路径：/:site/path
-  const fullPath = `/${site}${path}`
+  // 确保 path 以 / 开头
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const fullPath = `/${site}${normalizedPath}`
   
-  console.log('[Header] 跳转路由:', { site, path, fullPath, hash })
+  console.log('[Header] 跳转路由:', { site, path, normalizedPath, fullPath, hash })
   
   router.push({ path: fullPath, hash })
 

@@ -25,6 +25,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { handleOpenToTelegram } from '@/utils'
+import { getSite } from '@/utils/site'
 
 defineOptions({
   name: 'HelpSection',
@@ -37,7 +38,8 @@ const handleContactService = () => {
 }
 
 const handleViewProblems = () => {
-  router.push({ path: '/', hash: '#question' })
+  const site = getSite()
+  router.push({ path: `/${site}/`, hash: '#question' })
 }
 </script>
 
