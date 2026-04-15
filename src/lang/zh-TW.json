@@ -249,6 +249,12 @@
     "tips3": "切勿用交易所錢包轉帳",
     "tips4": "轉帳時請核對準確能量租賃錢包地址",
     "tips5": "如有轉錯或其他疑問，請聯繫客服",
+    "minUsdtError": "最低兌換金額為 {min} USDT",
+    "maxUsdtError": "最大兌換金額為 {max} USDT",
+    "minTrxError": "最低兌換金額為 {min} TRX",
+    "maxTrxError": "最大兌換金額為 {max} TRX",
+    "minExchange": "最小 {min} 起兌",
+    "maxExchange": "最大不超過 {max}",
     "usdtMinTip": "2 USDT 起兌，最大不超過70000 USDT",
     "trxMinTip": "10 TRX 起兌，最大不超過100000 TRX"
   },
@@ -267,7 +273,8 @@
     "title": "費用說明",
     "65000Energy": "使用65000能量：3TRX/筆",
     "131000Energy": "使用131000能量：5TRX/筆",
-    "activationPrice": "激活單價：1.2 TRX"
+    "activationPrice": "激活單價：1.2 TRX",
+    "activationPriceLabel": "激活單價"
   },
   "login": {
     "title": "登入",

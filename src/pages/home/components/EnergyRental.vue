@@ -109,12 +109,15 @@ import { type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
 import { storeToRefs } from 'pinia'
 
 const { t } = useI18n()
 const langStore = useLangStore()
 const commonStore = useCommonStore()
+const priceStore = usePriceStore()
 const { isMobile } = storeToRefs(commonStore)
+const { priceData } = storeToRefs(priceStore)
 
 const activeTab = ref('balance')
 const formRef = ref<FormInstance>()
@@ -126,7 +129,7 @@ const energyOptions = ref([
 
 const formData = reactive({
   energy: 65000,
-  unitPrice: '1.9',
+  unitPrice: computed(() => priceData.value?.stroke || '1.9'),
   address: '',
   selectedAddress: '',
 })

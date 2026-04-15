@@ -40,19 +40,24 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import FeeCard from '@/components/feeCard/index.vue'
 import KindTips from '@/components/kindTips/index.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
 
 const { t } = useI18n()
 const commonStore = useCommonStore()
+const priceStore = usePriceStore()
 const { isMobile } = storeToRefs(commonStore)
 
-const feeCardTexts = computed<string[]>(() => [t('feeCard.activationPrice')])
+const feeCardTexts = computed<string[]>(() => {
+  const activationPrice = priceStore.priceData?.active || '1.2'
+  return [`${t('feeCard.activationPriceLabel')}：${activationPrice} TRX`]
+})
 
 const kindTipTexts = computed<string[]>(() => [t('activation.tips1'), t('activation.tips2')])
 
@@ -92,6 +97,11 @@ const handleSaveAddress = async () => {
     console.error('Form validation failed:', error)
   }
 }
+
+// 初始化时获取价格
+onMounted(() => {
+  priceStore.fetchPrice()
+})
 </script>
 
 <style lang="scss" scoped>

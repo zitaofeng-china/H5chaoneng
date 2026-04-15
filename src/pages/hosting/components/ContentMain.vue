@@ -32,7 +32,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import type { FormInstance, FormRules } from 'element-plus'
@@ -40,12 +40,21 @@ import FeeCard from '@/components/feeCard/index.vue'
 import KindTips from '@/components/kindTips/index.vue'
 import AddressList from './AddressList.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
 
 const { t } = useI18n()
 const commonStore = useCommonStore()
+const priceStore = usePriceStore()
 const { isMobile } = storeToRefs(commonStore)
 
-const texts = computed(() => [t('hosting.65000EnergyFee'), t('hosting.131000EnergyFee')])
+const texts = computed(() => {
+  const price65k = priceStore.priceData?.hosting_65k || '3'
+  const price131k = priceStore.priceData?.hosting_131k || '5'
+  return [
+    `${t('hosting.use65000Energy')}：${price65k}TRX/${t('common.purchase')}`,
+    `${t('hosting.use131000Energy')}：${price131k}TRX/${t('common.purchase')}`,
+  ]
+})
 
 const tips = computed(() => [
   t('hosting.tips1'),
@@ -84,6 +93,11 @@ const handleSaveAddress = async () => {
     console.error('【ERROR INFO】:', error)
   }
 }
+
+// 初始化时获取价格
+onMounted(() => {
+  priceStore.fetchPrice()
+})
 </script>
 
 <style lang="scss" scoped>

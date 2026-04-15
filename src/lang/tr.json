@@ -251,6 +251,12 @@
     "tips3": "Borsa cüzdanı kullanarak transfer yapmayın",
     "tips4": "Transfer yaparken lütfen enerji kiralama cüzdanı adresini doğrulayın",
     "tips5": "Yanlış transfer veya diğer sorular için lütfen müşteri hizmetleriyle iletişime geçin",
+    "minUsdtError": "Minimum değişim tutarı {min} USDT",
+    "maxUsdtError": "Maksimum değişim tutarı {max} USDT",
+    "minTrxError": "Minimum değişim tutarı {min} TRX",
+    "maxTrxError": "Maksimum değişim tutarı {max} TRX",
+    "minExchange": "Minimum {min} değişim",
+    "maxExchange": "Maksimum {max}",
     "usdtMinTip": "Minimum 2 USDT, maksimum 70000 USDT",
     "trxMinTip": "Minimum 10 TRX, maksimum 100000 TRX"
   },
@@ -269,7 +275,8 @@
     "title": "Ücret Açıklaması",
     "65000Energy": "65000 enerji kullanımı: 3TRX/adet",
     "131000Energy": "131000 enerji kullanımı: 5TRX/adet",
-    "activationPrice": "Aktivasyon Fiyatı: 1.2 TRX"
+    "activationPrice": "Aktivasyon Fiyatı: 1.2 TRX",
+    "activationPriceLabel": "Aktivasyon Fiyatı"
   },
   "login": {
     "title": "Giriş Yap",

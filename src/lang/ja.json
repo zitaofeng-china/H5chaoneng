@@ -251,6 +251,12 @@
     "tips3": "取引所ウォレットで送金しないでください",
     "tips4": "送金时请核对准确的能量租赁钱包地址",
     "tips5": "送金错误或其他疑问の場合カスタマーサービスに連絡してください",
+    "minUsdtError": "最小交換金額は {min} USDT です",
+    "maxUsdtError": "最大交換金額は {max} USDT です",
+    "minTrxError": "最小交換金額は {min} TRX です",
+    "maxTrxError": "最大交換金額は {max} TRX です",
+    "minExchange": "最小 {min}から交換",
+    "maxExchange": "最大 {max}",
     "usdtMinTip": "最小 2 USDT、最大 70000 USDT",
     "trxMinTip": "最小 10 TRX、最大 100000 TRX"
   },
@@ -269,7 +275,8 @@
     "title": "料金説明",
     "65000Energy": "65000エネルギー使用：3TRX/件",
     "131000Energy": "131000エネルギー使用：5TRX/件",
-    "activationPrice": "活性化単価：1.2 TRX"
+    "activationPrice": "活性化単価：1.2 TRX",
+    "activationPriceLabel": "活性化単価"
   },
   "login": {
     "title": "ログイン",

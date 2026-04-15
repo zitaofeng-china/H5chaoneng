@@ -6,7 +6,7 @@
         <span class="rate-coin-symbol">{{ t('common.trx') }}</span>
       </span>
       <span class="rate-coin" v-else>
-        1<span class="rate-coin-symbol">{{ coin.toUpperCase() }}≈{{ rate }}</span>
+        10<span class="rate-coin-symbol">{{ coin.toUpperCase() }}≈{{ rate }}</span>
         <span class="rate-coin-symbol">{{ t('common.usdt') }}</span>
       </span>
       <div class="rate-label">{{ t('contract.realtimeRate') }}</div>

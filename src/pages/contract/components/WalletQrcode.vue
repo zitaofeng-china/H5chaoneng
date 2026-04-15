@@ -37,9 +37,11 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useClipboard } from '@vueuse/core'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
+import { usePriceStore } from '@/stores/usePriceStore'
 import KindTips from '@/components/kindTips/index.vue'
 
 const { t } = useI18n()
+const priceStore = usePriceStore()
 
 interface Props {
   coin: string
@@ -52,6 +54,15 @@ const props = withDefaults(defineProps<Props>(), {
 const walletAddress = ref('TMpHUncdDoCmaAADteBvSGBzRjAbXiB2pE')
 const isCopying = ref(false)
 
+// 获取最大额度
+const maxLimits = computed(() => {
+  if (!priceStore.priceData) return { usdt: 70000, trx: 100000 }
+  return {
+    usdt: Number.parseFloat(priceStore.priceData.max_usdt_2_trx) || 70000,
+    trx: Number.parseFloat(priceStore.priceData.max_trx_2_usdt) || 100000,
+  }
+})
+
 const tips = computed(() => [
   t('contract.tips1'),
   t('contract.tips2'),
@@ -60,11 +71,14 @@ const tips = computed(() => [
   t('contract.tips5'),
 ])
 
-const getCoinTips = computed(() =>
-  props.coin.toUpperCase() === 'USDT'
-    ? [t('contract.usdtMinTip')].concat(tips.value)
-    : [t('contract.trxMinTip')].concat(tips.value),
-)
+const getCoinTips = computed(() => {
+  const maxUsdt = maxLimits.value.usdt
+  const maxTrx = maxLimits.value.trx
+  
+  return props.coin.toUpperCase() === 'USDT'
+    ? [`${t('contract.minExchange', { min: 2 })} USDT，${t('contract.maxExchange', { max: maxUsdt })} USDT`].concat(tips.value)
+    : [`${t('contract.minExchange', { min: 10 })} TRX，${t('contract.maxExchange', { max: maxTrx })} TRX`].concat(tips.value)
+})
 
 const qrCode = useQRCode(walletAddress)
 const { copy } = useClipboard()

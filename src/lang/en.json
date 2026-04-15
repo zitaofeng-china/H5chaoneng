@@ -219,6 +219,8 @@
     "address": "Address to Host",
     "enterAddresses": "Please enter addresses, multiple addresses separated by English comma, or one address per line",
     "confirm": "Confirm",
+    "use65000Energy": "Using 65000 energy",
+    "use131000Energy": "Using 131000 energy",
     "tips1": "Using hosting mode requires balance greater than 30TRX",
     "tips2": "Your hosted addresses will always maintain 13.1W energy",
     "tips3": "Hosted addresses are charged one fee per USDT transfer (account balance deduction)",
@@ -251,6 +253,12 @@
     "tips3": "Do not use exchange wallet for transfer",
     "tips4": "Please verify the energy rental wallet address accurately during transfer",
     "tips5": "If transferred wrong or other questions, please contact customer service",
+    "minUsdtError": "Minimum exchange amount is {min} USDT",
+    "maxUsdtError": "Maximum exchange amount is {max} USDT",
+    "minTrxError": "Minimum exchange amount is {min} TRX",
+    "maxTrxError": "Maximum exchange amount is {max} TRX",
+    "minExchange": "Minimum {min} to exchange",
+    "maxExchange": "Maximum not exceed {max}",
     "usdtMinTip": "Minimum 2 USDT, maximum 70000 USDT",
     "trxMinTip": "Minimum 10 TRX, maximum 100000 TRX"
   },
@@ -269,7 +277,8 @@
     "title": "Fee Description",
     "65000Energy": "Using 65000 energy: 3TRX/count",
     "131000Energy": "Using 131000 energy: 5TRX/count",
-    "activationPrice": "Activation Price: 1.2 TRX"
+    "activationPrice": "Activation Price: 1.2 TRX",
+    "activationPriceLabel": "Activation Price"
   },
   "login": {
     "title": "Login",

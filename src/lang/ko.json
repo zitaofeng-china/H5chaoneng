@@ -251,6 +251,12 @@
     "tips3": "거래소 지갑으로 이체하지 마세요",
     "tips4": "이체 시 정확한 에너지 대여 지갑 주소를 확인해주세요",
     "tips5": "잘못 이체或其他 질문 시 고객 서비스에 연락하세요",
+    "minUsdtError": "최소 교환 금액은 {min} USDT입니다",
+    "maxUsdtError": "최대 교환 금액은 {max} USDT입니다",
+    "minTrxError": "최소 교환 금액은 {min} TRX입니다",
+    "maxTrxError": "최대 교환 금액은 {max} TRX입니다",
+    "minExchange": "최소 {min}부터 교환",
+    "maxExchange": "최대 {max}",
     "usdtMinTip": "최소 2 USDT, 최대 70000 USDT",
     "trxMinTip": "최소 10 TRX, 최대 100000 TRX"
   },
@@ -269,7 +275,8 @@
     "title": "비용 안내",
     "65000Energy": "65000 에너지 사용: 3TRX/건",
     "131000Energy": "131000 에너지 사용: 5TRX/건",
-    "activationPrice": "활성화 단가: 1.2 TRX"
+    "activationPrice": "활성화 단가: 1.2 TRX",
+    "activationPriceLabel": "활성화 단가"
   },
   "login": {
     "title": "로그인",

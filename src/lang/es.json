@@ -251,6 +251,12 @@
     "tips3": "No uses billetera de intercambio para transferir",
     "tips4": "Por favor verifique la dirección de la billetera de alquiler de energía con precisión durante la transferencia",
     "tips5": "Si transferiste mal o tienes otras preguntas, contacta al servicio al cliente",
+    "minUsdtError": "El monto mínimo de intercambio es {min} USDT",
+    "maxUsdtError": "El monto máximo de intercambio es {max} USDT",
+    "minTrxError": "El monto mínimo de intercambio es {min} TRX",
+    "maxTrxError": "El monto máximo de intercambio es {max} TRX",
+    "minExchange": "Mínimo {min} para intercambiar",
+    "maxExchange": "Máximo {max}",
     "usdtMinTip": "Mínimo 2 USDT, máximo 70000 USDT",
     "trxMinTip": "Mínimo 10 TRX, máximo 100000 TRX"
   },
@@ -269,7 +275,8 @@
     "title": "Descripción de Comisiones",
     "65000Energy": "Usando 65000 energía: 3TRX/unidad",
     "131000Energy": "Usando 131000 energía: 5TRX/unidad",
-    "activationPrice": "Precio de Activación: 1.2 TRX"
+    "activationPrice": "Precio de Activación: 1.2 TRX",
+    "activationPriceLabel": "Precio de Activación"
   },
   "login": {
     "title": "Iniciar Sesión",
