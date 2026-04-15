@@ -23,12 +23,12 @@ export function useAddress() {
         addressData.value = response.data
         return response.data
       } else {
-        ElMessage.error(response.msg || '获取付款地址失败')
+        // 错误已在 errorHandler 中处理，直接返回
         return null
       }
     } catch (error) {
       console.error('获取付款地址失败:', error)
-      ElMessage.error('获取付款地址失败')
+      // 错误已在 errorHandler 中统一处理，这里不再重复提示
       return null
     } finally {
       loading.value = false
