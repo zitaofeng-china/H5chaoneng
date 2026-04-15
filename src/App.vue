@@ -1,12 +1,27 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
+import { useSiteVerification } from '@/hooks/useSiteVerification'
+import { useUserStore } from '@/stores/useUserStore'
+import { usePriceStore } from '@/stores/usePriceStore'
 
 const route = useRoute()
+const { verifySite } = useSiteVerification()
+const userStore = useUserStore()
+const priceStore = usePriceStore()
 
-// 判断是否是404页面
 const is404Page = computed(() => route.name === 'NotFound')
+
+onMounted(async () => {
+  if (!is404Page.value) {
+    const isValid = await verifySite()
+    if (isValid) {
+      userStore.init()
+      await priceStore.fetchPrice()
+    }
+  }
+})
 </script>
 
 <template>
