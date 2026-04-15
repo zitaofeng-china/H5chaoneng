@@ -1,21 +1,11 @@
 <template>
   <div class="transfer-rental">
     <div class="top-banner">
-      <div class="banner-item">
+      <div class="banner-item" v-for="banner in priceBanners" :key="banner.count">
         <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer35') }}</div>
-      </div>
-      <div class="banner-item">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer7') }}</div>
-      </div>
-      <div class="banner-item">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer14') }}</div>
-      </div>
-      <div class="banner-item">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer70') }}</div>
+        <div class="text">
+          {{ t('transferRental.transferTemplate', { price: banner.price, count: banner.count }) }}
+        </div>
       </div>
     </div>
 
@@ -24,24 +14,10 @@
       {{ t('transferRental.note') }}
     </div>
 
-    <div class="qr-section">
-      <div class="section-title">{{ t('transferRental.walletQrcode') }}</div>
-      <div class="qr-code">
-        <img :src="qrCode" alt="Wallet QR Code" class="qr-image" />
-      </div>
-      <div class="wallet-address">
-        <span class="address-text">{{ walletAddress }}</span>
-        <el-button
-          link
-          type="primary"
-          @click="copyAddress"
-          class="copy-button"
-          :loading="isCopying"
-        >
-          <SvgIcon name="transfer-copy" width="24" height="24" />
-        </el-button>
-      </div>
-    </div>
+    <QrCodeWithAddress
+      :address="walletAddress"
+      :title="t('transferRental.walletQrcode')"
+    />
 
     <KindTips :tips="tips" />
   </div>
@@ -50,16 +26,32 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useClipboard } from '@vueuse/core'
-import { useQRCode } from '@vueuse/integrations/useQRCode'
+import { storeToRefs } from 'pinia'
+import { usePriceStore } from '@/stores/usePriceStore'
 import KindTips from '@/components/kindTips/index.vue'
+import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
 const { t } = useI18n()
+const priceStore = usePriceStore()
+const { priceData } = storeToRefs(priceStore)
 
 const walletAddress = ref('TMpHUncdDoCmaAADteBvSGBzRjAbXiB2pE')
-const isCopying = ref(false)
 
-const qrCode = useQRCode(walletAddress)
+// 动态计算按1小时价格购买的价格
+const hourlyPrice = computed(() => {
+  return Number.parseFloat(priceData.value?.time_1h || '5')
+})
+
+// 动态生成价格横幅（基于1小时价格）
+const priceBanners = computed(() => {
+  const price = hourlyPrice.value
+  return [
+    { count: 1, price: (price * 1).toFixed(1) },
+    { count: 2, price: (price * 2).toFixed(1) },
+    { count: 4, price: (price * 4).toFixed(1) },
+    { count: 20, price: (price * 20).toFixed(1) },
+  ]
+})
 
 const tips = computed(() => [
   t('transferRental.walletTips'),
@@ -68,22 +60,6 @@ const tips = computed(() => [
   t('transferRental.amountTip'),
   t('transferRental.addressTip'),
 ])
-
-const { copy } = useClipboard()
-
-const copyAddress = async () => {
-  isCopying.value = true
-  try {
-    await copy(walletAddress.value)
-    ElMessage.success(t('transferRental.copyAddress'))
-  } catch {
-    ElMessage.error(t('transferRental.copyFailed'))
-  } finally {
-    setTimeout(() => {
-      isCopying.value = false
-    }, 1000)
-  }
-}
 </script>
 
 <style lang="scss" scoped>
@@ -120,53 +96,6 @@ const copyAddress = async () => {
     align-items: center;
     gap: 6px;
   }
-
-  .qr-section {
-    text-align: center;
-    padding: 16px 0 18px;
-
-    .section-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: var(--theme-text-black);
-      // margin-bottom: 14px;
-    }
-
-    .qr-code {
-      width: 192px;
-      height: 192px;
-      margin: 0 auto;
-
-      .qr-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-
-    .wallet-address {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 14px;
-      color: var(--theme-text-black);
-    }
-
-    .address-text {
-      font-family: 'Courier New', monospace;
-    }
-
-    .copy-button {
-      padding: 0;
-      height: 18px;
-
-      :deep(svg) {
-        font-size: 14px;
-      }
-    }
-  }
 }
 
 @media (max-width: 768px) {
@@ -175,25 +104,6 @@ const copyAddress = async () => {
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
-    }
-
-    .qr-section {
-      padding: 12px 0 16px;
-    }
-
-    .qr-section {
-      .wallet-address {
-        display: initial;
-      }
-    }
-
-    .wallet-address {
-      flex-direction: column;
-      gap: 8px;
-
-      .address-text {
-        text-align: center;
-      }
     }
   }
 }

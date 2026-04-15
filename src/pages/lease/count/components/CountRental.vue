@@ -98,32 +98,21 @@
           </div>
         </div>
 
-        <div class="qr-section">
+        <QrCodeWithAddress
+          v-if="paymentAddress"
+          :address="paymentAddress"
+          :title="t('transferRental.walletQrcode')"
+          :tip="t('transferRental.addressTip')"
+        />
+        <div v-else class="qr-section">
           <div class="section-title">{{ t('transferRental.walletQrcode') }}</div>
-          <div class="qr-code">
-            <img v-if="paymentAddress" :src="qrCode" alt="Payment QR Code" class="qr-image" />
-            <el-skeleton v-else animated>
-              <template #template>
-                <el-skeleton-item variant="image" style="width: 192px; height: 192px" />
-              </template>
-            </el-skeleton>
-          </div>
+          <el-skeleton animated>
+            <template #template>
+              <el-skeleton-item variant="image" style="width: 192px; height: 192px; margin: 0 auto" />
+            </template>
+          </el-skeleton>
           <div class="wallet-address">
-            <span class="address-text">{{ paymentAddress || t('common.loading') }}</span>
-            <el-button
-              v-if="paymentAddress"
-              link
-              type="primary"
-              @click="copyAddress"
-              class="copy-button"
-              :loading="isCopying"
-            >
-              <SvgIcon name="transfer-copy" width="24" height="24" />
-            </el-button>
-          </div>
-          <div class="tips-info">
-            <SvgIcon name="fee-info" width="12" height="12" />
-            {{ t('transferRental.addressTip') }}
+            <span class="address-text">{{ t('common.loading') }}</span>
           </div>
         </div>
 
@@ -150,6 +139,7 @@ import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useAddress } from '@/hooks/useAddress'
 import { AddressKind } from '@/api/modules/address/types'
+import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
 defineOptions({ name: 'CountRental' })
 
@@ -167,15 +157,12 @@ const commonStore = useCommonStore()
 const priceStore = usePriceStore()
 const { isMobile } = storeToRefs(commonStore)
 const { fetchAddress, addressData, loading: addressLoading } = useAddress()
-const { copy } = useClipboard()
 
 // 显示付款地址弹窗
 const showPaymentDialog = ref(false)
-const isCopying = ref(false)
 
 // 生成二维码
 const paymentAddress = computed(() => addressData.value?.address || '')
-const qrCode = useQRCode(paymentAddress)
 
 // 动态获取按笔租赁单价
 const strokePrice = computed(() => {
@@ -310,23 +297,6 @@ const handleRent = async () => {
 }
 
 const handleBuy = () => {}
-
-// 复制地址
-const copyAddress = async () => {
-  if (!paymentAddress.value) return
-  
-  isCopying.value = true
-  try {
-    await copy(paymentAddress.value)
-    ElMessage.success(t('transferRental.copyAddress'))
-  } catch {
-    ElMessage.error(t('transferRental.copyFailed'))
-  } finally {
-    setTimeout(() => {
-      isCopying.value = false
-    }, 1000)
-  }
-}
 
 // 页面加载时获取价格
 onMounted(() => {
@@ -485,18 +455,7 @@ onMounted(() => {
       margin-bottom: 12px;
     }
 
-    .qr-code {
-      width: 192px;
-      height: 192px;
-      margin: 0 auto;
-
-      .qr-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-    }
-
+    // 加载状态的样式
     .wallet-address {
       margin-top: 12px;
       display: flex;
@@ -509,25 +468,6 @@ onMounted(() => {
       .address-text {
         font-family: 'Courier New', monospace;
         word-break: break-all;
-      }
-
-      .copy-button {
-        padding: 0;
-        height: 18px;
-      }
-    }
-
-    .tips-info {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      margin-top: 8px;
-      color: var(--theme-text-light-gray-muted);
-
-      svg {
-        color: var(--theme-text-black);
-        margin-right: 4px;
       }
     }
   }
