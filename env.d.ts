@@ -6,6 +6,7 @@
 interface ImportMetaEnv {
   // 基础配置
   readonly VITE_API_BASE_URL: string // API 基础 URL
+  readonly VITE_SITE_NAME: string // 网站名称
   readonly VITE_PORT: string // 应用端口
   readonly VITE_OPEN: string // 是否自动打开浏览器
 

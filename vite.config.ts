@@ -87,7 +87,29 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 8080,
-    open: true,
+    open: false,
+    cors: true, // 允许跨域
+    hmr: {
+      overlay: true, // 显示错误覆盖层
+    },
+    watch: {
+      usePolling: true, // 使用轮询模式（适用于某些文件系统）
+      interval: 100, // 轮询间隔
+    },
+    proxy: {
+      '/v3': {
+        target: 'http://47.84.135.181:8888',
+        changeOrigin: true,
+        rewrite: (path) => path,
+        // 配置代理请求头
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // 确保代理请求带上所有必要的请求头
+            console.log('[Proxy]', req.method, req.url)
+          })
+        },
+      },
+    },
   },
   build: {
     assetsInlineLimit: 0, // 调到 4kb
