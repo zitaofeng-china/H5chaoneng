@@ -83,7 +83,7 @@
             <el-form-item prop="passwords">
               <div class="input-wrapper">
                 <el-input
-                  v-model="registerForm.password"
+                  v-model="registerForm.passwords"
                   type="password"
                   :placeholder="$t('register.confirmPassword')"
                   size="large"
@@ -122,6 +122,7 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import LoginBackground from '@/components/logo/LoginBackground.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { authApi } from '@/api'
 
 defineOptions({
   name: 'RegisterPopup',
@@ -167,6 +168,16 @@ const rules = computed<FormRules<RegisterForm>>(() => ({
   passwords: [
     { required: true, message: t('register.confirmPassword'), trigger: 'blur' },
     { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (value && value !== registerForm.password) {
+          callback(new Error(t('register.passwordMismatch')))
+        } else {
+          callback()
+        }
+      },
+      trigger: ['blur', 'change'],
+    },
   ],
 }))
 
@@ -187,16 +198,33 @@ const handleRegister = async () => {
 
   try {
     await registerFormRef.value.validate()
+    
+    // 验证两次密码是否一致
+    if (registerForm.password !== registerForm.passwords) {
+      ElMessage.error(t('register.passwordMismatch'))
+      return
+    }
+    
     loading.value = true
 
-    setTimeout(() => {
+    // 调用注册接口
+    const response = await authApi.register({
+      username: registerForm.username,
+      email: registerForm.email,
+      password: registerForm.password,
+    })
+
+    // 注册成功
+    if (response.code === '000000') {
       ElMessage.success(t('register.registerSuccess'))
       visible.value = false
       emit('close')
-      loading.value = false
-    }, 1000)
-  } catch (error) {
-    console.error('【ERROR INFO】:', error)
+    } else {
+      ElMessage.error(response.message || t('register.registerFailed'))
+    }
+  } catch (error: any) {
+    console.error('注册失败:', error)
+    ElMessage.error(error.message || t('register.registerFailed'))
   } finally {
     loading.value = false
   }

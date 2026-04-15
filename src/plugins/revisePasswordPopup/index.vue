@@ -19,18 +19,6 @@
         ref="revisePasswordFormRef"
         class="login-form"
       >
-        <el-form-item :label="t('revisePassword.account')" prop="email">
-          <div class="input-wrapper">
-            <el-input
-              v-model="revisePasswordForm.email"
-              :placeholder="t('revisePassword.accountPlaceholder')"
-              size="large"
-              class="custom-input"
-            >
-            </el-input>
-          </div>
-        </el-form-item>
-
         <el-form-item :label="t('revisePassword.oldPassword')" prop="password">
           <div class="input-wrapper">
             <el-input
@@ -73,33 +61,34 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ref, reactive, computed, getCurrentInstance } from 'vue'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
+import { authApi } from '@/api'
+import { useUserStore } from '@/stores/useUserStore'
 
 defineOptions({
   name: 'RevisePasswordPopup',
 })
 interface RevisePasswordForm {
-  email: string
   password: string
   newPassword: string
 }
 
 const { t } = useI18n()
+const { proxy } = getCurrentInstance()!
+const userStore = useUserStore()
 
 const visible = ref(false)
 const loading = ref(false)
 const revisePasswordFormRef = ref<FormInstance>()
 
 const revisePasswordForm = reactive<RevisePasswordForm>({
-  email: '13600000000',
   password: '',
   newPassword: '',
 })
 
 const rules = computed<FormRules<RevisePasswordForm>>(() => ({
-  email: [{ required: true, message: t('login.emailRequired'), trigger: 'blur' }],
   password: [
     { required: true, message: t('revisePassword.oldPasswordPlaceholder'), trigger: 'blur' },
     { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
@@ -116,8 +105,8 @@ const emit = defineEmits<{
 
 const handleClose = async () => {
   visible.value = false
-  visible.value = false
   await revisePasswordFormRef.value?.resetFields()
+  emit('close')
 }
 
 const handleLogin = async () => {
@@ -127,14 +116,33 @@ const handleLogin = async () => {
     await revisePasswordFormRef.value.validate()
     loading.value = true
 
-    setTimeout(() => {
-      ElMessage.success(t('login.loginSuccess'))
+    // 调用修改密码接口
+    const response = await authApi.changePassword({
+      password: revisePasswordForm.password,
+      new_password: revisePasswordForm.newPassword,
+    })
+
+    // 修改成功
+    if (response.code === '000000') {
+      ElMessage.success(t('revisePassword.success'))
       visible.value = false
       emit('close')
-      loading.value = false
-    }, 1000)
-  } catch (error) {
-    console.error('【ERROR INFO】:', error)
+      
+      // 修改密码成功后，延迟退出登录
+      setTimeout(() => {
+        userStore.logout()
+        ElMessage.info(t('revisePassword.logoutTip'))
+        // 打开登录弹窗
+        setTimeout(() => {
+          proxy?.$loginPopup?.open()
+        }, 500)
+      }, 1000)
+    } else {
+      ElMessage.error(response.message || t('revisePassword.failed'))
+    }
+  } catch (error: any) {
+    console.error('修改密码失败:', error)
+    ElMessage.error(error.message || t('revisePassword.failed'))
   } finally {
     loading.value = false
   }

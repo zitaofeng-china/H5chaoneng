@@ -79,12 +79,13 @@
             <el-form-item prop="passwords">
               <div class="input-wrapper">
                 <el-input
-                  v-model="resetForm.password"
+                  v-model="resetForm.passwords"
                   type="password"
                   :placeholder="t('reset.confirmPassword')"
                   size="large"
                   class="custom-input"
                   show-password
+                  @input="handlePasswordChange"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -118,9 +119,10 @@ import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import LoginBackground from '@/components/logo/LoginBackground.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { authApi } from '@/api'
 
 defineOptions({
-  name: 'RegisterPopup',
+  name: 'ResetPopup',
 })
 
 interface ResetForm {
@@ -151,7 +153,10 @@ const rules = computed<FormRules<ResetForm>>(() => ({
     { required: true, message: t('login.emailRequired'), trigger: 'blur' },
     { type: 'email', message: t('login.emailInvalid'), trigger: 'blur' },
   ],
-  code: [{ required: true, message: t('reset.codePlaceholder'), trigger: 'blur' }],
+  code: [
+    { required: true, message: t('reset.codePlaceholder'), trigger: 'blur' },
+    { min: 6, message: t('login.verifyCodeLength'), trigger: 'blur' },
+  ],
   password: [
     { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
     { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
@@ -159,6 +164,16 @@ const rules = computed<FormRules<ResetForm>>(() => ({
   passwords: [
     { required: true, message: t('reset.confirmPassword'), trigger: 'blur' },
     { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (value && value !== resetForm.password) {
+          callback(new Error(t('register.passwordMismatch')))
+        } else {
+          callback()
+        }
+      },
+      trigger: ['blur', 'change'],
+    },
   ],
 }))
 
@@ -174,21 +189,44 @@ const handleClose = async () => {
   emit('close')
 }
 
+const handlePasswordChange = () => {
+  if (resetForm.passwords && resetFormRef.value) {
+    resetFormRef.value.validateField('passwords')
+  }
+}
+
 const handleRegister = async () => {
   if (!resetFormRef.value) return
 
   try {
     await resetFormRef.value.validate()
+
+    // 验证两次密码是否一致
+    if (resetForm.password !== resetForm.passwords) {
+      ElMessage.error(t('register.passwordMismatch'))
+      return
+    }
+
     loading.value = true
 
-    setTimeout(() => {
-      ElMessage.success(t('login.loginSuccess'))
+    // 调用重置密码接口
+    const response = await authApi.resetPassword({
+      email: resetForm.email,
+      password: resetForm.password,
+      verify_code: resetForm.code,
+    })
+
+    // 重置成功
+    if (response.code === '000000') {
+      ElMessage.success(t('reset.resetSuccess'))
       visible.value = false
       emit('close')
-      loading.value = false
-    }, 1000)
-  } catch (error) {
-    console.error('【ERROR INFO】:', error)
+    } else {
+      ElMessage.error(response.message || t('reset.resetFailed'))
+    }
+  } catch (error: any) {
+    console.error('重置密码失败:', error)
+    ElMessage.error(error.message || t('reset.resetFailed'))
   } finally {
     loading.value = false
   }
@@ -207,15 +245,23 @@ const handleSendVerificationCode = async () => {
     return
   }
 
-  countdown.value = 60
-  const timer = setInterval(() => {
-    countdown.value--
-    if (countdown.value <= 0) {
-      clearInterval(timer)
-    }
-  }, 1000)
+  try {
+    // TODO: 调用发送验证码接口
+    // await authApi.sendCode({ email: resetForm.email, type: 'reset' })
 
-  ElMessage.success(t('reset.codeSent'))
+    countdown.value = 60
+    const timer = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(timer)
+      }
+    }, 1000)
+
+    ElMessage.success(t('reset.codeSent'))
+  } catch (error: any) {
+    console.error('发送验证码失败:', error)
+    ElMessage.error(error.message || t('login.sendCodeFailed'))
+  }
 }
 
 const open = () => {

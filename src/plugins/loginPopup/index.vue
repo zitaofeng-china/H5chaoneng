@@ -4,7 +4,7 @@
       v-model="visible"
       :show-close="isMobile"
       :width="864"
-      :height="552"
+      :height="600"
       header-class="login-header"
       align-center
       @close="handleClose"
@@ -20,10 +20,10 @@
           </div>
 
           <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
-            <el-form-item prop="email">
+            <el-form-item prop="username">
               <div class="input-wrapper">
                 <el-input
-                  v-model="loginForm.email"
+                  v-model="loginForm.username"
                   :placeholder="$t('login.placeholder')"
                   size="large"
                   class="custom-input"
@@ -49,6 +49,30 @@
                     <SvgIcon name="login-password" width="24" height="24" />
                   </template>
                 </el-input>
+              </div>
+            </el-form-item>
+
+            <el-form-item prop="verifyCode">
+              <div class="input-wrapper code-wrapper">
+                <el-input
+                  v-model="loginForm.verifyCode"
+                  :placeholder="$t('login.verifyCodePlaceholder')"
+                  size="large"
+                  class="custom-input"
+                  maxlength="6"
+                >
+                  <template #prefix>
+                    <SvgIcon name="login-code" width="24" height="24" />
+                  </template>
+                </el-input>
+                <el-button
+                  class="send-code-btn"
+                  :disabled="countdown > 0 || sendingCode"
+                  :loading="sendingCode"
+                  @click="handleSendCode"
+                >
+                  {{ countdown > 0 ? `${countdown}s` : $t('login.sendCode') }}
+                </el-button>
               </div>
             </el-form-item>
 
@@ -84,49 +108,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, inject, getCurrentInstance } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import { useRegister } from '@/hooks/useRegister.ts'
-import { useReset } from '@/hooks/useReset.ts'
 import { useUserStore } from '@/stores/useUserStore'
-import { useCreateFetch } from '@/hooks/useCreateFetch'
+import { loginSimple, sendCode } from '@/api/modules/auth'
+import { authApi } from '@/api'
 import LoginBackground from '@/components/logo/LoginBackground.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { getToken } from '@/utils/token'
 
 defineOptions({
   name: 'LoginPopup',
 })
 
 interface LoginForm {
-  email: string
+  username: string
   password: string
+  verifyCode: string
   remember: boolean
 }
 
 const { t } = useI18n()
 const commonStore = useCommonStore()
 const { isMobile } = storeToRefs(commonStore)
+const { proxy } = getCurrentInstance()!
+const userStore = useUserStore()
 
 const visible = ref(false)
 const loading = ref(false)
+const sendingCode = ref(false)
+const countdown = ref(0)
+const smsId = ref('')
 const loginFormRef = ref<FormInstance>()
 
 const loginForm = reactive<LoginForm>({
-  email: '',
+  username: '',
   password: '',
+  verifyCode: '',
   remember: false,
 })
 
 const rules = computed<FormRules<LoginForm>>(() => ({
-  email: [
-    { required: true, message: t('login.emailRequired'), trigger: 'blur' },
-    { type: 'email', message: t('login.emailInvalid'), trigger: 'blur' },
+  username: [
+    { required: true, message: t('login.usernameRequired'), trigger: 'blur' },
   ],
   password: [
     { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
     { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
+  ],
+  verifyCode: [
+    // 验证码不是必填的
+    { len: 6, message: t('login.verifyCodeLength'), trigger: 'blur' },
   ],
 }))
 
@@ -136,19 +170,45 @@ const emit = defineEmits<{
   switchToRegister: []
 }>()
 
-const { open: openRegister } = useRegister()
-const { open: openReset } = useReset()
-const { login } = useUserStore()
+const { login: userLogin } = useUserStore()
 
-const { execute } = useCreateFetch('user/login', {
-  immediate: false,
-})
-  .post(loginForm)
-  .json()
+// 发送验证码
+const handleSendCode = async () => {
+  if (!loginForm.username) {
+    ElMessage.warning(t('login.usernameRequired'))
+    return
+  }
+
+  try {
+    sendingCode.value = true
+    // TODO: 调用真实的发送验证码接口
+    // const response = await sendCode({ username: loginForm.username })
+    // smsId.value = response.sms_id
+    
+    // 模拟发送成功
+    smsId.value = 'mock_sms_id_' + Date.now()
+    ElMessage.success(t('login.sendCodeSuccess'))
+    
+    // 开始倒计时
+    countdown.value = 60
+    const timer = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(timer)
+      }
+    }, 1000)
+  } catch (error: any) {
+    ElMessage.error(error.message || t('login.sendCodeFailed'))
+  } finally {
+    sendingCode.value = false
+  }
+}
 
 const handleClose = async () => {
   visible.value = false
   await loginFormRef.value?.resetFields()
+  countdown.value = 0
+  smsId.value = ''
   emit('close')
 }
 
@@ -157,34 +217,93 @@ const handleLogin = async () => {
 
   try {
     await loginFormRef.value.validate()
+    
+    if (!smsId.value) {
+      ElMessage.warning(t('login.sendCodeFirst'))
+      return
+    }
+
     loading.value = true
 
-    setTimeout(() => {
-      ElMessage.success(t('login.loginSuccess'))
-      visible.value = false
-      login()
-      emit('close')
-      loading.value = false
-    }, 1000)
-    const { data } = await execute()
-    console.log(data)
-  } catch (error) {
-    console.error('【ERROR INFO】:', error)
+    const response = await loginSimple({
+      code_id: smsId.value,
+      password: loginForm.password,
+      username: loginForm.username,
+      verify_code: loginForm.verifyCode,
+    })
+
+    console.log('=== 登录调试信息 ===')
+    console.log('1. 完整响应:', response)
+    console.log('2. response.data:', response.data)
+    console.log('3. response.data 类型:', typeof response.data)
+
+    // 后端返回的 data 直接就是 token 字符串
+    const token = typeof response.data === 'string' ? response.data : (response.data as any)?.token || ''
+    
+    console.log('4. 提取的 token:', token)
+    console.log('5. token 长度:', token.length)
+    
+    const loginData = {
+      token: token,
+      userInfo: undefined,
+    }
+    
+    console.log('6. 准备保存的 loginData:', loginData)
+    
+    // 保存用户信息和 token
+    userLogin(loginData)
+    
+    console.log('7. userLogin 调用完成')
+    console.log('8. getToken():', getToken())
+    
+    // 登录成功后获取用户信息
+    try {
+      console.log('9. 开始获取用户信息...')
+      const userInfoResponse = await authApi.getUserInfo()
+      console.log('10. 用户信息响应:', userInfoResponse)
+      
+      if (userInfoResponse.code === '000000' && userInfoResponse.data) {
+        // 使用 userStore 的方法更新用户信息（会自动按 Site 隔离存储）
+        userStore.updateUserInfo(userInfoResponse.data)
+        console.log('11. 用户信息已保存')
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+      // 获取用户信息失败不影响登录流程
+    }
+    
+    console.log('===================')
+    
+    ElMessage.success(t('login.loginSuccess'))
+    visible.value = false
+    emit('close')
+  } catch (error: any) {
+    console.error('登录失败:', error)
+    ElMessage.error(error.message || t('login.loginFailed'))
   } finally {
     loading.value = false
   }
 }
 
 const switchToReset = () => {
-  handleClose()
-  openReset()
+  // 先打开重置密码弹窗，再关闭登录弹窗
+  if (proxy?.$resetPopup) {
+    proxy.$resetPopup.open()
+    setTimeout(() => {
+      handleClose()
+    }, 50)
+  }
   emit('switchToReset')
 }
 
 const switchToRegister = async () => {
-  handleClose()
-  openRegister()
-
+  // 先打开注册弹窗，再关闭登录弹窗
+  if (proxy?.$registerPopup) {
+    proxy.$registerPopup.open()
+    setTimeout(() => {
+      handleClose()
+    }, 50)
+  }
   emit('switchToRegister')
 }
 
@@ -272,8 +391,13 @@ defineExpose({
       display: flex;
       align-items: center;
 
+      &.code-wrapper {
+        gap: 12px;
+      }
+
       .custom-input {
         height: 50px;
+        flex: 1;
 
         :deep(.el-input__wrapper) {
           border-radius: 4px;
@@ -292,6 +416,30 @@ defineExpose({
             font-size: 14px;
             font-weight: 400;
           }
+        }
+      }
+
+      .send-code-btn {
+        height: 50px;
+        padding: 0 20px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 4px;
+        background: var(--theme-bg-blue);
+        border: none;
+        color: var(--theme-text-white);
+        white-space: nowrap;
+        min-width: 100px;
+
+        &:hover:not(:disabled) {
+          background: var(--theme-bg-blue);
+          opacity: 0.9;
+        }
+
+        &:disabled {
+          background: #e0e0e0;
+          color: #999;
+          cursor: not-allowed;
         }
       }
     }

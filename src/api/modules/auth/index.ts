@@ -23,25 +23,39 @@ import type {
  * 用户登录
  */
 export function login(params: LoginParams) {
-  return post<LoginResponse>('/auth/login', params)
+  return post<LoginResponse>('/v3/login', params)
+}
+
+/**
+ * 用户登录（简化版，自动填充 Site）
+ */
+export function loginSimple(data: LoginParams) {
+  return login(data)
 }
 
 /**
  * 用户注册
  */
 export function register(params: RegisterParams) {
-  return post<RegisterResponse>('/auth/register', params)
+  return post<RegisterResponse>('/v3/register', params)
 }
 
 /**
- * 重置密码
+ * 修改密码（登录后，需要原密码）
+ */
+export function changePassword(params: { password: string; new_password: string }) {
+  return post<{}>('/v3/change_password', params)
+}
+
+/**
+ * 重置密码（忘记密码，需要验证码）
  */
 export function resetPassword(params: ResetPasswordParams) {
-  return post<{ success: boolean; message: string }>('/auth/reset-password', params)
+  return post<{}>('/v3/reset_password', params)
 }
 
 /**
- * 修改密码
+ * 修改密码（旧接口，保留兼容）
  */
 export function revisePassword(params: RevisePasswordParams) {
   return post<{ success: boolean; message: string }>('/auth/revise-password', params)
@@ -79,7 +93,7 @@ export function logout() {
  * 获取当前用户信息
  */
 export function getUserInfo() {
-  return get<UserInfo>('/auth/user-info')
+  return get<UserInfo>('/v3/user')
 }
 
 /**
