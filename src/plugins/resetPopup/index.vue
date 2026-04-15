@@ -99,7 +99,7 @@
                 type="primary"
                 size="large"
                 class="reset-btn"
-                @click="handleRegister"
+                @click="onReset"
                 :loading="loading"
               >
                 {{ t('reset.resetButton') }}
@@ -113,163 +113,46 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
-import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import LoginBackground from '@/components/logo/LoginBackground.vue'
+import { useI18n } from 'vue-i18n'
 import { useCommonStore } from '@/stores/useCommonStore'
-import { authApi } from '@/api'
+import { useResetForm } from '@/hooks/useResetForm'
+import LoginBackground from '@/components/logo/LoginBackground.vue'
+import type { ResetEmits } from './types'
 
 defineOptions({
   name: 'ResetPopup',
 })
 
-interface ResetForm {
-  email: string
-  code: string
-  password: string
-  passwords: string
-}
-
 const { t } = useI18n()
+const emit = defineEmits<ResetEmits>()
 const commonStore = useCommonStore()
 const { isMobile } = storeToRefs(commonStore)
 
-const visible = ref(false)
-const loading = ref(false)
-const countdown = ref(0)
-const resetFormRef = ref<FormInstance>()
-
-const resetForm = reactive<ResetForm>({
-  email: '',
-  code: '',
-  password: '',
-  passwords: '',
-})
-
-const rules = computed<FormRules<ResetForm>>(() => ({
-  email: [
-    { required: true, message: t('login.emailRequired'), trigger: 'blur' },
-    { type: 'email', message: t('login.emailInvalid'), trigger: 'blur' },
-  ],
-  code: [
-    { required: true, message: t('reset.codePlaceholder'), trigger: 'blur' },
-    { min: 6, message: t('login.verifyCodeLength'), trigger: 'blur' },
-  ],
-  password: [
-    { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
-    { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
-  ],
-  passwords: [
-    { required: true, message: t('reset.confirmPassword'), trigger: 'blur' },
-    { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
-    {
-      validator: (rule, value, callback) => {
-        if (value && value !== resetForm.password) {
-          callback(new Error(t('register.passwordMismatch')))
-        } else {
-          callback()
-        }
-      },
-      trigger: ['blur', 'change'],
-    },
-  ],
-}))
-
-const emit = defineEmits<{
-  close: []
-  switchToReset: []
-  switchToRegister: []
-}>()
+const {
+  visible,
+  loading,
+  countdown,
+  resetForm,
+  resetFormRef,
+  rules,
+  handleSendVerificationCode,
+  handlePasswordChange,
+  handleReset,
+  open,
+  close,
+} = useResetForm()
 
 const handleClose = async () => {
-  visible.value = false
-  await resetFormRef.value?.resetFields()
+  await close()
   emit('close')
 }
 
-const handlePasswordChange = () => {
-  if (resetForm.passwords && resetFormRef.value) {
-    resetFormRef.value.validateField('passwords')
+const onReset = async () => {
+  const success = await handleReset()
+  if (success) {
+    await handleClose()
   }
-}
-
-const handleRegister = async () => {
-  if (!resetFormRef.value) return
-
-  try {
-    await resetFormRef.value.validate()
-
-    // 验证两次密码是否一致
-    if (resetForm.password !== resetForm.passwords) {
-      ElMessage.error(t('register.passwordMismatch'))
-      return
-    }
-
-    loading.value = true
-
-    // 调用重置密码接口
-    const response = await authApi.resetPassword({
-      email: resetForm.email,
-      password: resetForm.password,
-      verify_code: resetForm.code,
-    })
-
-    // 重置成功
-    if (response.code === '000000') {
-      ElMessage.success(t('reset.resetSuccess'))
-      visible.value = false
-      emit('close')
-    } else {
-      ElMessage.error(response.message || t('reset.resetFailed'))
-    }
-  } catch (error: any) {
-    console.error('重置密码失败:', error)
-    ElMessage.error(error.message || t('reset.resetFailed'))
-  } finally {
-    loading.value = false
-  }
-}
-
-const handleSendVerificationCode = async () => {
-  if (countdown.value > 0) return
-
-  if (!resetForm.email) {
-    ElMessage.warning(t('reset.enterEmailFirst'))
-    return
-  }
-
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetForm.email)) {
-    ElMessage.warning(t('login.emailInvalid'))
-    return
-  }
-
-  try {
-    // TODO: 调用发送验证码接口
-    // await authApi.sendCode({ email: resetForm.email, type: 'reset' })
-
-    countdown.value = 60
-    const timer = setInterval(() => {
-      countdown.value--
-      if (countdown.value <= 0) {
-        clearInterval(timer)
-      }
-    }, 1000)
-
-    ElMessage.success(t('reset.codeSent'))
-  } catch (error: any) {
-    console.error('发送验证码失败:', error)
-    ElMessage.error(error.message || t('login.sendCodeFailed'))
-  }
-}
-
-const open = () => {
-  visible.value = true
-}
-
-const close = () => {
-  visible.value = false
 }
 
 defineExpose({
@@ -279,216 +162,5 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.reset-header {
-  padding: 0;
-}
-
-.reset-dialog {
-  overflow: hidden;
-  :deep(.el-dialog) {
-    padding: 0px;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-  }
-
-  :deep(.el-dialog__header) {
-    display: none;
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 0;
-  }
-}
-
-.reset-container {
-  display: flex;
-}
-
-.reset-left {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
-}
-
-.reset-right {
-  flex: 1;
-  padding: 50px 24px 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.reset-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 50px;
-
-  .reset-title {
-    font-size: 34px;
-    font-weight: 700;
-    color: #1a1a1a;
-    letter-spacing: 0.5px;
-  }
-}
-
-.reset-form {
-  display: flex;
-  flex-direction: column;
-
-  .el-form-item {
-    margin-bottom: 16px;
-
-    .input-wrapper {
-      flex: 1;
-      display: flex;
-      align-items: center;
-
-      .custom-input {
-        height: 50px;
-
-        :deep(.el-input__wrapper) {
-          border-radius: 4px;
-          padding: 14px;
-          background: var(--theme-bg-white);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        :deep(.el-input__inner) {
-          font-size: 14px;
-          color: #333;
-          font-weight: 400;
-
-          &::placeholder {
-            color: var(--theme-text-muted-gray);
-            font-size: 14px;
-            font-weight: 400;
-          }
-        }
-      }
-
-      .countdown {
-        margin-left: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        color: var(--theme-bg-blue);
-        cursor: pointer;
-        user-select: none;
-
-        &.disabled {
-          color: var(--theme-text-muted-gray);
-          cursor: not-allowed;
-        }
-      }
-    }
-  }
-}
-
-.form-actions {
-  margin-bottom: 50px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-
-  :deep(.el-checkbox) {
-    height: auto;
-
-    .el-checkbox__label {
-      font-size: 14px;
-      color: var(--theme-text-gray);
-      font-weight: 400;
-      padding: 0 8px;
-    }
-
-    .el-checkbox__input.is-checked .el-checkbox__inner {
-      background-color: var(--theme-bg-blue);
-      border-color: var(--theme-bg-blue);
-    }
-  }
-
-  :deep(.el-link) {
-    font-size: 14px;
-    color: var(--theme-bg-blue);
-    text-decoration: none;
-    font-weight: 500;
-
-    &::after {
-      display: none;
-    }
-
-    &:hover {
-      color: var(--theme-bg-blue);
-      text-decoration: none;
-    }
-  }
-}
-
-.reset-btn {
-  margin-top: 30px;
-  width: 100%;
-  height: 50px;
-  font-size: 18px;
-  font-weight: 600;
-  border-radius: 8px;
-  background: var(--theme-bg-blue);
-  border: none;
-  color: var(--theme-text-white);
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(64, 158, 255, 0.35);
-  }
-
-  &:active {
-    transform: translateY(0);
-    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
-  }
-
-  &.is-loading {
-    opacity: 0.8;
-  }
-
-  :deep(.el-icon) {
-    margin-right: 6px;
-  }
-}
-
-@media (max-width: 768px) {
-  .reset-dialog {
-    @include dialog-style;
-  }
-
-  .reset-container {
-    min-height: auto;
-    flex-direction: column;
-  }
-
-  .reset-right {
-    flex: 1;
-    padding: 20px 24px;
-  }
-
-  .reset-header {
-    margin-bottom: 24px;
-
-    .reset-title {
-      font-size: 20px;
-    }
-  }
-
-  .reset-form {
-    .el-form-item {
-      margin-bottom: 20px;
-    }
-  }
-
-  .reset-btn {
-    height: 44px;
-    margin-top: 0;
-    font-size: 14px;
-  }
-}
+@import './styles.scss';
 </style>
