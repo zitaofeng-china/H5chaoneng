@@ -7,7 +7,6 @@
         <el-form
           ref="formRef"
           :model="formData"
-          :rules="formRules"
           label-position="right"
           label-suffix=":"
           class="rental-form"
@@ -17,7 +16,10 @@
               <el-input
                 v-model="formData.unitPrice"
                 type="number"
+                :min="minValue"
+                :max="maxValue"
                 :placeholder="t('contract.enterAmountPlaceholder')"
+                @blur="handleBlur"
               >
                 <template #prefix>{{ t('contract.enterAmount') }}</template>
                 <template #suffix>{{
@@ -40,7 +42,7 @@
             </el-form-item>
           </div>
         </el-form>
-        <RateCard :coin="activeTab" />
+        <RateCard :coin="activeTab" :rate="displayRate" :stock="displayStock" />
         <WalletQrcode :coin="activeTab" />
       </el-tabs>
     </el-card>
@@ -48,28 +50,109 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { type FormInstance, type FormRules } from 'element-plus'
+import { type FormInstance } from 'element-plus'
+import { usePriceStore } from '@/stores/usePriceStore'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
 const { t } = useI18n()
+const priceStore = usePriceStore()
 
 const activeTab = ref('USDT')
 const formRef = ref<FormInstance>()
 
 const formData = reactive({
-  unitPrice: '1.9',
+  unitPrice: '2',
   coinAmount: '',
 })
 
-const formRules = computed<FormRules>(() => ({
-  unitPrice: [
-    { required: true, message: t('formValidation.unitPriceRequired'), trigger: 'blur' },
-    { pattern: /^\d+(\.\d+)?$/, message: t('formValidation.unitPriceInvalid'), trigger: 'blur' },
-  ],
-}))
+// 获取汇率
+const exchangeRate = computed(() => {
+  if (!priceStore.priceData) return { usdtToTrx: 0, trxToUsdt: 0 }
+  return {
+    usdtToTrx: Number.parseFloat(priceStore.priceData.usdt_2_trx) || 0,
+    trxToUsdt: Number.parseFloat(priceStore.priceData.trx_2_usdt) || 0,
+  }
+})
+
+// 获取最大额度
+const maxLimits = computed(() => {
+  if (!priceStore.priceData) return { usdt: 70000, trx: 100000 }
+  return {
+    usdt: Number.parseFloat(priceStore.priceData.max_usdt_2_trx) || 70000,
+    trx: Number.parseFloat(priceStore.priceData.max_trx_2_usdt) || 100000,
+  }
+})
+
+// 获取最小值和最大值
+const minValue = computed(() => activeTab.value === 'USDT' ? 2 : 10)
+const maxValue = computed(() => activeTab.value === 'USDT' ? maxLimits.value.usdt : maxLimits.value.trx)
+
+// 计算显示的汇率（使用最小值）
+const displayRate = computed(() => {
+  if (activeTab.value === 'USDT') {
+    // USDT→TRX: 2 USDT 能兑换多少 TRX
+    return (2 * exchangeRate.value.usdtToTrx).toFixed(2)
+  } else {
+    // TRX→USDT: 10 TRX 能兑换多少 USDT
+    return (10 * exchangeRate.value.trxToUsdt).toFixed(2)
+  }
+})
+
+// 显示库存（暂时使用固定值，后续可从接口获取）
+const displayStock = computed(() => '34430.21964')
+
+// 监听输入金额，计算预估获得
+watch(() => formData.unitPrice, (newValue) => {
+  const amount = Number.parseFloat(newValue)
+  
+  // 如果输入为空或无效，清空预估获得
+  if (newValue === '' || Number.isNaN(amount) || amount <= 0) {
+    formData.coinAmount = ''
+    return
+  }
+
+  // 限制最小值和最大值
+  if (amount < minValue.value) {
+    formData.unitPrice = String(minValue.value)
+    return
+  }
+  
+  if (amount > maxValue.value) {
+    formData.unitPrice = String(maxValue.value)
+    return
+  }
+
+  if (activeTab.value === 'USDT') {
+    // USDT→TRX
+    formData.coinAmount = (amount * exchangeRate.value.usdtToTrx).toFixed(2)
+  } else {
+    // TRX→USDT
+    formData.coinAmount = (amount * exchangeRate.value.trxToUsdt).toFixed(2)
+  }
+})
+
+// 监听切换标签，重置表单
+watch(activeTab, (newTab) => {
+  formData.unitPrice = newTab === 'USDT' ? '2' : '10'
+  formData.coinAmount = ''
+})
+
+// 失焦时检查并恢复最小值
+const handleBlur = () => {
+  const amount = Number.parseFloat(formData.unitPrice)
+  
+  if (formData.unitPrice === '' || Number.isNaN(amount) || amount < minValue.value) {
+    formData.unitPrice = String(minValue.value)
+  }
+}
+
+// 初始化时获取价格
+onMounted(() => {
+  priceStore.fetchPrice()
+})
 </script>
 
 <style lang="scss" scoped>

@@ -98,6 +98,7 @@
             v-model.number="customForm.count"
             type="number"
             :placeholder="t('lease.enterCustomCount')"
+            min="1"
             clearable
             @keyup.enter="confirmCustomCount"
           >
@@ -118,6 +119,7 @@ import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
 import { storeToRefs } from 'pinia'
 
 defineOptions({ name: 'TimeRental' })
@@ -134,25 +136,15 @@ interface RentalForm {
 const { t } = useI18n()
 
 const commonStore = useCommonStore()
+const priceStore = usePriceStore()
 const { isMobile } = storeToRefs(commonStore)
+const { priceData } = storeToRefs(priceStore)
 
 const rows = computed(() => [
   {
     label: t('lease.selectCount1Hour'),
     validity: 1,
-    validityUnit: 'hour', // 小时
-    options: [
-      `1${t('common.purchase')}`,
-      `2${t('common.purchase')}`,
-      `5${t('common.purchase')}`,
-      `10${t('common.purchase')}`,
-      t('lease.custom'),
-    ],
-  },
-  {
-    label: t('lease.selectCount3Hours'),
-    validity: 3,
-    validityUnit: 'hour', // 小时
+    validityUnit: 'hour',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -164,7 +156,7 @@ const rows = computed(() => [
   {
     label: t('lease.selectCount1Day'),
     validity: 1,
-    validityUnit: 'day', // 天
+    validityUnit: 'day',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -176,7 +168,7 @@ const rows = computed(() => [
   {
     label: t('lease.selectCount3Days'),
     validity: 3,
-    validityUnit: 'day', // 天
+    validityUnit: 'day',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -188,7 +180,7 @@ const rows = computed(() => [
   {
     label: t('lease.selectCount7Days'),
     validity: 7,
-    validityUnit: 'day', // 天
+    validityUnit: 'day',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -200,7 +192,7 @@ const rows = computed(() => [
   {
     label: t('lease.selectCount15Days'),
     validity: 15,
-    validityUnit: 'day', // 天
+    validityUnit: 'day',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -212,7 +204,7 @@ const rows = computed(() => [
   {
     label: t('lease.selectCount30Days'),
     validity: 30,
-    validityUnit: 'day', // 天
+    validityUnit: 'day',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -236,7 +228,23 @@ const customRowIndex = ref<number>(0)
 // 存储自定义数量
 const customCounts = ref<Record<number, number>>({})
 
-const unitPrice = ref(1.9)
+// 根据选中的行（时长）动态获取单价
+const unitPrice = computed(() => {
+  const [rowIdx] = selecteIndex.value
+  if (!priceData.value) return 1.9
+  
+  // 根据行索引映射到对应的价格字段（已删除3小时）
+  const priceMap = [
+    priceData.value.time_1h,  // 1小时
+    priceData.value.time_1d,  // 1天
+    priceData.value.time_3d,  // 3天
+    priceData.value.time_7d,  // 7天
+    priceData.value.time_15d, // 15天
+    priceData.value.time_30d, // 30天
+  ]
+  
+  return parseFloat(priceMap[rowIdx] || priceData.value.time_1h)
+})
 const count = computed(() => {
   const [rowIdx, colIdx] = selecteIndex.value
   const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
@@ -355,7 +363,7 @@ const customRules = computed<FormRules>(() => ({
     { type: 'number', message: t('formValidation.countMustBeNumber'), trigger: 'blur' },
     {
       validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
-        if (value <= 0) {
+        if (value < 1) {
           callback(new Error(t('formValidation.countMustBePositive')))
         } else if (value > 1000) {
           callback(new Error(t('formValidation.countTooLarge')))
