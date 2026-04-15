@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="navbar-container">
-      <div class="logo-section" @click.stop="handleToRouter('/')">
+      <div class="logo-section" @click.stop="handleToRouter('')">
         <div class="logo-icon">
           <img src="@/assets/images/logo.png" alt="Logo" />
         </div>
@@ -22,8 +22,8 @@
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('/') }"
-                  @click="handleToRouter('/')"
+                  :class="{ 'is-active': isActive('') }"
+                  @click="handleToRouter('')"
                 >
                   {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
@@ -79,25 +79,25 @@
               <el-dropdown-menu>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#question') }"
-                  @click.stop="handleToRouter('/', '#question')"
+                  @click.stop="handleToRouter('', '#question')"
                 >
                   {{ $t('nav.faq') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#feature') }"
-                  @click.stop="handleToRouter('/', '#feature')"
+                  @click.stop="handleToRouter('', '#feature')"
                 >
                   {{ $t('nav.features') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#howItWorks') }"
-                  @click.stop="handleToRouter('/', '#howItWorks')"
+                  @click.stop="handleToRouter('', '#howItWorks')"
                 >
                   {{ $t('nav.howItWorks') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#fee') }"
-                  @click.stop="handleToRouter('/', '#fee')"
+                  @click.stop="handleToRouter('', '#fee')"
                 >
                   {{ $t('nav.fee') }}
                 </el-dropdown-item>
@@ -144,7 +144,7 @@
         <div class="balance-display">
           <div class="balance-info">
             <SvgIcon name="header-USDT" width="24" height="24" />
-            <div class="balance-amount">1077</div>
+            <div class="balance-amount">{{ trxBalance }}</div>
           </div>
           <div class="recharge-btn" @click="handleRechange">
             <div class="text">{{ $t('common.recharge') }}</div>
@@ -191,13 +191,13 @@
       <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
-        :class="{ 'is-active': isActive('/') }"
+        :class="{ 'is-active': isActive('') }"
       >
         <div class="menu-wrap">
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('/') }"
-            @click="handleToRouter('/')"
+            :class="{ 'is-active': isActive('') }"
+            @click="handleToRouter('')"
           >
             {{ $t('nav.quickRent') }}
           </div>
@@ -246,28 +246,28 @@
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#question') }"
-            @click.stop="handleToRouter('/', '#question')"
+            @click.stop="handleToRouter('', '#question')"
           >
             {{ $t('nav.faq') }}
           </div>
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#feature') }"
-            @click.stop="handleToRouter('/', '#feature')"
+            @click.stop="handleToRouter('', '#feature')"
           >
             {{ $t('nav.features') }}
           </div>
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#howItWorks') }"
-            @click.stop="handleToRouter('/', '#howItWorks')"
+            @click.stop="handleToRouter('', '#howItWorks')"
           >
             {{ $t('nav.howItWorks') }}
           </div>
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#fee') }"
-            @click.stop="handleToRouter('/', '#fee')"
+            @click.stop="handleToRouter('', '#fee')"
           >
             {{ $t('nav.fee') }}
           </div>
@@ -285,23 +285,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, getCurrentInstance } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-plus'
 import Avatar from '@/assets/icons/header/avatar.svg'
-import { useLogin } from '@/hooks/useLogin'
-import { useRecharge } from '@/hooks/useRecharge'
-import { useRevisePassword } from '@/hooks/useRevisePassword'
-import { useRegister } from '@/hooks/useRegister'
 import { useUserStore } from '@/stores/useUserStore'
 import { useLangStore } from '@/stores/useLangStore'
 import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
+import { getSite } from '@/utils/site'
 
 defineOptions({
   name: 'LayoutHeader',
 })
+
+const instance = getCurrentInstance()
+const proxy = instance?.proxy as any // 使用 any 避免类型检查问题
 
 const localLang = ref(useLangStore().currentLocale)
 const activeNames = ref(['1'])
@@ -320,22 +320,29 @@ const lang = reactive({
   'zh-TW': '繁體中文',
 })
 
-const isActiveHome = computed(() =>
-  ['/', '/lease/time', '/lease/count'].includes(route.path as string),
-)
+const isActiveHome = computed(() => {
+  const site = getSite()
+  const homePaths = [`/${site}`, `/${site}/lease/time`, `/${site}/lease/count`]
+  return homePaths.includes(route.path as string)
+})
 
-const isLogin = computed(() => useUserStore().isLogin)
+const userStore = useUserStore()
+const isLogin = computed(() => userStore.isLogin)
+
+// 获取用户 TRX 余额
+const trxBalance = computed(() => {
+  if (!userStore.userInfo) return '0'
+  return userStore.userInfo.trx_balance || '0'
+})
 
 const route = useRoute()
 const router = useRouter()
-const { open } = useLogin()
-const { open: openRegister } = useRegister()
-const { open: openRecharge } = useRecharge()
-const { open: openRevisePassword } = useRevisePassword()
-const { logout } = useUserStore()
+const { logout } = userStore
 
 const isActive = (path: string) => {
-  return route.path === path
+  const site = getSite()
+  const fullPath = site ? `/${site}${path}` : path
+  return route.path === fullPath
 }
 
 const isHashActive = (hash: string) => {
@@ -343,7 +350,14 @@ const isHashActive = (hash: string) => {
 }
 
 const handleToRouter = (path: string, hash?: string) => {
-  router.push({ path, hash })
+  const site = getSite()
+  
+  // 构建完整路径：/:site/path
+  const fullPath = `/${site}${path}`
+  
+  console.log('[Header] 跳转路由:', { site, path, fullPath, hash })
+  
+  router.push({ path: fullPath, hash })
 
   if (isMobile()) {
     handleMenu('router')
@@ -364,19 +378,19 @@ const handleLanguageChange = (local: Locale) => {
 }
 
 const handleLogin = () => {
-  open()
+  proxy?.$loginPopup?.open()
 }
 
 const handleRegister = () => {
-  openRegister()
+  proxy?.$registerPopup?.open()
 }
 
 const handleRechange = () => {
-  openRecharge()
+  proxy?.$rechargePopup?.open()
 }
 
 const handleModifyPassword = () => {
-  openRevisePassword()
+  proxy?.$revisePasswordPopup?.open()
 }
 
 const handleLogout = () => {

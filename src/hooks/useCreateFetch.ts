@@ -1,14 +1,15 @@
 import { createFetch } from '@vueuse/core'
+import { getToken } from '@/utils/token'
 
 export const useCreateFetch = createFetch({
   baseUrl: '',
   options: {
     async beforeFetch({ options }) {
-      const token = localStorage.getItem('token')
+      const token = getToken()
       if (token) {
         options.headers = {
           ...options.headers,
-          Authorization: `Bearer ${token}`,
+          Authorization: token, // 注意：后端不需要 Bearer 前缀
         }
       }
       return { options }
