@@ -129,6 +129,7 @@
     "viewFaq": "查看常见问题"
   },
   "transferRental": {
+    "transferTemplate": "转账{price}TRX=获取购买{count}笔",
     "transfer35": "转账3.5TRX=获取购买1笔",
     "transfer7": "转账7TRX=获取购买2笔",
     "transfer14": "转账14TRX=获取购买4笔",

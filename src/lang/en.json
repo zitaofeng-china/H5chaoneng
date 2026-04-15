@@ -129,6 +129,7 @@
     "viewFaq": "View FAQ"
   },
   "transferRental": {
+    "transferTemplate": "Transfer {price}TRX = Get {count} Count",
     "transfer35": "Transfer 3.5TRX = Get 1 Count",
     "transfer7": "Transfer 7TRX = Get 2 Counts",
     "transfer14": "Transfer 14TRX = Get 4 Counts",

@@ -35,10 +35,11 @@
             <div class="form-wrap">
               <el-form-item :label="$t('home.totalPrice')" prop="unitPrice">
                 <el-input
-                  v-model="formData.unitPrice"
+                  v-model="unitPrice"
                   type="number"
                   :placeholder="$t('home.enterTotalPrice')"
                   :class="{ 'm-input': isMobile }"
+                  readonly
                 >
                   <template #prefix v-if="isMobile">{{ $t('home.totalPrice') }}</template>
                   <template #suffix>{{ $t('common.trx') }}</template>
@@ -129,9 +130,16 @@ const energyOptions = ref([
 
 const formData = reactive({
   energy: 65000,
-  unitPrice: computed(() => priceData.value?.stroke || '1.9'),
   address: '',
   selectedAddress: '',
+})
+
+// 根据选择的能量数量计算总价
+// 65000 能量 = flash 价格
+// 131000 能量 = flash 价格 × 2
+const unitPrice = computed(() => {
+  const flashPrice = Number.parseFloat(priceData.value?.flash || '1.9')
+  return formData.energy === 131000 ? (flashPrice * 2).toFixed(2) : flashPrice.toFixed(2)
 })
 
 watch([() => formData.energy, () => langStore.currentLocale], () => {
@@ -143,10 +151,6 @@ watch([() => formData.energy, () => langStore.currentLocale], () => {
 
 const formRules = computed<FormRules>(() => ({
   energy: [{ required: false, message: t('formValidation.selectEnergy'), trigger: 'change' }],
-  unitPrice: [
-    { required: true, message: t('formValidation.unitPriceRequired'), trigger: 'blur' },
-    { pattern: /^\d+(\.\d+)?$/, message: t('formValidation.unitPriceInvalid'), trigger: 'blur' },
-  ],
   address: [
     { required: true, message: t('formValidation.addressRequired'), trigger: 'blur' },
     { min: 10, message: t('formValidation.addressTooShort'), trigger: 'blur' },
@@ -368,6 +372,12 @@ onUnmounted(() => {
       border: 1px solid rgba(2, 15, 45, 0.08);
       padding: 0 12px;
       min-height: 44px;
+
+      &.is-disabled,
+      &:has(.el-input__inner[readonly]) {
+        background: rgba(2, 15, 45, 0.02);
+        cursor: not-allowed;
+      }
     }
 
     :deep(.el-input__inner) {
@@ -375,6 +385,10 @@ onUnmounted(() => {
       line-height: 44px;
       font-size: 14px;
       color: var(--theme-text-black);
+
+      &[readonly] {
+        cursor: not-allowed;
+      }
     }
 
     :deep(.el-input__suffix-inner) {
