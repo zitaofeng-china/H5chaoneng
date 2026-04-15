@@ -5,23 +5,17 @@
 // 认证模块
 export * as authApi from './modules/auth'
 
-// 用户模块
-export * as userApi from './modules/user'
+// Site 模块
+export * as siteApi from './modules/site'
 
-// 能量租赁模块
-export * as rentalApi from './modules/rental'
+// 价格模块
+export * as priceApi from './modules/price'
 
-// 合约闪兑模块
-export * as contractApi from './modules/contract'
-
-// 智能托管模块
-export * as hostingApi from './modules/hosting'
-
-// 批量激活模块
-export * as activationApi from './modules/activation'
+// 地址模块
+export * as addressApi from './modules/address'
 
 // 导出请求方法
-export { get, post, put, del, patch } from './request'
+export { get, post } from './request'
 
 // 导出通用类型
 export type { ApiResponse } from './types'
