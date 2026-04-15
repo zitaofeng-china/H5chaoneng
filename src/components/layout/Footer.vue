@@ -84,6 +84,7 @@
 import { handleOpenToTelegram, handleOXAccount, handleOpenEmail } from '@/utils'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { getSite } from '@/utils/site'
 
 defineOptions({
   name: 'LayoutFooter',
@@ -99,7 +100,10 @@ const currentYear = computed(() => new Date().getFullYear())
 const router = useRouter()
 
 const handleToRouter = (path: string, hash?: string) => {
-  router.push({ path, hash })
+  const site = getSite()
+  // 构建完整路径：/:site/path
+  const fullPath = `/${site}${path}`
+  router.push({ path: fullPath, hash })
 }
 </script>
 
