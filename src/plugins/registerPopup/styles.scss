@@ -1,6 +1,7 @@
 /**
  * 注册弹窗样式
  */
+@use '@/assets/styles/_mixins.scss' as *;
 
 .register-header {
   padding: 0;

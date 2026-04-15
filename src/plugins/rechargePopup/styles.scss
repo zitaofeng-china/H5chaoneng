@@ -1,6 +1,7 @@
 /**
  * 充值弹窗样式
  */
+@use '@/assets/styles/_mixins.scss' as *;
 
 .recharge-dialog {
   .arrow-left-icon {

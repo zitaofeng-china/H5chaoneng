@@ -1,6 +1,7 @@
 /**
  * 登录弹窗样式
  */
+@use '@/assets/styles/_mixins.scss' as *;
 
 .login-header {
   padding: 0;

@@ -1,6 +1,7 @@
 /**
  * 修改密码弹窗样式
  */
+@use '@/assets/styles/_mixins.scss' as *;
 
 .revise-dialog {
   .revise-title {
