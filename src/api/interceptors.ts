@@ -83,13 +83,13 @@ export function responseInterceptor<T = any>(
 
   // 提取响应数据（确保 code 是字符串类型）
   const code = String(response[codeField as keyof typeof response])
-  const message = response[messageField as keyof typeof response] as string
+  const msg = response[messageField as keyof typeof response] as string
   const data = response[dataField as keyof typeof response] as T
 
-  // 返回标准格式
+  // 返回标准格式（保持后端字段名 msg）
   return {
     code,
-    message,
+    msg,
     data,
   }
 }

@@ -35,17 +35,23 @@
 import { reactive, ref, computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
-import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import FeeCard from '@/components/feeCard/index.vue'
 import KindTips from '@/components/kindTips/index.vue'
 import AddressList from './AddressList.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { orderApi } from '@/api'
+import { OrderKind } from '@/api/modules/order/types'
+import { handleResponse } from '@/utils/response'
 
 const { t } = useI18n()
 const commonStore = useCommonStore()
 const priceStore = usePriceStore()
+const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
+const { userInfo } = storeToRefs(userStore)
 
 const texts = computed(() => {
   const price65k = priceStore.priceData?.hosting_65k || '3'
@@ -84,19 +90,56 @@ const handleSaveAddress = async () => {
   try {
     await formRef.value.validateField('address')
 
-    if (formData.address) {
-      ElMessage.success(t('formValidation.addressSaveSuccess'))
-    } else {
+    if (!formData.address) {
       ElMessage.warning(t('formValidation.enterAddressToSave'))
+      return
+    }
+
+    // 解析地址列表（支持逗号或换行分隔）
+    const addressList = formData.address
+      .split(/[,，\n\r]+/)  // 支持中英文逗号和换行符
+      .map(addr => addr.trim())  // 去除首尾空格
+      .filter(addr => addr.length > 0)  // 过滤空字符串
+
+    if (addressList.length === 0) {
+      ElMessage.warning('请输入有效的地址')
+      return
+    }
+
+    // 构建订单参数
+    const orderParams = {
+      count: undefined,                  // 托管不需要数量
+      duration: undefined,               // 托管不需要时长
+      kind: OrderKind.KindHosting,       // kind = 8（智能托管）
+      target: addressList,               // 地址数组
+      user_id: userInfo.value?.id || 0,  // 用户ID
+    }
+
+    // 调用创建订单接口
+    const response = await orderApi.createOrder(orderParams)
+    
+    // 处理响应并显示提示
+    const success = handleResponse(response, {
+      context: 'hosting', // 托管场景
+    })
+    
+    if (success) {
+      // 订单创建成功后清空表单
+      formData.address = ''
+      // 可以刷新地址列表
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
   }
 }
 
-// 初始化时获取价格
+// 初始化时获取价格和用户信息
 onMounted(() => {
   priceStore.fetchPrice()
+  // 如果用户已登录，获取用户信息
+  if (userStore.isLogin) {
+    userStore.fetchUserInfo()
+  }
 })
 </script>
 

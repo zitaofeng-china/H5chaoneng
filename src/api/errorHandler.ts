@@ -17,7 +17,8 @@ function showErrorMessage(message: string) {
 }
 
 /**
- * HTTP 错误处理
+ * HTTP 错误处理（404、500等）
+ * 这些错误需要立即显示，因为请求根本没有成功
  */
 export function handleHttpError(
   code: number,
@@ -35,33 +36,8 @@ export function handleHttpError(
 
   return {
     code,
-    message: errorMessage,
+    msg: errorMessage,
     data: null as any,
-  }
-}
-
-/**
- * 业务错误处理
- */
-export function handleBusinessError(
-  code: number | string,
-  message: string,
-  url: string,
-  method: string,
-  data?: any
-): ApiResponse {
-  const errorMessage = message || `业务错误 ${code}`
-  
-  if (import.meta.env.DEV) {
-    console.error('[Business Error]', { code, message, url, method, data })
-  }
-
-  showErrorMessage(errorMessage)
-
-  return {
-    code,
-    message: errorMessage,
-    data: data || null,
   }
 }
 

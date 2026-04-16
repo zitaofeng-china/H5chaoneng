@@ -28,14 +28,14 @@
                   {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('/lease/time') }"
-                  @click="handleToRouter('/lease/time')"
+                  :class="{ 'is-active': isActive('/lease-time') }"
+                  @click="handleToRouter('/lease-time')"
                 >
                   {{ $t('nav.rentByTime') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('/lease/count') }"
-                  @click="handleToRouter('/lease/count')"
+                  :class="{ 'is-active': isActive('/lease-count') }"
+                  @click="handleToRouter('/lease-count')"
                 >
                   {{ $t('nav.rentByCount') }}
                 </el-dropdown-item>
@@ -203,15 +203,15 @@
           </div>
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('/lease/time') }"
-            @click="handleToRouter('/lease/time')"
+            :class="{ 'is-active': isActive('/lease-time') }"
+            @click="handleToRouter('/lease-time')"
           >
             {{ $t('nav.rentByTime') }}
           </div>
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('/lease/count') }"
-            @click="handleToRouter('/lease/count')"
+            :class="{ 'is-active': isActive('/lease-count') }"
+            @click="handleToRouter('/lease-count')"
           >
             {{ $t('nav.rentByCount') }}
           </div>
@@ -322,7 +322,7 @@ const lang = reactive({
 
 const isActiveHome = computed(() => {
   const site = getSite()
-  const homePaths = [`/${site}/`, `/${site}/lease/time`, `/${site}/lease/count`]
+  const homePaths = [`/${site}/`, `/${site}/lease-time`, `/${site}/lease-count`]
   return homePaths.includes(route.path as string)
 })
 

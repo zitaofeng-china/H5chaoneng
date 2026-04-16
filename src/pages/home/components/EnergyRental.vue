@@ -104,21 +104,27 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, onUnmounted } from 'vue'
+import { ref, reactive, watch, computed, onUnmounted, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { authApi, orderApi } from '@/api'
+import { OrderKind } from '@/api/modules/order/types'
+import { handleResponse } from '@/utils/response'
 import { storeToRefs } from 'pinia'
 
 const { t } = useI18n()
 const langStore = useLangStore()
 const commonStore = useCommonStore()
 const priceStore = usePriceStore()
+const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { priceData } = storeToRefs(priceStore)
+const { userInfo } = storeToRefs(userStore)
 
 const activeTab = ref('balance')
 const formRef = ref<FormInstance>()
@@ -152,19 +158,49 @@ watch([() => formData.energy, () => langStore.currentLocale], () => {
 const formRules = computed<FormRules>(() => ({
   energy: [{ required: false, message: t('formValidation.selectEnergy'), trigger: 'change' }],
   address: [
-    { required: true, message: t('formValidation.addressRequired'), trigger: 'blur' },
-    { min: 10, message: t('formValidation.addressTooShort'), trigger: 'blur' },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: string | Error) => void) => {
+        // 如果已保存地址有值，则租用地址可以为空
+        if (formData.selectedAddress) {
+          callback()
+        } else if (!value) {
+          // 如果已保存地址为空，则租用地址必填
+          callback(new Error(t('formValidation.addressRequired')))
+        } else if (value.length < 10) {
+          callback(new Error(t('formValidation.addressTooShort')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
   ],
   selectedAddress: [
-    { required: true, message: t('formValidation.selectAddress'), trigger: 'change' },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: string | Error) => void) => {
+        // 如果租用地址有值，则已保存地址可以为空
+        if (formData.address) {
+          callback()
+        } else if (!value) {
+          // 如果租用地址为空，则已保存地址必选
+          callback(new Error(t('formValidation.selectAddress')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change',
+    },
   ],
 }))
 
-const addressOptions = ref([
-  { label: `${t('home.addressLabel')} 1`, value: 'address1' },
-  { label: `${t('home.addressLabel')} 2`, value: 'address2' },
-  { label: `${t('home.addressLabel')} 3`, value: 'address3' },
-])
+const addressOptions = computed(() => {
+  // 从用户信息的 address_list 中获取地址列表
+  const addresses = userInfo.value?.address_list || []
+  return addresses.map((addr, index) => ({
+    label: addr,
+    value: addr,
+  }))
+})
 
 const handleSaveAddress = async () => {
   if (!formRef.value) return
@@ -172,15 +208,33 @@ const handleSaveAddress = async () => {
   try {
     await formRef.value.validateField('address')
 
-    if (formData.address) {
-      const newAddress = {
-        label: formData.address,
-        value: formData.address,
-      }
-      addressOptions.value.push(newAddress)
-      ElMessage.success(t('formValidation.addressSaveSuccess'))
-    } else {
+    if (!formData.address) {
       ElMessage.warning(t('formValidation.enterAddressToSave'))
+      return
+    }
+
+    // 检查地址是否已存在
+    const existingAddresses = userInfo.value?.address_list || []
+    if (existingAddresses.includes(formData.address)) {
+      ElMessage.warning('该地址已存在')
+      return
+    }
+
+    // 更新用户地址列表
+    const updatedAddressList = [...existingAddresses, formData.address]
+    const response = await authApi.updateUserInfo({ address_list: updatedAddressList })
+
+    // 处理响应并显示提示（使用场景上下文）
+    const success = handleResponse(response, {
+      context: 'address_save', // 地址保存场景
+    })
+
+    if (success) {
+      // 重新获取用户信息
+      const userResponse = await authApi.getUserInfo()
+      if (userResponse.data) {
+        userStore.updateUserInfo(userResponse.data)
+      }
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
@@ -193,20 +247,52 @@ const handleRentNow = async () => {
   try {
     await formRef.value.validate()
 
-    if (!formData.address && !formData.selectedAddress) {
-      ElMessage.warning(t('formValidation.enterOrSelectAddress'))
-      return
+    // 根据选择的能量数量确定 count
+    const count = formData.energy === 131000 ? 2 : 1
+
+    // 优先使用租用地址，如果没有则使用已保存地址
+    const targetAddress = formData.address || formData.selectedAddress
+
+    // 调用创建订单接口
+    const orderParams = {
+      count,
+      duration: 3600,  // 1小时 = 3600秒
+      kind: OrderKind.KindFlashEnergy,  // kind = 7
+      target: [targetAddress],
+      user_id: userInfo.value?.id || 0,
     }
 
-    ElMessage.success(t('formValidation.renting', { energy: formData.energy }))
-
-    setTimeout(() => {
-      ElMessage.success(t('formValidation.energyAdded', { energy: formData.energy }))
-    }, 2000)
+    const response = await orderApi.createOrder(orderParams)
+    
+    // 处理响应并显示提示（使用场景上下文）
+    const success = handleResponse(response, {
+      context: 'order_create', // 订单创建场景
+      // 不需要手动指定 successMessage 和 errorMessage
+      // 会自动根据 context 和 code 获取准确的提示
+    })
+    
+    if (success) {
+      // 订单创建成功后的处理
+      // TODO: 可以在这里添加成功后的逻辑，比如跳转到订单页面
+    }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
   }
 }
+
+onMounted(async () => {
+  // 获取用户信息
+  if (userStore.isLogin) {
+    try {
+      const response = await authApi.getUserInfo()
+      if (response.data) {
+        userStore.updateUserInfo(response.data)
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+    }
+  }
+})
 
 onUnmounted(() => {
   formRef.value?.resetFields()

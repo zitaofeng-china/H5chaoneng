@@ -3,9 +3,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // 独立的 404 路由（不带 site 前缀）
     {
       path: '/404',
-      name: 'NotFound',
+      name: 'NotFoundStandalone',
       component: () => import('@/pages/404/index.vue'),
     },
     {
@@ -17,20 +18,14 @@ const router = createRouter({
           component: () => import('@/pages/home/index.vue'),
         },
         {
-          path: 'lease',
-          name: 'LeasePage',
-          children: [
-            {
-              path: 'time',
-              name: 'TimeRentPage',
-              component: () => import('@/pages/lease/time/index.vue'),
-            },
-            {
-              path: 'count',
-              name: 'CountRentPage',
-              component: () => import('@/pages/lease/count/index.vue'),
-            },
-          ],
+          path: 'lease-time',
+          name: 'TimeRentPage',
+          component: () => import('@/pages/lease/time/index.vue'),
+        },
+        {
+          path: 'lease-count',
+          name: 'CountRentPage',
+          component: () => import('@/pages/lease/count/index.vue'),
         },
         {
           path: 'contract',
@@ -47,11 +42,13 @@ const router = createRouter({
           name: 'Activation',
           component: () => import('@/pages/activation/index.vue'),
         },
+        // 在 site 路由组内的 404
+        {
+          path: ':pathMatch(.*)*',
+          name: 'NotFound',
+          component: () => import('@/pages/404/index.vue'),
+        },
       ],
-    },
-    {
-      path: '/:pathMatch(.*)*',
-      redirect: '/404',
     },
   ],
   scrollBehavior(to) {

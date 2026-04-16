@@ -14,6 +14,9 @@ export * as priceApi from './modules/price'
 // 地址模块
 export * as addressApi from './modules/address'
 
+// 订单模块
+export * as orderApi from './modules/order'
+
 // 导出请求方法
 export { get, post } from './request'
 

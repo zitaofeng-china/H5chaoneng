@@ -1,7 +1,8 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { LoginResponse } from '@/api/modules/auth/types'
-import { getToken, setToken, removeToken, setRefreshToken, removeRefreshToken, getUserInfo, setUserInfo, removeUserInfo } from '@/utils/token'
+import { getToken, setToken, removeToken, setRefreshToken, removeRefreshToken, getUserInfo as getStoredUserInfo, setUserInfo, removeUserInfo } from '@/utils/token'
+import { logout as logoutApi, getUserInfo as getUserInfoApi } from '@/api/modules/auth'
 
 export const useUserStore = defineStore('user', () => {
   const token = ref('')
@@ -12,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
   // 初始化：从当前 Site 的存储中加载
   function init() {
     token.value = getToken() || ''
-    userInfo.value = getUserInfo()
+    userInfo.value = getStoredUserInfo()
   }
 
   function login(response: LoginResponse) {
@@ -30,13 +31,22 @@ export const useUserStore = defineStore('user', () => {
     }
   }
 
-  function logout() {
-    token.value = ''
-    userInfo.value = null
-    
-    removeToken()
-    removeRefreshToken()
-    removeUserInfo()
+  async function logout() {
+    try {
+      // 调用后端登出接口
+      await logoutApi()
+    } catch (error) {
+      console.error('登出接口调用失败:', error)
+      // 即使接口失败，也要清除本地数据
+    } finally {
+      // 清除本地存储
+      token.value = ''
+      userInfo.value = null
+      
+      removeToken()
+      removeRefreshToken()
+      removeUserInfo()
+    }
   }
 
   // 更新用户信息（登录后获取用户信息时使用）
@@ -44,6 +54,20 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = info || null
     if (info) {
       setUserInfo(info)
+    }
+  }
+
+  // 从服务器获取用户信息
+  async function fetchUserInfo() {
+    try {
+      const response = await getUserInfoApi()
+      if (response.code === 0 && response.data) {
+        updateUserInfo(response.data)
+        return response.data
+      }
+    } catch (error) {
+      console.error('获取用户信息失败:', error)
+      return null
     }
   }
 
@@ -55,5 +79,6 @@ export const useUserStore = defineStore('user', () => {
     login,
     logout,
     updateUserInfo,
+    fetchUserInfo,
   }
 })

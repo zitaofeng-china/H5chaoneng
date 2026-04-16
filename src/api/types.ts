@@ -5,7 +5,7 @@
 // 通用响应结构
 export interface ApiResponse<T = any> {
   code: number | string // 支持数字和字符串类型的状态码
-  message: string
+  msg: string // 后端统一使用 msg 字段
   data: T
 }
 

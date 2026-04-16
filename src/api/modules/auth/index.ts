@@ -2,7 +2,7 @@
  * 认证模块 API
  */
 
-import { post, get } from '@/api/request'
+import { post, get, put } from '@/api/request'
 import type {
   LoginParams,
   LoginResponse,
@@ -86,7 +86,7 @@ export function refreshToken(params: RefreshTokenParams) {
  * 用户登出
  */
 export function logout() {
-  return post<LogoutResponse>('/auth/logout')
+  return post<LogoutResponse>('/v3/logout')
 }
 
 /**
@@ -100,5 +100,5 @@ export function getUserInfo() {
  * 更新用户信息
  */
 export function updateUserInfo(params: Partial<UserInfo>) {
-  return post<UserInfo>('/auth/update-user-info', params)
+  return put<UserInfo>('/v3/user', params)
 }

@@ -120,6 +120,10 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { orderApi } from '@/api'
+import { OrderKind } from '@/api/modules/order/types'
+import { handleResponse } from '@/utils/response'
 import { storeToRefs } from 'pinia'
 
 defineOptions({ name: 'TimeRental' })
@@ -137,8 +141,10 @@ const { t } = useI18n()
 
 const commonStore = useCommonStore()
 const priceStore = usePriceStore()
+const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { priceData } = storeToRefs(priceStore)
+const { userInfo } = storeToRefs(userStore)
 
 const rows = computed(() => [
   {
@@ -414,9 +420,46 @@ const confirmCustomCount = async () => {
 
 const rentNow = async () => {
   if (!formRef.value) return
+  
   try {
     await formRef.value.validate()
-    ElMessage.success(`${t('formValidation.rentalSuccess')} ${totalDisplay.value}`)
+
+    // 计算 duration（转换为秒数）
+    const [rowIdx] = selecteIndex.value
+    const validityValue = rows.value[rowIdx]?.validity || 1
+    const validityUnitValue = rows.value[rowIdx]?.validityUnit || 'day'
+    
+    let durationInSeconds: number
+    if (validityUnitValue === 'hour') {
+      // 小时转秒：1小时 = 3600秒
+      durationInSeconds = validityValue * 3600
+    } else {
+      // 天转秒：1天 = 86400秒
+      durationInSeconds = validityValue * 86400
+    }
+
+    // 构建订单参数
+    const orderParams = {
+      count: count.value,                    // 笔数
+      duration: durationInSeconds,           // 有效时间（秒）
+      kind: OrderKind.KindTimeEnergy,        // kind = 4（按时间租用）
+      target: [wallet.value],                // 地址数组
+      user_id: userInfo.value?.id || 0,      // 用户ID
+    }
+
+    // 调用创建订单接口
+    const response = await orderApi.createOrder(orderParams)
+    
+    // 处理响应并显示提示
+    const success = handleResponse(response, {
+      context: 'lease_time', // 按时间租用场景
+    })
+    
+    if (success) {
+      // 订单创建成功后的处理
+      // 可以清空表单或跳转到订单页面
+      wallet.value = ''
+    }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
   }

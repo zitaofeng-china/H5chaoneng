@@ -5,7 +5,7 @@
 import type { ApiResponse } from './types'
 import { BASE_URL, REQUEST_TIMEOUT, RESPONSE_CONFIG } from './config'
 import { requestInterceptor, responseInterceptor } from './interceptors'
-import { handleHttpError, handleBusinessError } from './errorHandler'
+import { handleHttpError } from './errorHandler'
 
 // 请求配置
 interface RequestConfig extends RequestInit {
@@ -77,8 +77,17 @@ async function request<T = any>(
     const { successCode } = RESPONSE_CONFIG
     const isSuccess = data.code === successCode
 
+    // 不在这里显示错误提示，由组件层统一处理
     if (!isSuccess) {
-      return handleBusinessError(data.code, data.message, fullUrl, method, data.data)
+      if (import.meta.env.DEV) {
+        console.error('[Business Error]', {
+          code: data.code,
+          msg: data.msg,
+          url: fullUrl,
+          method,
+          data: data.data,
+        })
+      }
     }
 
     return data
@@ -88,14 +97,14 @@ async function request<T = any>(
       if (error.message === 'Request timeout') {
         return {
           code: -1,
-          message: '请求超时',
+          msg: '请求超时',
           data: null as any,
         }
       }
       if (error.message.includes('Failed to fetch')) {
         return {
           code: -1,
-          message: '网络错误',
+          msg: '网络错误',
           data: null as any,
         }
       }
@@ -104,7 +113,7 @@ async function request<T = any>(
     // 未知错误
     return {
       code: -1,
-      message: error instanceof Error ? error.message : '未知错误',
+      msg: error instanceof Error ? error.message : '未知错误',
       data: null as any,
     }
   }
@@ -127,6 +136,28 @@ export function get<T = any>(url: string, params?: Record<string, any>, config?:
 export function post<T = any>(url: string, data?: any, config?: RequestConfig) {
   return request<T>(url, {
     method: 'POST',
+    body: JSON.stringify(data),
+    ...config,
+  })
+}
+
+/**
+ * PUT 请求
+ */
+export function put<T = any>(url: string, data?: any, config?: RequestConfig) {
+  return request<T>(url, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+    ...config,
+  })
+}
+
+/**
+ * PATCH 请求
+ */
+export function patch<T = any>(url: string, data?: any, config?: RequestConfig) {
+  return request<T>(url, {
+    method: 'PATCH',
     body: JSON.stringify(data),
     ...config,
   })
