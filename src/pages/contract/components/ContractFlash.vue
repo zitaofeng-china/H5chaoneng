@@ -43,7 +43,7 @@
           </div>
         </el-form>
         <RateCard :coin="activeTab" :rate="displayRate" :stock="displayStock" />
-        <WalletQrcode :coin="activeTab" />
+        <WalletQrcode :coin="activeTab" :payment-address="paymentAddress" @retry="handleRetryFetchAddress" />
       </el-tabs>
     </el-card>
   </div>
@@ -54,6 +54,8 @@ import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { type FormInstance } from 'element-plus'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { addressApi } from '@/api'
+import { AddressKind } from '@/api/modules/address/types'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
@@ -62,11 +64,50 @@ const priceStore = usePriceStore()
 
 const activeTab = ref('USDT')
 const formRef = ref<FormInstance>()
+const paymentAddress = ref('')
 
 const formData = reactive({
   unitPrice: '2',
   coinAmount: '',
 })
+
+// 获取付款地址（USDT和TRX都使用同一个kind=3）
+const fetchPaymentAddress = async () => {
+  try {
+    const response = await addressApi.getAddress({ kind: AddressKind.FLASH_EXCHANGE })
+    console.log('获取付款地址响应:', response)
+    
+    // 检查响应数据结构
+    if (response.data) {
+      const data = response.data as any
+      // 如果 data 是对象且有 address 字段
+      if (typeof data === 'object' && !Array.isArray(data) && 'address' in data) {
+        paymentAddress.value = data.address
+      }
+      // 如果 data 是数组，查找 addressKind=3 的项
+      else if (Array.isArray(data)) {
+        const addressItem = data.find((item: any) => item.addressKind === 3)
+        if (addressItem?.address) {
+          paymentAddress.value = addressItem.address
+        }
+      }
+      // 如果 data 直接是地址字符串
+      else if (typeof data === 'string') {
+        paymentAddress.value = data
+      }
+    }
+    
+    console.log('解析后的付款地址:', paymentAddress.value)
+  } catch (error) {
+    console.error('获取付款地址失败:', error)
+  }
+}
+
+// 处理重试
+const handleRetryFetchAddress = () => {
+  paymentAddress.value = '' // 清空地址，触发重新加载
+  fetchPaymentAddress()
+}
 
 // 获取汇率
 const exchangeRate = computed(() => {
@@ -149,9 +190,10 @@ const handleBlur = () => {
   }
 }
 
-// 初始化时获取价格
+// 初始化时获取价格和付款地址
 onMounted(() => {
   priceStore.fetchPrice()
+  fetchPaymentAddress()
 })
 </script>
 

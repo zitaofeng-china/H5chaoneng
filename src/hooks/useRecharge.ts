@@ -6,12 +6,10 @@ import { ref, computed } from 'vue'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/useUserStore'
-import { authApi } from '@/api'
+import { authApi, addressApi } from '@/api'
+import { AddressKind } from '@/api/modules/address/types'
 import { useCopyToClipboard } from './useCopyToClipboard'
 import type { UserAccountInfo, TableRow } from '@/plugins/rechargePopup/types'
-
-// 固定的充值地址
-const FIXED_RECHARGE_ADDRESS = 'TVu2qP0XXDwm2W6S5m1i8iVyv2mVAUakax'
 
 export function useRecharge() {
   const { t } = useI18n()
@@ -19,6 +17,41 @@ export function useRecharge() {
   const { isCopying, copyText } = useCopyToClipboard()
 
   const visible = ref(false)
+  const rechargeAddress = ref<string>('')
+  const isLoadingAddress = ref(false)
+
+  /**
+   * 获取充值地址
+   */
+  const fetchRechargeAddress = async () => {
+    isLoadingAddress.value = true
+    try {
+      const response = await addressApi.getAddress({ kind: AddressKind.RECHARGE })
+      
+      if (response.code === '000000' && response.data) {
+        // 处理多种可能的数据结构
+        let address = ''
+        
+        if (typeof response.data === 'string') {
+          address = response.data
+        } else if (Array.isArray(response.data) && response.data.length > 0) {
+          address = typeof response.data[0] === 'string' 
+            ? response.data[0] 
+            : response.data[0].address || ''
+        } else if (typeof response.data === 'object' && 'address' in response.data) {
+          address = response.data.address || ''
+        }
+        
+        if (address) {
+          rechargeAddress.value = address
+        }
+      }
+    } catch (error) {
+      console.error('获取充值地址失败:', error)
+    } finally {
+      isLoadingAddress.value = false
+    }
+  }
 
   /**
    * 获取用户账户信息
@@ -50,19 +83,27 @@ export function useRecharge() {
     { label: t('recharge.email'), value: userAccountInfo.value.email },
     { label: t('recharge.tgOfficial'), value: userAccountInfo.value.tgOfficialNumber },
     { label: t('recharge.trxBalance'), value: userAccountInfo.value.trxAmount },
-    { label: t('recharge.rechargeAddress'), value: FIXED_RECHARGE_ADDRESS, type: 'address' },
+    { 
+      label: t('recharge.rechargeAddress'), 
+      value: rechargeAddress.value || '-', 
+      type: 'address' 
+    },
   ])
 
   /**
    * 生成二维码
    */
-  const qrCode = useQRCode(FIXED_RECHARGE_ADDRESS)
+  const qrCode = computed(() => {
+    return rechargeAddress.value ? useQRCode(rechargeAddress.value).value : ''
+  })
 
   /**
    * 复制充值地址
    */
   const copyAddress = () => {
-    copyText(FIXED_RECHARGE_ADDRESS)
+    if (rechargeAddress.value) {
+      copyText(rechargeAddress.value)
+    }
   }
 
   /**
@@ -86,7 +127,10 @@ export function useRecharge() {
    */
   const open = async () => {
     visible.value = true
-    await fetchUserInfo()
+    await Promise.all([
+      fetchUserInfo(),
+      fetchRechargeAddress()
+    ])
   }
 
   /**
@@ -99,8 +143,10 @@ export function useRecharge() {
   return {
     visible,
     isCopying,
+    isLoadingAddress,
     tableData,
     qrCode,
+    rechargeAddress,
     copyAddress,
     open,
     close,

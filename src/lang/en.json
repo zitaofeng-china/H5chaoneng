@@ -26,7 +26,10 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "Recharge"
+    "recharge": "Recharge",
+    "loadFailed": "Load Failed",
+    "loadFailedHint": "Please check your network connection or try again later",
+    "retry": "Retry"
   },
   "nav": {
     "home": "Home",
@@ -294,6 +297,7 @@
     "passwordRequired": "Please enter password",
     "passwordMinLength": "Password cannot be less than 6 characters",
     "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
     "logout": "Logout"
   },
   "register": {
@@ -387,5 +391,14 @@
     "renting": "Renting {energy} energy...",
     "energyAdded": "{energy} energy has been successfully added to your address",
     "customCountSet": "Custom count set successfully"
+  },
+  "welcome": {
+    "importantNotice": "Important Notice",
+    "iAcknowledge": "I have read and acknowledged all the above information",
+    "confirmAndContinue": "Confirm and Continue",
+    "notice1": "Please verify the receiving address before transfer",
+    "notice2": "Energy rental has time limits. Use within validity period",
+    "notice3": "Please read the transaction notice carefully before trading",
+    "notice4": "Contact customer service immediately if you encounter any issues"
   }
 }

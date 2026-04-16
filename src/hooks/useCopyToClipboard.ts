@@ -27,11 +27,23 @@ export function useCopyToClipboard() {
     isCopying.value = true
     try {
       await copy(text)
-      ElMessage.success(t('transferRental.copyAddress'))
+      ElMessage({
+        message: t('transferRental.copyAddress'),
+        type: 'success',
+        duration: 2500,
+        showClose: false,
+        customClass: 'copy-success-message',
+        offset: 80,
+      })
       return true
     } catch (error) {
       console.error('复制失败:', error)
-      ElMessage.error(t('transferRental.copyFailed'))
+      ElMessage({
+        message: t('transferRental.copyFailed'),
+        type: 'error',
+        duration: 2500,
+        showClose: false,
+      })
       return false
     } finally {
       setTimeout(() => {

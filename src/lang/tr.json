@@ -26,7 +26,10 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "Şarj"
+    "recharge": "Şarj",
+    "loadFailed": "Yükleme Başarısız",
+    "loadFailedHint": "Lütfen ağ bağlantınızı kontrol edin veya daha sonra tekrar deneyin",
+    "retry": "Tekrar Dene"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -291,6 +294,7 @@
     "passwordRequired": "Lütfen şifreyi girin",
     "passwordMinLength": "Şifre 6 karakterden az olamaz",
     "loginSuccess": "Giriş başarılı",
+    "loginFailed": "Giriş başarısız",
     "logout": "Çıkış Yap"
   },
   "register": {
@@ -384,5 +388,14 @@
     "renting": "{energy} enerjisi kiralanıyor...",
     "energyAdded": "{energy} enerjisi adresinize başarıyla eklendi",
     "customCountSet": "Özel miktar başarıyla ayarlandı"
+  },
+  "welcome": {
+    "importantNotice": "Önemli Duyuru",
+    "iAcknowledge": "Yukarıdaki tüm bilgileri okudum ve onaylıyorum",
+    "confirmAndContinue": "Onayla ve Devam Et",
+    "notice1": "Lütfen transfer yapmadan önce alıcı adresini doğrulayın",
+    "notice2": "Enerji kiralamanın zaman sınırları vardır. Geçerlilik süresi içinde kullanın",
+    "notice3": "Lütfen işlem yapmadan önce işlem bildirimini dikkatlice okuyun",
+    "notice4": "Herhangi bir sorunla karşılaşırsanız derhal müşteri hizmetleriyle iletişime geçin"
   }
 }

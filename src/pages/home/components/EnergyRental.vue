@@ -96,7 +96,7 @@
         </el-tab-pane>
 
         <el-tab-pane :label="$t('home.transferRental')" name="transfer">
-          <TransferRental />
+          <TransferRental :payment-address="paymentAddress" @retry="handleRetryFetchAddress" />
         </el-tab-pane>
       </el-tabs>
     </el-card>
@@ -112,8 +112,9 @@ import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
-import { authApi, orderApi } from '@/api'
+import { authApi, orderApi, addressApi } from '@/api'
 import { OrderKind } from '@/api/modules/order/types'
+import { AddressKind } from '@/api/modules/address/types'
 import { handleResponse } from '@/utils/response'
 import { storeToRefs } from 'pinia'
 
@@ -128,11 +129,57 @@ const { userInfo } = storeToRefs(userStore)
 
 const activeTab = ref('balance')
 const formRef = ref<FormInstance>()
+const paymentAddress = ref('')
 
 const energyOptions = ref([
   { label: `${t('common.65000')} ${t('lease.energy')}`, value: 65000 },
   { label: `${t('common.131000')} ${t('lease.energy')}`, value: 131000 },
 ])
+
+// 监听标签页切换，当切换到转账租赁时获取付款地址
+watch(activeTab, async (newTab) => {
+  if (newTab === 'transfer' && !paymentAddress.value) {
+    await fetchPaymentAddress()
+  }
+})
+
+// 获取付款地址
+const fetchPaymentAddress = async () => {
+  try {
+    const response = await addressApi.getAddress({ kind: AddressKind.FLASH_ENERGY_TRANSFER })
+    console.log('获取付款地址响应:', response)
+    
+    // 检查响应数据结构
+    if (response.data) {
+      const data = response.data as any
+      // 如果 data 是对象且有 address 字段
+      if (typeof data === 'object' && !Array.isArray(data) && 'address' in data) {
+        paymentAddress.value = data.address
+      }
+      // 如果 data 是数组，查找 addressKind=4 的项
+      else if (Array.isArray(data)) {
+        const addressItem = data.find((item: any) => item.addressKind === 4)
+        if (addressItem?.address) {
+          paymentAddress.value = addressItem.address
+        }
+      }
+      // 如果 data 直接是地址字符串
+      else if (typeof data === 'string') {
+        paymentAddress.value = data
+      }
+    }
+    
+    console.log('解析后的付款地址:', paymentAddress.value)
+  } catch (error) {
+    console.error('获取付款地址失败:', error)
+  }
+}
+
+// 处理重试
+const handleRetryFetchAddress = () => {
+  paymentAddress.value = '' // 清空地址，触发重新加载
+  fetchPaymentAddress()
+}
 
 const formData = reactive({
   energy: 65000,

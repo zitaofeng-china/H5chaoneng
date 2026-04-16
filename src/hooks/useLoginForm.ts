@@ -95,7 +95,8 @@ export function useLoginForm() {
 
       // 检查响应是否成功
       if (response.code !== '000000') {
-        // 错误已在 errorHandler 中处理，直接返回
+        // 显示后端返回的错误信息
+        ElMessage.error(response.msg || t('login.loginFailed'))
         return false
       }
 
@@ -122,10 +123,15 @@ export function useLoginForm() {
       }
       
       ElMessage.success(t('login.loginSuccess'))
+      
+      // 触发登录成功事件，显示重要提示弹窗
+      window.dispatchEvent(new CustomEvent('user-login-success'))
+      
       return true
     } catch (error: any) {
       console.error('登录失败:', error)
-      // 错误已在 errorHandler 中统一处理，这里不再重复提示
+      // 显示错误信息
+      ElMessage.error(error.message || t('login.loginFailed'))
       return false
     } finally {
       loading.value = false

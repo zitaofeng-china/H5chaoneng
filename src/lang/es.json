@@ -26,7 +26,10 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "Recarga"
+    "recharge": "Recarga",
+    "loadFailed": "Error de Carga",
+    "loadFailedHint": "Por favor verifique su conexión de red o intente más tarde",
+    "retry": "Reintentar"
   },
   "nav": {
     "home": "Inicio",
@@ -291,6 +294,7 @@
     "passwordRequired": "Por favor ingrese la contraseña",
     "passwordMinLength": "La contraseña no puede tener menos de 6 caracteres",
     "loginSuccess": "Inicio de sesión exitoso",
+    "loginFailed": "Error al iniciar sesión",
     "logout": "Cerrar Sesión"
   },
   "register": {
@@ -384,5 +388,14 @@
     "renting": "Alquilando energía {energy}...",
     "energyAdded": "La energía {energy} ha sido agregada exitosamente a su dirección",
     "customCountSet": "Cantidad personalizada establecida exitosamente"
+  },
+  "welcome": {
+    "importantNotice": "Aviso Importante",
+    "iAcknowledge": "He leído y reconozco toda la información anterior",
+    "confirmAndContinue": "Confirmar y Continuar",
+    "notice1": "Por favor verifique la dirección de recepción antes de transferir",
+    "notice2": "El alquiler de energía tiene límites de tiempo. Use dentro del período de validez",
+    "notice3": "Por favor, lea atentamente el aviso de transacción antes de operar",
+    "notice4": "Contacte al servicio al cliente inmediatamente si encuentra problemas"
   }
 }

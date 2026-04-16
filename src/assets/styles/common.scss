@@ -47,3 +47,31 @@ body {
     }
   }
 }
+
+/* 复制成功提示样式 - 更加醒目且协调 */
+.copy-success-message {
+  min-width: 280px !important;
+  padding: 14px 18px !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 6px 16px rgba(103, 194, 58, 0.25) !important;
+  
+  /* 让整个消息框居中 */
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  
+  .el-message__content {
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+    text-align: center !important;
+    flex: none !important;
+  }
+  
+  .el-message__icon {
+    font-size: 18px !important;
+    margin-right: 8px !important;
+  }
+}

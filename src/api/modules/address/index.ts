@@ -1,7 +1,7 @@
 /**
  * 地址模块 API
  */
-import request from '@/api/request'
+import { get } from '@/api/request'
 import type { ApiResponse } from '@/api/types'
 import type { GetAddressParams, AddressData } from './types'
 
@@ -11,5 +11,5 @@ import type { GetAddressParams, AddressData } from './types'
  * @returns 付款地址数据
  */
 export function getAddress(params: GetAddressParams): Promise<ApiResponse<AddressData>> {
-  return request.get<ApiResponse<AddressData>>('/v3/address', { params })
+  return get<AddressData>('/v3/address', params)
 }

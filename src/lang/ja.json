@@ -26,7 +26,10 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "チャージ"
+    "recharge": "チャージ",
+    "loadFailed": "読み込み失敗",
+    "loadFailedHint": "ネットワーク接続を確認するか、後でもう一度お試しください",
+    "retry": "再試行"
   },
   "nav": {
     "home": "ホーム",
@@ -291,6 +294,7 @@
     "passwordRequired": "パスワードを入力してください",
     "passwordMinLength": "パスワードは6文字以上必要です",
     "loginSuccess": "ログイン成功",
+    "loginFailed": "ログイン失敗",
     "logout": "ログアウト"
   },
   "register": {
@@ -384,5 +388,14 @@
     "renting": "{energy} エネルギーをレンタル中...",
     "energyAdded": "{energy} エネルギーが正常にご使用の住所に追加されました",
     "customCountSet": "カスタム数量が正常に設定されました"
+  },
+  "welcome": {
+    "importantNotice": "重要なお知らせ",
+    "iAcknowledge": "上記のすべての情報を読み、確認しました",
+    "confirmAndContinue": "確認して続行",
+    "notice1": "送金前に必ず受取アドレスを確認してください",
+    "notice2": "エネルギーレンタルには有効期限があります。期限内にご使用ください",
+    "notice3": "取引前に取引注意事項をよくお読みください",
+    "notice4": "問題が発生した場合は、すぐにカスタマーサービスにお問い合わせください"
   }
 }

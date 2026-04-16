@@ -101,11 +101,12 @@ const handleCopy = () => {
     align-items: center;
     justify-content: center;
     font-size: 12px;
+    font-weight: 700;
     margin-top: 6px;
-    color: var(--theme-text-light-gray-muted);
+    color: #C13535;
 
     svg {
-      color: var(--theme-text-black);
+      color: #C13535;
       padding-right: 2px;
     }
   }

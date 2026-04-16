@@ -25,7 +25,10 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "充值"
+    "recharge": "充值",
+    "loadFailed": "載入失敗",
+    "loadFailedHint": "請檢查網絡連接或稍後重試",
+    "retry": "重試"
   },
   "nav": {
     "home": "首頁",
@@ -289,6 +292,7 @@
     "passwordRequired": "請輸入密碼",
     "passwordMinLength": "密碼長度不能少於6位",
     "loginSuccess": "登入成功",
+    "loginFailed": "登入失敗",
     "logout": "退出系統"
   },
   "register": {
@@ -382,5 +386,14 @@
     "renting": "正在租用 {energy} 能量...",
     "energyAdded": "{energy} 能量已成功添加到您的地址",
     "customCountSet": "自定義數量設置成功"
+  },
+  "welcome": {
+    "importantNotice": "重要提示",
+    "iAcknowledge": "我已閱讀並知悉以上所有提示內容",
+    "confirmAndContinue": "確認並繼續",
+    "notice1": "轉帳前務必核對收款地址",
+    "notice2": "能量租賃有時效性，請在有效期內使用",
+    "notice3": "請在交易前仔細查看交易須知",
+    "notice4": "如遇問題請及時聯繫客服"
   }
 }

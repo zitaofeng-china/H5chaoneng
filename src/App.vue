@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
+import WelcomeDialog from '@/components/WelcomeDialog.vue'
 import { useSiteVerification } from '@/hooks/useSiteVerification'
 import { useUserStore } from '@/stores/useUserStore'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -28,6 +29,9 @@ onMounted(async () => {
   <div id="app" :class="{ 'is-404': is404Page }">
     <Layout v-if="!is404Page" />
     <router-view v-else />
+    
+    <!-- 首次访问欢迎弹窗 -->
+    <WelcomeDialog v-if="!is404Page" />
   </div>
 </template>
 

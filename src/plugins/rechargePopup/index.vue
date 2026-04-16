@@ -22,13 +22,17 @@
           <div class="desc-item" v-for="row in tableData" :key="row.value">
             <div class="desc-label">{{ row.label }}</div>
             <div class="desc-value">
-              {{ row.value }}
+              <span v-if="row.type === 'address' && isLoadingAddress" class="loading-text">
+                {{ t('common.loading') }}
+              </span>
+              <span v-else>{{ row.value }}</span>
               <el-button
                 link
                 type="primary"
                 @click="copyAddress"
                 class="copy-btn"
                 :loading="isCopying"
+                :disabled="isLoadingAddress || !rechargeAddress"
                 v-if="row.type === 'address'"
               >
                 <SvgIcon name="transfer-copy" width="18" height="18" />
@@ -39,7 +43,19 @@
         <div class="qrcode-section">
           <div class="qrcode-title">{{ t('recharge.scanQrcode') }}</div>
           <div class="qrcode-container">
-            <img :src="qrCode" alt="QR Code" class="qrcode-img" />
+            <div v-if="isLoadingAddress" class="loading-container">
+              <el-icon class="is-loading" :size="40">
+                <Loading />
+              </el-icon>
+              <div class="loading-text">{{ t('common.loading') }}</div>
+            </div>
+            <img v-else-if="qrCode" :src="qrCode" alt="QR Code" class="qrcode-img" />
+            <div v-else class="error-placeholder">
+              <el-icon :size="40" color="#DC2626">
+                <CircleClose />
+              </el-icon>
+              <div class="error-text">{{ t('common.loadFailed') }}</div>
+            </div>
           </div>
 
           <div class="tips-container">
@@ -63,6 +79,7 @@ import { storeToRefs } from 'pinia'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useRecharge } from '@/hooks/useRecharge'
 import { useI18n } from 'vue-i18n'
+import { Loading, CircleClose } from '@element-plus/icons-vue'
 
 defineOptions({
   name: 'RechargePopup',
@@ -75,8 +92,10 @@ const { isMobile } = storeToRefs(commonStore)
 const {
   visible,
   isCopying,
+  isLoadingAddress,
   tableData,
   qrCode,
+  rechargeAddress,
   copyAddress,
   open,
   close,

@@ -6,6 +6,10 @@
  * 地址类别枚举
  */
 export enum AddressKind {
+  RECHARGE = 2, // 充值
+  FLASH_EXCHANGE = 3, // 闪兑（USDT/TRX互换）
+  FLASH_ENERGY_TRANSFER = 4, // 闪租能量-转账租赁
+  FLASH_ENERGY_BALANCE = 7, // 闪租能量-余额支付
   COUNT_RENTAL = 9, // 按笔数租用
   // 可以根据需要添加其他类别
 }

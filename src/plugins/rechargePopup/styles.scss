@@ -135,6 +135,42 @@
     height: 100%;
     object-fit: contain;
   }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    .loading-text {
+      font-size: 14px;
+      color: var(--theme-text-light-gray-muted);
+    }
+
+    .is-loading {
+      color: var(--el-color-primary);
+    }
+  }
+
+  .error-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    .error-text {
+      font-size: 14px;
+      color: #DC2626;
+      font-weight: 500;
+    }
+  }
+}
+
+.loading-text {
+  color: var(--theme-text-light-gray-muted);
+  font-style: italic;
 }
 
 .tips-container {

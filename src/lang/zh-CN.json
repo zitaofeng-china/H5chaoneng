@@ -26,7 +26,10 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "充值"
+    "recharge": "充值",
+    "loadFailed": "加载失败",
+    "loadFailedHint": "请检查网络连接或稍后重试",
+    "retry": "重试"
   },
   "nav": {
     "home": "首页",
@@ -143,7 +146,15 @@
     "expiryTip": "请在1小时内使用能量,否则会过期回收",
     "amountTip": "务必转入以上对应金额的TRX,否则会租用失败",
     "addressTip": "转账时请核对准确能量租赁钱包地址",
-    "walletAddress": "租用钱包地址"
+    "walletAddress": "租用钱包地址",
+    "importantNotice": "重要提示",
+    "iAcknowledge": "我已阅读并知悉以上所有提示内容",
+    "confirmAndContinue": "确认并继续",
+    "notice1": "转账后能量将在3秒内自动添加到您的地址",
+    "notice2": "请务必转入对应金额的TRX，金额不符将导致租用失败",
+    "notice3": "能量有效期为1小时，请及时使用",
+    "notice4": "向无USDT的地址转账需要双倍能量",
+    "notice5": "转账前请仔细核对收款地址，转错地址无法退款"
   },
   "kindTips": {
     "title": "温馨提示"
@@ -261,7 +272,15 @@
     "minExchange": "最小 {min} 起兑",
     "maxExchange": "最大不超过 {max}",
     "usdtMinTip": "2 USDT 起兑，最大不超过70000 USDT",
-    "trxMinTip": "10 TRX 起兑，最大不超过100000 TRX"
+    "trxMinTip": "10 TRX 起兑，最大不超过100000 TRX",
+    "importantNotice": "重要提示",
+    "iAcknowledge": "我已阅读并知悉以上所有提示内容",
+    "confirmAndContinue": "确认并继续",
+    "flashNotice1": "转账后系统将自动完成兑换并返回代币",
+    "flashNotice2": "请务必转入正确的金额，低于最小额度将原路退回并扣除手续费",
+    "flashNotice3": "切勿使用交易所钱包进行转账",
+    "flashNotice4": "交易时会有小于0.01的滑点，以实际交易为准",
+    "flashNotice5": "转账前请仔细核对收款地址，转错地址无法退款"
   },
   "activation": {
     "title": "激活入口",
@@ -406,5 +425,14 @@
     "renting": "正在租用 {energy} 能量...",
     "energyAdded": "{energy} 能量已成功添加到您的地址",
     "customCountSet": "自定义数量设置成功"
+  },
+  "welcome": {
+    "importantNotice": "重要提示",
+    "iAcknowledge": "我已阅读并知悉以上所有提示内容",
+    "confirmAndContinue": "确认并继续",
+    "notice1": "转账前务必核对收款地址",
+    "notice2": "能量租赁有时效性，请在有效期内使用",
+    "notice3": "请在交易前仔细查看交易须知",
+    "notice4": "如遇问题请及时联系客服"
   }
 }
