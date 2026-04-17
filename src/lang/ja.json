@@ -48,7 +48,8 @@
     "features": "特徴",
     "howItWorks": "仕組み",
     "fee": "手数料",
-    "contactUs": "お問い合わせ"
+    "contactUs": "お問い合わせ",
+    "userInfo": "ユーザー情報"
   },
   "home": {
     "title": "即時エネルギーレンタル",
@@ -329,7 +330,17 @@
     "rechargeAddress": "受取住所",
     "scanQrcode": "QRコードをスキャンして入金",
     "minTransfer": "1TRXより大きい金額は自由に送金可能",
-    "checkAddress": "送金时请核对地址"
+    "checkAddress": "送金时请核对地址",
+    "customAmount": "TRX入金額をカスタマイズするにはクリック",
+    "enterCustomAmount": "入金額を入力してください（最小1 TRX）",
+    "minAmount": "最小入金額は1 TRXで、小数点以下2桁まで対応",
+    "confirmAmount": "入金額を確認",
+    "rechargeAmount": "入金額",
+    "changeAmount": "金額を変更",
+    "transferExactAmount": "以下のアドレスに {amount} TRX を送金してください",
+    "finalAmountNote": "クリックして金額をコピー、小数点にご注意ください",
+    "copyAmount": "金額をコピー",
+    "copyAmountSuccess": "金額がクリップボードにコピーされました"
   },
   "error": {
     "unknown": "不明なエラー",

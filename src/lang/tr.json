@@ -48,7 +48,8 @@
     "features": "Özellikler",
     "howItWorks": "Nasıl Çalışır",
     "fee": "Ücret",
-    "contactUs": "İletişime Geç"
+    "contactUs": "İletişime Geç",
+    "userInfo": "Kullanıcı Bilgisi"
   },
   "home": {
     "title": "Hızlı Enerji Kiralama",
@@ -329,7 +330,17 @@
     "rechargeAddress": "Alma Adresi",
     "scanQrcode": "Yüklemek için QR Kodu Tara",
     "minTransfer": "1TRX'den büyük herhangi bir miktar transfer edilebilir",
-    "checkAddress": "Transfer yaparken lütfen adresi doğrulayın"
+    "checkAddress": "Transfer yaparken lütfen adresi doğrulayın",
+    "customAmount": "TRX yükleme miktarını özelleştirmek için tıklayın",
+    "enterCustomAmount": "Lütfen yükleme miktarını girin (minimum 1 TRX)",
+    "minAmount": "Minimum yükleme miktarı 1 TRX'dir, iki ondalık basamağı destekler",
+    "confirmAmount": "Yükleme Miktarını Onayla",
+    "rechargeAmount": "Yükleme Miktarı",
+    "changeAmount": "Miktarı Değiştir",
+    "transferExactAmount": "Lütfen aşağıdaki adrese {amount} TRX transfer edin",
+    "finalAmountNote": "Miktarı kopyalamak için tıklayın, ondalık noktaya dikkat edin",
+    "copyAmount": "Miktarı Kopyala",
+    "copyAmountSuccess": "Miktar panoya kopyalandı"
   },
   "error": {
     "unknown": "Bilinmeyen hata",

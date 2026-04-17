@@ -103,7 +103,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#contact') }"
-                  @click.stop="handleOpenToTelegram('GasVipBot')"
+                  @click.stop="handleOpenToTelegram(tgAdmin)"
                 >
                   {{ $t('nav.contactUs') }}
                 </el-dropdown-item>
@@ -118,7 +118,7 @@
             name="header-tg"
             width="24"
             height="24"
-            @click="handleOpenToTelegram('GasVipBot')"
+            @click="handleOpenToTelegram(botName)"
           />
         </div>
         <div class="dropdown-popper-box">
@@ -141,6 +141,10 @@
           </el-dropdown>
         </div>
 
+        <div class="customer-service-btn" @click="handleOpenToTelegram(tgAdmin)" :title="$t('nav.contactUs')">
+          <el-icon :size="20"><IEpService /></el-icon>
+        </div>
+
         <div class="balance-display">
           <div class="balance-info">
             <SvgIcon name="header-USDT" width="24" height="24" />
@@ -158,6 +162,9 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu>
+                <el-dropdown-item @click.stop="handleUserInfo">
+                  {{ $t('nav.userInfo') }}
+                </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleModifyPassword">
                   {{ $t('revisePassword.title') }}
                 </el-dropdown-item>
@@ -274,7 +281,7 @@
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#contact') }"
-            @click.stop="handleOpenToTelegram('GasVipBot')"
+            @click.stop="handleOpenToTelegram(tgAdmin)"
           >
             {{ $t('nav.contactUs') }}
           </div>
@@ -291,6 +298,8 @@ import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-
 import Avatar from '@/assets/icons/header/avatar.svg'
 import { useUserStore } from '@/stores/useUserStore'
 import { useLangStore } from '@/stores/useLangStore'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { storeToRefs } from 'pinia'
 import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
@@ -302,6 +311,9 @@ defineOptions({
 
 const instance = getCurrentInstance()
 const proxy = instance?.proxy as any // 使用 any 避免类型检查问题
+
+const siteStore = useSiteStore()
+const { tgAdmin, botName } = storeToRefs(siteStore)
 
 const localLang = ref(useLangStore().currentLocale)
 const activeNames = ref(['1'])
@@ -394,6 +406,10 @@ const handleRechange = () => {
 
 const handleModifyPassword = () => {
   proxy?.$revisePasswordPopup?.open()
+}
+
+const handleUserInfo = () => {
+  proxy?.$userInfoPopup?.open()
 }
 
 const handleLogout = () => {
@@ -601,6 +617,27 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
     &:hover {
       opacity: 0.8;
     }
+  }
+}
+
+.customer-service-btn {
+  min-width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--theme-bg-gray);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  color: #fff;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 0.6;
   }
 }
 
@@ -851,6 +888,11 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 
   .right-section {
     gap: 4px;
+
+    .customer-service-btn {
+      min-width: 32px;
+      height: 32px;
+    }
   }
 
   .right-section {

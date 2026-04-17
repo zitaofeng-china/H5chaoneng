@@ -7,9 +7,12 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { siteApi, priceApi } from '@/api'
 import { getSite, clearSite } from '@/utils/site'
+import { useSiteStore } from '@/stores/useSiteStore'
 
 export function useSiteVerification() {
   const router = useRouter()
+  const siteStore = useSiteStore()
+  
   const isVerifying = ref(false)
   const isValid = ref(false)
   const siteInfo = ref<any>(null)
@@ -34,6 +37,10 @@ export function useSiteVerification() {
       if (siteResponse.code === '000000' && priceResponse.code === '000000') {
         siteInfo.value = siteResponse.data
         priceInfo.value = priceResponse.data
+        
+        // 同时更新到 Site Store，供其他组件使用
+        siteStore.updateSiteInfo(siteResponse.data)
+        
         isValid.value = true
         return true
       } else {

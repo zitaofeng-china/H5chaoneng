@@ -47,7 +47,8 @@
     "features": "特點",
     "howItWorks": "工作原理",
     "fee": "手續費",
-    "contactUs": "聯繫我們"
+    "contactUs": "聯繫我們",
+    "userInfo": "基本信息"
   },
   "home": {
     "title": "閃租能量",
@@ -327,7 +328,17 @@
     "rechargeAddress": "收款地址",
     "scanQrcode": "掃描二維碼充值",
     "minTransfer": "可轉入大於1TRX的任意金額",
-    "checkAddress": "轉帳時請核對地址"
+    "checkAddress": "轉帳時請核對地址",
+    "customAmount": "點我自定義充值TRX金額",
+    "enterCustomAmount": "請輸入充值金額（最小1 TRX）",
+    "minAmount": "最小充值金額為 1 TRX，支持小數點後兩位",
+    "confirmAmount": "確認充值金額",
+    "rechargeAmount": "充值金額",
+    "changeAmount": "修改金額",
+    "transferExactAmount": "請轉帳 {amount} TRX 到以下地址",
+    "finalAmountNote": "點擊可複製金額，請注意小數點",
+    "copyAmount": "複製金額",
+    "copyAmountSuccess": "金額已複製到剪貼板"
   },
   "error": {
     "unknown": "未知錯誤",

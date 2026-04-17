@@ -48,7 +48,8 @@
     "features": "特点",
     "howItWorks": "工作原理",
     "fee": "手续费",
-    "contactUs": "联系我们"
+    "contactUs": "联系我们",
+    "userInfo": "基本信息"
   },
   "home": {
     "title": "闪租能量",
@@ -360,7 +361,18 @@
     "rechargeAddress": "收款地址",
     "scanQrcode": "扫描二维码充值",
     "minTransfer": "可转入大于1TRX的任意金额",
-    "checkAddress": "转账时请核对地址"
+    "checkAddress": "转账时请核对地址",
+    "customAmount": "点我自定义充值TRX金额",
+    "enterCustomAmount": "请输入充值金额（最小1 TRX）",
+    "minAmount": "最小充值金额为 1 TRX，支持小数点后两位",
+    "confirmAmount": "确认充值金额",
+    "rechargeAmount": "充值金额",
+    "changeAmount": "修改金额",
+    "transferExactAmount": "请转账 {amount} TRX 到以下地址",
+    "finalAmountNote": "点击可复制金额，请注意小数点",
+    "copyAmount": "复制金额",
+    "copyAmountSuccess": "金额已复制到剪贴板",
+    "loadingHint": "正在获取充值地址，请稍候..."
   },
   "revisePassword": {
     "title": "修改密码",

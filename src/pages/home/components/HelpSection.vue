@@ -26,15 +26,19 @@
 import { useRouter } from 'vue-router'
 import { handleOpenToTelegram } from '@/utils'
 import { getSite } from '@/utils/site'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { storeToRefs } from 'pinia'
 
 defineOptions({
   name: 'HelpSection',
 })
 
 const router = useRouter()
+const siteStore = useSiteStore()
+const { tgAdmin } = storeToRefs(siteStore)
 
 const handleContactService = () => {
-  handleOpenToTelegram('GasVipBot')
+  handleOpenToTelegram(tgAdmin.value)
 }
 
 const handleViewProblems = () => {

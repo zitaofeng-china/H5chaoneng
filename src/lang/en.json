@@ -48,7 +48,8 @@
     "features": "Features",
     "howItWorks": "How It Works",
     "fee": "Fee",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "userInfo": "User Info"
   },
   "home": {
     "title": "Flash Rent Energy",
@@ -332,7 +333,17 @@
     "rechargeAddress": "Receiving Address",
     "scanQrcode": "Scan QR Code to Recharge",
     "minTransfer": "Any amount greater than 1TRX can be transferred",
-    "checkAddress": "Please verify address during transfer"
+    "checkAddress": "Please verify address during transfer",
+    "customAmount": "Click to customize TRX recharge amount",
+    "enterCustomAmount": "Please enter recharge amount (minimum 1 TRX)",
+    "minAmount": "Minimum recharge amount is 1 TRX, supports two decimal places",
+    "confirmAmount": "Confirm Recharge Amount",
+    "rechargeAmount": "Recharge Amount",
+    "changeAmount": "Change Amount",
+    "transferExactAmount": "Please transfer {amount} TRX to the following address",
+    "finalAmountNote": "Click to copy amount, please note the decimal point",
+    "copyAmount": "Copy Amount",
+    "copyAmountSuccess": "Amount copied to clipboard"
   },
   "revisePassword": {
     "title": "Change Password",

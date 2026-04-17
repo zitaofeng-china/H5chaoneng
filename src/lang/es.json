@@ -48,7 +48,8 @@
     "features": "Características",
     "howItWorks": "Cómo Funciona",
     "fee": "Comisiones",
-    "contactUs": "Contáctanos"
+    "contactUs": "Contáctanos",
+    "userInfo": "Información del Usuario"
   },
   "home": {
     "title": "Alquiler Rápido de Energía",
@@ -329,7 +330,17 @@
     "rechargeAddress": "Dirección de Recepción",
     "scanQrcode": "Escanear Código QR para Recargar",
     "minTransfer": "Se puede transferir cualquier monto mayor a 1TRX",
-    "checkAddress": "Por favor verifique la dirección durante la transferencia"
+    "checkAddress": "Por favor verifique la dirección durante la transferencia",
+    "customAmount": "Haga clic para personalizar el monto de recarga TRX",
+    "enterCustomAmount": "Por favor ingrese el monto de recarga (mínimo 1 TRX)",
+    "minAmount": "El monto mínimo de recarga es 1 TRX, admite dos decimales",
+    "confirmAmount": "Confirmar Monto de Recarga",
+    "rechargeAmount": "Monto de Recarga",
+    "changeAmount": "Cambiar Monto",
+    "transferExactAmount": "Por favor transfiera {amount} TRX a la siguiente dirección",
+    "finalAmountNote": "Haga clic para copiar el monto, tenga en cuenta el punto decimal",
+    "copyAmount": "Copiar Monto",
+    "copyAmountSuccess": "Monto copiado al portapapeles"
   },
   "error": {
     "unknown": "Error desconocido",

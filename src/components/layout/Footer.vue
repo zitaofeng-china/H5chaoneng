@@ -8,7 +8,7 @@
           </div>
           <div class="description">{{ $t('footer.description') }}</div>
           <div class="social-icons">
-            <div class="social-icon" @click="handleOpenToTelegram(telegram)">
+            <div class="social-icon" @click="handleOpenToTelegram(tgAdmin)">
               <SvgIcon name="footer-telegram" width="24" height="24" />
             </div>
             <div class="social-icon" @click="handleOXAccount(twitter)">
@@ -56,17 +56,17 @@
         <div class="footer-section right-section">
           <div class="section-title">{{ $t('footer.contactUs') }}</div>
           <div class="contact-info">
-            <div class="contact-item" @click="handleOpenToTelegram(telegram)">
+            <div class="contact-item" @click="handleOpenToTelegram(tgAdmin)">
               <SvgIcon name="footer-telegram" width="20" height="20" />
-              <span>{{ $t('footer.telegramContact') }}</span>
+              <span>{{ displayTgAdmin }}</span>
             </div>
             <div class="contact-item" @click="handleOpenEmail(email)">
               <SvgIcon name="footer-email" width="20" height="20" />
-              <span>{{ $t('footer.emailContact') }}</span>
+              <span>{{ email }}</span>
             </div>
             <div class="contact-item" @click="handleOXAccount(twitter)">
               <SvgIcon name="footer-twitter" width="20" height="20" />
-              <span>{{ $t('footer.twitterContact') }}</span>
+              <span>{{ displayTwitter }}</span>
             </div>
           </div>
         </div>
@@ -85,13 +85,28 @@ import { handleOpenToTelegram, handleOXAccount, handleOpenEmail } from '@/utils'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSite } from '@/utils/site'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { storeToRefs } from 'pinia'
 
 defineOptions({
   name: 'LayoutFooter',
 })
 
+const siteStore = useSiteStore()
+const { tgAdmin } = storeToRefs(siteStore)
+
+// 显示用的 Telegram 账号（确保有 @ 前缀）
+const displayTgAdmin = computed(() => {
+  if (!tgAdmin.value) return ''
+  return tgAdmin.value.startsWith('@') ? tgAdmin.value : `@${tgAdmin.value}`
+})
+
+// 显示用的 Twitter 账号（确保有 @ 前缀）
+const displayTwitter = computed(() => {
+  return twitter.value.startsWith('@') ? twitter.value : `@${twitter.value}`
+})
+
 const email = ref('VipTronGas@Gmail.com')
-const telegram = ref('GasVipBot')
 const twitter = ref('TronGasVipBot')
 
 // 动态获取当前年份

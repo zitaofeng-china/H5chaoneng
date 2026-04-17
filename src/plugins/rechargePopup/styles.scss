@@ -178,7 +178,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 12px;
+  margin-top: 16px;
 
   .tips-title,
   .tips-text {
@@ -190,9 +191,45 @@
     }
   }
 
+  .tips-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--theme-text-black);
+  }
+
+  .tips-address {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+
+    .address-text {
+      font-size: 14px;
+      font-family: monospace;
+      color: var(--theme-text-black);
+      word-break: break-all;
+      text-align: center;
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: var(--theme-text-light-gray-muted);
+    }
+
+    .copy-address-btn {
+      flex-shrink: 0;
+      padding: 4px;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
   .tips-text {
     font-size: 12px;
-    color: var(--theme-text-light-gray-muted);
+    color: #DC2626;
+    font-weight: 500;
     line-height: 0;
   }
 }
@@ -244,6 +281,188 @@
     .desc-value {
       word-break: break-all;
       padding: 0 10px;
+    }
+  }
+}
+
+
+// 第一步：选择充值金额
+.step-one {
+  padding: 40px 60px;
+
+  .amount-selection {
+    .preset-amounts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .amount-btn {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 15, 45, 0.03);
+        border: 2px solid rgba(2, 15, 45, 0.08);
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--theme-text-black);
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(22, 93, 255, 0.05);
+          border-color: rgba(22, 93, 255, 0.3);
+        }
+
+        &.active {
+          background: var(--theme-bg-blue);
+          border-color: var(--theme-bg-blue);
+          color: #fff;
+          box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+        }
+      }
+    }
+
+    .custom-amount-section {
+      margin-bottom: 20px;
+
+      .custom-amount-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--theme-text-black);
+      }
+
+      .custom-amount-input {
+        :deep(.el-input__wrapper) {
+          height: 54px;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .confirm-amount-btn {
+      width: 100%;
+      height: 54px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+  }
+}
+
+// 第二步：显示地址和二维码
+.step-two {
+  .selected-amount-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(54, 211, 153, 0.08) 100%);
+    border-radius: 12px;
+    margin-bottom: 24px;
+
+    .amount-label {
+      font-size: 14px;
+      color: var(--theme-text-muted);
+    }
+
+    .amount-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--theme-bg-blue);
+
+      .copy-amount-btn {
+        padding: 4px;
+        font-size: 14px;
+        
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    .amount-note {
+      font-size: 12px;
+      color: #DC2626;
+      font-weight: 500;
+    }
+
+    .change-amount-btn {
+      font-size: 14px;
+      margin-top: 4px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .step-one {
+    padding: 24px 20px;
+
+    .amount-selection {
+      .preset-amounts {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+
+        .amount-btn {
+          height: 50px;
+          font-size: 16px;
+        }
+      }
+
+      .custom-amount-section {
+        .custom-amount-label {
+          font-size: 14px;
+        }
+
+        .custom-amount-input {
+          :deep(.el-input__wrapper) {
+            height: 48px;
+            font-size: 14px;
+          }
+        }
+      }
+
+      .confirm-amount-btn {
+        height: 48px;
+        font-size: 16px;
+      }
+    }
+  }
+
+  .step-two {
+    .selected-amount-display {
+      gap: 6px;
+
+      .amount-value {
+        font-size: 20px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .amount-note {
+        font-size: 11px;
+        text-align: center;
+      }
+    }
+
+    .tips-container {
+      .tips-address {
+        flex-wrap: wrap;
+
+        .address-text {
+          font-size: 13px;
+        }
+      }
     }
   }
 }

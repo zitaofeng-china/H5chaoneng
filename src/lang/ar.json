@@ -48,7 +48,8 @@
     "features": "الميزات",
     "howItWorks": "كيف يعمل",
     "fee": "الرسوم",
-    "contactUs": "اتصل بنا"
+    "contactUs": "اتصل بنا",
+    "userInfo": "معلومات المستخدم"
   },
   "home": {
     "title": "تأجير طاقة فلاش",
@@ -329,7 +330,17 @@
     "rechargeAddress": "عنوان الاستلام",
     "scanQrcode": "امسح رمز QR للشحن",
     "minTransfer": "يمكن تحويل أي مبلغ أكبر من 1TRX",
-    "checkAddress": "يرجى التحقق من العنوان أثناء التحويل"
+    "checkAddress": "يرجى التحقق من العنوان أثناء التحويل",
+    "customAmount": "انقر لتخصيص مبلغ شحن TRX",
+    "enterCustomAmount": "الرجاء إدخال مبلغ الشحن (الحد الأدنى 1 TRX)",
+    "minAmount": "الحد الأدنى لمبلغ الشحن هو 1 TRX، يدعم منزلتين عشريتين",
+    "confirmAmount": "تأكيد مبلغ الشحن",
+    "rechargeAmount": "مبلغ الشحن",
+    "changeAmount": "تغيير المبلغ",
+    "transferExactAmount": "يرجى تحويل {amount} TRX إلى العنوان التالي",
+    "finalAmountNote": "انقر لنسخ المبلغ، يرجى ملاحظة النقطة العشرية",
+    "copyAmount": "نسخ المبلغ",
+    "copyAmountSuccess": "تم نسخ المبلغ إلى الحافظة"
   },
   "error": {
     "unknown": "خطأ غير معروف",

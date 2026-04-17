@@ -16,9 +16,10 @@ export function useCopyToClipboard() {
   /**
    * 复制文本到剪贴板
    * @param text - 要复制的文本
+   * @param successMessage - 自定义成功提示信息（可选）
    * @returns Promise<boolean> - 复制是否成功
    */
-  const copyText = async (text: string): Promise<boolean> => {
+  const copyText = async (text: string, successMessage?: string): Promise<boolean> => {
     if (!text) {
       ElMessage.warning(t('common.nothingToCopy') || '没有可复制的内容')
       return false
@@ -28,7 +29,7 @@ export function useCopyToClipboard() {
     try {
       await copy(text)
       ElMessage({
-        message: t('transferRental.copyAddress'),
+        message: successMessage || t('transferRental.copyAddress'),
         type: 'success',
         duration: 2500,
         showClose: false,
