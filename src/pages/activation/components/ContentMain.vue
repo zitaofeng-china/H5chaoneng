@@ -68,14 +68,29 @@ const feeCardTexts = computed<string[]>(() => {
 
 const kindTipTexts = computed<string[]>(() => [t('activation.tips1'), t('activation.tips2')])
 
-const notices = computed<string[]>(() => [
-  t('activation.activationNotice') +
-    ': 2025-01-02 16:20:30 ' +
-    t('activation.activationTotalCount') +
-    ': 4, ' +
-    t('activation.activationSuccessCount') +
-    ': 2',
-])
+// 激活通知状态（使用 ref 使其响应式）
+const activationNotice = ref<string>('')
+
+// 从 localStorage 加载激活通知
+const loadActivationNotice = () => {
+  const saved = localStorage.getItem('activationNotice')
+  if (saved) {
+    activationNotice.value = saved
+  }
+}
+
+// 保存激活通知到 localStorage
+const saveActivationNotice = (notice: string) => {
+  activationNotice.value = notice
+  localStorage.setItem('activationNotice', notice)
+}
+
+const notices = computed<string[]>(() => {
+  if (activationNotice.value) {
+    return [activationNotice.value]
+  }
+  return []
+})
 
 const formRef = ref<FormInstance>()
 const formData = reactive({
@@ -123,17 +138,49 @@ const handleSaveAddress = async () => {
     // 调用创建订单接口
     const response = await orderApi.createOrder(orderParams)
     
-    // 处理响应并显示提示
-    const success = handleResponse(response, {
-      context: 'activation', // 批量激活场景
-    })
+    console.log('[批量激活] API响应:', response)
     
-    if (success) {
-      // 订单创建成功后清空表单
+    // 检查响应
+    if (response.code === '000000' && response.data) {
+      const data = response.data as any
+      const targetList = data.TargetList || []
+      const skipList = data.SkipList || []
+      const totalCount = addressList.length
+      const activatedCount = targetList.length
+      const skippedCount = skipList.length
+      
+      // 生成当前时间
+      const now = new Date()
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+      
+      // 生成激活通知
+      const notice = `${t('activation.activationNotice')}: ${timeStr} ${t('activation.activationTotalCount')}: ${totalCount}, ${t('activation.activationSuccessCount')}: ${activatedCount}, ${t('activation.skippedCount')}: ${skippedCount}`
+      saveActivationNotice(notice)
+      
+      // 根据结果显示不同的消息
+      if (activatedCount === 0 && skippedCount === 0) {
+        // 全部失败
+        ElMessage.error(t('activation.allFailed'))
+      } else if (activatedCount > 0) {
+        // 有激活成功的
+        if (skippedCount > 0) {
+          ElMessage.success(t('activation.partialSuccess', { activated: activatedCount, skipped: skippedCount }))
+        } else {
+          ElMessage.success(t('activation.allSuccess', { count: activatedCount }))
+        }
+      } else if (skippedCount > 0) {
+        // 全部跳过（已激活）
+        ElMessage.warning(t('activation.allSkipped'))
+      }
+      
+      // 清空表单
       formData.address = ''
+    } else {
+      ElMessage.error(response.msg || t('activation.activationFailed'))
     }
-  } catch (error) {
+  } catch (error: any) {
     console.error('【ERROR INFO】:', error)
+    ElMessage.error(error.message || t('activation.activationFailed'))
   }
 }
 
@@ -143,6 +190,17 @@ onMounted(() => {
   // 如果用户已登录，获取用户信息
   if (userStore.isLogin) {
     userStore.fetchUserInfo()
+  }
+  
+  // 加载激活通知
+  loadActivationNotice()
+  
+  // 检查是否有待激活的地址（从托管页面跳转过来）
+  const pendingAddresses = sessionStorage.getItem('pendingActivationAddresses')
+  if (pendingAddresses) {
+    formData.address = pendingAddresses
+    // 清除 sessionStorage
+    sessionStorage.removeItem('pendingActivationAddresses')
   }
 })
 </script>
@@ -192,16 +250,49 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .content-main {
-    .notice-wrap {
-      .notice-item {
-        align-items: flex-start;
+    border-radius: 8px;
+    box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
+
+    :deep(.el-card__body) {
+      padding: 16px;
+    }
+
+    .details-form {
+      margin-top: 16px;
+
+      :deep(.el-form-item__label) {
+        display: block;
+        height: initial;
+        font-size: 13px;
+        line-height: 1.4;
+        padding-bottom: 8px;
+      }
+
+      :deep(.el-textarea__inner) {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .rent-btn {
+        width: 100%;
+        height: 44px;
+        font-size: 15px;
+        margin: 16px 0 8px;
       }
     }
 
-    :deep(.el-form-item__label) {
-      display: block;
-      height: initial;
+    .notice-wrap {
+      .notice-item {
+        align-items: flex-start;
+        font-size: 12px;
+        padding: 8px 0;
+
+        svg {
+          margin-top: 2px;
+        }
+      }
     }
   }
 }
+
 </style>
