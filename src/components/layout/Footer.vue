@@ -11,9 +11,6 @@
             <div class="social-icon" @click="handleOpenToTelegram(tgAdmin)">
               <SvgIcon name="footer-telegram" width="24" height="24" />
             </div>
-            <div class="social-icon" @click="handleOXAccount(twitter)">
-              <SvgIcon name="footer-twitter" width="24" height="24" />
-            </div>
           </div>
         </div>
 
@@ -60,14 +57,6 @@
               <SvgIcon name="footer-telegram" width="20" height="20" />
               <span>{{ displayTgAdmin }}</span>
             </div>
-            <div class="contact-item" @click="handleOpenEmail(email)">
-              <SvgIcon name="footer-email" width="20" height="20" />
-              <span>{{ email }}</span>
-            </div>
-            <div class="contact-item" @click="handleOXAccount(twitter)">
-              <SvgIcon name="footer-twitter" width="20" height="20" />
-              <span>{{ displayTwitter }}</span>
-            </div>
           </div>
         </div>
       </div>
@@ -81,8 +70,8 @@
 </template>
 
 <script setup lang="ts">
-import { handleOpenToTelegram, handleOXAccount, handleOpenEmail } from '@/utils'
-import { ref, computed } from 'vue'
+import { handleOpenToTelegram } from '@/utils'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { getSite } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
@@ -100,14 +89,6 @@ const displayTgAdmin = computed(() => {
   if (!tgAdmin.value) return ''
   return tgAdmin.value.startsWith('@') ? tgAdmin.value : `@${tgAdmin.value}`
 })
-
-// 显示用的 Twitter 账号（确保有 @ 前缀）
-const displayTwitter = computed(() => {
-  return twitter.value.startsWith('@') ? twitter.value : `@${twitter.value}`
-})
-
-const email = ref('VipTronGas@Gmail.com')
-const twitter = ref('TronGasVipBot')
 
 // 动态获取当前年份
 const currentYear = computed(() => new Date().getFullYear())
@@ -314,7 +295,7 @@ const handleToRouter = (path: string, hash?: string) => {
 @media (max-width: 768px) {
   .footer {
     min-height: auto;
-    padding: 40px 0 0;
+    padding: 24px 0 0;
   }
 
   .footer-container {
@@ -322,73 +303,94 @@ const handleToRouter = (path: string, hash?: string) => {
   }
 
   .footer-content {
-    flex-direction: column;
-    gap: 40px;
-    padding-bottom: 40px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding-bottom: 20px;
 
     .footer-section {
       flex: none;
     }
 
+    // Logo 和社交图标放在一行
     .left-section {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+
       .logo-section {
-        margin-bottom: 16px;
+        margin-bottom: 0;
 
         img {
-          height: 36px;
+          height: 28px;
         }
       }
 
       .description {
-        max-width: 100%;
-        margin-bottom: 20px;
-        font-size: 13px;
+        display: none; // 移动端隐藏描述文字
       }
 
       .social-icons {
-        gap: 16px;
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
       }
 
       .social-icon {
-        width: 44px;
-        height: 44px;
+        width: 34px;
+        height: 34px;
+        
+        svg {
+          width: 18px;
+          height: 18px;
+        }
       }
     }
 
-    .middle-section,
-    .right-section {
-      .section-title {
-        font-size: 16px;
-        margin-bottom: 20px;
-        font-weight: 700;
-      }
-    }
-
+    // 快速链接改为两列布局
     .middle-section {
+      .section-title {
+        font-size: 13px;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
       .link-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px 12px;
+
         li {
-          margin-bottom: 16px;
+          margin-bottom: 0;
 
           .footer-link {
-            font-size: 15px;
+            font-size: 12px;
             opacity: 0.8;
           }
         }
       }
     }
 
+    // 联系方式简化
     .right-section {
+      .section-title {
+        font-size: 13px;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
       .contact-item {
-        padding: 10px 8px;
-        margin: -10px -8px;
+        padding: 6px 4px;
+        margin: -6px -4px;
 
         svg {
-          width: 22px;
-          height: 22px;
+          width: 16px;
+          height: 16px;
         }
 
         span {
-          font-size: 15px;
+          font-size: 12px;
           opacity: 0.8;
         }
       }
@@ -396,13 +398,13 @@ const handleToRouter = (path: string, hash?: string) => {
   }
 
   .footer-bottom {
-    padding: 24px 0 32px;
+    padding: 14px 0 18px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 
     .copyright {
-      font-size: 13px;
+      font-size: 10px;
       opacity: 0.6;
-      line-height: 1.5;
+      line-height: 1.3;
     }
   }
 }

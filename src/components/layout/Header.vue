@@ -141,10 +141,6 @@
           </el-dropdown>
         </div>
 
-        <div class="customer-service-btn" @click="handleOpenToTelegram(tgAdmin)" :title="$t('nav.contactUs')">
-          <el-icon :size="20"><IEpService /></el-icon>
-        </div>
-
         <div class="balance-display">
           <div class="balance-info">
             <SvgIcon name="header-USDT" width="24" height="24" />
@@ -598,6 +594,42 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   outline: none !important;
 }
 
+@media (max-width: 768px) {
+  :deep(.el-dropdown-menu) {
+    min-width: 100px !important;
+    max-width: 140px !important;
+    padding: 4px 2px !important;
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    
+    /* 美化滚动条 */
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  :deep(.el-dropdown-menu__item) {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+    min-height: 32px !important;
+    line-height: 1.3 !important;
+  }
+}
+
 .right-section {
   display: flex;
   align-items: center;
@@ -617,27 +649,6 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
     &:hover {
       opacity: 0.8;
     }
-  }
-}
-
-.customer-service-btn {
-  min-width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--theme-bg-gray);
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  color: #fff;
-
-  &:hover {
-    opacity: 0.8;
-  }
-
-  &:active {
-    opacity: 0.6;
   }
 }
 
@@ -718,14 +729,14 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   right: 0;
   z-index: 99;
   background: var(--theme-bg-white);
-  border-radius: 0 0 15px 15px;
+  border-radius: 0 0 12px 12px;
   box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   overflow-y: auto;
 
   /* 美化滚动条 */
   &::-webkit-scrollbar {
-    width: 6px;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-track {
@@ -734,7 +745,7 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 
   &::-webkit-scrollbar-thumb {
     background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
+    border-radius: 2px;
 
     &:hover {
       background: rgba(0, 0, 0, 0.15);
@@ -742,8 +753,8 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   }
 
   :deep(.el-collapse) {
-    padding: 12px 16px 16px;
-    border-radius: 0 0 15px 15px;
+    padding: 10px 14px 14px;
+    border-radius: 0 0 12px 12px;
   }
 
   :deep(.el-collapse-item__arrow) {
@@ -756,27 +767,27 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   }
 
   :deep(.el-collapse-item__header) {
-    height: 48px;
-    line-height: 48px;
-    border-radius: 8px;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 6px;
     border-bottom-color: transparent;
-    background: rgba(2, 15, 45, 0.04);
+    background: rgba(2, 15, 45, 0.03);
     transition: all 0.3s ease;
     margin-bottom: 2px;
 
     &:hover {
-      background: rgba(2, 15, 45, 0.06);
+      background: rgba(2, 15, 45, 0.05);
     }
   }
 
   :deep(.el-collapse-item__content) {
-    padding-bottom: 8px;
-    padding-top: 4px;
+    padding-bottom: 6px;
+    padding-top: 2px;
   }
 
   :deep(.el-collapse-item) {
     &:not(:last-child) {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     &.is-active {
@@ -805,9 +816,9 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   }
 
   :deep(.el-collapse-item__title) {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
-    padding: 0 16px;
+    padding: 0 14px;
     color: var(--theme-text-gray);
   }
 
@@ -817,16 +828,16 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 
   .menu-wrap {
     color: var(--theme-text-gray);
-    padding: 0 8px;
+    padding: 0 6px;
 
     .menu-item {
-      padding: 0 16px;
-      height: 44px;
+      padding: 0 14px;
+      height: 40px;
       display: flex;
       align-items: center;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 500;
-      border-radius: 6px;
+      border-radius: 5px;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
@@ -834,11 +845,11 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
       &::before {
         content: '';
         position: absolute;
-        left: 8px;
+        left: 7px;
         top: 50%;
         transform: translateY(-50%);
-        width: 4px;
-        height: 4px;
+        width: 3px;
+        height: 3px;
         background: var(--theme-text-green);
         border-radius: 50%;
         opacity: 0;
@@ -868,67 +879,105 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 
 @media (max-width: 768px) {
   .navbar {
-    height: 44px;
+    height: 54px;
     padding: 0 10px;
   }
 
-  .no-login {
-    gap: 3px;
+  .navbar-container {
+    gap: 6px;
   }
+
+  .no-login {
+    gap: 4px;
+    font-size: 12px;
+  }
+  
   .logo-icon {
     display: none;
   }
 
   .m-logo-icon {
     display: flex;
+    
+    img {
+      height: 30px;
+      width: auto;
+    }
   }
+  
   .nav-links {
     display: none;
   }
 
   .right-section {
-    gap: 4px;
+    gap: 5px;
+    flex: 1;
+    justify-content: flex-end;
 
-    .customer-service-btn {
-      min-width: 32px;
-      height: 32px;
-    }
-  }
-
-  .right-section {
     .info-wrap {
-      min-width: 32px;
-      height: 32px;
+      min-width: 34px;
+      height: 34px;
+      
+      svg {
+        width: 19px;
+        height: 19px;
+      }
     }
   }
 
   .balance-display {
-    min-width: 32px;
-    height: 32px;
+    min-width: auto;
+    height: 34px;
+    padding: 0 3px;
+    font-size: 12px;
 
     .balance-info {
-      padding-left: 0;
-      padding-right: 8px;
+      padding: 0 6px 0 5px;
+      gap: 4px;
+      
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    
+    .balance-amount {
+      font-size: 12px;
+      max-width: 55px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
   .recharge-btn {
-    min-width: auto;
+    min-width: 56px;
+    height: 26px;
+    padding: 0 6px;
+    
     .text {
-      max-width: 40px;
+      font-size: 11px;
       white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
+    }
+  }
+
+  .user-icon {
+    .user-avatar {
+      width: 34px;
+      height: 34px;
     }
   }
 
   .no-login {
     .btn {
-      max-width: 40px;
+      font-size: 12px;
       white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
     }
+  }
+  
+  .collapse-container {
+    top: 54px;
+    max-height: calc(100vh - 54px);
   }
 }
 </style>
