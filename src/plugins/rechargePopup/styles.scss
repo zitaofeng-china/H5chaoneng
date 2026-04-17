@@ -240,47 +240,132 @@
     @include dialog-style;
 
     :deep(.el-dialog) {
-      padding: 16px;
+      padding: 16px 12px 14px;
+      width: 90% !important;
+      max-width: 400px;
+      border-radius: 12px;
+      margin: auto !important;
     }
 
     :deep(.el-dialog--center) {
-      width: 100%;
-      height: 100%;
+      width: 90%;
+      max-width: 400px;
+      height: auto;
+      max-height: 85vh;
+      overflow-y: auto;
     }
 
-    .recharge-title {
-      height: 44px;
+    :deep(.el-dialog__header) {
+      padding: 0 0 12px 0;
       margin: 0;
+      text-align: center;
+    }
+
+    :deep(.el-overlay) {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--theme-bg-white);
-      font-size: 18px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      background: var(--theme-bg);
-      z-index: 99;
+    }
 
-      .arrow-left-icon {
-        position: fixed;
-        left: 20px;
-        display: block;
-        z-index: 100;
-        color: var(--theme-text-white);
+    .recharge-title {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: 600;
+      text-align: center;
+      width: 100%;
+    }
+
+    :deep(.el-dialog__headerbtn) {
+      top: 16px;
+      right: 12px;
+      width: 26px;
+      height: 26px;
+    }
+
+    :deep(.el-dialog__close) {
+      font-size: 15px;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 0;
+    }
+  }
+
+  .desc-wrap {
+    font-size: 12px;
+    border-radius: 6px;
+
+    .desc-item {
+      height: 38px;
+
+      .desc-label {
+        flex-basis: 100px;
+        font-size: 11px;
+      }
+
+      .desc-value {
+        word-break: break-all;
+        padding: 0 10px;
+        font-size: 12px;
       }
     }
   }
 
-  .desc-wrap .desc-item {
-    .desc-label {
-      flex-basis: 120px;
+  .address-row {
+    gap: 6px;
+
+    .address-text {
+      font-size: 10px;
     }
 
-    .desc-value {
-      word-break: break-all;
-      padding: 0 10px;
+    .copy-btn {
+      :deep(.el-icon) {
+        font-size: 15px;
+      }
+    }
+  }
+
+  .qrcode-title {
+    margin-top: 16px;
+    font-size: 15px;
+  }
+
+  .qrcode-container {
+    width: 160px;
+    height: 160px;
+  }
+
+  .tips-container {
+    gap: 8px;
+    margin-top: 10px;
+
+    .tips-title {
+      font-size: 13px;
+      
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .tips-address {
+      gap: 6px;
+
+      .address-text {
+        font-size: 11px;
+      }
+
+      .copy-address-btn {
+        :deep(.el-icon) {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .tips-text {
+      font-size: 10px;
+      line-height: 1.3;
     }
   }
 }
@@ -288,7 +373,7 @@
 
 // 第一步：选择充值金额
 .step-one {
-  padding: 40px 60px;
+  padding: 40px 60px 30px;
 
   .amount-selection {
     .preset-amounts {
@@ -406,52 +491,99 @@
 
 @media (max-width: 768px) {
   .step-one {
-    padding: 24px 20px;
+    padding: 14px 12px 12px;
 
     .amount-selection {
       .preset-amounts {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
+        gap: 8px;
+        margin-bottom: 14px;
 
         .amount-btn {
-          height: 50px;
-          font-size: 16px;
+          height: 44px;
+          font-size: 14px;
+          border-radius: 6px;
+          font-weight: 600;
         }
       }
 
       .custom-amount-section {
+        margin-bottom: 14px;
+
         .custom-amount-label {
-          font-size: 14px;
+          font-size: 13px;
+          margin-bottom: 8px;
+          font-weight: 600;
+          
+          .el-icon {
+            font-size: 16px;
+          }
         }
 
         .custom-amount-input {
           :deep(.el-input__wrapper) {
-            height: 48px;
-            font-size: 14px;
+            height: 44px;
+            font-size: 13px;
+          }
+
+          :deep(.el-input__suffix) {
+            font-size: 13px;
           }
         }
       }
 
       .confirm-amount-btn {
-        height: 48px;
-        font-size: 16px;
+        height: 44px;
+        font-size: 14px;
+        font-weight: 600;
       }
     }
   }
 
   .step-two {
     .selected-amount-display {
-      gap: 6px;
+      gap: 5px;
+      padding: 14px 12px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+
+      .amount-label {
+        font-size: 12px;
+      }
 
       .amount-value {
-        font-size: 20px;
+        font-size: 18px;
         flex-wrap: wrap;
         justify-content: center;
+        gap: 6px;
+        
+        .copy-amount-btn {
+          font-size: 12px;
+          
+          :deep(.el-icon) {
+            font-size: 14px;
+          }
+        }
       }
 
       .amount-note {
-        font-size: 11px;
+        font-size: 10px;
         text-align: center;
+        line-height: 1.3;
+      }
+
+      .deadline-note {
+        font-size: 10px;
+        text-align: center;
+        line-height: 1.3;
+        color: #DC2626;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+
+      .change-amount-btn {
+        font-size: 12px;
+        margin-top: 2px;
       }
     }
 
@@ -460,7 +592,7 @@
         flex-wrap: wrap;
 
         .address-text {
-          font-size: 13px;
+          font-size: 11px;
         }
       }
     }

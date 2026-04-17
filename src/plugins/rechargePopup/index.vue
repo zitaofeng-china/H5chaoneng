@@ -68,11 +68,11 @@
       <div v-else class="recharge-content step-two">
         <div class="selected-amount-display">
           <div class="amount-value">
-            {{ finalAmount }} TRX
+            {{ actualAmount || selectedAmount }} {{ actualCoin }}
             <el-button
               link
               type="primary"
-              @click="copyFinalAmount"
+              @click="copyActualAmount"
               class="copy-amount-btn"
               :loading="isCopying"
             >
@@ -80,9 +80,9 @@
             </el-button>
           </div>
           <div class="amount-note">{{ t('recharge.finalAmountNote') }}</div>
-          <el-button link type="primary" @click="backToStep1" class="change-amount-btn">
-            {{ t('recharge.changeAmount') }}
-          </el-button>
+          <div v-if="deadline" class="deadline-note">
+            {{ t('recharge.transferDeadline', { time: deadline }) }}
+          </div>
         </div>
 
         <div class="qrcode-section">
@@ -128,17 +128,18 @@ const {
   isLoadingAddress,
   currentStep,
   selectedAmount,
-  finalAmount,
   customAmountInput,
   isCustomAmount,
   presetAmounts,
   rechargeAddress,
+  actualAmount,
+  actualCoin,
+  deadline,
   selectPresetAmount,
   handleCustomAmountFocus,
   handleCustomAmountInput,
   confirmAmount,
-  backToStep1,
-  copyFinalAmount,
+  copyActualAmount,
   open,
   close,
 } = useRecharge()

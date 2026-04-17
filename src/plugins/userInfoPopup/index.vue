@@ -73,8 +73,10 @@ const userInfoData = computed<UserInfoRow[]>(() => {
   ]
 })
 
-const open = () => {
+const open = async () => {
   visible.value = true
+  // 打开弹窗时刷新用户信息
+  await userStore.fetchUserInfo()
 }
 
 const close = () => {
@@ -185,51 +187,94 @@ defineExpose({
 // 移动端适配
 @media (max-width: 768px) {
   .user-info-dialog {
-    @include dialog-style;
-
     :deep(.el-dialog) {
-      padding: 16px;
+      width: 100% !important;
+      max-width: 100%;
+      height: 100vh;
+      margin: 0;
+      border-radius: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
     }
 
-    :deep(.el-dialog--center) {
-      width: 100%;
-      height: 100%;
+    :deep(.el-dialog__header) {
+      padding: 0;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    :deep(.el-dialog__body) {
+      flex: 1;
+      padding: 60px 16px 20px;
+      overflow-y: auto;
     }
 
     .user-info-title {
-      height: 44px;
+      height: 54px;
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--theme-bg-white);
-      font-size: 18px;
+      color: var(--theme-text-white);
+      font-size: 17px;
+      font-weight: 600;
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       background: var(--theme-bg);
       z-index: 99;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
       .arrow-left-icon {
-        position: fixed;
-        left: 20px;
-        display: block;
-        z-index: 100;
+        position: absolute;
+        left: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
         color: var(--theme-text-white);
+        cursor: pointer;
+        transition: opacity 0.3s ease;
+
+        &:active {
+          opacity: 0.7;
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
       }
     }
   }
 
-  .desc-wrap .desc-item {
-    .desc-label {
-      flex-basis: 100px;
-      font-size: 13px;
-    }
+  .user-info-content {
+    padding: 0;
+  }
 
-    .desc-value {
-      font-size: 13px;
-      padding: 0 10px;
+  .desc-wrap {
+    border-radius: 6px;
+    font-size: 13px;
+
+    .desc-item {
+      height: 46px;
+
+      .desc-label {
+        height: 46px;
+        flex-basis: 100px;
+        font-size: 13px;
+        padding: 0 8px;
+        font-weight: 600;
+      }
+
+      .desc-value {
+        font-size: 13px;
+        padding: 0 12px;
+        font-weight: 500;
+      }
     }
   }
 }
