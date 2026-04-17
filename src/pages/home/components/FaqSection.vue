@@ -177,24 +177,50 @@ const toggleItem = (index: number) => {
   }
 
   .faq-section {
-    padding: 50px 0;
+    padding: 40px 0;
   }
 
   .faq-header {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
 
   .faq-title {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .faq-subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .faq-list {
+    gap: 12px;
+  }
+
+  .faq-item {
+    border-radius: 10px;
   }
 
   .faq-question {
-    padding: 18px 32px;
+    padding: 16px 18px;
     font-size: 14px;
+    font-weight: 600;
+    gap: 12px;
+  }
+
+  .faq-icon {
+    svg {
+      width: 20px;
+      height: 20px;
+    }
   }
 
   .faq-answer {
-    font-size: 14px;
+    padding: 8px 18px 16px;
+    font-size: 13px;
+    line-height: 1.6;
   }
 }
 </style>

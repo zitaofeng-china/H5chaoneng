@@ -145,26 +145,40 @@ const handleViewProblems = () => {
   .help-content {
     .help-info {
       &:not(:last-child) {
-        margin-bottom: 32px;
+        margin-bottom: 20px;
       }
     }
   }
 
-  .help-buttons {
-    gap: 15px;
-  }
-
-  .help-button {
-    min-width: 180px;
-    max-width: 200px;
-  }
-
   .help-section {
-    padding: 50px 0;
+    padding: 32px 0;
   }
 
   .help-title {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .help-subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .help-buttons {
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .help-button {
+    flex: 1;
+    max-width: 160px;
+    min-width: 140px;
+    height: 44px;
+    font-size: 14px;
+    border-radius: 6px;
   }
 }
 </style>

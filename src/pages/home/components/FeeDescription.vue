@@ -281,15 +281,26 @@ defineOptions({
   }
 
   .fee-description {
-    padding: 50px 0;
+    padding: 40px 0;
   }
 
   .fee-header {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
   }
 
   .fee-title {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .fee-subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .fee-content {
+    border-radius: 12px;
   }
 
   .fee-columns {
@@ -301,6 +312,7 @@ defineOptions({
 
     .fee-column {
       position: relative;
+      padding: 20px 18px;
 
       &:not(:last-child) {
         &::after {
@@ -308,12 +320,79 @@ defineOptions({
           content: '';
           position: absolute;
           bottom: 0;
-          left: 30px;
-          right: 30px;
+          left: 18px;
+          right: 18px;
           border-top: 1px solid rgba(245, 245, 245, 1);
         }
       }
     }
+  }
+
+  .column-title {
+    font-size: 16px;
+    font-weight: 600;
+
+    svg {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+    }
+  }
+
+  .fee-item {
+    font-size: 13px;
+
+    .fee-label {
+      font-size: 13px;
+    }
+
+    .fee-value {
+      font-size: 13px;
+    }
+
+    .fee-info {
+      .text {
+        font-size: 11px;
+        line-height: 18px;
+      }
+
+      svg {
+        width: 11px;
+        height: 11px;
+      }
+    }
+
+    &.fee-item-bg {
+      padding: 8px;
+
+      .fee-info .text {
+        font-size: 12px;
+      }
+    }
+  }
+
+  .important-notice {
+    padding: 20px 18px;
+  }
+
+  .notice-title {
+    font-size: 13px;
+  }
+
+  .notice-item {
+    font-size: 13px;
+    gap: 6px;
+
+    svg {
+      width: 11px;
+      height: 11px;
+      flex-shrink: 0;
+    }
+  }
+
+  .notice-text {
+    font-size: 12px;
+    line-height: 1.5;
   }
 }
 </style>
