@@ -5,7 +5,6 @@
 export interface LoginForm {
   username: string
   password: string
-  verifyCode: string
   remember: boolean
 }
 

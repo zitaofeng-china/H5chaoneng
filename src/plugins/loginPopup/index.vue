@@ -52,30 +52,6 @@
               </div>
             </el-form-item>
 
-            <el-form-item prop="verifyCode">
-              <div class="input-wrapper code-wrapper">
-                <el-input
-                  v-model="loginForm.verifyCode"
-                  :placeholder="$t('login.verifyCodePlaceholder')"
-                  size="large"
-                  class="custom-input"
-                  maxlength="6"
-                >
-                  <template #prefix>
-                    <SvgIcon name="login-code" width="24" height="24" />
-                  </template>
-                </el-input>
-                <el-button
-                  class="send-code-btn"
-                  :disabled="countdown > 0 || sendingCode"
-                  :loading="sendingCode"
-                  @click="handleSendCode"
-                >
-                  {{ countdown > 0 ? `${countdown}s` : $t('login.sendCode') }}
-                </el-button>
-              </div>
-            </el-form-item>
-
             <div class="form-actions">
               <el-checkbox v-model="loginForm.remember">
                 {{ $t('login.rememberPassword') }}
@@ -127,12 +103,9 @@ const { isMobile } = storeToRefs(commonStore)
 const {
   visible,
   loading,
-  sendingCode,
-  countdown,
   loginForm,
   loginFormRef,
   rules,
-  handleSendCode,
   handleLogin,
   open,
   close,

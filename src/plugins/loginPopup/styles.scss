@@ -217,7 +217,16 @@
 // 移动端适配
 @media (max-width: 768px) {
   .login-dialog {
-    @include dialog-style;
+    :deep(.el-dialog) {
+      width: 100% !important;
+      max-width: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 0;
+    }
   }
 
   .login-container {
@@ -225,32 +234,89 @@
     flex-direction: column;
   }
 
+  .login-left {
+    display: block;
+    flex: none;
+    height: 240px;
+    
+    :deep(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
   .login-right {
-    flex: 1;
-    padding: 20px 24px;
+    padding: 24px 20px 32px;
   }
 
   .login-header {
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    text-align: center;
 
     .login-title {
       font-size: 20px;
+      font-weight: 600;
     }
   }
 
   .login-form {
     .el-form-item {
-      margin-bottom: 20px;
+      margin-bottom: 16px;
+
+      &:last-of-type {
+        margin-bottom: 20px;
+      }
+    }
+
+    .input-wrapper {
+      .custom-input {
+        height: 44px;
+
+        :deep(.el-input__wrapper) {
+          padding: 10px 12px;
+        }
+
+        :deep(.el-input__inner) {
+          font-size: 14px;
+        }
+      }
+
+      .send-code-btn {
+        height: 44px;
+        font-size: 13px;
+        padding: 0 16px;
+        min-width: 90px;
+      }
     }
   }
 
   .form-actions {
     margin-bottom: 24px;
+    font-size: 13px;
+
+    :deep(.el-checkbox__label) {
+      font-size: 13px;
+    }
+
+    :deep(.el-link) {
+      font-size: 13px;
+    }
   }
 
-  .login-btn,
-  .register-link {
+  .login-btn {
     height: 44px;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .register-link {
+    margin-top: 16px;
+
+    :deep(.el-link) {
+      font-size: 14px;
+      font-weight: 600;
+    }
   }
 }
+
