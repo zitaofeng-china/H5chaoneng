@@ -429,13 +429,13 @@ const rentNow = async () => {
     const validityValue = rows.value[rowIdx]?.validity || 1
     const validityUnitValue = rows.value[rowIdx]?.validityUnit || 'day'
     
-    let durationInSeconds: number
+    let durationInSeconds: number | string
     if (validityUnitValue === 'hour') {
       // 小时转秒：1小时 = 3600秒
-      durationInSeconds = validityValue * 3600
+      durationInSeconds = validityValue * 3600 + "s"
     } else {
       // 天转秒：1天 = 86400秒
-      durationInSeconds = validityValue * 86400
+      durationInSeconds = validityValue * 86400 + "s"
     }
 
     // 构建订单参数
@@ -537,11 +537,92 @@ const rentNow = async () => {
 
 @media (max-width: 768px) {
   .time-rental-page {
-    padding: 18px 16px 16px;
+    padding: 12px;
+  }
+
+  .rental-wrapper {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .selection-grid {
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .grid-row {
+    gap: 6px;
+    padding: 3px 0;
+  }
+
+  .row-label {
+    font-size: 12px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
   }
 
   .row-options {
-    gap: 8px;
+    gap: 6px;
+  }
+
+  .pill {
+    height: 34px;
+    font-size: 12px;
+    padding: 0 6px;
+    min-width: 0;
+    flex: 1 1 calc(50% - 3px);
+    font-weight: 500;
+  }
+
+  .details-card {
+    .card-title {
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 14px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 13px;
+    padding-bottom: 4px;
+  }
+
+  :deep(.el-input__inner) {
+    font-size: 13px;
+    height: 38px;
+  }
+
+  :deep(.rent-btn) {
+    width: 100%;
+    height: 42px;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  :deep(.el-dialog) {
+    width: 90% !important;
+    max-width: 400px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 14px 16px;
+  }
+
+  :deep(.el-dialog__title) {
+    font-size: 15px;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 12px 16px;
   }
 }
 </style>

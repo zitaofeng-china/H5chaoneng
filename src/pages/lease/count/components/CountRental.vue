@@ -263,7 +263,9 @@ watch([total, unitPrice, count], () => {
   form.total = total.value
   form.unitPrice = unitPrice.value
   form.count = count.value
-})
+  // 更新后清除 total 字段的验证错误
+  formRef.value?.clearValidate('total')
+}, { immediate: true })
 
 watch(wallet, (v) => (form.wallet = v))
 
@@ -418,22 +420,125 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .time-rental-page {
-    padding: 16px;
-    display: block;
+    padding: 12px;
   }
 
   .rental-wrapper {
-    width: initial;
-    padding: 18px;
+    width: 100%;
+    padding: 16px;
+  }
+
+  .selection-grid {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .grid-row {
+    gap: 6px;
+    padding: 4px 0;
   }
 
   .row-options {
+    gap: 8px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .pill {
-    font-size: 12px;
+    height: 38px;
+    font-size: 13px;
+    padding: 0 8px;
+    min-width: 0;
+  }
+
+  .custom-input-wrapper {
+    margin-top: 10px;
+    padding: 12px;
+
+    .custom-form-item {
+      :deep(.el-form-item__label) {
+        font-size: 13px;
+      }
+
+      :deep(.el-input__inner) {
+        height: 40px;
+        font-size: 14px;
+      }
+    }
+  }
+
+  .details-card {
+    .card-title {
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 16px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 13px;
+    padding-bottom: 6px;
+  }
+
+  :deep(.el-input__inner) {
+    font-size: 14px;
+    height: 40px;
+  }
+
+  :deep(.rent-btn) {
+    width: 100%;
+    height: 44px;
+    font-size: 15px;
+    margin-top: 8px;
+  }
+
+  :deep(.buy-btn) {
+    margin-top: 8px;
+  }
+
+  .btn-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  :deep(.el-dialog) {
+    width: 90% !important;
+    max-width: 400px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+
+  .payment-dialog {
+    .payment-info {
+      padding: 12px;
+      margin-bottom: 16px;
+
+      .info-row {
+        padding: 6px 0;
+        font-size: 13px;
+
+        &.highlight .value {
+          font-size: 16px;
+        }
+      }
+    }
+
+    .payment-tips {
+      margin-top: 12px;
+      padding: 10px;
+
+      .tip-item {
+        font-size: 11px;
+        margin-bottom: 6px;
+      }
+    }
   }
 }
 
