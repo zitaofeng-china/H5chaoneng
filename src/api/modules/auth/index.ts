@@ -11,6 +11,7 @@ import type {
   ResetPasswordParams,
   RevisePasswordParams,
   SendCodeParams,
+  SendEmailCodeParams,
   SendCodeResponse,
   VerifyTokenResponse,
   RefreshTokenParams,
@@ -66,6 +67,13 @@ export function revisePassword(params: RevisePasswordParams) {
  */
 export function sendCode(params: SendCodeParams) {
   return post<SendCodeResponse>('/auth/send-code', params)
+}
+
+/**
+ * 发送邮箱验证码
+ */
+export function sendEmailCode(params: SendEmailCodeParams) {
+  return post<{}>('/v1/user/email/code', params)
 }
 
 /**

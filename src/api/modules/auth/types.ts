@@ -77,6 +77,12 @@ export interface SendCodeParams {
   type: 'register' | 'reset' | 'verify'
 }
 
+// 发送邮箱验证码请求参数
+export interface SendEmailCodeParams {
+  channel: string // 新密码（用户想要设置的新密码）
+  email: string // 电子邮箱
+}
+
 // 发送验证码响应数据
 export interface SendCodeResponse {
   success: boolean

@@ -24,8 +24,38 @@ export enum OrderKind {
  */
 export interface CreateOrderParams {
   count?: number              // 数量（托管时可不传）
-  duration?: number           // 时长（秒数，按笔数租用/托管时可不传）
+  duration?: number | string  // 时长（秒数，按笔数租用/托管时可不传）
   kind: OrderKind | number    // 订单类型
   target: string[]            // 目标地址列表
   user_id: number             // 用户ID
+}
+
+/**
+ * 创建充值订单请求参数
+ */
+export interface CreateDepositOrderParams {
+  amount: number              // 充值金额
+  coin: string                // 币种（例如："TRX"）
+  user_id: number             // 用户ID
+}
+
+/**
+ * 充值订单数据
+ */
+export interface DepositOrderData {
+  id: string                  // 订单ID
+  created_at: number          // 创建时间（Unix时间戳）
+  updated_at: number          // 更新时间（Unix时间戳）
+  paid_at: number | null      // 支付时间（Unix时间戳）
+  kind: number                // 订单类型
+  status: number              // 状态
+  origin: number              // 来源
+  user_id: number             // 用户ID
+  agent_id: number            // 代理ID
+  bot_id: number              // 机器人ID
+  amount: string              // 充值金额
+  coin: string                // 币种
+  receive_address: string     // 收款地址（充值地址）
+  pay_id: string              // 支付ID
+  describe: string            // 描述
 }
