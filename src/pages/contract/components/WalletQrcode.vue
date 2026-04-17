@@ -246,8 +246,48 @@ const getCoinTips = computed(() => {
 
 @media (max-width: 768px) {
   .transfer-rental {
-    .top-banner {
-      gap: 10px;
+    padding: 0;
+
+    .instruction-note {
+      margin: 16px 0 12px;
+      font-size: 13px;
+    }
+
+    .loading-section,
+    .error-section {
+      padding: 24px 12px;
+      margin: 12px 0;
+      border-radius: 6px;
+
+      .loading-title,
+      .error-title {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .loading-placeholder,
+      .error-placeholder {
+        padding: 30px 0;
+        gap: 10px;
+
+        .el-icon {
+          font-size: 36px;
+        }
+
+        .loading-text,
+        .error-text {
+          font-size: 14px;
+        }
+
+        .error-hint {
+          font-size: 13px;
+        }
+
+        .retry-button {
+          padding: 8px 20px;
+          font-size: 14px;
+        }
+      }
     }
   }
 }

@@ -54,7 +54,7 @@ import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { type FormInstance } from 'element-plus'
 import { usePriceStore } from '@/stores/usePriceStore'
-import { addressApi } from '@/api'
+import { addressApi, binanceApi } from '@/api'
 import { AddressKind } from '@/api/modules/address/types'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
@@ -66,10 +66,25 @@ const activeTab = ref('USDT')
 const formRef = ref<FormInstance>()
 const paymentAddress = ref('')
 
+// 币安实时汇率
+const binanceRate = ref<number>(0)
+
 const formData = reactive({
   unitPrice: '2',
   coinAmount: '',
 })
+
+// 获取币安实时汇率
+const fetchBinanceRate = async () => {
+  try {
+    const data = await binanceApi.getTrxUsdtPrice()
+    binanceRate.value = parseFloat(data.price)
+  } catch (error) {
+    console.error('[Contract Flash] 获取币安汇率失败:', error)
+    // 如果获取失败，使用后端价格作为备用
+    binanceRate.value = 0
+  }
+}
 
 // 获取付款地址（USDT和TRX都使用同一个kind=3）
 const fetchPaymentAddress = async () => {
@@ -109,12 +124,43 @@ const handleRetryFetchAddress = () => {
   fetchPaymentAddress()
 }
 
-// 获取汇率
+// 获取汇率（币安实时汇率 × 手续费百分比）
 const exchangeRate = computed(() => {
+  // 如果没有后端价格数据，返回0
   if (!priceStore.priceData) return { usdtToTrx: 0, trxToUsdt: 0 }
+  
+  // 获取后端手续费比例（百分比形式，如 0.06 = 6%）
+  const feeRateUsdtToTrx = Number.parseFloat(priceStore.priceData.usdt_2_trx) || 0
+  const feeRateTrxToUsdt = Number.parseFloat(priceStore.priceData.trx_2_usdt) || 0
+  
+  console.log('[Contract Flash] 手续费比例:', { feeRateUsdtToTrx, feeRateTrxToUsdt })
+  
+  // 如果有币安实时汇率，使用币安汇率 × (1 - 手续费比例)
+  if (binanceRate.value > 0) {
+    // 币安返回的是 TRXUSDT，即 1 TRX = X USDT
+    // 所以 1 USDT = 1/X TRX
+    const binanceUsdtToTrx = 1 / binanceRate.value // 1 USDT = X TRX
+    const binanceTrxToUsdt = binanceRate.value // 1 TRX = X USDT
+    
+    const calculatedRates = {
+      // USDT→TRX: 币安汇率 × (1 - 手续费比例)
+      // 例如: 3.0833 × (1 - 0.06) = 3.0833 × 0.94 = 2.898
+      usdtToTrx: binanceUsdtToTrx * (1 - feeRateUsdtToTrx),
+      
+      // TRX→USDT: 币安汇率 × (1 - 手续费比例)
+      // 例如: 0.3243 × (1 - 0.04) = 0.3243 × 0.96 = 0.3113
+      trxToUsdt: binanceTrxToUsdt * (1 - feeRateTrxToUsdt),
+    }
+    
+    console.log('[Contract Flash] 计算后的汇率:', calculatedRates)
+    return calculatedRates
+  }
+  
+  // 如果没有币安汇率，使用后端价格作为汇率（假设后端返回的是实际汇率而不是手续费）
+  console.log('[Contract Flash] 使用后端价格作为汇率')
   return {
-    usdtToTrx: Number.parseFloat(priceStore.priceData.usdt_2_trx) || 0,
-    trxToUsdt: Number.parseFloat(priceStore.priceData.trx_2_usdt) || 0,
+    usdtToTrx: feeRateUsdtToTrx > 1 ? feeRateUsdtToTrx : 0,
+    trxToUsdt: feeRateTrxToUsdt > 0.01 ? feeRateTrxToUsdt : 0,
   }
 })
 
@@ -168,18 +214,35 @@ watch(() => formData.unitPrice, (newValue) => {
 
   if (activeTab.value === 'USDT') {
     // USDT→TRX
-    formData.coinAmount = (amount * exchangeRate.value.usdtToTrx).toFixed(2)
+    const rate = exchangeRate.value.usdtToTrx
+    if (rate > 0) {
+      formData.coinAmount = (amount * rate).toFixed(2)
+    } else {
+      formData.coinAmount = '0.00'
+    }
   } else {
     // TRX→USDT
-    formData.coinAmount = (amount * exchangeRate.value.trxToUsdt).toFixed(2)
+    const rate = exchangeRate.value.trxToUsdt
+    if (rate > 0) {
+      formData.coinAmount = (amount * rate).toFixed(2)
+    } else {
+      formData.coinAmount = '0.00'
+    }
   }
-})
+}, { immediate: true }) // 添加 immediate: true，初始化时立即执行
 
 // 监听切换标签，重置表单
 watch(activeTab, (newTab) => {
   formData.unitPrice = newTab === 'USDT' ? '2' : '10'
   formData.coinAmount = ''
 })
+
+// 监听汇率变化，重新计算预估获得
+watch(() => exchangeRate.value, () => {
+  // 触发重新计算
+  const currentValue = formData.unitPrice
+  formData.unitPrice = currentValue
+}, { deep: true })
 
 // 失焦时检查并恢复最小值
 const handleBlur = () => {
@@ -190,9 +253,10 @@ const handleBlur = () => {
   }
 }
 
-// 初始化时获取价格和付款地址
+// 初始化时获取价格、币安汇率和付款地址
 onMounted(() => {
   priceStore.fetchPrice()
+  fetchBinanceRate() // 获取币安实时汇率
   fetchPaymentAddress()
 })
 </script>
@@ -327,8 +391,71 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
-  :deep(.el-input__inner) {
-    padding-right: 15px;
+  .contract-flash {
+    padding: 0 0 60px;
+
+    .rental-card {
+      border-radius: 6px;
+      box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
+
+      :deep(.el-card__body) {
+        padding: 16px;
+      }
+    }
+
+    .rental-tabs {
+      :deep(.el-tabs__header) {
+        margin: 0 0 18px;
+      }
+
+      :deep(.el-tabs__nav) {
+        padding: 2px;
+      }
+
+      :deep(.el-tabs__item) {
+        height: 40px;
+        line-height: 40px;
+        font-size: 13px;
+      }
+    }
+
+    .form-wrap {
+      :deep(.el-form-item) {
+        margin-bottom: 14px;
+
+        .el-input {
+          font-size: 13px;
+
+          .el-input__wrapper {
+            padding: 0 10px;
+          }
+
+          .el-input__inner {
+            height: 40px;
+            line-height: 40px;
+            font-size: 13px;
+          }
+
+          .el-input__prefix,
+          .el-input__suffix-inner {
+            font-size: 13px;
+            font-weight: 600;
+          }
+
+          &.is-disabled {
+            .el-input__wrapper {
+              background: rgba(2, 15, 45, 0.02);
+            }
+
+            .el-input__inner {
+              padding-right: 10px;
+              color: var(--theme-text-gray);
+            }
+          }
+        }
+      }
+    }
   }
 }
+
 </style>
