@@ -2,32 +2,68 @@
  * 登录表单业务逻辑 Hook
  */
 
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/useUserStore'
 import { loginSimple } from '@/api/modules/auth'
 import { authApi } from '@/api'
-import { useCountdown } from './useCountdown'
 import { useFormValidation } from './useFormValidation'
 import type { LoginForm } from '@/plugins/loginPopup/types'
+
+// 记住密码的存储 key
+const REMEMBER_PASSWORD_KEY = 'remember_password'
+const SAVED_USERNAME_KEY = 'saved_username'
+const SAVED_PASSWORD_KEY = 'saved_password'
+
+interface RememberPasswordData {
+  username: string
+  password: string
+}
+
+/**
+ * 保存记住的密码
+ */
+function saveRememberPassword(username: string, password: string) {
+  localStorage.setItem(REMEMBER_PASSWORD_KEY, 'true')
+  localStorage.setItem(SAVED_USERNAME_KEY, username)
+  localStorage.setItem(SAVED_PASSWORD_KEY, password)
+}
+
+/**
+ * 获取记住的密码
+ */
+function getRememberPassword(): RememberPasswordData | null {
+  const remember = localStorage.getItem(REMEMBER_PASSWORD_KEY)
+  if (remember === 'true') {
+    const username = localStorage.getItem(SAVED_USERNAME_KEY) || ''
+    const password = localStorage.getItem(SAVED_PASSWORD_KEY) || ''
+    return { username, password }
+  }
+  return null
+}
+
+/**
+ * 清除记住的密码
+ */
+function clearRememberPassword() {
+  localStorage.removeItem(REMEMBER_PASSWORD_KEY)
+  localStorage.removeItem(SAVED_USERNAME_KEY)
+  localStorage.removeItem(SAVED_PASSWORD_KEY)
+}
 
 export function useLoginForm() {
   const { t } = useI18n()
   const userStore = useUserStore()
-  const { countdown, start: startCountdown } = useCountdown(60)
   const { usernameRules, passwordRules } = useFormValidation()
 
   const visible = ref(false)
   const loading = ref(false)
-  const sendingCode = ref(false)
-  const smsId = ref('')
   const loginFormRef = ref<FormInstance>()
 
   const loginForm = reactive<LoginForm>({
     username: '',
     password: '',
-    verifyCode: '',
     remember: false,
   })
 
@@ -37,38 +73,7 @@ export function useLoginForm() {
   const rules = computed<FormRules<LoginForm>>(() => ({
     username: usernameRules.value,
     password: passwordRules.value,
-    verifyCode: [
-      { len: 6, message: t('login.verifyCodeLength'), trigger: 'blur' },
-    ],
   }))
-
-  /**
-   * 发送验证码
-   */
-  const handleSendCode = async () => {
-    if (!loginForm.username) {
-      ElMessage.warning(t('login.usernameRequired'))
-      return
-    }
-
-    try {
-      sendingCode.value = true
-      // TODO: 调用真实的发送验证码接口
-      // const response = await sendCode({ username: loginForm.username })
-      // smsId.value = response.sms_id
-      
-      // 模拟发送成功
-      smsId.value = 'mock_sms_id_' + Date.now()
-      ElMessage.success(t('login.sendCodeSuccess'))
-      
-      // 开始倒计时
-      startCountdown(60)
-    } catch (error: any) {
-      ElMessage.error(error.message || t('login.sendCodeFailed'))
-    } finally {
-      sendingCode.value = false
-    }
-  }
 
   /**
    * 登录处理
@@ -78,19 +83,14 @@ export function useLoginForm() {
 
     try {
       await loginFormRef.value.validate()
-      
-      if (!smsId.value) {
-        ElMessage.warning(t('login.sendCodeFirst'))
-        return false
-      }
 
       loading.value = true
 
       const response = await loginSimple({
-        code_id: smsId.value,
+        code_id: '',
         password: loginForm.password,
         username: loginForm.username,
-        verify_code: loginForm.verifyCode,
+        verify_code: '',
       })
 
       // 检查响应是否成功
@@ -122,6 +122,13 @@ export function useLoginForm() {
         // 获取用户信息失败不影响登录流程
       }
       
+      // 处理记住密码
+      if (loginForm.remember) {
+        saveRememberPassword(loginForm.username, loginForm.password)
+      } else {
+        clearRememberPassword()
+      }
+      
       ElMessage.success(t('login.loginSuccess'))
       
       // 触发登录成功事件，显示重要提示弹窗
@@ -143,7 +150,6 @@ export function useLoginForm() {
    */
   const resetForm = async () => {
     await loginFormRef.value?.resetFields()
-    smsId.value = ''
   }
 
   /**
@@ -151,6 +157,8 @@ export function useLoginForm() {
    */
   const open = () => {
     visible.value = true
+    // 打开弹窗时加载记住的密码
+    loadRememberPassword()
   }
 
   /**
@@ -161,15 +169,29 @@ export function useLoginForm() {
     await resetForm()
   }
 
+  /**
+   * 加载记住的密码
+   */
+  const loadRememberPassword = () => {
+    const saved = getRememberPassword()
+    if (saved) {
+      loginForm.username = saved.username
+      loginForm.password = saved.password
+      loginForm.remember = true
+    }
+  }
+
+  // 组件挂载时加载记住的密码
+  onMounted(() => {
+    loadRememberPassword()
+  })
+
   return {
     visible,
     loading,
-    sendingCode,
-    countdown,
     loginForm,
     loginFormRef,
     rules,
-    handleSendCode,
     handleLogin,
     resetForm,
     open,

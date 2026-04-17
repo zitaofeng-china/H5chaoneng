@@ -55,12 +55,26 @@ export function useResetForm() {
       return
     }
 
-    try {
-      // TODO: 调用发送验证码接口
-      // await authApi.sendCode({ email: resetForm.email, type: 'reset' })
+    // 检查是否已输入新密码
+    if (!resetForm.password) {
+      ElMessage.warning(t('reset.enterPasswordFirst'))
+      return
+    }
 
-      startCountdown(60)
-      ElMessage.success(t('reset.codeSent'))
+    try {
+      // 调用发送邮箱验证码接口
+      // channel 参数传入新密码
+      const response = await authApi.sendEmailCode({
+        channel: resetForm.password, // 新密码作为 channel 参数
+        email: resetForm.email,
+      })
+
+      if (response.code === '000000') {
+        startCountdown(60)
+        ElMessage.success(t('reset.codeSent'))
+      } else {
+        ElMessage.error(response.msg || t('login.sendCodeFailed'))
+      }
     } catch (error: any) {
       console.error('发送验证码失败:', error)
       ElMessage.error(error.message || t('login.sendCodeFailed'))

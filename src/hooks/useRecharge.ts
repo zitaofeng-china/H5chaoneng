@@ -3,9 +3,9 @@
  */
 
 import { ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
-import { authApi, addressApi } from '@/api'
-import { AddressKind } from '@/api/modules/address/types'
+import { authApi, orderApi } from '@/api'
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
 
@@ -14,25 +14,24 @@ export function useRecharge() {
   const userStore = useUserStore()
   const { isCopying, copyText } = useCopyToClipboard()
 
+  // 弹窗状态
   const visible = ref(false)
-  const rechargeAddress = ref<string>('')
   const isLoadingAddress = ref(false)
   
   // 充值流程状态
   const currentStep = ref(1) // 1: 选择金额, 2: 显示地址
+  
+  // 用户输入的金额
   const selectedAmount = ref<number>(0)
-  const finalAmount = ref<number>(0) // 最终充值金额（包含随机小数）
   const customAmountInput = ref<string>('')
   const isCustomAmount = ref(false)
   const presetAmounts = [10, 30, 50, 200, 500, 1000]
-
-  /**
-   * 计算最终充值金额（固定添加0.01）
-   */
-  const calculateFinalAmount = (baseAmount: number): number => {
-    const integerPart = Math.floor(baseAmount)
-    return parseFloat((integerPart + 0.01).toFixed(2))
-  }
+  
+  // 订单返回的实际数据
+  const rechargeAddress = ref<string>('') // 充值地址
+  const actualAmount = ref<string>('')    // 实际充值金额
+  const actualCoin = ref<string>('TRX')   // 币种
+  const deadline = ref<string>('')        // 转账截止时间
 
   /**
    * 选择预设金额
@@ -63,84 +62,114 @@ export function useRecharge() {
   }
 
   /**
-   * 确认金额，进入第二步
+   * 确认金额，创建充值订单并进入第二步
    */
   const confirmAmount = async () => {
+    // 验证金额
     if (selectedAmount.value < 1) {
+      ElMessage.warning(t('recharge.invalidAmount') || '请输入有效的充值金额')
       return
     }
-    // 计算最终充值金额（包含随机小数）
-    finalAmount.value = calculateFinalAmount(selectedAmount.value)
-    currentStep.value = 2
-    // 进入第二步时获取充值地址
-    await Promise.all([
-      fetchUserInfo(),
-      fetchRechargeAddress()
-    ])
-  }
-
-  /**
-   * 返回第一步
-   */
-  const backToStep1 = () => {
-    currentStep.value = 1
-  }
-
-  /**
-   * 获取充值地址
-   */
-  const fetchRechargeAddress = async () => {
+    
     isLoadingAddress.value = true
     
-    // 设置10秒超时
-    const timeoutPromise = new Promise((_, reject) => {
-      setTimeout(() => reject(new Error('请求超时')), 10000)
-    })
-    
     try {
-      console.log('[Recharge] 开始获取充值地址, kind=', AddressKind.RECHARGE)
+      const userId = userStore.userInfo?.id || 0
       
-      const response = await Promise.race([
-        addressApi.getAddress({ kind: AddressKind.RECHARGE }),
-        timeoutPromise
-      ]) as any
-      
-      console.log('[Recharge] 获取充值地址响应:', response)
-      
-      if (response.code === '000000' && response.data) {
-        // 处理多种可能的数据结构
-        let address = ''
-        
-        if (typeof response.data === 'string') {
-          address = response.data
-          console.log('[Recharge] 地址类型: 字符串', address)
-        } else if (Array.isArray(response.data) && response.data.length > 0) {
-          address = typeof response.data[0] === 'string' 
-            ? response.data[0] 
-            : response.data[0].address || ''
-          console.log('[Recharge] 地址类型: 数组', address)
-        } else if (typeof response.data === 'object' && 'address' in response.data) {
-          address = response.data.address || ''
-          console.log('[Recharge] 地址类型: 对象', address)
-        }
-        
-        if (address) {
-          rechargeAddress.value = address
-          console.log('[Recharge] 充值地址设置成功:', address)
-        } else {
-          console.warn('[Recharge] 无法从响应中提取地址')
-        }
-      } else {
-        console.warn('[Recharge] 响应码不是 000000 或没有数据:', response)
+      if (!userId) {
+        ElMessage.error(t('common.pleaseLogin') || '请先登录')
+        isLoadingAddress.value = false
+        return
       }
+      
+      console.log('[Recharge] 创建充值订单:', {
+        amount: selectedAmount.value,
+        coin: 'TRX',
+        userId
+      })
+      
+      // 创建充值订单
+      const response = await orderApi.createDepositOrder({
+        amount: selectedAmount.value,
+        coin: 'TRX',
+        user_id: userId
+      })
+      
+      console.log('[Recharge] 订单响应:', response)
+      
+      // 检查响应
+      if (response.code !== '000000') {
+        console.warn('[Recharge] 订单创建失败:', response.msg)
+        ElMessage.error(response.msg || t('recharge.createOrderFailed') || '创建订单失败')
+        resetOrderData()
+        return
+      }
+      
+      if (!response.data) {
+        console.error('[Recharge] 响应数据为空')
+        ElMessage.error(t('recharge.createOrderFailed') || '创建订单失败')
+        resetOrderData()
+        return
+      }
+      
+      // 提取订单数据
+      const { receive_address, amount, coin } = response.data
+      
+      if (!receive_address) {
+        console.error('[Recharge] 响应中缺少充值地址')
+        ElMessage.error(t('recharge.noAddressReturned') || '未获取到充值地址')
+        resetOrderData()
+        return
+      }
+      
+      // 保存订单数据
+      rechargeAddress.value = receive_address
+      actualAmount.value = amount || selectedAmount.value.toString()
+      actualCoin.value = coin || 'TRX'
+      
+      // 计算截止时间（当前时间 + 5分钟）
+      const now = new Date()
+      const deadlineTime = new Date(now.getTime() + 5 * 60 * 1000)
+      deadline.value = deadlineTime.toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+      })
+      
+      console.log('[Recharge] 订单创建成功:', {
+        address: receive_address,
+        amount: actualAmount.value,
+        coin: actualCoin.value,
+        deadline: deadline.value
+      })
+      
+      // 进入第二步
+      currentStep.value = 2
+      
+      // 刷新用户信息
+      await fetchUserInfo()
+      
     } catch (error) {
-      console.error('[Recharge] 获取充值地址失败:', error)
-      // 确保即使出错也要停止加载状态
-      rechargeAddress.value = ''
+      console.error('[Recharge] 创建订单异常:', error)
+      ElMessage.error(t('recharge.createOrderFailed') || '创建订单失败，请重试')
+      resetOrderData()
     } finally {
       isLoadingAddress.value = false
-      console.log('[Recharge] 加载状态结束, isLoadingAddress=', isLoadingAddress.value)
     }
+  }
+
+  /**
+   * 重置订单数据
+   */
+  const resetOrderData = () => {
+    rechargeAddress.value = ''
+    actualAmount.value = ''
+    actualCoin.value = 'TRX'
+    deadline.value = ''
   }
 
   /**
@@ -153,11 +182,11 @@ export function useRecharge() {
   }
 
   /**
-   * 复制最终充值金额
+   * 复制充值金额（使用接口返回的实际金额）
    */
-  const copyFinalAmount = () => {
-    if (finalAmount.value > 0) {
-      copyText(finalAmount.value.toString(), t('recharge.copyAmountSuccess'))
+  const copyActualAmount = () => {
+    if (actualAmount.value) {
+      copyText(actualAmount.value, t('recharge.copyAmountSuccess'))
     }
   }
 
@@ -165,15 +194,18 @@ export function useRecharge() {
    * 获取最新用户信息
    */
   const fetchUserInfo = async () => {
-    if (userStore.isLogin && userStore.token) {
-      try {
-        const userInfoResponse = await authApi.getUserInfo()
-        if (userInfoResponse.code === '000000' && userInfoResponse.data) {
-          userStore.updateUserInfo(userInfoResponse.data)
-        }
-      } catch (error) {
-        console.error('获取用户信息失败:', error)
+    if (!userStore.isLogin || !userStore.token) {
+      return
+    }
+    
+    try {
+      const response = await authApi.getUserInfo()
+      if (response.code === '000000' && response.data) {
+        userStore.updateUserInfo(response.data)
+        console.log('[Recharge] 用户信息已更新')
       }
+    } catch (error) {
+      console.error('[Recharge] 获取用户信息失败:', error)
     }
   }
 
@@ -184,11 +216,11 @@ export function useRecharge() {
     visible.value = true
     currentStep.value = 1
     selectedAmount.value = 0
-    customAmountInput.value = '1' // 默认值为1
+    customAmountInput.value = '1'
     isCustomAmount.value = false
-    rechargeAddress.value = ''
-    finalAmount.value = 0
-    // 只获取用户信息，不获取地址（等确认金额后再获取）
+    resetOrderData()
+    
+    // 获取最新用户信息
     await fetchUserInfo()
   }
 
@@ -199,30 +231,37 @@ export function useRecharge() {
     visible.value = false
     currentStep.value = 1
     selectedAmount.value = 0
-    customAmountInput.value = '1' // 重置为默认值1
+    customAmountInput.value = '1'
     isCustomAmount.value = false
-    rechargeAddress.value = ''
-    finalAmount.value = 0
+    resetOrderData()
   }
 
   return {
+    // 状态
     visible,
     isCopying,
     isLoadingAddress,
     currentStep,
+    
+    // 用户输入
     selectedAmount,
-    finalAmount,
     customAmountInput,
     isCustomAmount,
     presetAmounts,
+    
+    // 订单数据
     rechargeAddress,
+    actualAmount,
+    actualCoin,
+    deadline,
+    
+    // 方法
     selectPresetAmount,
     handleCustomAmountFocus,
     handleCustomAmountInput,
     confirmAmount,
-    backToStep1,
     copyAddress,
-    copyFinalAmount,
+    copyActualAmount,
     open,
     close,
   }
