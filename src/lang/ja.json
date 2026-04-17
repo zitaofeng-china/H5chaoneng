@@ -220,6 +220,19 @@
     "historyUsed": "歴史使用量",
     "todayUsed": "今日使用量",
     "deleteHosting": "ホスティング削除",
+    "orderId": "注文ID",
+    "createdAt": "作成時間",
+    "noAddresses": "ホスティング住所がありません",
+    "enterValidAddress": "有効な住所を入力してください",
+    "addSuccess": "{count}件のホスティング住所を追加しました",
+    "addPartialSuccess": "{success}件成功、{fail}件失敗",
+    "addFailed": "ホスティング住所の追加に失敗しました",
+    "deleteConfirm": "ホスティング住所 {address} を削除してもよろしいですか？",
+    "deleteSuccess": "ホスティング住所を削除しました",
+    "deleteFailed": "ホスティング住所の削除に失敗しました",
+    "addressNotActivated": "以下の住所がアクティベートされていません。アクティベートページに移動しますか？",
+    "goToActivate": "アクティベートへ",
+    "addingAddresses": "住所 {current}/{total} を追加中",
     "address": "ホスティングする住所",
     "enterAddresses": "住所を入力してください、複数の住所は英語カンマで区切るか、1行に1住所",
     "confirm": "確認",
@@ -319,7 +332,8 @@
     "confirmPassword": "パスワード確認",
     "resetButton": "リセット確認",
     "codeSent": "認証コードがメールアドレスに送信されました",
-    "enterEmailFirst": "まずメールアドレスを入力してください"
+    "enterEmailFirst": "まずメールアドレスを入力してください",
+    "enterPasswordFirst": "まず新しいパスワードを入力してください"
   },
   "recharge": {
     "title": "アカウント入金",
@@ -340,7 +354,12 @@
     "transferExactAmount": "以下のアドレスに {amount} TRX を送金してください",
     "finalAmountNote": "クリックして金額をコピー、小数点にご注意ください",
     "copyAmount": "金額をコピー",
-    "copyAmountSuccess": "金額がクリップボードにコピーされました"
+    "copyAmountSuccess": "金額がクリップボードにコピーされました",
+    "invalidAmount": "有効なチャージ金額を入力してください",
+    "createOrderFailed": "注文の作成に失敗しました",
+    "noAddressReturned": "チャージアドレスの取得に失敗しました",
+    "loadingHint": "チャージ注文を作成中です。お待ちください...",
+    "transferDeadline": "{time} までに送金を完了してください"
   },
   "error": {
     "unknown": "不明なエラー",

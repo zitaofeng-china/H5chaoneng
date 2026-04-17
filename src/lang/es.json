@@ -29,7 +29,8 @@
     "recharge": "Recarga",
     "loadFailed": "Error de Carga",
     "loadFailedHint": "Por favor verifique su conexión de red o intente más tarde",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "pleaseLogin": "Por favor inicie sesión primero"
   },
   "nav": {
     "home": "Inicio",
@@ -220,6 +221,19 @@
     "historyUsed": "Usado Históricamente",
     "todayUsed": "Usado Hoy",
     "deleteHosting": "Eliminar Alojamiento",
+    "orderId": "ID de Pedido",
+    "createdAt": "Fecha de Creación",
+    "noAddresses": "Sin direcciones alojadas",
+    "enterValidAddress": "Por favor ingrese direcciones válidas",
+    "addSuccess": "Se agregaron exitosamente {count} direcciones de alojamiento",
+    "addPartialSuccess": "Se agregaron {success} exitosamente, fallaron {fail}",
+    "addFailed": "Error al agregar dirección de alojamiento",
+    "deleteConfirm": "¿Está seguro de que desea eliminar la dirección de alojamiento {address}?",
+    "deleteSuccess": "Dirección de alojamiento eliminada exitosamente",
+    "deleteFailed": "Error al eliminar dirección de alojamiento",
+    "addressNotActivated": "Las siguientes direcciones no están activadas. ¿Ir a la página de activación?",
+    "goToActivate": "Ir a Activar",
+    "addingAddresses": "Agregando dirección {current}/{total}",
     "address": "Dirección a Alojar",
     "enterAddresses": "Por favor ingrese las direcciones, múltiples direcciones separadas por coma o una dirección por línea",
     "confirm": "Confirmar",
@@ -319,7 +333,8 @@
     "confirmPassword": "Confirmar Contraseña",
     "resetButton": "Confirmar Restablecimiento",
     "codeSent": "El código de verificación ha sido enviado a su correo electrónico",
-    "enterEmailFirst": "Por favor ingrese el correo electrónico primero"
+    "enterEmailFirst": "Por favor ingrese el correo electrónico primero",
+    "enterPasswordFirst": "Por favor ingrese la nueva contraseña primero"
   },
   "recharge": {
     "title": "Recarga de Cuenta",
@@ -340,7 +355,12 @@
     "transferExactAmount": "Por favor transfiera {amount} TRX a la siguiente dirección",
     "finalAmountNote": "Haga clic para copiar el monto, tenga en cuenta el punto decimal",
     "copyAmount": "Copiar Monto",
-    "copyAmountSuccess": "Monto copiado al portapapeles"
+    "copyAmountSuccess": "Monto copiado al portapapeles",
+    "invalidAmount": "Por favor ingrese un monto de recarga válido",
+    "createOrderFailed": "Error al crear el pedido",
+    "noAddressReturned": "No se pudo obtener la dirección de recarga",
+    "loadingHint": "Creando orden de recarga, por favor espere...",
+    "transferDeadline": "Por favor complete la transferencia antes de {time}"
   },
   "error": {
     "unknown": "Error desconocido",

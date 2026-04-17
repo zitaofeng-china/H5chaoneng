@@ -28,7 +28,8 @@
     "recharge": "充值",
     "loadFailed": "載入失敗",
     "loadFailedHint": "請檢查網絡連接或稍後重試",
-    "retry": "重試"
+    "retry": "重試",
+    "pleaseLogin": "請先登錄"
   },
   "nav": {
     "home": "首頁",
@@ -218,6 +219,19 @@
     "historyUsed": "歷史已用",
     "todayUsed": "今天已用",
     "deleteHosting": "刪除託管",
+    "orderId": "訂單ID",
+    "createdAt": "創建時間",
+    "noAddresses": "暫無託管地址",
+    "enterValidAddress": "請輸入有效的地址",
+    "addSuccess": "成功添加 {count} 個託管地址",
+    "addPartialSuccess": "成功添加 {success} 個，失敗 {fail} 個",
+    "addFailed": "添加託管地址失敗",
+    "deleteConfirm": "確定要刪除託管地址 {address} 嗎？",
+    "deleteSuccess": "刪除託管地址成功",
+    "deleteFailed": "刪除託管地址失敗",
+    "addressNotActivated": "檢測到以下地址未激活，是否前往激活頁面？",
+    "goToActivate": "前往激活",
+    "addingAddresses": "正在添加第 {current}/{total} 個地址",
     "address": "需要託管的地址",
     "enterAddresses": "請輸入地址，多個地址，請使用英文逗號分隔，或一行一個地址，",
     "confirm": "確定",
@@ -317,7 +331,8 @@
     "confirmPassword": "確認密碼",
     "resetButton": "確認重置",
     "codeSent": "驗證碼已發送到您的郵箱",
-    "enterEmailFirst": "請先輸入郵箱"
+    "enterEmailFirst": "請先輸入郵箱",
+    "enterPasswordFirst": "請先輸入新密碼"
   },
   "recharge": {
     "title": "帳戶充值",
@@ -338,7 +353,12 @@
     "transferExactAmount": "請轉帳 {amount} TRX 到以下地址",
     "finalAmountNote": "點擊可複製金額，請注意小數點",
     "copyAmount": "複製金額",
-    "copyAmountSuccess": "金額已複製到剪貼板"
+    "copyAmountSuccess": "金額已複製到剪貼板",
+    "invalidAmount": "請輸入有效的充值金額",
+    "createOrderFailed": "創建訂單失敗",
+    "noAddressReturned": "未獲取到充值地址",
+    "loadingHint": "正在創建充值訂單，請稍候...",
+    "transferDeadline": "請在 {time} 之前完成轉帳"
   },
   "error": {
     "unknown": "未知錯誤",

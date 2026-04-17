@@ -29,7 +29,8 @@
     "recharge": "Şarj",
     "loadFailed": "Yükleme Başarısız",
     "loadFailedHint": "Lütfen ağ bağlantınızı kontrol edin veya daha sonra tekrar deneyin",
-    "retry": "Tekrar Dene"
+    "retry": "Tekrar Dene",
+    "pleaseLogin": "Lütfen önce giriş yapın"
   },
   "nav": {
     "home": "Ana Sayfa",
@@ -220,6 +221,19 @@
     "historyUsed": "Geçmişte Kullanılan",
     "todayUsed": "Bugün Kullanılan",
     "deleteHosting": "Barındırmayı Sil",
+    "orderId": "Sipariş ID",
+    "createdAt": "Oluşturma Zamanı",
+    "noAddresses": "Barındırılan adres yok",
+    "enterValidAddress": "Lütfen geçerli adresler girin",
+    "addSuccess": "{count} barındırma adresi başarıyla eklendi",
+    "addPartialSuccess": "{success} başarılı, {fail} başarısız",
+    "addFailed": "Barındırma adresi eklenemedi",
+    "deleteConfirm": "{address} barındırma adresini silmek istediğinizden emin misiniz?",
+    "deleteSuccess": "Barındırma adresi başarıyla silindi",
+    "deleteFailed": "Barındırma adresi silinemedi",
+    "addressNotActivated": "Aşağıdaki adresler etkinleştirilmemiş. Etkinleştirme sayfasına gitmek ister misiniz?",
+    "goToActivate": "Etkinleştirmeye Git",
+    "addingAddresses": "Adres {current}/{total} ekleniyor",
     "address": "Barındırılacak Adres",
     "enterAddresses": "Lütfen adresleri girin, birden fazla adres için İngilizce virgül ile ayırın veya her satıra bir adres",
     "confirm": "Onayla",
@@ -319,7 +333,8 @@
     "confirmPassword": "Şifreyi Onayla",
     "resetButton": "Sıfırlamayı Onayla",
     "codeSent": "Doğrulama kodunuz e-postanıza gönderildi",
-    "enterEmailFirst": "Lütfen önce e-postayı girin"
+    "enterEmailFirst": "Lütfen önce e-postayı girin",
+    "enterPasswordFirst": "Lütfen önce yeni şifreyi girin"
   },
   "recharge": {
     "title": "Hesap Yükleme",
@@ -340,7 +355,12 @@
     "transferExactAmount": "Lütfen aşağıdaki adrese {amount} TRX transfer edin",
     "finalAmountNote": "Miktarı kopyalamak için tıklayın, ondalık noktaya dikkat edin",
     "copyAmount": "Miktarı Kopyala",
-    "copyAmountSuccess": "Miktar panoya kopyalandı"
+    "copyAmountSuccess": "Miktar panoya kopyalandı",
+    "invalidAmount": "Lütfen geçerli bir yeniden yükleme miktarı girin",
+    "createOrderFailed": "Sipariş oluşturulamadı",
+    "noAddressReturned": "Yeniden yükleme adresi alınamadı",
+    "loadingHint": "Yeniden yükleme siparişi oluşturuluyor, lütfen bekleyin...",
+    "transferDeadline": "Lütfen {time} tarihinden önce transferi tamamlayın"
   },
   "error": {
     "unknown": "Bilinmeyen hata",

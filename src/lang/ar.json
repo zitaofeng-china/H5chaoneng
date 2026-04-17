@@ -29,7 +29,8 @@
     "recharge": "إعادة الشحن",
     "loadFailed": "فشل التحميل",
     "loadFailedHint": "يرجى التحقق من اتصال الشبكة أو المحاولة لاحقاً",
-    "retry": "إعادة المحاولة"
+    "retry": "إعادة المحاولة",
+    "pleaseLogin": "الرجاء تسجيل الدخول أولاً"
   },
   "nav": {
     "home": "الرئيسية",
@@ -220,6 +221,19 @@
     "historyUsed": "المستخدم تاريخياً",
     "todayUsed": "المستخدم اليوم",
     "deleteHosting": "حذف الاستضافة",
+    "orderId": "معرف الطلب",
+    "createdAt": "وقت الإنشاء",
+    "noAddresses": "لا توجد عناوين مستضافة",
+    "enterValidAddress": "الرجاء إدخال عناوين صالحة",
+    "addSuccess": "تمت إضافة {count} عنوان استضافة بنجاح",
+    "addPartialSuccess": "نجح {success}، فشل {fail}",
+    "addFailed": "فشل في إضافة عنوان الاستضافة",
+    "deleteConfirm": "هل أنت متأكد من حذف عنوان الاستضافة {address}؟",
+    "deleteSuccess": "تم حذف عنوان الاستضافة بنجاح",
+    "deleteFailed": "فشل في حذف عنوان الاستضافة",
+    "addressNotActivated": "العناوين التالية غير مفعلة. الانتقال إلى صفحة التفعيل؟",
+    "goToActivate": "الذهاب للتفعيل",
+    "addingAddresses": "إضافة العنوان {current}/{total}",
     "address": "العنوان المراد استضافته",
     "enterAddresses": "الرجاء إدخال العناوين، عدة عناوين مفصولة بفاصلة إنجليزية أو عنوان واحد لكل سطر",
     "confirm": "تأكيد",
@@ -319,7 +333,8 @@
     "confirmPassword": "تأكيد كلمة المرور",
     "resetButton": "تأكيد إعادة التعيين",
     "codeSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
-    "enterEmailFirst": "الرجاء إدخال البريد الإلكتروني أولاً"
+    "enterEmailFirst": "الرجاء إدخال البريد الإلكتروني أولاً",
+    "enterPasswordFirst": "الرجاء إدخال كلمة المرور الجديدة أولاً"
   },
   "recharge": {
     "title": "شحن الحساب",
@@ -340,7 +355,12 @@
     "transferExactAmount": "يرجى تحويل {amount} TRX إلى العنوان التالي",
     "finalAmountNote": "انقر لنسخ المبلغ، يرجى ملاحظة النقطة العشرية",
     "copyAmount": "نسخ المبلغ",
-    "copyAmountSuccess": "تم نسخ المبلغ إلى الحافظة"
+    "copyAmountSuccess": "تم نسخ المبلغ إلى الحافظة",
+    "invalidAmount": "الرجاء إدخال مبلغ إعادة شحن صالح",
+    "createOrderFailed": "فشل في إنشاء الطلب",
+    "noAddressReturned": "فشل في الحصول على عنوان إعادة الشحن",
+    "loadingHint": "جاري إنشاء طلب إعادة الشحن، يرجى الانتظار...",
+    "transferDeadline": "يرجى إكمال التحويل قبل {time}"
   },
   "error": {
     "unknown": "خطأ غير معروف",

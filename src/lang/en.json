@@ -29,7 +29,8 @@
     "recharge": "Recharge",
     "loadFailed": "Load Failed",
     "loadFailedHint": "Please check your network connection or try again later",
-    "retry": "Retry"
+    "retry": "Retry",
+    "pleaseLogin": "Please login first"
   },
   "nav": {
     "home": "Home",
@@ -221,6 +222,19 @@
     "historyUsed": "History Used",
     "todayUsed": "Today Used",
     "deleteHosting": "Delete Hosting",
+    "orderId": "Order ID",
+    "createdAt": "Created At",
+    "noAddresses": "No hosted addresses",
+    "enterValidAddress": "Please enter valid addresses",
+    "addSuccess": "Successfully added {count} hosting address(es)",
+    "addPartialSuccess": "Successfully added {success}, failed {fail}",
+    "addFailed": "Failed to add hosting address",
+    "deleteConfirm": "Are you sure you want to delete hosting address {address}?",
+    "deleteSuccess": "Hosting address deleted successfully",
+    "deleteFailed": "Failed to delete hosting address",
+    "addressNotActivated": "The following addresses are not activated. Go to activation page?",
+    "goToActivate": "Go to Activate",
+    "addingAddresses": "Adding address {current}/{total}",
     "address": "Address to Host",
     "enterAddresses": "Please enter addresses, multiple addresses separated by English comma, or one address per line",
     "confirm": "Confirm",
@@ -275,6 +289,12 @@
     "activationNotice": "Activation Notice",
     "activationSuccessCount": "Activated Address Count",
     "activationTotalCount": "Address Count",
+    "skippedCount": "Skipped",
+    "allSuccess": "Successfully activated {count} address(es)",
+    "partialSuccess": "Successfully activated {activated} address(es), skipped {skipped} already activated",
+    "allSkipped": "All addresses are already activated, no need to activate again",
+    "allFailed": "Activation failed, please check if addresses are valid",
+    "activationFailed": "Activation failed",
     "tips1": "Maximum 1000 addresses for batch activation",
     "tips2": "Activated addresses do not charge activation fee"
   },
@@ -322,7 +342,8 @@
     "confirmPassword": "Confirm Password",
     "resetButton": "Confirm Reset",
     "codeSent": "Verification code has been sent to your email",
-    "enterEmailFirst": "Please enter email first"
+    "enterEmailFirst": "Please enter email first",
+    "enterPasswordFirst": "Please enter new password first"
   },
   "recharge": {
     "title": "Account Recharge",
@@ -343,7 +364,12 @@
     "transferExactAmount": "Please transfer {amount} TRX to the following address",
     "finalAmountNote": "Click to copy amount, please note the decimal point",
     "copyAmount": "Copy Amount",
-    "copyAmountSuccess": "Amount copied to clipboard"
+    "copyAmountSuccess": "Amount copied to clipboard",
+    "invalidAmount": "Please enter a valid recharge amount",
+    "createOrderFailed": "Failed to create order",
+    "noAddressReturned": "Failed to get recharge address",
+    "loadingHint": "Creating recharge order, please wait...",
+    "transferDeadline": "Please complete the transfer before {time}"
   },
   "revisePassword": {
     "title": "Change Password",
