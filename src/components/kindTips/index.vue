@@ -30,9 +30,10 @@ const { t } = useI18n()
 
 <style lang="scss" scoped>
 .tips-section {
-  margin: 14px -24px -24px;
-  padding: 24px;
+  margin: 14px 0 0;
+  padding: 20px;
   background: var(--theme-transfer-bg-light);
+  border-radius: 4px;
 
   .tips-title {
     font-size: 14px;
@@ -50,14 +51,47 @@ const { t } = useI18n()
 
   .tip-item {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 6px;
+    line-height: 1.5;
   }
 
   .tip-text {
     font-size: 14px;
-    line-height: 0;
+    line-height: 1.5;
     color: rgba(30, 41, 59, 0.8);
+    flex: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .tips-section {
+    margin: 12px 0 0;
+    padding: 14px 12px;
+    border-radius: 6px;
+
+    .tips-title {
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .tips-list {
+      gap: 8px;
+    }
+
+    .tip-item {
+      gap: 6px;
+
+      svg {
+        margin-top: 2px;
+        flex-shrink: 0;
+      }
+    }
+
+    .tip-text {
+      font-size: 12px;
+      line-height: 1.6;
+    }
   }
 }
 </style>
