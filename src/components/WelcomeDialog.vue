@@ -470,10 +470,11 @@ const handleConfirm = () => {
 @media (max-width: 768px) {
   .welcome-dialog {
     :deep(.el-dialog) {
-      width: 95% !important;
-      max-width: 500px;
-      margin: 10px auto;
-      max-height: 92vh;
+      width: 100% !important;
+      max-width: 100%;
+      margin: 0;
+      border-radius: 0;
+      max-height: 100vh;
       display: flex;
       flex-direction: column;
     }
@@ -482,7 +483,7 @@ const handleConfirm = () => {
       padding: 0 20px 20px;
       overflow-y: auto;
       flex: 1;
-      max-height: calc(92vh - 180px);
+      max-height: calc(100vh - 200px);
       
       /* 移动端滚动条样式 */
       &::-webkit-scrollbar {
@@ -498,7 +499,7 @@ const handleConfirm = () => {
     .dialog-header {
       padding: 20px;
       flex-direction: column;
-      gap: 14px;
+      gap: 12px;
       align-items: stretch;
       flex-shrink: 0;
 
@@ -523,104 +524,25 @@ const handleConfirm = () => {
         width: 100%;
         
         :deep(.el-input__wrapper) {
-          height: 42px;
+          height: 40px;
         }
       }
     }
 
     .dialog-content {
       .notice-list {
-        padding: 20px 0;
-        margin-bottom: 20px;
+        padding: 18px 0;
+        margin-bottom: 18px;
 
         .notice-item {
-          font-size: 15px;
+          font-size: 14px;
           margin-bottom: 12px;
-          padding: 10px 14px;
+          padding: 10px 12px;
+          line-height: 1.6;
           
           .check-icon {
             font-size: 18px;
           }
-        }
-      }
-
-      .agreement-wrapper {
-        padding: 16px 18px;
-      }
-
-      .agreement-checkbox {
-        :deep(.el-checkbox__label) {
-          font-size: 14px;
-          line-height: 1.5;
-        }
-
-        :deep(.el-checkbox__inner) {
-          width: 20px;
-          height: 20px;
-        }
-      }
-
-      .countdown-badge {
-        min-width: 38px;
-        height: 26px;
-        font-size: 13px;
-        padding: 0 10px;
-      }
-    }
-
-    .dialog-footer {
-      .confirm-button {
-        height: 50px;
-        font-size: 16px;
-      }
-    }
-  }
-}
-
-@media (max-width: 480px) {
-  .welcome-dialog {
-    :deep(.el-dialog) {
-      width: 96% !important;
-      margin: 8px auto;
-      max-height: 94vh;
-    }
-
-    :deep(.el-dialog__body) {
-      padding: 0 16px 16px;
-      max-height: calc(94vh - 170px);
-    }
-
-    :deep(.el-dialog__footer) {
-      padding: 0 16px 20px;
-    }
-
-    .dialog-header {
-      padding: 16px;
-
-      &::after {
-        left: 16px;
-        right: 16px;
-      }
-
-      .header-content {
-        .warning-icon {
-          font-size: 22px;
-        }
-
-        .header-title {
-          font-size: 16px;
-        }
-      }
-    }
-
-    .dialog-content {
-      .notice-list {
-        padding: 16px 0;
-
-        .notice-item {
-          font-size: 14px;
-          gap: 10px;
-          padding: 8px 12px;
         }
       }
 
@@ -631,6 +553,12 @@ const handleConfirm = () => {
       .agreement-checkbox {
         :deep(.el-checkbox__label) {
           font-size: 13px;
+          line-height: 1.5;
+        }
+
+        :deep(.el-checkbox__inner) {
+          width: 18px;
+          height: 18px;
         }
       }
 
@@ -638,7 +566,7 @@ const handleConfirm = () => {
         min-width: 36px;
         height: 24px;
         font-size: 12px;
-        padding: 0 8px;
+        padding: 0 10px;
       }
     }
 
@@ -651,66 +579,53 @@ const handleConfirm = () => {
   }
 }
 
-/* 超小屏幕优化 */
-@media (max-width: 360px) {
+@media (max-width: 480px) {
   .welcome-dialog {
-    :deep(.el-dialog) {
-      width: 98% !important;
-      margin: 5px auto;
-    }
-
-    :deep(.el-dialog__body) {
-      padding: 0 12px 12px;
-    }
-
-    :deep(.el-dialog__footer) {
-      padding: 0 12px 16px;
-    }
-
     .dialog-header {
-      padding: 12px;
+      padding: 18px;
 
       &::after {
-        left: 12px;
-        right: 12px;
+        left: 18px;
+        right: 18px;
       }
 
       .header-content {
-        gap: 8px;
-
         .warning-icon {
-          font-size: 20px;
+          font-size: 22px;
         }
 
         .header-title {
-          font-size: 15px;
+          font-size: 17px;
         }
       }
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 0 18px 18px;
+    }
+
+    :deep(.el-dialog__footer) {
+      padding: 0 18px 22px;
     }
 
     .dialog-content {
       .notice-list {
-        padding: 12px 0;
+        padding: 16px 0;
 
         .notice-item {
           font-size: 13px;
-          margin-bottom: 10px;
-          padding: 8px 10px;
+          gap: 10px;
+          padding: 9px 11px;
         }
       }
 
       .agreement-wrapper {
-        padding: 12px 14px;
+        padding: 13px 15px;
       }
 
       .agreement-checkbox {
         :deep(.el-checkbox__label) {
           font-size: 12px;
-        }
-
-        :deep(.el-checkbox__inner) {
-          width: 18px;
-          height: 18px;
         }
       }
 
@@ -726,6 +641,81 @@ const handleConfirm = () => {
       .confirm-button {
         height: 46px;
         font-size: 14px;
+      }
+    }
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 360px) {
+  .welcome-dialog {
+    .dialog-header {
+      padding: 16px;
+
+      &::after {
+        left: 16px;
+        right: 16px;
+      }
+
+      .header-content {
+        gap: 8px;
+
+        .warning-icon {
+          font-size: 20px;
+        }
+
+        .header-title {
+          font-size: 16px;
+        }
+      }
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 0 16px 16px;
+    }
+
+    :deep(.el-dialog__footer) {
+      padding: 0 16px 20px;
+    }
+
+    .dialog-content {
+      .notice-list {
+        padding: 14px 0;
+
+        .notice-item {
+          font-size: 12px;
+          margin-bottom: 10px;
+          padding: 8px 10px;
+        }
+      }
+
+      .agreement-wrapper {
+        padding: 12px 14px;
+      }
+
+      .agreement-checkbox {
+        :deep(.el-checkbox__label) {
+          font-size: 11px;
+        }
+
+        :deep(.el-checkbox__inner) {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      .countdown-badge {
+        min-width: 32px;
+        height: 20px;
+        font-size: 10px;
+        padding: 0 7px;
+      }
+    }
+
+    .dialog-footer {
+      .confirm-button {
+        height: 44px;
+        font-size: 13px;
       }
     }
   }
