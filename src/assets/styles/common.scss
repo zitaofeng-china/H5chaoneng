@@ -34,16 +34,19 @@ body {
     max-width: 768px;
   }
 
-  @media (max-width: 768px) {
-    .common-page {
-      margin: 0;
+  .common-page {
+    margin: 20px 0 0;
 
-      .common-head {
-        .common-title {
-          margin-bottom: 6px;
-          font-size: 24px;
-        }
+    .common-head {
+      .common-title {
+        margin-bottom: 16px;
+        font-size: 20px;
+        font-weight: 600;
       }
+    }
+
+    .common-body {
+      margin-top: 20px;
     }
   }
 }

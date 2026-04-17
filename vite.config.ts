@@ -109,6 +109,30 @@ export default defineConfig({
           })
         },
       },
+      '/v2': {
+        target: 'http://47.84.135.181:8888',
+        changeOrigin: true,
+        rewrite: (path) => path,
+        // 配置代理请求头
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // 确保代理请求带上所有必要的请求头
+            console.log('[Proxy v2]', req.method, req.url)
+          })
+        },
+      },
+      '/v1': {
+        target: 'http://47.84.135.181:8888',
+        changeOrigin: true,
+        rewrite: (path) => path,
+        // 配置代理请求头
+        configure: (proxy, options) => {
+          proxy.on('proxyReq', (proxyReq, req, res) => {
+            // 确保代理请求带上所有必要的请求头
+            console.log('[Proxy v1]', req.method, req.url)
+          })
+        },
+      },
     },
   },
   build: {

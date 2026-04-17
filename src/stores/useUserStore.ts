@@ -61,12 +61,16 @@ export const useUserStore = defineStore('user', () => {
   async function fetchUserInfo() {
     try {
       const response = await getUserInfoApi()
-      if (response.code === 0 && response.data) {
+      console.log('[User Store] 获取用户信息响应:', response)
+      if (response.code === '000000' && response.data) {
         updateUserInfo(response.data)
+        console.log('[User Store] 用户信息已更新:', response.data)
         return response.data
+      } else {
+        console.warn('[User Store] 获取用户信息失败:', response)
       }
     } catch (error) {
-      console.error('获取用户信息失败:', error)
+      console.error('[User Store] 获取用户信息失败:', error)
       return null
     }
   }

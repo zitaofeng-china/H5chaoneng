@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
@@ -14,14 +14,37 @@ const priceStore = usePriceStore()
 
 const is404Page = computed(() => route.name === 'NotFound')
 
+/**
+ * 监听页面可见性变化，自动刷新用户信息
+ */
+function handleVisibilityChange() {
+  if (!document.hidden && userStore.isLogin) {
+    // 页面变为可见且用户已登录时，刷新用户信息
+    userStore.fetchUserInfo()
+  }
+}
+
 onMounted(async () => {
   if (!is404Page.value) {
     const isValid = await verifySite()
     if (isValid) {
       userStore.init()
       await priceStore.fetchPrice()
+      
+      // 如果用户已登录，获取最新用户信息
+      if (userStore.isLogin) {
+        await userStore.fetchUserInfo()
+      }
     }
   }
+  
+  // 监听页面可见性变化
+  document.addEventListener('visibilitychange', handleVisibilityChange)
+})
+
+onUnmounted(() => {
+  // 移除事件监听
+  document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 
@@ -43,6 +66,12 @@ onMounted(async () => {
 
   &.is-404 {
     padding-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  #app {
+    padding-top: 54px;
   }
 }
 </style>

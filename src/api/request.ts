@@ -163,4 +163,15 @@ export function patch<T = any>(url: string, data?: any, config?: RequestConfig) 
   })
 }
 
+/**
+ * DELETE 请求
+ */
+export function deleteRequest<T = any>(url: string, params?: Record<string, any>, config?: RequestConfig) {
+  return request<T>(url, {
+    method: 'DELETE',
+    params,
+    ...config,
+  })
+}
+
 export default request
