@@ -81,8 +81,8 @@ export function useRegisterForm() {
   /**
    * 重置表单
    */
-  const resetForm = async () => {
-    await registerFormRef.value?.resetFields()
+  const resetForm = () => {
+    registerFormRef.value?.resetFields()
   }
 
   /**
@@ -95,9 +95,9 @@ export function useRegisterForm() {
   /**
    * 关闭弹窗
    */
-  const close = async () => {
+  const close = () => {
     visible.value = false
-    await resetForm()
+    resetForm()
   }
 
   return {

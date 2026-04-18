@@ -134,8 +134,8 @@ export function useResetForm() {
   /**
    * 重置表单
    */
-  const resetFormFields = async () => {
-    await resetFormRef.value?.resetFields()
+  const resetFormFields = () => {
+    resetFormRef.value?.resetFields()
   }
 
   /**
@@ -148,9 +148,9 @@ export function useResetForm() {
   /**
    * 关闭弹窗
    */
-  const close = async () => {
+  const close = () => {
     visible.value = false
-    await resetFormFields()
+    resetFormFields()
   }
 
   return {

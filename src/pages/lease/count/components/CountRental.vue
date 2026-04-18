@@ -167,9 +167,6 @@ const usdtUnitPrice = computed(() => {
   return parseFloat(price)
 })
 
-// USDT 总价
-const usdtTotal = computed(() => +(usdtUnitPrice.value * count.value).toFixed(2))
-
 // 动态获取按笔租赁单价
 const strokePrice = computed(() => {
   const price = priceStore.priceData?.stroke || '3.5'

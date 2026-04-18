@@ -148,8 +148,8 @@ export function useLoginForm() {
   /**
    * 重置表单
    */
-  const resetForm = async () => {
-    await loginFormRef.value?.resetFields()
+  const resetForm = () => {
+    loginFormRef.value?.resetFields()
   }
 
   /**
@@ -164,9 +164,9 @@ export function useLoginForm() {
   /**
    * 关闭弹窗
    */
-  const close = async () => {
+  const close = () => {
     visible.value = false
-    await resetForm()
+    resetForm()
   }
 
   /**

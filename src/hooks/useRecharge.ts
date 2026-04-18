@@ -8,6 +8,7 @@ import { useUserStore } from '@/stores/useUserStore'
 import { authApi, orderApi } from '@/api'
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
+import { formatDeadline } from '@/utils/time'
 
 export function useRecharge() {
   const { t } = useI18n()
@@ -128,17 +129,7 @@ export function useRecharge() {
       actualCoin.value = coin || 'TRX'
       
       // 计算截止时间（当前时间 + 5分钟）
-      const now = new Date()
-      const deadlineTime = new Date(now.getTime() + 5 * 60 * 1000)
-      deadline.value = deadlineTime.toLocaleString('zh-CN', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: false
-      })
+      deadline.value = formatDeadline(5)
       
       console.log('[Recharge] 订单创建成功:', {
         address: receive_address,

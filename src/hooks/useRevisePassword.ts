@@ -84,8 +84,8 @@ export function useRevisePassword() {
   /**
    * 重置表单
    */
-  const resetForm = async () => {
-    await revisePasswordFormRef.value?.resetFields()
+  const resetForm = () => {
+    revisePasswordFormRef.value?.resetFields()
   }
 
   /**
@@ -98,9 +98,9 @@ export function useRevisePassword() {
   /**
    * 关闭弹窗
    */
-  const close = async () => {
+  const close = () => {
     visible.value = false
-    await resetForm()
+    resetForm()
   }
 
   return {
