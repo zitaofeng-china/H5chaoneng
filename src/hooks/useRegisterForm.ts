@@ -33,7 +33,6 @@ export function useRegisterForm() {
   const rules = computed<FormRules<RegisterForm>>(() => ({
     username: usernameRules.value,
     email: emailRules.value,
-    telegram: telegramRules.value,
     password: passwordRules.value,
     passwords: confirmPasswordRules(() => registerForm.password).value,
   }))

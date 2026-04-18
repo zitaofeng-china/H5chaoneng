@@ -79,7 +79,7 @@ export interface SendCodeParams {
 
 // 发送邮箱验证码请求参数
 export interface SendEmailCodeParams {
-  channel: string // 新密码（用户想要设置的新密码）
+  channel: string // 验证码类型（忘记密码场景固定为 "change_passwd"）
   email: string // 电子邮箱
 }
 

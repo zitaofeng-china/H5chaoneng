@@ -19,10 +19,9 @@ export function useFormValidation() {
   ])
 
   /**
-   * 邮箱验证规则
+   * 邮箱验证规则（选填）
    */
   const emailRules = computed<FormItemRule[]>(() => [
-    { required: true, message: t('login.emailRequired'), trigger: 'blur' },
     { type: 'email', message: t('login.emailInvalid'), trigger: 'blur' },
   ])
 

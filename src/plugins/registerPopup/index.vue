@@ -48,20 +48,6 @@
                 </el-input>
               </div>
             </el-form-item>
-            <el-form-item prop="telegram">
-              <div class="input-wrapper">
-                <el-input
-                  v-model="registerForm.telegram"
-                  :placeholder="$t('register.telegramPlaceholder')"
-                  size="large"
-                  class="custom-input"
-                >
-                  <template #prefix>
-                    <SvgIcon name="login-telegram" width="24" height="24" />
-                  </template>
-                </el-input>
-              </div>
-            </el-form-item>
 
             <el-form-item prop="password">
               <div class="input-wrapper">

@@ -55,17 +55,11 @@ export function useResetForm() {
       return
     }
 
-    // 检查是否已输入新密码
-    if (!resetForm.password) {
-      ElMessage.warning(t('reset.enterPasswordFirst'))
-      return
-    }
-
     try {
       // 调用发送邮箱验证码接口
-      // channel 参数传入新密码
+      // channel 参数固定为 "change_passwd"
       const response = await authApi.sendEmailCode({
-        channel: resetForm.password, // 新密码作为 channel 参数
+        channel: 'change_passwd', // 固定为 change_passwd
         email: resetForm.email,
       })
 
