@@ -19,6 +19,7 @@
       <QrCodeWithAddress
         :address="props.paymentAddress"
         :title="t('transferRental.walletQrcode')"
+        :tip="t('common.checkWalletAddress')"
       />
     </div>
     <div v-else-if="loadingTimeout" class="error-section">
@@ -261,7 +262,95 @@ const tips = computed(() => [
     .top-banner {
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 8px;
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    .banner-item {
+      gap: 6px;
+      width: 100%;
+
+      svg {
+        flex-shrink: 0;
+      }
+
+      .text {
+        flex: 1;
+        line-height: 1.4;
+      }
+    }
+
+    .instruction-note {
+      margin: 16px 0 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .qr-section-wrapper {
+      margin: 12px 0;
+    }
+
+    .loading-section {
+      padding: 24px 16px;
+      margin: 12px 0;
+
+      .loading-title {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .loading-placeholder {
+        padding: 32px 0;
+        gap: 12px;
+
+        .el-icon {
+          font-size: 36px;
+        }
+
+        .loading-text {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .error-section {
+      padding: 24px 16px;
+      margin: 12px 0;
+
+      .error-title {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .error-placeholder {
+        padding: 32px 0;
+        gap: 10px;
+
+        .error-icon {
+          font-size: 40px;
+          margin-bottom: 6px;
+        }
+
+        .error-text {
+          font-size: 15px;
+        }
+
+        .error-hint {
+          font-size: 13px;
+          margin-bottom: 6px;
+        }
+
+        .retry-button {
+          margin-top: 6px;
+          padding: 8px 20px;
+          font-size: 14px;
+
+          .mr-2 {
+            margin-right: 4px;
+          }
+        }
+      }
     }
   }
 }

@@ -75,26 +75,20 @@
       <KindTips :tips="tips" />
     </div>
 
-    <!-- 付款地址弹窗 -->
+    <!-- USDT 付款地址弹窗 -->
     <el-dialog
       v-model="showPaymentDialog"
-      :title="t('countRental.title')"
+      :title="t('countRental.usdtPaymentTitle')"
       width="500px"
       :close-on-click-modal="false"
+      :class="{ 'mobile-dialog': isMobile }"
     >
       <div class="payment-dialog">
-        <div class="payment-info">
-          <div class="info-row">
-            <span class="label">{{ t('lease.count') }}:</span>
-            <span class="value">{{ count }} {{ t('common.purchase') }}</span>
-          </div>
-          <div class="info-row">
-            <span class="label">{{ t('lease.unitPrice') }}:</span>
-            <span class="value">{{ unitPrice }} {{ t('common.trx') }}</span>
-          </div>
-          <div class="info-row highlight">
-            <span class="label">{{ t('lease.totalPrice') }}:</span>
-            <span class="value">{{ totalDisplay }} {{ t('common.trx') }}</span>
+        <!-- 温馨提示移到顶部 -->
+        <div class="payment-tips">
+          <div class="tip-item" v-for="(tip, idx) in paymentTips" :key="idx">
+            <SvgIcon name="trumpet" width="12" height="12" />
+            <span>{{ tip }}</span>
           </div>
         </div>
 
@@ -102,7 +96,7 @@
           v-if="paymentAddress"
           :address="paymentAddress"
           :title="t('transferRental.walletQrcode')"
-          :tip="t('transferRental.addressTip')"
+          :tip="t('common.checkWalletAddress')"
         />
         <div v-else class="qr-section">
           <div class="section-title">{{ t('transferRental.walletQrcode') }}</div>
@@ -115,13 +109,6 @@
             <span class="address-text">{{ t('common.loading') }}</span>
           </div>
         </div>
-
-        <div class="payment-tips">
-          <div class="tip-item" v-for="(tip, idx) in paymentTips" :key="idx">
-            <SvgIcon name="trumpet" width="12" height="12" />
-            <span>{{ tip }}</span>
-          </div>
-        </div>
       </div>
     </el-dialog>
   </div>
@@ -132,8 +119,6 @@ import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { storeToRefs } from 'pinia'
-import { useQRCode } from '@vueuse/integrations/useQRCode'
-import { useClipboard } from '@vueuse/core'
 import KindTips from '@/components/kindTips/index.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -162,13 +147,28 @@ const priceStore = usePriceStore()
 const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { userInfo } = storeToRefs(userStore)
-const { fetchAddress, addressData, loading: addressLoading } = useAddress()
+const { fetchAddress, addressData } = useAddress()
 
 // 显示付款地址弹窗
 const showPaymentDialog = ref(false)
 
-// 生成二维码
-const paymentAddress = computed(() => addressData.value?.address || '')
+// 生成二维码 - 修复：接口直接返回地址字符串，而不是对象
+const paymentAddress = computed(() => {
+  // addressData.value 可能是字符串或对象
+  if (typeof addressData.value === 'string') {
+    return addressData.value
+  }
+  return (addressData.value as any)?.address || ''
+})
+
+// USDT 单价（从价格接口获取 stroke_usdt 字段）
+const usdtUnitPrice = computed(() => {
+  const price = priceStore.priceData?.stroke_usdt || '11'
+  return parseFloat(price)
+})
+
+// USDT 总价
+const usdtTotal = computed(() => +(usdtUnitPrice.value * count.value).toFixed(2))
 
 // 动态获取按笔租赁单价
 const strokePrice = computed(() => {
@@ -197,10 +197,9 @@ const tips = computed(() => [
 ])
 
 const paymentTips = computed(() => [
-  t('transferRental.walletTips'),
-  t('transferRental.noUsdtTip'),
-  t('transferRental.expiryTip'),
-  t('transferRental.amountTip'),
+  t('countRental.usdtTip1', { amount: usdtUnitPrice.value }), // 转账 {amount} USDT = 获取购买1笔
+  t('countRental.usdtTip2'), // 购买多笔请转对应USDT的倍数金额
+  t('countRental.usdtTip3'), // 请注意金额，错误金额将当成1小时能量发货
 ])
 
 const selecteIndex = ref<[number, number]>([0, 0])
@@ -327,7 +326,21 @@ const handleRent = async () => {
   }
 }
 
-const handleBuy = () => {}
+const handleBuy = async () => {
+  try {
+    // 获取 USDT 付款地址（kind = 5，按笔数租用）
+    const address = await fetchAddress(AddressKind.COUNT_RENTAL)
+    
+    if (address) {
+      // 显示付款弹窗
+      showPaymentDialog.value = true
+    } else {
+      ElMessage.error(t('common.getAddressFailed'))
+    }
+  } catch (error) {
+    console.error('【USDT购买错误】:', error)
+  }
+}
 
 // 页面加载时获取价格
 onMounted(() => {
@@ -488,92 +501,143 @@ onMounted(() => {
     height: 40px;
   }
 
-  :deep(.rent-btn) {
-    width: 100%;
-    height: 44px;
-    font-size: 15px;
-    margin-top: 8px;
-  }
-
-  :deep(.buy-btn) {
-    margin-top: 8px;
-  }
-
   .btn-wrap {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     width: 100%;
+
+    :deep(.el-button) {
+      width: 100%;
+      height: 44px !important;
+      font-size: 15px;
+      margin: 0 !important;
+      padding: 0 16px;
+      line-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   }
 
   :deep(.el-dialog) {
     width: 90% !important;
     max-width: 400px;
+    border-radius: 12px;
+    margin: auto;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--theme-border-light);
+    margin: 0;
+  }
+
+  :deep(.el-dialog__title) {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--theme-text-black);
   }
 
   :deep(.el-dialog__body) {
-    padding: 16px;
+    padding: 14px 16px 14px;
+    margin: 0;
   }
 
   .payment-dialog {
-    .payment-info {
-      padding: 12px;
+    .payment-tips {
       margin-bottom: 16px;
+      padding: 12px;
+      background: var(--theme-choose-orange-bg);
+      border-radius: 8px;
+      border: 1px solid var(--theme-choose-orange);
 
-      .info-row {
-        padding: 6px 0;
-        font-size: 13px;
+      .tip-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--theme-text-black);
+        margin-bottom: 8px;
+        line-height: 1.4;
 
-        &.highlight .value {
-          font-size: 16px;
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        svg {
+          flex-shrink: 0;
+          margin-top: 1px;
+          width: 13px;
+          height: 13px;
+          color: var(--theme-choose-orange);
+        }
+
+        span {
+          flex: 1;
         }
       }
     }
 
-    .payment-tips {
-      margin-top: 12px;
-      padding: 10px;
+    :deep(.qr-section) {
+      padding: 0 !important;
+      margin: 0 !important;
 
-      .tip-item {
-        font-size: 11px;
-        margin-bottom: 6px;
+      .section-title {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 10px;
+      }
+
+      .qr-code {
+        margin: 0 auto 8px;
+      }
+
+      .wallet-address {
+        margin-top: 8px;
+        font-size: 12px;
+      }
+
+      .tips-info {
+        margin-top: 6px;
+        margin-bottom: 0;
       }
     }
   }
 }
 
 .payment-dialog {
-  .payment-info {
-    background: var(--theme-time-bg-light);
+  .payment-tips {
+    padding: 12px;
+    background: var(--theme-choose-orange-bg);
     border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 20px;
+    border: 1px solid rgba(249, 115, 22, 0.3);
 
-    .info-row {
+    .tip-item {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 0;
-      font-size: 14px;
+      align-items: flex-start;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--theme-text-black);
+      margin-bottom: 8px;
+      line-height: 1.5;
 
-      .label {
-        color: var(--theme-text-muted);
+      &:last-child {
+        margin-bottom: 0;
       }
 
-      .value {
-        font-weight: 600;
-        color: var(--theme-text-black);
+      svg {
+        flex-shrink: 0;
+        margin-top: 2px;
+        color: var(--theme-choose-orange);
       }
 
-      &.highlight {
-        border-top: 1px solid rgba(0, 0, 0, 0.06);
-        margin-top: 8px;
-        padding-top: 12px;
-
-        .value {
-          font-size: 18px;
-          color: var(--theme-bg-blue);
-        }
+      span {
+        flex: 1;
       }
     }
   }
@@ -589,7 +653,6 @@ onMounted(() => {
       margin-bottom: 12px;
     }
 
-    // 加载状态的样式
     .wallet-address {
       margin-top: 12px;
       display: flex;
@@ -605,28 +668,40 @@ onMounted(() => {
       }
     }
   }
+}
 
-  .payment-tips {
-    margin-top: 16px;
-    padding: 12px;
-    background: rgba(255, 243, 224, 0.5);
-    border-radius: 8px;
+// PC端样式优化 - 使用主题颜色
+@media (min-width: 769px) {
+  .payment-dialog {
+    .payment-tips {
+      padding: 20px;
+      margin-bottom: 24px;
+      background: var(--theme-choose-orange-bg);
+      border: 2px solid var(--theme-choose-orange);
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
 
-    .tip-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 6px;
-      font-size: 12px;
-      color: var(--theme-text-muted);
-      margin-bottom: 8px;
+      .tip-item {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        line-height: 1.6;
+        color: var(--theme-text-black);
 
-      &:last-child {
-        margin-bottom: 0;
-      }
+        &:last-child {
+          margin-bottom: 0;
+        }
 
-      svg {
-        flex-shrink: 0;
-        margin-top: 2px;
+        svg {
+          width: 16px;
+          height: 16px;
+          margin-top: 3px;
+          color: var(--theme-choose-orange);
+        }
+
+        span {
+          flex: 1;
+        }
       }
     }
   }

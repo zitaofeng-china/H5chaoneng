@@ -243,13 +243,26 @@ const handleRetry = () => {
   .qr-section {
     padding: 12px 0 16px;
 
+    .section-title {
+      font-size: 15px;
+    }
+
     .wallet-address {
       flex-direction: column;
       gap: 8px;
+      font-size: 12px;
 
       .address-text {
         text-align: center;
+        font-size: 11px;
+        line-height: 1.4;
       }
+    }
+
+    .tips-info {
+      font-size: 11px;
+      line-height: 1.4;
+      padding: 0 8px;
     }
 
     .status-container {

@@ -28,8 +28,10 @@
     "131000": "131000",
     "recharge": "充值",
     "loadFailed": "加载失败",
+    "getAddressFailed": "获取付款地址失败",
+    "retry": "重试",
     "loadFailedHint": "请检查网络连接或稍后重试",
-    "retry": "重试"
+    "checkWalletAddress": "转账时请核对钱包地址"
   },
   "nav": {
     "home": "首页",
@@ -218,6 +220,11 @@
     "enterAddress": "请输入地址",
     "rentNowButton": "立即租用",
     "usdtBuy": "USDT购买",
+    "usdtPaymentTitle": "USDT 付款",
+    "usdtTip1": "转账 {amount} USDT = 获取购买1笔",
+    "usdtTip2": "购买多笔请转对应USDT的倍数金额",
+    "usdtTip3": "请注意金额，错误金额将当成1小时能量发货",
+    "usdtAddressTip": "转账时请核对准确USDT付款钱包地址",
     "tips1": "购买1笔能量数为130000",
     "tips2": "不限制使用时间，每转账一次扣一笔",
     "tips3": "24小时不用扣一笔",
@@ -271,6 +278,7 @@
     "trxMin": "TRX ≥ 30",
     "remainingStock": "剩余库存：",
     "flashWalletQrcode": "闪兑钱包二维码",
+    "flashAddressTip": "转账时请核对准确闪兑钱包地址",
     "copySuccess": "地址已复制到剪贴板",
     "copyFailed": "复制失败，请手动复制",
     "checkAddress": "转账时请核对地址",

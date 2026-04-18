@@ -10,7 +10,7 @@
       <QrCodeWithAddress
         :address="props.paymentAddress"
         :title="t('contract.flashWalletQrcode')"
-        :tip="t('contract.checkAddress')"
+        :tip="t('common.checkWalletAddress')"
       />
     </div>
     <div v-else-if="loadingTimeout" class="error-section">

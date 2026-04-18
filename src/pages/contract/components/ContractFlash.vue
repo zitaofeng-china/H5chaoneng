@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { type FormInstance } from 'element-plus'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -241,8 +241,39 @@ watch(activeTab, (newTab) => {
 watch(() => exchangeRate.value, () => {
   // 触发重新计算
   const currentValue = formData.unitPrice
-  formData.unitPrice = currentValue
+  if (currentValue) {
+    // 强制触发 watch
+    const temp = formData.unitPrice
+    formData.unitPrice = ''
+    nextTick(() => {
+      formData.unitPrice = temp
+    })
+  }
 }, { deep: true })
+
+// 监听价格数据加载完成
+watch(() => priceStore.priceData, (newData) => {
+  if (newData && formData.unitPrice) {
+    // 价格数据加载完成后，重新计算预估获得
+    const currentValue = formData.unitPrice
+    formData.unitPrice = ''
+    nextTick(() => {
+      formData.unitPrice = currentValue
+    })
+  }
+}, { immediate: true })
+
+// 监听币安汇率加载完成
+watch(() => binanceRate.value, (newRate) => {
+  if (newRate > 0 && formData.unitPrice) {
+    // 币安汇率加载完成后，重新计算预估获得
+    const currentValue = formData.unitPrice
+    formData.unitPrice = ''
+    nextTick(() => {
+      formData.unitPrice = currentValue
+    })
+  }
+})
 
 // 失焦时检查并恢复最小值
 const handleBlur = () => {
