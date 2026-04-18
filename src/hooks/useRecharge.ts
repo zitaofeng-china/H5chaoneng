@@ -225,9 +225,34 @@ export function useRecharge() {
   }
 
   /**
+   * 延迟获取用户信息（多次调用）
+   * 在关闭弹窗后分别在 5秒、10秒、15秒 后调用用户信息接口
+   */
+  const fetchUserInfoWithDelay = () => {
+    const delays = [5000, 10000, 15000] // 5秒、10秒、15秒
+    
+    delays.forEach((delay, index) => {
+      setTimeout(async () => {
+        try {
+          console.log(`[Recharge] 第${index + 1}次延迟获取用户信息（延迟${delay / 1000}秒）`)
+          await fetchUserInfo()
+        } catch (error) {
+          console.error(`[Recharge] 第${index + 1}次延迟获取用户信息失败:`, error)
+        }
+      }, delay)
+    })
+  }
+
+  /**
    * 关闭弹窗
    */
   const close = () => {
+    // 如果在第二步关闭弹窗，延迟调用用户信息接口
+    if (currentStep.value === 2) {
+      console.log('[Recharge] 关闭弹窗，启动延迟获取用户信息')
+      fetchUserInfoWithDelay()
+    }
+    
     visible.value = false
     currentStep.value = 1
     selectedAmount.value = 0
