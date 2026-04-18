@@ -340,11 +340,7 @@ onMounted(() => {
 }
 
 .rental-wrapper {
-  width: 856px;
-  background: var(--theme-text-white);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 6px 24px rgba(16, 24, 40, 0.08);
+  @include rental-card;
 }
 
 .title {
@@ -377,20 +373,7 @@ onMounted(() => {
 }
 
 .pill {
-  flex: 1;
-  height: 36px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  background: var(--theme-time-bg-light);
-  color: var(--theme-text-light-gray);
-  border: none;
-  cursor: pointer;
-
-  &.active {
-    background: var(--theme-bg-blue);
-    color: var(--theme-text-white);
-  }
+  @include pill-button;
 }
 
 .custom-input-wrapper {

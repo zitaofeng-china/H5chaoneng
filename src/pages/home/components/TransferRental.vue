@@ -51,11 +51,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
@@ -71,45 +72,17 @@ const { t } = useI18n()
 const priceStore = usePriceStore()
 const { priceData } = storeToRefs(priceStore)
 
-// 加载超时检测
-const loadingTimeout = ref(false)
-let timeoutTimer: ReturnType<typeof setTimeout> | null = null
-
-onMounted(() => {
-  startLoadingTimer()
+const { loadingTimeout, resetTimer } = useAddressLoading({
+  address: () => props.paymentAddress,
 })
 
-onUnmounted(() => {
-  if (timeoutTimer) {
-    clearTimeout(timeoutTimer)
-  }
-})
-
-// 重新加载 - 触发父组件重新获取地址
 const emit = defineEmits<{
   retry: []
 }>()
 
 const handleRetry = () => {
-  loadingTimeout.value = false
-  // 重新启动定时器
-  startLoadingTimer()
-  // 通知父组件重新获取地址
+  resetTimer()
   emit('retry')
-}
-
-const startLoadingTimer = () => {
-  // 清除之前的定时器
-  if (timeoutTimer) {
-    clearTimeout(timeoutTimer)
-  }
-  
-  // 10秒后如果还没有地址，显示错误提示
-  timeoutTimer = setTimeout(() => {
-    if (!props.paymentAddress) {
-      loadingTimeout.value = true
-    }
-  }, 10000)
 }
 
 // 动态计算按1小时价格购买的价格

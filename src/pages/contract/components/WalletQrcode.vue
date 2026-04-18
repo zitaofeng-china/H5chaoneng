@@ -42,10 +42,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch, onMounted, onUnmounted } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
@@ -62,58 +63,16 @@ const props = withDefaults(defineProps<Props>(), {
   paymentAddress: '',
 })
 
-// 加载超时检测
-const loadingTimeout = ref(false)
-let timeoutTimer: ReturnType<typeof setTimeout> | null = null
-
-const startLoadingTimer = () => {
-  // 清除之前的定时器
-  if (timeoutTimer) {
-    clearTimeout(timeoutTimer)
-  }
-  
-  // 重置超时状态
-  loadingTimeout.value = false
-  
-  // 10秒后如果还没有地址，显示错误提示
-  timeoutTimer = setTimeout(() => {
-    if (!props.paymentAddress) {
-      loadingTimeout.value = true
-    }
-  }, 10000)
-}
-
-// 监听 paymentAddress 变化
-watch(() => props.paymentAddress, (newAddress) => {
-  if (newAddress) {
-    // 如果有地址了，清除定时器
-    if (timeoutTimer) {
-      clearTimeout(timeoutTimer)
-    }
-    loadingTimeout.value = false
-  }
+const { loadingTimeout, resetTimer } = useAddressLoading({
+  address: () => props.paymentAddress,
 })
 
-onMounted(() => {
-  startLoadingTimer()
-})
-
-onUnmounted(() => {
-  if (timeoutTimer) {
-    clearTimeout(timeoutTimer)
-  }
-})
-
-// 重新加载 - 触发父组件重新获取地址
 const emit = defineEmits<{
   retry: []
 }>()
 
 const handleRetry = () => {
-  loadingTimeout.value = false
-  // 重新启动定时器
-  startLoadingTimer()
-  // 通知父组件重新获取地址
+  resetTimer()
   emit('retry')
 }
 
