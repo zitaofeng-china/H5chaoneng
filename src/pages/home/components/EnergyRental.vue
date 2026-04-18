@@ -112,10 +112,11 @@ import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
-import { authApi, orderApi, addressApi } from '@/api'
+import { authApi, addressApi } from '@/api'
 import { OrderKind } from '@/api/modules/order/types'
 import { AddressKind } from '@/api/modules/address/types'
 import { handleResponse } from '@/utils/response'
+import { useOrderCreation } from '@/hooks/useOrderCreation'
 import { storeToRefs } from 'pinia'
 
 const { t } = useI18n()
@@ -126,6 +127,7 @@ const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
+const { loading: orderLoading, createOrder } = useOrderCreation()
 
 const activeTab = ref('balance')
 const formRef = ref<FormInstance>()
@@ -294,33 +296,20 @@ const handleRentNow = async () => {
   try {
     await formRef.value.validate()
 
-    // 根据选择的能量数量确定 count
     const count = formData.energy === 131000 ? 2 : 1
-
-    // 优先使用租用地址，如果没有则使用已保存地址
     const targetAddress = formData.address || formData.selectedAddress
 
-    // 调用创建订单接口
-    const orderParams = {
+    const success = await createOrder({
       count,
-      duration: 3600,  // 1小时 = 3600秒
-      kind: OrderKind.KindFlashEnergy,  // kind = 7
+      duration: 3600,
+      kind: OrderKind.KindFlashEnergy,
       target: [targetAddress],
-      user_id: userInfo.value?.id || 0,
-    }
-
-    const response = await orderApi.createOrder(orderParams)
-    
-    // 处理响应并显示提示（使用场景上下文）
-    const success = handleResponse(response, {
-      context: 'order_create', // 订单创建场景
-      // 不需要手动指定 successMessage 和 errorMessage
-      // 会自动根据 context 和 code 获取准确的提示
+      userId: userInfo.value?.id || 0,
+      context: 'order_create',
     })
     
     if (success) {
       // 订单创建成功后的处理
-      // TODO: 可以在这里添加成功后的逻辑，比如跳转到订单页面
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)

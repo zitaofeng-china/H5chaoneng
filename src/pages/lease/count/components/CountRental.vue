@@ -124,10 +124,9 @@ import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useAddress } from '@/hooks/useAddress'
+import { useOrderCreation } from '@/hooks/useOrderCreation'
 import { AddressKind } from '@/api/modules/address/types'
-import { orderApi } from '@/api'
 import { OrderKind } from '@/api/modules/order/types'
-import { handleResponse } from '@/utils/response'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
 defineOptions({ name: 'CountRental' })
@@ -148,6 +147,7 @@ const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { userInfo } = storeToRefs(userStore)
 const { fetchAddress, addressData } = useAddress()
+const { loading: orderLoading, createOrder } = useOrderCreation()
 
 // 显示付款地址弹窗
 const showPaymentDialog = ref(false)
@@ -291,32 +291,17 @@ const handleRent = async () => {
   try {
     await formRef.value.validate()
 
-    // 构建订单参数
-    const orderParams = {
-      count: count.value,                    // 笔数（1、3、5、7、10 或自定义）
-      duration: undefined,                   // 按笔数租用没有时长，留空
-      kind: OrderKind.KindStrokeEnergy,      // kind = 5（按笔数租用）
-      target: [wallet.value],                // 地址数组
-      user_id: userInfo.value?.id || 0,      // 用户ID
-    }
-
-    // 调用创建订单接口
-    const response = await orderApi.createOrder(orderParams)
-    
-    // 处理响应并显示提示
-    const success = handleResponse(response, {
-      context: 'lease_count', // 按笔数租用场景
+    const success = await createOrder({
+      count: count.value,
+      duration: undefined,
+      kind: OrderKind.KindStrokeEnergy,
+      target: [wallet.value],
+      userId: userInfo.value?.id || 0,
+      context: 'lease_count',
     })
     
     if (success) {
-      // 订单创建成功后的处理
       wallet.value = ''
-      
-      // 可选：显示付款地址弹窗
-      // const address = await fetchAddress(AddressKind.COUNT_RENTAL)
-      // if (address) {
-      //   showPaymentDialog.value = true
-      // }
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
