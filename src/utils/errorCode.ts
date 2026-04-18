@@ -94,7 +94,7 @@ export const CONTEXT_ERROR_MAP: Record<string, Record<string, string>> = {
 
   // 注册场景
   register: {
-    '000007': '注册失败',
+    '000007': '用户名或邮箱已被注册',
     '000006': '用户名已存在',
     '001005': '验证码错误',
     '001006': '验证码已过期，请重新获取',

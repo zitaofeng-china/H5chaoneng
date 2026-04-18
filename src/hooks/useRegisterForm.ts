@@ -7,6 +7,7 @@ import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { authApi } from '@/api'
 import { useFormValidation } from './useFormValidation'
+import { handleResponse } from '@/utils/response'
 import type { RegisterForm } from '@/plugins/registerPopup/types'
 
 export function useRegisterForm() {
@@ -46,7 +47,6 @@ export function useRegisterForm() {
     try {
       await registerFormRef.value.validate()
       
-      // 验证两次密码是否一致
       if (registerForm.password !== registerForm.passwords) {
         ElMessage.error(t('register.passwordMismatch'))
         return false
@@ -54,24 +54,20 @@ export function useRegisterForm() {
       
       loading.value = true
 
-      // 调用注册接口
       const response = await authApi.register({
         username: registerForm.username,
         email: registerForm.email,
         password: registerForm.password,
       })
 
-      // 注册成功
-      if (response.code === '000000') {
-        ElMessage.success(t('register.registerSuccess'))
-        return true
-      } else {
-        // 错误已在 errorHandler 中处理，直接返回
-        return false
-      }
+      const success = handleResponse(response, {
+        context: 'register',
+      })
+      
+      return success
     } catch (error: any) {
-      console.error('注册失败:', error)
-      // 错误已在 errorHandler 中统一处理，这里不再重复提示
+      console.error('[注册] 异常:', error)
+      ElMessage.error(error.message || '注册失败，请重试')
       return false
     } finally {
       loading.value = false
