@@ -4,6 +4,7 @@
  */
 
 import { getSite } from './site'
+import type { UserInfo } from '@/api/modules/auth/types'
 
 const TOKENS_KEY = 'tokens'
 const REFRESH_TOKENS_KEY = 'refresh_tokens'
@@ -14,7 +15,7 @@ interface TokenStorage {
 }
 
 interface UserInfoStorage {
-  [site: string]: any
+  [site: string]: UserInfo
 }
 
 function getAllTokens(): TokenStorage {
@@ -103,13 +104,13 @@ export function removeRefreshToken(): void {
   saveAllRefreshTokens(tokens)
 }
 
-export function getUserInfo(): any | null {
+export function getUserInfo(): UserInfo | null {
   const site = getSite()
   if (!site) return null
   return getAllUserInfos()[site] || null
 }
 
-export function setUserInfo(userInfo: any): void {
+export function setUserInfo(userInfo: UserInfo): void {
   const site = getSite()
   if (!site) return
   const infos = getAllUserInfos()

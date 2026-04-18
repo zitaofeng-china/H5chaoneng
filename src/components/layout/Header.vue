@@ -11,16 +11,22 @@
       </div>
 
       <div class="nav-links">
-        <div class="dropdown-popper-box" :class="{ 'is-active': isActiveHome }">
-          <el-dropdown :teleported="false">
-            <div class="nav-link">
-              <div class="nav-link-text">
+        <!-- 能量租赁下拉菜单 -->
+        <div class="dropdown-popper-box energy-rental-dropdown" :class="{ 'is-active': isActiveHome }">
+          <el-dropdown 
+            trigger="click"
+            :hide-on-click="true"
+            placement="bottom-start"
+            popper-class="energy-rental-popper-unique"
+          >
+            <span class="nav-link">
+              <span class="nav-link-text">
                 {{ $t('nav.energyRental') }}
-              </div>
+              </span>
               <el-icon class="el-icon--right"><IEpArrowDown /></el-icon>
-            </div>
+            </span>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="energy-rental-menu-unique">
                 <el-dropdown-item
                   :class="{ 'is-active': isActive('/') }"
                   @click="handleToRouter('/')"
@@ -44,39 +50,42 @@
           </el-dropdown>
         </div>
 
-        <a
-          href="#"
+        <div
           class="nav-link"
           :class="{ 'is-active': isActive('/contract') }"
           @click="handleToRouter('/contract')"
         >
           {{ $t('nav.contractFlash') }}
-        </a>
-        <a
-          href="#"
+        </div>
+        <div
           class="nav-link"
           :class="{ 'is-active': isActive('/hosting') }"
           @click="handleToRouter('/hosting')"
         >
           {{ $t('nav.smartHosting') }}
-        </a>
-        <a
-          href="#"
+        </div>
+        <div
           class="nav-link"
           :class="{ 'is-active': isActive('/activation') }"
           @click="handleToRouter('/activation')"
         >
           {{ $t('nav.batchActivation') }}
-        </a>
+        </div>
 
-        <div class="dropdown-popper-box">
-          <el-dropdown :teleported="false">
-            <div class="nav-link">
-              <div class="nav-link-text">{{ $t('nav.faq') }}</div>
+        <!-- 常见问题下拉菜单 -->
+        <div class="dropdown-popper-box faq-dropdown" :class="{ 'is-active': isActiveFaq }">
+          <el-dropdown 
+            trigger="click"
+            :hide-on-click="true"
+            placement="bottom-start"
+            popper-class="faq-popper-unique"
+          >
+            <span class="nav-link">
+              <span class="nav-link-text">{{ $t('nav.faq') }}</span>
               <el-icon class="el-icon--right"><IEpArrowDown /></el-icon>
-            </div>
+            </span>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="faq-menu-unique">
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#question') }"
                   @click.stop="handleToRouter('/', '#question')"
@@ -121,13 +130,13 @@
             @click="handleOpenToTelegram(botName)"
           />
         </div>
-        <div class="dropdown-popper-box">
-          <el-dropdown :teleported="false" @command="handleLanguageChange">
+        <div class="dropdown-popper-box lang-dropdown">
+          <el-dropdown trigger="hover" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
               <SvgIcon name="header-lang" class="icon-svg" width="24" height="24" />
             </div>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="lang-menu">
                 <el-dropdown-item
                   :class="{ 'is-active': localLang === key }"
                   v-for="(value, key) in lang"
@@ -151,13 +160,13 @@
           </div>
         </div>
 
-        <div class="dropdown-popper-box" v-if="isLogin">
-          <el-dropdown :teleported="false">
+        <div class="dropdown-popper-box user-dropdown" v-if="isLogin">
+          <el-dropdown trigger="hover" :teleported="true" popper-class="user-popper">
             <div class="user-icon">
               <img :src="Avatar" alt="" class="user-avatar" />
             </div>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="user-menu">
                 <el-dropdown-item @click.stop="handleUserInfo">
                   {{ $t('nav.userInfo') }}
                 </el-dropdown-item>
@@ -328,10 +337,20 @@ const lang = reactive({
   'zh-TW': '繁體中文',
 })
 
+// 判断是否在能量租赁相关页面（首页、按时间租用、按笔数租用）
 const isActiveHome = computed(() => {
   const site = getSite()
-  const homePaths = [`/${site}/`, `/${site}/lease-time`, `/${site}/lease-count`]
-  return homePaths.includes(route.path as string)
+  const energyRentalPaths = [`/${site}/`, `/${site}/lease-time`, `/${site}/lease-count`]
+  // 只有在这些页面且没有hash时才激活能量租赁下拉菜单
+  // 如果有hash，说明用户在查看FAQ部分，不应该激活能量租赁
+  return energyRentalPaths.includes(route.path as string) && !route.hash
+})
+
+// 判断是否应该激活常见问题下拉菜单
+const isActiveFaq = computed(() => {
+  const site = getSite()
+  // 只有在首页且有hash时才激活常见问题下拉菜单
+  return route.path === `/${site}/` && !!route.hash
 })
 
 const userStore = useUserStore()
@@ -488,6 +507,7 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
     gap: 5px;
     transition: color 0.3s ease;
     padding: 5px 0;
+    cursor: pointer;
 
     &:active,
     &:focus {
@@ -561,6 +581,16 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   .el-dropdown__popper {
     padding: 0 2px;
   }
+}
+
+/* 能量租赁下拉菜单样式 */
+.energy-rental-popper-unique {
+  z-index: 2000 !important;
+}
+
+/* 常见问题下拉菜单样式 */
+.faq-popper-unique {
+  z-index: 2001 !important;
 }
 
 :deep(.el-dropdown-menu) {

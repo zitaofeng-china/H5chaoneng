@@ -52,10 +52,11 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { type FormInstance } from 'element-plus'
 import { usePriceStore } from '@/stores/usePriceStore'
-import { addressApi, binanceApi } from '@/api'
+import { binanceApi } from '@/api'
 import { AddressKind } from '@/api/modules/address/types'
+import { usePaymentAddress } from '@/hooks/usePaymentAddress'
+import { logger } from '@/utils/logger'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
@@ -63,8 +64,9 @@ const { t } = useI18n()
 const priceStore = usePriceStore()
 
 const activeTab = ref('USDT')
-const formRef = ref<FormInstance>()
-const paymentAddress = ref('')
+
+// 使用统一的地址管理 hook
+const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymentAddress(AddressKind.FLASH_EXCHANGE)
 
 // 币安实时汇率
 const binanceRate = ref<number>(0)
@@ -79,48 +81,16 @@ const fetchBinanceRate = async () => {
   try {
     const data = await binanceApi.getTrxUsdtPrice()
     binanceRate.value = parseFloat(data.price)
+    logger.info('[Contract Flash] 币安汇率获取成功', { rate: binanceRate.value })
   } catch (error) {
-    console.error('[Contract Flash] 获取币安汇率失败:', error)
+    logger.error('[Contract Flash] 获取币安汇率失败', error)
     // 如果获取失败，使用后端价格作为备用
     binanceRate.value = 0
   }
 }
 
-// 获取付款地址（USDT和TRX都使用同一个kind=3）
-const fetchPaymentAddress = async () => {
-  try {
-    const response = await addressApi.getAddress({ kind: AddressKind.FLASH_EXCHANGE })
-    console.log('获取付款地址响应:', response)
-    
-    // 检查响应数据结构
-    if (response.data) {
-      const data = response.data as any
-      // 如果 data 是对象且有 address 字段
-      if (typeof data === 'object' && !Array.isArray(data) && 'address' in data) {
-        paymentAddress.value = data.address
-      }
-      // 如果 data 是数组，查找 addressKind=3 的项
-      else if (Array.isArray(data)) {
-        const addressItem = data.find((item: any) => item.addressKind === 3)
-        if (addressItem?.address) {
-          paymentAddress.value = addressItem.address
-        }
-      }
-      // 如果 data 直接是地址字符串
-      else if (typeof data === 'string') {
-        paymentAddress.value = data
-      }
-    }
-    
-    console.log('解析后的付款地址:', paymentAddress.value)
-  } catch (error) {
-    console.error('获取付款地址失败:', error)
-  }
-}
-
 // 处理重试
 const handleRetryFetchAddress = () => {
-  paymentAddress.value = '' // 清空地址，触发重新加载
   fetchPaymentAddress()
 }
 
@@ -133,7 +103,7 @@ const exchangeRate = computed(() => {
   const feeRateUsdtToTrx = Number.parseFloat(priceStore.priceData.usdt_2_trx) || 0
   const feeRateTrxToUsdt = Number.parseFloat(priceStore.priceData.trx_2_usdt) || 0
   
-  console.log('[Contract Flash] 手续费比例:', { feeRateUsdtToTrx, feeRateTrxToUsdt })
+  logger.debug('[Contract Flash] 手续费比例', { feeRateUsdtToTrx, feeRateTrxToUsdt })
   
   // 如果有币安实时汇率，使用币安汇率 × (1 - 手续费比例)
   if (binanceRate.value > 0) {
@@ -152,12 +122,12 @@ const exchangeRate = computed(() => {
       trxToUsdt: binanceTrxToUsdt * (1 - feeRateTrxToUsdt),
     }
     
-    console.log('[Contract Flash] 计算后的汇率:', calculatedRates)
+    logger.debug('[Contract Flash] 计算后的汇率', calculatedRates)
     return calculatedRates
   }
   
   // 如果没有币安汇率，使用后端价格作为汇率（假设后端返回的是实际汇率而不是手续费）
-  console.log('[Contract Flash] 使用后端价格作为汇率')
+  logger.debug('[Contract Flash] 使用后端价格作为汇率')
   return {
     usdtToTrx: feeRateUsdtToTrx > 1 ? feeRateUsdtToTrx : 0,
     trxToUsdt: feeRateTrxToUsdt > 0.01 ? feeRateTrxToUsdt : 0,
