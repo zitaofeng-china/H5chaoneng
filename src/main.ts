@@ -6,6 +6,7 @@ import 'element-plus/dist/index.css'
 import 'element-plus/theme-chalk/el-message.css'
 
 import './assets/styles/index.scss'
+import './assets/styles/address-dropdown.scss'
 import App from './App.vue'
 import router from './router'
 import 'virtual:svg-icons-register'

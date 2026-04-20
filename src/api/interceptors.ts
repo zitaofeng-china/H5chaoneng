@@ -86,6 +86,38 @@ export function responseInterceptor<T = any>(
   const msg = response[messageField as keyof typeof response] as string
   const data = response[dataField as keyof typeof response] as T
 
+  // 检查token是否过期（401或特定业务码）
+  const TOKEN_EXPIRED_CODES = ['100003', '100004', '401']
+  if (TOKEN_EXPIRED_CODES.includes(code)) {
+    // 保存需要保留的数据
+    const locale = localStorage.getItem('locale')
+    
+    // 清除认证相关存储
+    localStorage.removeItem('tokens')
+    localStorage.removeItem('refresh_tokens')
+    localStorage.removeItem('user_infos')
+    localStorage.removeItem('remember_password')
+    localStorage.removeItem('saved_username')
+    localStorage.removeItem('saved_password')
+    
+    // 恢复语言设置
+    if (locale) {
+      localStorage.setItem('locale', locale)
+    }
+    
+    // 清除sessionStorage
+    sessionStorage.clear()
+    
+    // 清除所有Cookie
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
+    })
+    
+    // 不跳转，只清除认证信息
+  }
+
   // 返回标准格式（保持后端字段名 msg）
   return {
     code,

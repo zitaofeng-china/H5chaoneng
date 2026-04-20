@@ -92,19 +92,23 @@ async function request<T = any>(
 
     return data
   } catch (error) {
+    // 动态导入 i18n 以避免循环依赖
+    const i18n = (await import('@/lang')).default
+    const t = i18n.global.t
+    
     // 错误处理
     if (error instanceof Error) {
       if (error.message === 'Request timeout') {
         return {
           code: -1,
-          msg: '请求超时',
+          msg: t('network.timeout'),
           data: null as any,
         }
       }
       if (error.message.includes('Failed to fetch')) {
         return {
           code: -1,
-          msg: '网络错误',
+          msg: t('network.error'),
           data: null as any,
         }
       }
@@ -113,7 +117,7 @@ async function request<T = any>(
     // 未知错误
     return {
       code: -1,
-      msg: error instanceof Error ? error.message : '未知错误',
+      msg: error instanceof Error ? error.message : t('error.unknown'),
       data: null as any,
     }
   }

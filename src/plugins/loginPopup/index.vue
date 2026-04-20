@@ -27,6 +27,7 @@
                   :placeholder="$t('login.placeholder')"
                   size="large"
                   class="custom-input"
+                  autocomplete="username"
                 >
                   <template #prefix>
                     <SvgIcon name="login-user" width="24" height="24" />
@@ -44,6 +45,7 @@
                   size="large"
                   class="custom-input"
                   show-password
+                  autocomplete="current-password"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />

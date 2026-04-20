@@ -126,6 +126,12 @@ const handleSaveAddress = async () => {
           if (response.code === '000000') {
             successCount++
           } else {
+            // 检查是否是未登录错误
+            if (response.code === '401' || response.code === '100003' || response.code === '100004') {
+              ElMessage.error(t('auth.tokenExpired'))
+              return // 停止继续添加
+            }
+            
             failedCount++
             failedAddresses.push(address)
             
@@ -162,6 +168,11 @@ const handleSaveAddress = async () => {
       if (successCount > 0) {
         formData.address = ''
         window.dispatchEvent(new CustomEvent('refresh-hosting-list'))
+        
+        // 刷新用户信息以更新余额
+        if (userStore.isLogin) {
+          await userStore.fetchUserInfo()
+        }
       }
       
       // 如果有失败的，显示失败的地址
@@ -258,7 +269,7 @@ onMounted(() => {
     box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
 
     :deep(.el-card__body) {
-      padding: 14px;
+      padding: 10px;
     }
 
     .details-form {

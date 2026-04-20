@@ -31,7 +31,7 @@
                   :class="{ 'is-active': isActive('/') }"
                   @click="handleToRouter('/')"
                 >
-                  {{ $t('nav.quickRent') }}
+                  {{ $t('home.title') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isActive('/lease-time') }"
@@ -297,7 +297,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, getCurrentInstance } from 'vue'
+import { computed, reactive, ref, getCurrentInstance, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-plus'
 import Avatar from '@/assets/icons/header/avatar.svg'
@@ -427,8 +427,40 @@ const handleUserInfo = () => {
   proxy?.$userInfoPopup?.open()
 }
 
-const handleLogout = () => {
-  logout()
+const handleLogout = async () => {
+  try {
+    await logout()
+    
+    // 保存需要保留的数据
+    const locale = localStorage.getItem('locale')
+    
+    // 清除所有可能的Cookie
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
+    })
+    
+    // 恢复语言设置
+    if (locale) {
+      localStorage.setItem('locale', locale)
+    }
+    
+    // 保留当前URL的站点信息并重定向到首页
+    const currentPath = window.location.pathname
+    const segments = currentPath.split('/').filter(Boolean)
+    const site = segments[0] || ''
+    
+    // 跳转到首页，保留站点信息
+    window.location.href = site ? `/${site}/` : '/'
+  } catch (error) {
+    console.error('退出登录失败:', error)
+    // 即使失败也要刷新页面
+    const currentPath = window.location.pathname
+    const segments = currentPath.split('/').filter(Boolean)
+    const site = segments[0] || ''
+    window.location.href = site ? `/${site}/` : '/'
+  }
 }
 
 const handleChange = (val: CollapseModelValue) => {
@@ -443,6 +475,22 @@ const handleCollapseDestroy = () => {
 const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   isMenu.value = type !== 'menu' ? false : !isMenu.value
 }
+
+// 监听窗口大小变化，当从移动端切换到PC端时自动关闭菜单
+const handleResize = () => {
+  if (!isMobile() && isMenu.value) {
+    isMenu.value = false
+    activeNames.value = ['1']
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style lang="scss" scoped>

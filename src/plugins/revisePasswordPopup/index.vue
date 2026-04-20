@@ -28,6 +28,7 @@
               size="large"
               class="custom-input"
               show-password
+              autocomplete="off"
             >
             </el-input>
           </div>
@@ -42,6 +43,7 @@
               size="large"
               class="custom-input"
               show-password
+              autocomplete="new-password"
             >
             </el-input>
           </div>

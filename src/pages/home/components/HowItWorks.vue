@@ -183,7 +183,7 @@ defineOptions({
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 16px;
+    padding: 0 6px;
   }
 
   .how-it-works {

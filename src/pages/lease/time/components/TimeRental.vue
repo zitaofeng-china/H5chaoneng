@@ -1,7 +1,8 @@
 <template>
   <div class="time-rental-page">
     <div class="rental-wrapper">
-      <div class="selection-grid">
+      <!-- 桌面端：网格布局 -->
+      <div class="selection-grid" v-if="!isMobile">
         <div class="grid-row" v-for="(row, rIdx) in rows" :key="rIdx">
           <div class="row-label">
             <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
@@ -13,6 +14,46 @@
               :key="idx"
               :class="['pill', selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
               @click="onSelect(rIdx, idx, opt)"
+            >
+              {{ opt }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 移动端：下拉选择时长 + 按钮选择数量 -->
+      <div class="mobile-selection" v-else>
+        <div class="selection-item">
+          <label class="selection-label">
+            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            {{ t('lease.selectDuration') }}
+          </label>
+          <el-select
+            v-model="mobileSelectedDuration"
+            :placeholder="t('lease.selectDuration')"
+            @change="onMobileDurationChange"
+            class="duration-select"
+          >
+            <el-option
+              v-for="(row, idx) in rows"
+              :key="idx"
+              :label="row.label"
+              :value="idx"
+            />
+          </el-select>
+        </div>
+
+        <div class="selection-item">
+          <label class="selection-label">
+            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            {{ t('lease.selectQuantity') }}
+          </label>
+          <div class="row-options">
+            <button
+              v-for="(opt, idx) in mobileCountOptions"
+              :key="idx"
+              :class="['pill', mobileSelectedCount === idx ? 'active' : '']"
+              @click="onMobileCountChange(idx, opt)"
             >
               {{ opt }}
             </button>
@@ -55,20 +96,20 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item :label="t('lease.energy')" prop="energy">
-            <el-input v-model="energy" disabled class="m-input" v-if="isMobile">
-              <template #prefix v-if="isMobile">{{ t('lease.energy') }}</template>
-              <template #suffix> {{ t('common.w') }} </template>
-            </el-input>
-            <el-input :model-value="energy + ' ' + t('common.w')" disabled v-else />
-          </el-form-item>
-
           <el-form-item :label="t('lease.validity')" prop="validity">
             <el-input v-model="validity" disabled class="m-input" v-if="isMobile">
               <template #prefix>{{ t('lease.validity') }}</template>
               <template #suffix> {{ validityUnit }} </template>
             </el-input>
             <el-input :model-value="validity + ' ' + validityUnit" disabled v-else />
+          </el-form-item>
+
+          <el-form-item :label="t('lease.singleEnergy')" prop="energy">
+            <el-input v-model="energy" disabled class="m-input" v-if="isMobile">
+              <template #prefix v-if="isMobile">{{ t('lease.singleEnergy') }}</template>
+              <template #suffix> {{ t('common.w') }} </template>
+            </el-input>
+            <el-input :model-value="energy + ' ' + t('common.w')" disabled v-else />
           </el-form-item>
 
           <el-form-item :label="t('lease.walletAddress')" prop="wallet">
@@ -148,15 +189,15 @@ const { loading: orderLoading, createOrder } = useOrderCreation()
 
 const rows = computed(() => [
   {
-    label: t('lease.selectCount1Hour'),
+    label: t('lease.selectCount1Day'),
     validity: 1,
-    validityUnit: 'hour',
+    validityUnit: 'day',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[0] ? `${customCounts.value[0]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
@@ -168,7 +209,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[1] ? `${customCounts.value[1]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
@@ -180,7 +221,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[2] ? `${customCounts.value[2]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
@@ -192,7 +233,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[3] ? `${customCounts.value[3]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
@@ -204,7 +245,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[4] ? `${customCounts.value[4]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
@@ -216,12 +257,21 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[5] ? `${customCounts.value[5]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
 ])
 
 const selecteIndex = ref<[number, number]>([0, 0])
+
+// 移动端选择状态
+const mobileSelectedDuration = ref(0) // 选中的时长索引
+const mobileSelectedCount = ref(0) // 选中的数量索引
+
+// 移动端数量选项
+const mobileCountOptions = computed(() => {
+  return rows.value[mobileSelectedDuration.value]?.options || []
+})
 
 // 自定义对话框状态
 const customDialogVisible = ref(false)
@@ -239,10 +289,10 @@ const unitPrice = computed(() => {
   const [rowIdx] = selecteIndex.value
   if (!priceData.value) return 1.9
   
-  // 根据行索引映射到对应的价格字段（已删除3小时）
+  // 根据行索引映射到对应的价格字段
   const priceMap = [
-    priceData.value.time_1h,  // 1小时
     priceData.value.time_1d,  // 1天
+    priceData.value.time_1d,  // 1天（第二行）
     priceData.value.time_3d,  // 3天
     priceData.value.time_7d,  // 7天
     priceData.value.time_15d, // 15天
@@ -255,12 +305,7 @@ const count = computed(() => {
   const [rowIdx, colIdx] = selecteIndex.value
   const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
 
-  // 如果是自定义，使用保存的自定义数量
-  if (opt === t('lease.custom')) {
-    return customCounts.value[rowIdx] || 1
-  }
-
-  // 否则从选项文本中提取数字
+  // 从选项文本中提取数字
   const num = parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
   return num
 })
@@ -395,10 +440,30 @@ watch(wallet, (v) => (form.wallet = v))
 function onSelect(rowIdx: number, idx: number, opt: string) {
   selecteIndex.value = [rowIdx, idx]
 
-  // 判断是否点击了"自定义"
-  if (opt === t('lease.custom')) {
+  // 判断是否点击了"自定义"或者是最后一个按钮（自定义按钮的位置）
+  if (opt === t('lease.custom') || idx === 4) {
     customRowIndex.value = rowIdx
     customForm.count = customCounts.value[rowIdx] || 1
+    customDialogVisible.value = true
+  }
+}
+
+// 移动端时长选择变化
+const onMobileDurationChange = (durationIdx: number) => {
+  mobileSelectedDuration.value = durationIdx
+  mobileSelectedCount.value = 0 // 重置数量选择
+  selecteIndex.value = [durationIdx, 0]
+}
+
+// 移动端数量选择变化
+const onMobileCountChange = (countIdx: number, opt: string) => {
+  mobileSelectedCount.value = countIdx
+  selecteIndex.value = [mobileSelectedDuration.value, countIdx]
+  
+  // 判断是否选择了"自定义"或者是最后一个选项（自定义按钮的位置）
+  if (opt === t('lease.custom') || countIdx === 4) {
+    customRowIndex.value = mobileSelectedDuration.value
+    customForm.count = customCounts.value[mobileSelectedDuration.value] || 1
     customDialogVisible.value = true
   }
 }
@@ -507,43 +572,96 @@ const rentNow = async () => {
 
 @media (max-width: 768px) {
   .time-rental-page {
-    padding: 12px;
+    padding: 6px;
   }
 
   .rental-wrapper {
     width: 100%;
-    padding: 14px;
+    padding: 10px;
   }
 
   .selection-grid {
-    gap: 8px;
-    margin-bottom: 18px;
+    display: none;
   }
 
-  .grid-row {
-    gap: 6px;
-    padding: 3px 0;
-  }
-
-  .row-label {
-    font-size: 12px;
-    margin-bottom: 0;
+  .mobile-selection {
     display: flex;
-    align-items: center;
-    gap: 4px;
-  }
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 18px;
 
-  .row-options {
-    gap: 6px;
-  }
+    .selection-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
 
-  .pill {
-    height: 34px;
-    font-size: 12px;
-    padding: 0 6px;
-    min-width: 0;
-    flex: 1 1 calc(50% - 3px);
-    font-weight: 500;
+      .selection-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      :deep(.el-select) {
+        width: 100%;
+
+        .el-input__wrapper {
+          background: rgba(2, 15, 45, 0.03);
+          border-radius: 4px;
+          box-shadow: none;
+          border: 1px solid rgba(2, 15, 45, 0.08);
+          padding: 0 12px;
+          min-height: 42px;
+        }
+
+        .el-input__inner {
+          height: 42px;
+          font-size: 14px;
+          color: var(--theme-text-black);
+        }
+      }
+
+      .row-options {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .pill {
+        height: 36px;
+        font-size: 13px;
+        padding: 0 8px;
+        min-width: 0;
+        flex: 1 1 calc(50% - 3px);
+        font-weight: 500;
+        background: rgba(2, 15, 45, 0.03);
+        border: 1px solid rgba(2, 15, 45, 0.08);
+        border-radius: 4px;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background: rgba(2, 15, 45, 0.05);
+        }
+
+        &.active {
+          background: var(--theme-bg-blue);
+          color: white;
+          border-color: var(--theme-bg-blue);
+        }
+
+        &:last-child {
+          flex: 1 1 100%;
+        }
+      }
+    }
   }
 
   .details-card {
@@ -554,17 +672,27 @@ const rentNow = async () => {
   }
 
   :deep(.el-form-item) {
-    margin-bottom: 14px;
+    margin-bottom: 8px;
   }
 
   :deep(.el-form-item__label) {
     font-size: 13px;
-    padding-bottom: 4px;
+    padding-bottom: 0;
   }
 
   :deep(.el-input__inner) {
-    font-size: 13px;
-    height: 38px;
+    font-size: 15px;
+    height: 36px;
+    font-weight: 500;
+  }
+
+  :deep(.el-input__prefix),
+  :deep(.el-input__suffix) {
+    font-size: 14px;
+  }
+
+  :deep(.el-input__wrapper) {
+    min-height: 36px;
   }
 
   :deep(.rent-btn) {

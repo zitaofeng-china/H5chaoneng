@@ -299,7 +299,7 @@ const handleToRouter = (path: string, hash?: string) => {
   }
 
   .footer-container {
-    padding: 0 16px;
+    padding: 0 10px;
   }
 
   .footer-content {

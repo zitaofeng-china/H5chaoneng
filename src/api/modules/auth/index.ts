@@ -73,7 +73,7 @@ export function sendCode(params: SendCodeParams) {
  * 发送邮箱验证码
  */
 export function sendEmailCode(params: SendEmailCodeParams) {
-  return post<{}>('/v1/user/email/code', params)
+  return post<{}>('/v3/captcha/email', params)
 }
 
 /**

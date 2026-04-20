@@ -3,6 +3,7 @@
     <!-- 实时汇率显示 -->
     <div class="rate-section">
       <div class="rate-main">
+        <span class="rate-label-inline">{{ t('contract.realtimeRate') }}</span>
         <span class="rate-text" v-if="coin.toUpperCase() === 'USDT'">
           2 <span class="rate-unit">{{ t('common.usdt') }}</span>
           <span class="rate-symbol">≈</span>
@@ -16,7 +17,6 @@
           <span class="rate-unit">{{ t('common.usdt') }}</span>
         </span>
       </div>
-      <div class="rate-label">{{ t('contract.realtimeRate') }}</div>
     </div>
     
     <!-- 交易说明 -->
@@ -81,6 +81,17 @@ withDefaults(defineProps<Props>(), {
     justify-content: space-between;
     
     .rate-main {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      .rate-label-inline {
+        font-size: 13px;
+        color: var(--theme-text-mute);
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
       .rate-text {
         display: flex;
         align-items: center;
@@ -101,15 +112,9 @@ withDefaults(defineProps<Props>(), {
       }
 
       .rate-value {
-        color: var(--theme-text-black);
+        color: var(--theme-bg-blue);
         font-weight: 600;
       }
-    }
-
-    .rate-label {
-      font-size: 12px;
-      color: var(--theme-text-light-gray-muted);
-      white-space: nowrap;
     }
   }
 
@@ -168,44 +173,48 @@ withDefaults(defineProps<Props>(), {
 
 @media (max-width: 768px) {
   .rate-card {
-    padding: 14px 12px;
+    padding: 10px;
     gap: 12px;
     border-radius: 6px;
 
     // 实时汇率区域 - 移动端优化
     .rate-section {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 6px;
+      flex-direction: row;
+      align-items: center;
+      gap: 8px;
       padding-bottom: 12px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 
       .rate-main {
+        flex-direction: row;
+        align-items: center;
+        gap: 6px;
+
+        .rate-label-inline {
+          font-size: 12px;
+          font-weight: 500;
+          color: var(--theme-text-mute);
+        }
+
         .rate-text {
-          font-size: 16px;
+          font-size: 14px;
           gap: 3px;
           font-weight: 600;
         }
 
         .rate-unit {
-          font-size: 14px;
+          font-size: 13px;
         }
 
         .rate-symbol {
-          margin: 0 4px;
-          font-size: 14px;
+          margin: 0 3px;
+          font-size: 13px;
         }
 
         .rate-value {
-          font-size: 16px;
+          font-size: 14px;
           color: var(--theme-bg-blue);
         }
-      }
-
-      .rate-label {
-        font-size: 11px;
-        opacity: 0.6;
-        font-weight: 400;
       }
     }
 

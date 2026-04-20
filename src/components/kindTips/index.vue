@@ -51,7 +51,7 @@ const { t } = useI18n()
 
   .tip-item {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     gap: 6px;
     line-height: 1.5;
   }
@@ -83,7 +83,6 @@ const { t } = useI18n()
       gap: 6px;
 
       svg {
-        margin-top: 2px;
         flex-shrink: 0;
       }
     }

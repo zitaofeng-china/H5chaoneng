@@ -21,11 +21,11 @@ defineOptions({
 <style lang="scss" scoped>
 @media (max-width: 768px) {
   .common-page {
-    padding: 0 16px 40px;
+    padding: 0 6px 40px;
 
     .common-head {
       .common-title {
-        margin-bottom: 16px;
+        margin-bottom: 10px;
       }
     }
   }

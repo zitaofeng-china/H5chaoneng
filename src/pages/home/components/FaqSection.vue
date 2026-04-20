@@ -173,7 +173,7 @@ const toggleItem = (index: number) => {
 @media (max-width: 768px) {
   .faq-container {
     max-width: initial;
-    padding: 0 16px;
+    padding: 0 10px;
   }
 
   .faq-section {

@@ -27,6 +27,7 @@
                   :placeholder="$t('register.usernamePlaceholder')"
                   size="large"
                   class="custom-input"
+                  autocomplete="username"
                 >
                   <template #prefix>
                     <SvgIcon name="login-user" width="24" height="24" />
@@ -41,6 +42,7 @@
                   :placeholder="$t('register.emailPlaceholder')"
                   size="large"
                   class="custom-input"
+                  autocomplete="email"
                 >
                   <template #prefix>
                     <SvgIcon name="login-email" width="24" height="24" />
@@ -58,6 +60,7 @@
                   size="large"
                   class="custom-input"
                   show-password
+                  autocomplete="new-password"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -75,6 +78,7 @@
                   size="large"
                   class="custom-input"
                   show-password
+                  autocomplete="new-password"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />

@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { ElMessageBox, ElMessage } from 'element-plus'
 import ActivationCard from './AddressCard.vue'
 import { addressApi } from '@/api'
 import type { HostingAddressItem } from '@/api/modules/address/types'
@@ -77,24 +78,41 @@ async function onDelete(id: number) {
   }
 
   try {
-    // 确认删除 - 使用国际化
-    const confirmed = confirm(t('hosting.deleteConfirm', { address: item.address }))
-    if (!confirmed) return
+    // 使用 ElMessageBox 确认删除
+    await ElMessageBox.confirm(
+      t('hosting.deleteConfirmMessage', { address: item.address }),
+      t('hosting.deleteConfirmTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning',
+        distinguishCancelAndClose: true,
+        customClass: 'delete-hosting-dialog',
+        center: false,
+      }
+    )
 
-    // 调用删除接口
+    // 用户确认删除，调用删除接口
     const response = await addressApi.deleteHostingAddress({ address: item.address })
     
     if (response.code === '000000') {
       console.log('[删除托管地址] 删除成功:', item.address)
+      ElMessage.success(t('hosting.deleteSuccess'))
       // 删除成功后重新获取列表
       await fetchHostingList()
     } else {
       console.error('[删除托管地址] 删除失败:', response.msg)
-      alert(response.msg || t('hosting.deleteFailed'))
+      ElMessage.error(response.msg || t('hosting.deleteFailed'))
     }
-  } catch (err: any) {
-    console.error('[删除托管地址] 删除失败:', err)
-    alert(err.message || t('hosting.deleteFailed'))
+  } catch (error: any) {
+    // 用户取消删除或发生错误
+    if (error === 'cancel' || error === 'close') {
+      console.log('[删除托管地址] 用户取消删除')
+      return
+    }
+    
+    console.error('[删除托管地址] 删除失败:', error)
+    ElMessage.error(error.message || t('hosting.deleteFailed'))
   }
 }
 

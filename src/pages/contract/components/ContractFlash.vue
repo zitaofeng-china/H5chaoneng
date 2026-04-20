@@ -147,14 +147,14 @@ const maxLimits = computed(() => {
 const minValue = computed(() => activeTab.value === 'USDT' ? 2 : 10)
 const maxValue = computed(() => activeTab.value === 'USDT' ? maxLimits.value.usdt : maxLimits.value.trx)
 
-// 计算显示的汇率（使用最小值）
+// 计算显示的汇率（使用最小值，保留5位小数）
 const displayRate = computed(() => {
   if (activeTab.value === 'USDT') {
     // USDT→TRX: 2 USDT 能兑换多少 TRX
-    return (2 * exchangeRate.value.usdtToTrx).toFixed(2)
+    return (2 * exchangeRate.value.usdtToTrx).toFixed(5)
   } else {
     // TRX→USDT: 10 TRX 能兑换多少 USDT
-    return (10 * exchangeRate.value.trxToUsdt).toFixed(2)
+    return (10 * exchangeRate.value.trxToUsdt).toFixed(5)
   }
 })
 
@@ -400,7 +400,7 @@ onMounted(() => {
       box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
 
       :deep(.el-card__body) {
-        padding: 16px;
+        padding: 10px;
       }
     }
 

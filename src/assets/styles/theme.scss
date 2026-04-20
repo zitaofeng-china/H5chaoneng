@@ -83,3 +83,51 @@
   --theme-choose-yellow: rgba(245, 158, 11, 1);
   --theme-choose-yellow-bg: rgba(245, 158, 11, 0.15);
 }
+
+/* ========== 全局滚动条样式优化 ========== */
+/* Webkit 浏览器（Chrome, Safari, Edge）滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(2, 15, 45, 0.03);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(2, 15, 45, 0.2);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(2, 15, 45, 0.35);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: rgba(2, 15, 45, 0.45);
+}
+
+/* Firefox 滚动条样式 */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(2, 15, 45, 0.2) rgba(2, 15, 45, 0.03);
+}
+
+/* 移动端滚动条优化 */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: rgba(2, 15, 45, 0.15);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(2, 15, 45, 0.25);
+  }
+}

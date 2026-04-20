@@ -28,12 +28,15 @@
               v-model.number="customCount"
               type="number"
               :min="1"
-              :max="1000"
+              :max="maxCount"
               :placeholder="t('lease.enterCustomCount')"
               @input="handleCustomInput"
             >
               <template #suffix> {{ t('common.purchase') }} </template>
             </el-input>
+            <div class="max-count-hint">
+              {{ t('lease.maxCountHint', { max: maxCount }) }}
+            </div>
           </el-form-item>
         </div>
       </div>
@@ -173,6 +176,17 @@ const strokePrice = computed(() => {
   return parseFloat(price)
 })
 
+// 计算用户可购买的最大笔数
+const maxCount = computed(() => {
+  const balance = parseFloat(userInfo.value?.trx_balance || '0')
+  const price = strokePrice.value
+  
+  if (price <= 0) return 1000 // 如果价格无效，使用默认最大值
+  
+  const max = Math.floor(balance / price)
+  return Math.max(1, Math.min(max, 1000)) // 最小为1，最大为1000
+})
+
 const rows = computed(() => {
   const counts = [1, 3, 5, 7, 10]
   return [
@@ -278,8 +292,9 @@ function handleCustomInput(value: string | number) {
   const num = typeof value === 'string' ? parseInt(value) : value
   if (isNaN(num) || num < 1) {
     customCount.value = 1
-  } else if (num > 1000) {
-    customCount.value = 1000
+  } else if (num > maxCount.value) {
+    customCount.value = maxCount.value
+    ElMessage.warning(t('lease.exceedMaxCount', { max: maxCount.value }))
   } else {
     customCount.value = num
   }
@@ -394,16 +409,22 @@ onMounted(() => {
       color: var(--theme-text-muted);
     }
   }
+  
+  .max-count-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--theme-text-muted);
+  }
 }
 
 @media (max-width: 768px) {
   .time-rental-page {
-    padding: 12px;
+    padding: 6px;
   }
 
   .rental-wrapper {
     width: 100%;
-    padding: 16px;
+    padding: 10px;
   }
 
   .selection-grid {

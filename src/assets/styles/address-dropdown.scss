@@ -1,0 +1,82 @@
+// 已保存地址下拉选项的删除图标样式
+.el-select-dropdown__item {
+  overflow: visible !important;
+  padding-right: 4px !important;
+  
+  .address-option {
+    display: block !important;
+    width: 100% !important;
+    overflow: visible !important;
+    position: relative !important;
+    min-height: 34px !important;
+    
+    .delete-icon {
+      position: absolute !important;
+      right: 0 !important;
+      top: 50% !important;
+      transform: translateY(-50%) !important;
+      cursor: pointer !important;
+      transition: all 0.2s ease !important;
+      z-index: 10 !important;
+      
+      rect {
+        fill: #020F2D !important;
+        opacity: 0.2 !important;
+      }
+      
+      path {
+        fill: #1e293b !important;
+        opacity: 0.8 !important;
+      }
+      
+      &:hover {
+        transform: translateY(-50%) scale(1.1) !important;
+        
+        rect {
+          fill: #ff4d4f !important;
+          opacity: 0.3 !important;
+        }
+        
+        path {
+          fill: #ff4d4f !important;
+          opacity: 1 !important;
+        }
+      }
+    }
+    
+    .address-text {
+      display: block !important;
+      overflow: hidden !important;
+      text-overflow: ellipsis !important;
+      white-space: nowrap !important;
+      padding-right: 30px !important;
+      line-height: 34px !important;
+    }
+  }
+}
+
+// 移动端优化
+@media (max-width: 768px) {
+  .el-select-dropdown__item {
+    font-size: 12px !important;
+    padding: 8px 12px !important;
+    line-height: 1.4 !important;
+    min-height: 36px !important;
+    
+    .address-option {
+      min-height: 20px !important;
+      
+      .delete-icon {
+        width: 20px !important;
+        height: 20px !important;
+        right: -4px !important;
+      }
+      
+      .address-text {
+        font-size: 12px !important;
+        line-height: 20px !important;
+        padding-right: 24px !important;
+      }
+    }
+  }
+}

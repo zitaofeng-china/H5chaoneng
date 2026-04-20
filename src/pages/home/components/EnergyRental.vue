@@ -65,12 +65,40 @@
                   style="width: 100%"
                   :class="{ 'm-input': isMobile }"
                 >
+                  <template #empty>
+                    <div class="custom-empty">
+                      {{ $t('home.noSavedAddress') }}
+                    </div>
+                  </template>
                   <el-option
                     v-for="addr in addressOptions"
                     :key="addr.value"
                     :label="addr.label"
                     :value="addr.value"
-                  />
+                  >
+                    <div class="address-option">
+                      <span class="address-text">{{ addr.label }}</span>
+                      <svg 
+                        class="delete-icon" 
+                        width="24" 
+                        height="24" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        xmlns="http://www.w3.org/2000/svg"
+                        @click.stop="handleDeleteAddress(addr.value)"
+                      >
+                        <rect opacity="0.1" width="24" height="24" rx="4.5" fill="#020F2D"/>
+                        <g opacity="0.6" clip-path="url(#clip0_1_1693)">
+                          <path d="M12.0002 11.1161L8.46101 7.57695C8.22392 7.33985 7.82483 7.3365 7.58076 7.58057C7.33498 7.82635 7.33506 8.21876 7.57713 8.46083L11.1163 12L7.57713 15.5391C7.34003 15.7762 7.33668 16.1753 7.58076 16.4194C7.82654 16.6652 8.21894 16.6651 8.46102 16.423L12.0002 12.8839L15.5393 16.423C15.7764 16.6601 16.1755 16.6635 16.4196 16.4194C16.6654 16.1736 16.6653 15.7812 16.4232 15.5392L12.8841 12L16.4232 8.46083C16.6603 8.22373 16.6637 7.82465 16.4196 7.58057C16.1738 7.33479 15.7814 7.33487 15.5393 7.57695L12.0002 11.1161Z" fill="white"/>
+                        </g>
+                        <defs>
+                          <clipPath id="clip0_1_1693">
+                            <rect width="10" height="10" fill="white" transform="translate(7 7)"/>
+                          </clipPath>
+                        </defs>
+                      </svg>
+                    </div>
+                  </el-option>
                 </el-select>
               </el-form-item>
 
@@ -106,7 +134,7 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed, onUnmounted, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
@@ -235,7 +263,7 @@ const handleSaveAddress = async () => {
     // 检查地址是否已存在
     const existingAddresses = userInfo.value?.address_list || []
     if (existingAddresses.includes(formData.address)) {
-      ElMessage.warning('该地址已存在')
+      ElMessage.warning(t('formValidation.addressAlreadyExists'))
       return
     }
 
@@ -260,6 +288,51 @@ const handleSaveAddress = async () => {
   }
 }
 
+const handleDeleteAddress = async (address: string) => {
+  try {
+    // 显示确认对话框
+    await ElMessageBox.confirm(
+      t('home.deleteAddressConfirm', { address }),
+      t('home.deleteAddressTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning',
+      }
+    )
+
+    // 从地址列表中删除该地址
+    const existingAddresses = userInfo.value?.address_list || []
+    const updatedAddressList = existingAddresses.filter(addr => addr !== address)
+    
+    const response = await authApi.updateUserInfo({ address_list: updatedAddressList })
+
+    // 处理响应并显示提示
+    const success = handleResponse(response, {
+      context: 'address_delete',
+    })
+
+    if (success) {
+      // 如果删除的是当前选中的地址，清空选择
+      if (formData.selectedAddress === address) {
+        formData.selectedAddress = ''
+      }
+      
+      // 重新获取用户信息
+      const userResponse = await authApi.getUserInfo()
+      if (userResponse.data) {
+        userStore.updateUserInfo(userResponse.data)
+      }
+    }
+  } catch (error) {
+    // 用户取消删除
+    if (error === 'cancel') {
+      return
+    }
+    console.error('【ERROR INFO】:', error)
+  }
+}
+
 const handleRentNow = async () => {
   if (!formRef.value) return
 
@@ -271,7 +344,7 @@ const handleRentNow = async () => {
 
     const success = await createOrder({
       count,
-      duration: 3600,
+      duration: "3600s",
       kind: OrderKind.KindFlashEnergy,
       target: [targetAddress],
       userId: userInfo.value?.id || 0,
@@ -549,6 +622,13 @@ onUnmounted(() => {
       background: var(--theme-bg-orange);
       border: none;
     }
+
+    .custom-empty {
+      padding: 10px 0;
+      text-align: center;
+      color: var(--theme-text-light-gray);
+      font-size: 14px;
+    }
   }
 
   .placeholder-content {
@@ -561,14 +641,14 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .energy-rental {
-    padding: 0 20px 40px;
+    padding: 0 6px 40px;
 
     .header {
-      padding-bottom: 24px;
+      padding-bottom: 10px;
     }
 
     .title {
-      font-size: 24px;
+      font-size: 20px;
     }
 
     .rental-form {
@@ -594,6 +674,7 @@ onUnmounted(() => {
 
     .rental-card {
       :deep(.el-card__body) {
+        padding: 10px;
         padding-bottom: 30px;
         overflow: hidden;
       }

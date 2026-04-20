@@ -139,7 +139,7 @@ const handleViewProblems = () => {
 @media (max-width: 768px) {
   .help-container {
     max-width: initial;
-    padding: 0 16px;
+    padding: 0 6px;
   }
 
   .help-content {

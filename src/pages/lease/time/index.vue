@@ -47,8 +47,8 @@ onMounted(async () => {
 
     .time-head {
       .time-title {
-        font-size: 24px;
-        margin-bottom: 2px;
+        font-size: 20px;
+        margin-bottom: 10px;
       }
     }
   }

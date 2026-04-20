@@ -71,18 +71,32 @@ const kindTipTexts = computed<string[]>(() => [t('activation.tips1'), t('activat
 // 激活通知状态（使用 ref 使其响应式）
 const activationNotice = ref<string>('')
 
-// 从 localStorage 加载激活通知
+// 从 localStorage 加载激活通知（检查是否超过30分钟）
 const loadActivationNotice = () => {
   const saved = localStorage.getItem('activationNotice')
-  if (saved) {
-    activationNotice.value = saved
+  const savedTime = localStorage.getItem('activationNoticeTime')
+  
+  if (saved && savedTime) {
+    const noticeTime = Number.parseInt(savedTime, 10)
+    const now = Date.now()
+    const thirtyMinutes = 30 * 60 * 1000 // 30分钟的毫秒数
+    
+    // 如果通知时间在30分钟内，显示通知
+    if (now - noticeTime < thirtyMinutes) {
+      activationNotice.value = saved
+    } else {
+      // 超过30分钟，清除通知
+      localStorage.removeItem('activationNotice')
+      localStorage.removeItem('activationNoticeTime')
+    }
   }
 }
 
-// 保存激活通知到 localStorage
+// 保存激活通知到 localStorage（同时保存时间戳）
 const saveActivationNotice = (notice: string) => {
   activationNotice.value = notice
   localStorage.setItem('activationNotice', notice)
+  localStorage.setItem('activationNoticeTime', Date.now().toString())
 }
 
 const notices = computed<string[]>(() => {
@@ -122,7 +136,7 @@ const handleSaveAddress = async () => {
       .filter(addr => addr.length > 0)  // 过滤空字符串
 
     if (addressList.length === 0) {
-      ElMessage.warning('请输入有效的地址')
+      ElMessage.warning(t('formValidation.enterValidAddress'))
       return
     }
 
@@ -138,13 +152,12 @@ const handleSaveAddress = async () => {
     // 调用创建订单接口
     const response = await orderApi.createOrder(orderParams)
     
-    console.log('[批量激活] API响应:', response)
-    
     // 检查响应
-    if (response.code === '000000' && response.data) {
+    if (response.code === '000000') {
       const data = response.data as any
-      const targetList = data.TargetList || []
-      const skipList = data.SkipList || []
+      // 后端返回的字段名是小写的 target_list 和 skip_list
+      const targetList = data?.target_list || []
+      const skipList = data?.skip_list || []
       const totalCount = addressList.length
       const activatedCount = targetList.length
       const skippedCount = skipList.length
@@ -159,8 +172,13 @@ const handleSaveAddress = async () => {
       
       // 根据结果显示不同的消息
       if (activatedCount === 0 && skippedCount === 0) {
-        // 全部失败
-        ElMessage.error(t('activation.allFailed'))
+        // 如果没有target_list和skip_list数据，但code是000000，说明激活成功
+        if (!data || (!data.target_list && !data.skip_list)) {
+          ElMessage.success(t('activation.allSuccess', { count: totalCount }))
+        } else {
+          // 全部失败
+          ElMessage.error(t('activation.allFailed'))
+        }
       } else if (activatedCount > 0) {
         // 有激活成功的
         if (skippedCount > 0) {
@@ -168,9 +186,19 @@ const handleSaveAddress = async () => {
         } else {
           ElMessage.success(t('activation.allSuccess', { count: activatedCount }))
         }
+        
+        // 刷新用户信息以更新余额
+        if (userStore.isLogin) {
+          await userStore.fetchUserInfo()
+        }
       } else if (skippedCount > 0) {
         // 全部跳过（已激活）
         ElMessage.warning(t('activation.allSkipped'))
+      }
+      
+      // 刷新用户信息以更新余额（无论是否有TargetList，只要code是000000就刷新）
+      if (userStore.isLogin) {
+        await userStore.fetchUserInfo()
       }
       
       // 清空表单
@@ -254,7 +282,7 @@ onMounted(() => {
     box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
 
     :deep(.el-card__body) {
-      padding: 16px;
+      padding: 10px;
     }
 
     .details-form {

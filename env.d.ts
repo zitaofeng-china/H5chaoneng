@@ -33,3 +33,10 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// 全局Window接口扩展
+declare global {
+  interface Window {
+    __tokenExpiredHandled?: boolean
+  }
+}

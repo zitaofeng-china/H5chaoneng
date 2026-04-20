@@ -200,26 +200,40 @@ const handleRetry = () => {
 
   .wallet-address {
     margin-top: 10px;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 4px;
     font-size: 14px;
     color: var(--theme-text-black);
+    max-width: 100%;
   }
 
   .address-text {
     font-family: 'Courier New', monospace;
     word-break: break-all;
+    flex-shrink: 1;
+    min-width: 0;
   }
 
   .copy-button {
-    padding: 0;
-    height: 18px;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 24px !important;
+    width: 24px !important;
+    min-width: 24px !important;
     flex-shrink: 0;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
     :deep(svg) {
       font-size: 14px;
+    }
+    
+    :deep(.el-button__text) {
+      padding: 0 !important;
+      margin: 0 !important;
     }
   }
 
@@ -248,14 +262,22 @@ const handleRetry = () => {
     }
 
     .wallet-address {
-      flex-direction: column;
-      gap: 8px;
+      gap: 4px;
       font-size: 12px;
+      padding: 0 12px;
 
       .address-text {
-        text-align: center;
         font-size: 11px;
         line-height: 1.4;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .copy-button {
+        height: 20px !important;
+        width: 20px !important;
+        min-width: 20px !important;
       }
     }
 

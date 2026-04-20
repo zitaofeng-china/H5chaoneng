@@ -69,12 +69,15 @@ export function useRevisePassword() {
         
         return true
       } else {
-        // 错误已在 errorHandler 中处理，直接返回
+        // 显示错误提示
+        const errorMsg = response.msg || t('revisePassword.failed')
+        ElMessage.error(errorMsg)
         return false
       }
     } catch (error: any) {
       console.error('修改密码失败:', error)
-      // 错误已在 errorHandler 中统一处理，这里不再重复提示
+      // 显示通用错误提示
+      ElMessage.error(t('revisePassword.failed'))
       return false
     } finally {
       loading.value = false
