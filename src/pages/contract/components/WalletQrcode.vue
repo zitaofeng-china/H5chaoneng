@@ -45,22 +45,24 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
-import { usePriceStore } from '@/stores/usePriceStore'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
 const { t } = useI18n()
-const priceStore = usePriceStore()
 
 interface Props {
   coin: string
   paymentAddress?: string
+  maxUsdt?: number
+  maxTrx?: number
 }
 
 const props = withDefaults(defineProps<Props>(), {
   coin: 'USDT',
   paymentAddress: '',
+  maxUsdt: 10000,
+  maxTrx: 30000,
 })
 
 const { loadingTimeout, resetTimer } = useAddressLoading({
@@ -76,12 +78,11 @@ const handleRetry = () => {
   emit('retry')
 }
 
-// 获取最大额度
+// 获取最大额度（使用父组件传递的值）
 const maxLimits = computed(() => {
-  if (!priceStore.priceData) return { usdt: 70000, trx: 100000 }
   return {
-    usdt: Number.parseFloat(priceStore.priceData.max_usdt_2_trx) || 70000,
-    trx: Number.parseFloat(priceStore.priceData.max_trx_2_usdt) || 100000,
+    usdt: props.maxUsdt,
+    trx: props.maxTrx,
   }
 })
 

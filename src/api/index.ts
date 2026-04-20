@@ -20,6 +20,9 @@ export * as orderApi from './modules/order'
 // 币安模块
 export * as binanceApi from './modules/binance'
 
+// 闪兑汇率模块
+export * as exchangeApi from './modules/exchange'
+
 // 导出请求方法
 export { get, post } from './request'
 

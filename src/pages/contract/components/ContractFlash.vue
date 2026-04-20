@@ -43,7 +43,13 @@
           </div>
         </el-form>
         <RateCard :coin="activeTab" :rate="displayRate" :stock="displayStock" />
-        <WalletQrcode :coin="activeTab" :payment-address="paymentAddress" @retry="handleRetryFetchAddress" />
+        <WalletQrcode 
+          :coin="activeTab" 
+          :payment-address="paymentAddress" 
+          :max-usdt="maxLimits.usdt"
+          :max-trx="maxLimits.trx"
+          @retry="handleRetryFetchAddress" 
+        />
       </el-tabs>
     </el-card>
   </div>
@@ -52,8 +58,8 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { usePriceStore } from '@/stores/usePriceStore'
-import { binanceApi } from '@/api'
+import { exchangeApi } from '@/api'
+import type { ExchangeRateData } from '@/api/modules/exchange/types'
 import { AddressKind } from '@/api/modules/address/types'
 import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { logger } from '@/utils/logger'
@@ -61,31 +67,36 @@ import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
 const { t } = useI18n()
-const priceStore = usePriceStore()
 
 const activeTab = ref('USDT')
 
 // 使用统一的地址管理 hook
 const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymentAddress(AddressKind.FLASH_EXCHANGE)
 
-// 币安实时汇率
-const binanceRate = ref<number>(0)
+// 闪兑汇率数据
+const exchangeRateData = ref<ExchangeRateData | null>(null)
 
 const formData = reactive({
   unitPrice: '2',
   coinAmount: '',
 })
 
-// 获取币安实时汇率
-const fetchBinanceRate = async () => {
+// 获取闪兑汇率
+const fetchExchangeRate = async () => {
   try {
-    const data = await binanceApi.getTrxUsdtPrice()
-    binanceRate.value = parseFloat(data.price)
-    logger.info('[Contract Flash] 币安汇率获取成功', { rate: binanceRate.value })
+    const response = await exchangeApi.getExchangeRate()
+    console.log('[Contract Flash] API 响应:', response)
+    
+    if (response.code === '000000' && response.data) {
+      // request 函数返回 ApiResponse<ExchangeRateData>
+      // response.data 就是 ExchangeRateData
+      exchangeRateData.value = response.data
+      logger.info('[Contract Flash] 闪兑汇率获取成功', response.data)
+    } else {
+      logger.error('[Contract Flash] 获取闪兑汇率失败', response.msg)
+    }
   } catch (error) {
-    logger.error('[Contract Flash] 获取币安汇率失败', error)
-    // 如果获取失败，使用后端价格作为备用
-    binanceRate.value = 0
+    logger.error('[Contract Flash] 获取闪兑汇率失败', error)
   }
 }
 
@@ -94,52 +105,29 @@ const handleRetryFetchAddress = () => {
   fetchPaymentAddress()
 }
 
-// 获取汇率（币安实时汇率 × 手续费百分比）
+// 获取汇率（直接使用接口返回的价格）
 const exchangeRate = computed(() => {
-  // 如果没有后端价格数据，返回0
-  if (!priceStore.priceData) return { usdtToTrx: 0, trxToUsdt: 0 }
+  if (!exchangeRateData.value) return { usdtToTrx: 0, trxToUsdt: 0 }
   
-  // 获取后端手续费比例（百分比形式，如 0.06 = 6%）
-  const feeRateUsdtToTrx = Number.parseFloat(priceStore.priceData.usdt_2_trx) || 0
-  const feeRateTrxToUsdt = Number.parseFloat(priceStore.priceData.trx_2_usdt) || 0
+  // price_trx: TRX价格（1 TRX = X USDT）
+  // price_usdt: USDT价格（1 USDT = X TRX）
+  const priceTrx = Number.parseFloat(exchangeRateData.value.price_trx) || 0
+  const priceUsdt = Number.parseFloat(exchangeRateData.value.price_usdt) || 0
   
-  logger.debug('[Contract Flash] 手续费比例', { feeRateUsdtToTrx, feeRateTrxToUsdt })
+  logger.debug('[Contract Flash] 汇率数据', { priceTrx, priceUsdt })
   
-  // 如果有币安实时汇率，使用币安汇率 × (1 - 手续费比例)
-  if (binanceRate.value > 0) {
-    // 币安返回的是 TRXUSDT，即 1 TRX = X USDT
-    // 所以 1 USDT = 1/X TRX
-    const binanceUsdtToTrx = 1 / binanceRate.value // 1 USDT = X TRX
-    const binanceTrxToUsdt = binanceRate.value // 1 TRX = X USDT
-    
-    const calculatedRates = {
-      // USDT→TRX: 币安汇率 × (1 - 手续费比例)
-      // 例如: 3.0833 × (1 - 0.06) = 3.0833 × 0.94 = 2.898
-      usdtToTrx: binanceUsdtToTrx * (1 - feeRateUsdtToTrx),
-      
-      // TRX→USDT: 币安汇率 × (1 - 手续费比例)
-      // 例如: 0.3243 × (1 - 0.04) = 0.3243 × 0.96 = 0.3113
-      trxToUsdt: binanceTrxToUsdt * (1 - feeRateTrxToUsdt),
-    }
-    
-    logger.debug('[Contract Flash] 计算后的汇率', calculatedRates)
-    return calculatedRates
-  }
-  
-  // 如果没有币安汇率，使用后端价格作为汇率（假设后端返回的是实际汇率而不是手续费）
-  logger.debug('[Contract Flash] 使用后端价格作为汇率')
   return {
-    usdtToTrx: feeRateUsdtToTrx > 1 ? feeRateUsdtToTrx : 0,
-    trxToUsdt: feeRateTrxToUsdt > 0.01 ? feeRateTrxToUsdt : 0,
+    usdtToTrx: priceUsdt, // 1 USDT = X TRX
+    trxToUsdt: priceTrx,  // 1 TRX = X USDT
   }
 })
 
 // 获取最大额度
 const maxLimits = computed(() => {
-  if (!priceStore.priceData) return { usdt: 70000, trx: 100000 }
+  if (!exchangeRateData.value) return { usdt: 10000, trx: 30000 }
   return {
-    usdt: Number.parseFloat(priceStore.priceData.max_usdt_2_trx) || 70000,
-    trx: Number.parseFloat(priceStore.priceData.max_trx_2_usdt) || 100000,
+    usdt: Number.parseFloat(exchangeRateData.value.max_usdt2trx) || 10000,
+    trx: Number.parseFloat(exchangeRateData.value.max_trx2usdt) || 30000,
   }
 })
 
@@ -158,8 +146,18 @@ const displayRate = computed(() => {
   }
 })
 
-// 显示库存（暂时使用固定值，后续可从接口获取）
-const displayStock = computed(() => '34430.21964')
+// 显示库存（使用接口返回的库存数据）
+const displayStock = computed(() => {
+  if (!exchangeRateData.value) return '0'
+  
+  if (activeTab.value === 'USDT') {
+    // USDT→TRX，显示 TRX 库存
+    return exchangeRateData.value.stock_trx
+  } else {
+    // TRX→USDT，显示 USDT 库存
+    return exchangeRateData.value.stock_usdt
+  }
+})
 
 // 监听输入金额，计算预估获得
 watch(() => formData.unitPrice, (newValue) => {
@@ -201,10 +199,12 @@ watch(() => formData.unitPrice, (newValue) => {
   }
 }, { immediate: true }) // 添加 immediate: true，初始化时立即执行
 
-// 监听切换标签，重置表单
+// 监听切换标签，重置表单并重新获取汇率
 watch(activeTab, (newTab) => {
   formData.unitPrice = newTab === 'USDT' ? '2' : '10'
   formData.coinAmount = ''
+  // 切换标签时重新获取汇率
+  fetchExchangeRate()
 })
 
 // 监听汇率变化，重新计算预估获得
@@ -222,7 +222,7 @@ watch(() => exchangeRate.value, () => {
 }, { deep: true })
 
 // 监听价格数据加载完成
-watch(() => priceStore.priceData, (newData) => {
+watch(() => exchangeRateData.value, (newData) => {
   if (newData && formData.unitPrice) {
     // 价格数据加载完成后，重新计算预估获得
     const currentValue = formData.unitPrice
@@ -233,18 +233,6 @@ watch(() => priceStore.priceData, (newData) => {
   }
 }, { immediate: true })
 
-// 监听币安汇率加载完成
-watch(() => binanceRate.value, (newRate) => {
-  if (newRate > 0 && formData.unitPrice) {
-    // 币安汇率加载完成后，重新计算预估获得
-    const currentValue = formData.unitPrice
-    formData.unitPrice = ''
-    nextTick(() => {
-      formData.unitPrice = currentValue
-    })
-  }
-})
-
 // 失焦时检查并恢复最小值
 const handleBlur = () => {
   const amount = Number.parseFloat(formData.unitPrice)
@@ -254,10 +242,9 @@ const handleBlur = () => {
   }
 }
 
-// 初始化时获取价格、币安汇率和付款地址
+// 初始化时获取汇率和付款地址
 onMounted(() => {
-  priceStore.fetchPrice()
-  fetchBinanceRate() // 获取币安实时汇率
+  fetchExchangeRate() // 获取闪兑汇率
   fetchPaymentAddress()
 })
 </script>

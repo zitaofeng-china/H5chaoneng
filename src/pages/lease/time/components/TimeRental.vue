@@ -189,9 +189,9 @@ const { loading: orderLoading, createOrder } = useOrderCreation()
 
 const rows = computed(() => [
   {
-    label: t('lease.selectCount1Day'),
+    label: t('lease.selectCount1Hour'),
     validity: 1,
-    validityUnit: 'day',
+    validityUnit: 'hour',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
@@ -291,8 +291,8 @@ const unitPrice = computed(() => {
   
   // 根据行索引映射到对应的价格字段
   const priceMap = [
+    priceData.value.time_1h,  // 1小时
     priceData.value.time_1d,  // 1天
-    priceData.value.time_1d,  // 1天（第二行）
     priceData.value.time_3d,  // 3天
     priceData.value.time_7d,  // 7天
     priceData.value.time_15d, // 15天

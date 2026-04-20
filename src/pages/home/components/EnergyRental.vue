@@ -577,6 +577,18 @@ onUnmounted(() => {
       .el-input__wrapper {
         cursor: pointer;
       }
+
+      .el-input__inner {
+        font-size: 14px;
+        color: var(--theme-text-muted);
+        font-weight: 600;
+      }
+
+      .el-select__selected-item {
+        font-size: 14px;
+        color: var(--theme-text-muted);
+        font-weight: 600;
+      }
     }
 
     .info-text {
@@ -669,6 +681,18 @@ onUnmounted(() => {
       .action-buttons .el-button {
         height: 44px;
         font-size: 14px;
+      }
+
+      :deep(.el-select) {
+        .el-input__inner {
+          font-size: 13px;
+          font-weight: 600;
+        }
+
+        .el-select__selected-item {
+          font-size: 13px;
+          font-weight: 600;
+        }
       }
     }
 
