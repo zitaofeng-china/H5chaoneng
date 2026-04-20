@@ -1,20 +1,19 @@
 /**
  * 复制到剪贴板 Hook
  * 提供统一的复制功能和状态管理
+ * 支持 HTTPS、localhost 和 HTTP 环境
  */
 
 import { ref } from 'vue'
-import { useClipboard } from '@vueuse/core'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 
 export function useCopyToClipboard() {
   const { t } = useI18n()
-  const { copy } = useClipboard()
   const isCopying = ref(false)
 
   /**
-   * 复制文本到剪贴板
+   * 复制文本到剪贴板（兼容所有环境）
    * @param text - 要复制的文本
    * @param successMessage - 自定义成功提示信息（可选）
    * @returns Promise<boolean> - 复制是否成功
@@ -27,7 +26,28 @@ export function useCopyToClipboard() {
 
     isCopying.value = true
     try {
-      await copy(text)
+      // 方案 1：尝试使用现代 Clipboard API（HTTPS/localhost）
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text)
+      } else {
+        // 方案 2：降级到传统方法（HTTP 环境）
+        const textArea = document.createElement('textarea')
+        textArea.value = text
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        textArea.style.top = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        
+        const successful = document.execCommand('copy')
+        document.body.removeChild(textArea)
+        
+        if (!successful) {
+          throw new Error('execCommand failed')
+        }
+      }
+
       ElMessage({
         message: successMessage || t('transferRental.copyAddress'),
         type: 'success',

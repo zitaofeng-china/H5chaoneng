@@ -17,7 +17,11 @@ import { visualizer } from 'rollup-plugin-visualizer'
 // import viteCompression from 'vite-plugin-compression'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const isProduction = mode === 'production'
+  const shouldAnalyze = process.env.ANALYZE === 'true'
+
+  return {
   plugins: [
     vue(),
     vueJsx(),
@@ -53,7 +57,7 @@ export default defineConfig({
     }),
     ViteImageOptimizer({
       /* 常用配置 */
-      test: /\.(jpe?g|png|gif|tiff|webp|svg)$/i,
+      test: /\.(jpe?g|png|gif|tiff|webp)$/i, // 移除 svg，不压缩 SVG
       exclude: undefined,
       include: undefined,
       includePublic: true, // 是否压缩 public 目录下的图片
@@ -64,19 +68,23 @@ export default defineConfig({
       jpeg: { quality: 75 },
       jpg: { quality: 75 },
       webp: { lossless: true, quality: 75 },
-      // SVG 压缩配置，通常用于非 SvgIcon 目录的大图
-      svg: {
-        multipass: true,
-        plugins: [{ name: 'removeViewBox', active: false }, { name: 'sortAttrs' }],
-      },
     }),
-    visualizer({ open: false, filename: 'stats.html', gzipSize: true, brotliSize: true }), // 打包后自动打开分析页面
+    visualizer({ 
+      open: false, 
+      filename: 'stats.html', 
+      gzipSize: true, 
+      brotliSize: true,
+      // 只在需要分析时生成，加快构建速度
+      template: 'treemap', // 使用更快的模板
+    }),
+    // Gzip 压缩（生产环境启用）
     // viteCompression({
     //   verbose: true, // 是否在控制台输出压缩结果
-    //   disable: true, // 是否禁用
-    //   threshold: 10240, // 体积大于 threshold 才进行压缩单位 b (10kb)
-    //   algorithm: 'gzip', // 压缩算法,可选 [ 'gzip' , 'brotliCompress' ,'deflate' , 'deflateRaw']
+    //   disable: false, // 生产环境启用
+    //   threshold: 10240, // 体积大于 10KB 才进行压缩
+    //   algorithm: 'gzip', // 压缩算法
     //   ext: '.gz', // 生成的压缩包后缀
+    //   deleteOriginFile: false, // 不删除源文件
     // }),
   ],
   resolve: {
@@ -95,6 +103,16 @@ export default defineConfig({
     watch: {
       usePolling: true, // 使用轮询模式（适用于某些文件系统）
       interval: 100, // 轮询间隔
+    },
+    // 预热常用文件，减少首次访问延迟
+    warmup: {
+      clientFiles: [
+        './src/main.ts',
+        './src/App.vue',
+        './src/router/index.ts',
+        './src/stores/useUserStore.ts',
+        './src/pages/home/index.vue',
+      ],
     },
     proxy: {
       '/v3': {
@@ -136,8 +154,13 @@ export default defineConfig({
     },
   },
   build: {
+    target: 'es2015', // 目标浏览器
     assetsInlineLimit: 0, // 调到 4kb
     chunkSizeWarningLimit: 1000, // 1. 提高警告阈值到 1000k（如果有些库压缩后确实很大，500k 的默认警告太严格了）
+    sourcemap: false, // 生产环境不生成 sourcemap
+    cssCodeSplit: true, // CSS 代码分割
+    minify: 'esbuild', // 使用 esbuild 压缩（比 terser 快很多）
+    // terserOptions 在使用 esbuild 时不需要
     rollupOptions: {
       output: {
         manualChunks(id) {
@@ -201,4 +224,5 @@ export default defineConfig({
       },
     },
   },
+  }
 })
