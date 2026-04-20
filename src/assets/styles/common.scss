@@ -72,3 +72,15 @@ body {
     margin-right: 8px !important;
   }
 }
+
+/* 全局 Message 提示框位置调整 - 向下移动避免遮挡标题 */
+.el-message {
+  top: 80px !important;
+}
+
+/* 移动端 Message 提示框位置调整 */
+@media (max-width: 768px) {
+  .el-message {
+    top: 70px !important;
+  }
+}

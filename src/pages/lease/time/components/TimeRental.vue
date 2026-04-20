@@ -310,7 +310,7 @@ const count = computed(() => {
   return num
 })
 
-const energy = ref(13.0)
+const energy = ref(13.1)
 const validity = computed(() => {
   const [rowIdx] = selecteIndex.value
   return rows.value[rowIdx]?.validity || 1
