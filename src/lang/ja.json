@@ -419,7 +419,8 @@
     "button": "パスワード変更",
     "success": "パスワードが正常に変更されました",
     "failed": "パスワードの変更に失敗しました",
-    "logoutTip": "パスワードが変更されました。再度ログインしてください"
+    "logoutTip": "パスワードが変更されました。再度ログインしてください",
+    "passwordSameError": "新しいパスワードは以前のパスワードと同じにできません"
   },
   "formValidation": {
     "unitPriceRequired": "単価を入力してください",

@@ -394,7 +394,8 @@
     "button": "Change Password",
     "success": "Password changed successfully",
     "failed": "Failed to change password",
-    "logoutTip": "Password has been changed, please login again"
+    "logoutTip": "Password has been changed, please login again",
+    "passwordSameError": "New password cannot be the same as old password"
   },
   "error": {
     "unknown": "Unknown error",

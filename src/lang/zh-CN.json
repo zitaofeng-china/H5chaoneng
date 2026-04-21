@@ -430,7 +430,8 @@
     "button": "修改密码",
     "success": "密码修改成功",
     "failed": "密码修改失败",
-    "logoutTip": "密码已修改，请重新登录"
+    "logoutTip": "密码已修改，请重新登录",
+    "passwordSameError": "新旧密码不可相同"
   },
   "error": {
     "unknown": "未知错误",

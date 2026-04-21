@@ -420,7 +420,8 @@
     "button": "Cambiar Contraseña",
     "success": "Contraseña cambiada exitosamente",
     "failed": "Error al cambiar la contraseña",
-    "logoutTip": "La contraseña ha sido cambiada, por favor inicie sesión nuevamente"
+    "logoutTip": "La contraseña ha sido cambiada, por favor inicie sesión nuevamente",
+    "passwordSameError": "La nueva contraseña no puede ser igual a la antigua"
   },
   "formValidation": {
     "unitPriceRequired": "Por favor ingrese el precio unitario",

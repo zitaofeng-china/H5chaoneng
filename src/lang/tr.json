@@ -420,7 +420,8 @@
     "button": "Şifre Değiştir",
     "success": "Şifre başarıyla değiştirildi",
     "failed": "Şifre değiştirilemedi",
-    "logoutTip": "Şifre değiştirildi, lütfen tekrar giriş yapın"
+    "logoutTip": "Şifre değiştirildi, lütfen tekrar giriş yapın",
+    "passwordSameError": "Yeni şifre eski şifre ile aynı olamaz"
   },
   "formValidation": {
     "unitPriceRequired": "Lütfen birim fiyatı girin",

@@ -419,7 +419,8 @@
     "button": "비밀번호 변경",
     "success": "비밀번호가 성공적으로 변경되었습니다",
     "failed": "비밀번호 변경에 실패했습니다",
-    "logoutTip": "비밀번호가 변경되었습니다. 다시 로그인해주세요"
+    "logoutTip": "비밀번호가 변경되었습니다. 다시 로그인해주세요",
+    "passwordSameError": "새 비밀번호는 이전 비밀번호와 같을 수 없습니다"
   },
   "formValidation": {
     "unitPriceRequired": "단가를 입력해주세요",

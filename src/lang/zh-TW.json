@@ -418,7 +418,8 @@
     "button": "修改密碼",
     "success": "密碼修改成功",
     "failed": "密碼修改失敗",
-    "logoutTip": "密碼已修改，請重新登入"
+    "logoutTip": "密碼已修改，請重新登入",
+    "passwordSameError": "新舊密碼不可相同"
   },
   "formValidation": {
     "unitPriceRequired": "請輸入單價",

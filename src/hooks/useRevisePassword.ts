@@ -34,6 +34,16 @@ export function useRevisePassword() {
     newPassword: [
       { required: true, message: t('revisePassword.newPasswordPlaceholder'), trigger: 'blur' },
       { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
+      {
+        validator: (_rule, value, callback) => {
+          if (value && value === revisePasswordForm.password) {
+            callback(new Error(t('revisePassword.passwordSameError')))
+          } else {
+            callback()
+          }
+        },
+        trigger: 'blur',
+      },
     ],
   }))
 
