@@ -29,6 +29,7 @@
     "loadFailed": "載入失敗",
     "loadFailedHint": "請檢查網絡連接或稍後重試",
     "retry": "重試",
+    "checkWalletAddress": "轉帳時請核對錢包地址",
     "pleaseLogin": "請先登錄"
   },
   "nav": {
@@ -136,6 +137,7 @@
     "viewFaq": "查看常見問題"
   },
   "transferRental": {
+    "transferTemplate": "轉帳{price}TRX=獲取購買{count}筆",
     "transfer35": "轉帳3.5TRX=獲取購買1筆",
     "transfer7": "轉帳7TRX=獲取購買2筆",
     "transfer14": "轉帳14TRX=獲取購買4筆",
@@ -247,6 +249,8 @@
     "address": "需要託管的地址",
     "enterAddresses": "請輸入地址，多個地址，請使用英文逗號分隔，或一行一個地址，",
     "confirm": "確定",
+    "use65000Energy": "使用65000能量",
+    "use131000Energy": "使用131000能量",
     "tips1": "使用託管模式需要餘額大於30TRX",
     "tips2": "您的託管地址將會始終保持13.1W能量",
     "tips3": "託管地址每USDT轉帳一次計一筆費用（帳戶餘額扣費）",
@@ -296,6 +300,12 @@
     "activationNotice": "激活通知",
     "activationSuccessCount": "已激活地址數",
     "activationTotalCount": "地址數量",
+    "skippedCount": "已跳過",
+    "allSuccess": "成功激活 {count} 個地址",
+    "partialSuccess": "成功激活 {activated} 個地址，跳過 {skipped} 個已激活地址",
+    "allSkipped": "所有地址均已激活",
+    "allFailed": "激活失敗",
+    "activationFailed": "激活失敗",
     "tips1": "批量激活地址數量最多為1000個",
     "tips2": "已激活的地址不收取激活費用"
   },
@@ -332,7 +342,11 @@
     "registerButton": "註冊",
     "usernameRequired": "請輸入用戶名",
     "telegramRequired": "請輸入TG用戶名",
-    "registerSuccess": "註冊成功"
+    "registerSuccess": "註冊成功",
+    "registerFailed": "註冊失敗",
+    "passwordMismatch": "兩次輸入的密碼不一致",
+    "registerSuccessButLoginFailed": "註冊成功，但自動登入失敗，請手動登入",
+    "registerAndLoginSuccess": "註冊成功，已自動登入"
   },
   "reset": {
     "title": "重置密碼",

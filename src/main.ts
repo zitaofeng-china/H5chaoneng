@@ -16,6 +16,9 @@ import i18n, { initLocale } from '@/lang'
 
 const app = createApp(App)
 
+// 暴露 app 实例到 window，供拦截器使用
+;(window as any).__VUE_APP__ = app
+
 app.use(createPinia())
 app.use(router)
 app.use(i18n)

@@ -72,17 +72,17 @@ export function useRecharge() {
       return
     }
     
+    // 检查登录状态
+    const userId = userStore.userInfo?.id || 0
+    if (!userId || !userStore.isLogin) {
+      ElMessage.warning(t('common.pleaseLogin') || '请先登录')
+      close() // 关闭弹窗
+      return
+    }
+    
     isLoadingAddress.value = true
     
     try {
-      const userId = userStore.userInfo?.id || 0
-      
-      if (!userId) {
-        ElMessage.error(t('common.pleaseLogin') || '请先登录')
-        isLoadingAddress.value = false
-        return
-      }
-      
       console.log('[Recharge] 创建充值订单:', {
         amount: selectedAmount.value,
         coin: 'TRX',
@@ -144,10 +144,17 @@ export function useRecharge() {
       // 刷新用户信息
       await fetchUserInfo()
       
-    } catch (error) {
+    } catch (error: any) {
       console.error('[Recharge] 创建订单异常:', error)
-      ElMessage.error(t('recharge.createOrderFailed') || '创建订单失败，请重试')
-      resetOrderData()
+      
+      // 如果是未登录错误，关闭弹窗
+      if (error.message === 'NOT_LOGGED_IN') {
+        ElMessage.warning(t('common.pleaseLogin') || '请先登录')
+        close()
+      } else {
+        ElMessage.error(t('recharge.createOrderFailed') || '创建订单失败，请重试')
+        resetOrderData()
+      }
     } finally {
       isLoadingAddress.value = false
     }

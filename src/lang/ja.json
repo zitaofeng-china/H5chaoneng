@@ -29,7 +29,9 @@
     "recharge": "チャージ",
     "loadFailed": "読み込み失敗",
     "loadFailedHint": "ネットワーク接続を確認するか、後でもう一度お試しください",
-    "retry": "再試行"
+    "retry": "再試行",
+    "checkWalletAddress": "送金時はウォレットアドレスを確認してください",
+    "pleaseLogin": "まずログインしてください"
   },
   "nav": {
     "home": "ホーム",
@@ -136,6 +138,7 @@
     "viewFaq": "よくある質問を見る"
   },
   "transferRental": {
+    "transferTemplate": "{price}TRX送金 = {count}件獲得",
     "transfer35": "3.5TRX送金 = 1件獲得",
     "transfer7": "7TRX送金 = 2件獲得",
     "transfer14": "14TRX送金 = 4件獲得",
@@ -148,7 +151,7 @@
     "noUsdtTip": "USDTのない住所への送金は2倍のエネルギーが必要です",
     "expiryTip": "1時間以内にエネルギーを使用してください、過ぎると期限切れ回收されます",
     "amountTip": "必ず上記該当額のTRXを送金してください、，不然レンタルに失敗します",
-    "addressTip": "送金时请核对准确的能量租赁钱包地址",
+    "addressTip": "送金時にエネルギーレンタルウォレット住所を正確に確認してください",
     "walletAddress": "レンタルウォレット住所"
   },
   "kindTips": {
@@ -248,6 +251,8 @@
     "address": "ホスティングする住所",
     "enterAddresses": "住所を入力してください、複数の住所は英語カンマで区切るか、1行に1住所",
     "confirm": "確認",
+    "use65000Energy": "65000エネルギー使用",
+    "use131000Energy": "131000エネルギー使用",
     "tips1": "ホスティングモード使用には残高が30TRXより大きい必要",
     "tips2": "ホスティング済み住所は常に13.1Wエネルギーを維持します",
     "tips3": "ホスティング済み住所はUSDT送金ごとに1回料金徴収（アカウント残高から控除）",
@@ -274,12 +279,12 @@
     "flashWalletQrcode": "即時交換ウォレットQRコード",
     "copySuccess": "住所がクリップボードにコピーされました",
     "copyFailed": "コピーに失敗しました、手動でコピーしてください",
-    "checkAddress": "送金时请核对地址",
-    "tips1": "過剰お支払い或不到帳の場合返金のためカスタマーサービスに連絡してください",
+    "checkAddress": "送金時はアドレスを確認してください",
+    "tips1": "過剰お支払いまたは未着金の場合、返金のためカスタマーサービスに連絡してください",
     "tips2": "24時間送金がなければ1件控除",
     "tips3": "取引所ウォレットで送金しないでください",
-    "tips4": "送金时请核对准确的能量租赁钱包地址",
-    "tips5": "送金错误或其他疑问の場合カスタマーサービスに連絡してください",
+    "tips4": "送金時にエネルギーレンタルウォレット住所を正確に確認してください",
+    "tips5": "送金エラーまたはその他の質問がある場合は、カスタマーサービスに連絡してください",
     "minUsdtError": "最小交換金額は {min} USDT です",
     "maxUsdtError": "最大交換金額は {max} USDT です",
     "minTrxError": "最小交換金額は {min} TRX です",
@@ -297,6 +302,12 @@
     "activationNotice": "活性化お知らせ",
     "activationSuccessCount": "活性化済み住所数",
     "activationTotalCount": "住所数量",
+    "skippedCount": "スキップ済み",
+    "allSuccess": "{count}件の住所を活性化しました",
+    "partialSuccess": "{activated}件の住所を活性化しました、{skipped}件の活性化済み住所をスキップしました",
+    "allSkipped": "すべての住所が活性化済みです",
+    "allFailed": "活性化に失敗しました",
+    "activationFailed": "活性化に失敗しました",
     "tips1": "一括活性化は最大1000住所まで",
     "tips2": "活性化済み住所は活性化料金を徴収しません"
   },
@@ -333,7 +344,11 @@
     "registerButton": "登録",
     "usernameRequired": "ユーザー名を入力してください",
     "telegramRequired": "TGユーザー名を入力してください",
-    "registerSuccess": "登録成功"
+    "registerSuccess": "登録成功",
+    "registerFailed": "登録失敗",
+    "passwordMismatch": "パスワードが一致しません",
+    "registerSuccessButLoginFailed": "登録成功、しかし自動ログインに失敗しました。手動でログインしてください",
+    "registerAndLoginSuccess": "登録成功、自動的にログインしました"
   },
   "reset": {
     "title": "パスワードリセット",
@@ -356,7 +371,7 @@
     "rechargeAddress": "受取住所",
     "scanQrcode": "QRコードをスキャンして入金",
     "minTransfer": "1TRXより大きい金額は自由に送金可能",
-    "checkAddress": "送金时请核对地址",
+    "checkAddress": "送金時はアドレスを確認してください",
     "customAmount": "TRX入金額をカスタマイズするにはクリック",
     "enterCustomAmount": "入金額を入力してください（最小1 TRX）",
     "minAmount": "最小入金額は1 TRXで、小数点以下2桁まで対応",

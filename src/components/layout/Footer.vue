@@ -151,7 +151,7 @@ const handleToRouter = (path: string, hash?: string) => {
       line-height: 1.6;
       margin-bottom: 24px;
       opacity: 0.7;
-      max-width: 300px;
+      white-space: 310px;
     }
 
     .social-icons {

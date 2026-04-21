@@ -31,7 +31,8 @@
     "getAddressFailed": "获取付款地址失败",
     "retry": "重试",
     "loadFailedHint": "请检查网络连接或稍后重试",
-    "checkWalletAddress": "转账时请核对钱包地址"
+    "checkWalletAddress": "转账时请核对钱包地址",
+    "pleaseLogin": "请先登录"
   },
   "nav": {
     "home": "首页",
@@ -272,6 +273,7 @@
     "tips6": "建议一天最少转账超过一次使用",
     "tips7": "每USDT转账后将会自动托管一笔，直到余额不足",
     "65000EnergyFee": "使用65000能量：3TRX/笔",
+    "131000EnergyFee": "使用131000能量：5TRX/笔",
     "131000EnergyFee": "使用131000能量：5TRX/笔"
   },
   "contract": {
@@ -374,7 +376,9 @@
     "telegramRequired": "请输入TG用户名",
     "registerSuccess": "注册成功",
     "registerFailed": "注册失败",
-    "passwordMismatch": "两次输入的密码不一致"
+    "passwordMismatch": "两次输入的密码不一致",
+    "registerSuccessButLoginFailed": "注册成功，但自动登录失败，请手动登录",
+    "registerAndLoginSuccess": "注册成功，已自动登录"
   },
   "reset": {
     "title": "重置密码",

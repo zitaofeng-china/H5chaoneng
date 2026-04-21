@@ -30,6 +30,7 @@
     "loadFailed": "Error de Carga",
     "loadFailedHint": "Por favor verifique su conexión de red o intente más tarde",
     "retry": "Reintentar",
+    "checkWalletAddress": "Por favor verifique la dirección de la billetera durante la transferencia",
     "pleaseLogin": "Por favor inicie sesión primero"
   },
   "nav": {
@@ -137,6 +138,7 @@
     "viewFaq": "Ver Preguntas Frecuentes"
   },
   "transferRental": {
+    "transferTemplate": "Transferir {price}TRX = Obtener {count} Unidad",
     "transfer35": "Transferir 3.5TRX = Obtener 1 Unidad",
     "transfer7": "Transferir 7TRX = Obtener 2 Unidades",
     "transfer14": "Transferir 14TRX = Obtener 4 Unidades",
@@ -249,6 +251,8 @@
     "address": "Dirección a Alojar",
     "enterAddresses": "Por favor ingrese las direcciones, múltiples direcciones separadas por coma o una dirección por línea",
     "confirm": "Confirmar",
+    "use65000Energy": "Usando 65000 energía",
+    "use131000Energy": "Usando 131000 energía",
     "tips1": "Usar el modo de alojamiento requiere saldo mayor a 30TRX",
     "tips2": "Sus direcciones alojadas siempre mantendrán 13.1W de energía",
     "tips3": "Las direcciones alojadas cobran una tarifa por cada transferencia USDT (deducción del saldo de la cuenta)",
@@ -298,6 +302,12 @@
     "activationNotice": "Aviso de Activación",
     "activationSuccessCount": "Cantidad de Direcciones Activadas",
     "activationTotalCount": "Cantidad de Direcciones",
+    "skippedCount": "Omitidas",
+    "allSuccess": "Se activaron exitosamente {count} direcciones",
+    "partialSuccess": "Se activaron exitosamente {activated} direcciones, se omitieron {skipped} direcciones ya activadas",
+    "allSkipped": "Todas las direcciones ya están activadas",
+    "allFailed": "Error al activar",
+    "activationFailed": "Error al activar",
     "tips1": "Máximo 1000 direcciones para activación masiva",
     "tips2": "Las direcciones activadas no cobran tarifa de activación"
   },
@@ -334,7 +344,11 @@
     "registerButton": "Registrarse",
     "usernameRequired": "Por favor ingrese el nombre de usuario",
     "telegramRequired": "Por favor ingrese el nombre de usuario de TG",
-    "registerSuccess": "Registro exitoso"
+    "registerSuccess": "Registro exitoso",
+    "registerFailed": "Registro fallido",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "registerSuccessButLoginFailed": "Registro exitoso, pero el inicio de sesión automático falló. Por favor inicie sesión manualmente",
+    "registerAndLoginSuccess": "Registro exitoso, sesión iniciada automáticamente"
   },
   "reset": {
     "title": "Restablecer Contraseña",

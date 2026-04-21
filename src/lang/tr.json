@@ -30,6 +30,7 @@
     "loadFailed": "Yükleme Başarısız",
     "loadFailedHint": "Lütfen ağ bağlantınızı kontrol edin veya daha sonra tekrar deneyin",
     "retry": "Tekrar Dene",
+    "checkWalletAddress": "Transfer yaparken lütfen cüzdan adresini doğrulayın",
     "pleaseLogin": "Lütfen önce giriş yapın"
   },
   "nav": {
@@ -137,6 +138,7 @@
     "viewFaq": "SSS'yi Görüntüle"
   },
   "transferRental": {
+    "transferTemplate": "{price}TRX Transfer Et = {count} Adet Al",
     "transfer35": "3.5TRX Transfer Et = 1 Adet Al",
     "transfer7": "7TRX Transfer Et = 2 Adet Al",
     "transfer14": "14TRX Transfer Et = 4 Adet Al",
@@ -249,6 +251,8 @@
     "address": "Barındırılacak Adres",
     "enterAddresses": "Lütfen adresleri girin, birden fazla adres için İngilizce virgül ile ayırın veya her satıra bir adres",
     "confirm": "Onayla",
+    "use65000Energy": "65000 enerji kullanımı",
+    "use131000Energy": "131000 enerji kullanımı",
     "tips1": "Barındırma modunu kullanmak için 30TRX'den büyük bakiye gerekir",
     "tips2": "Barındırılan adresleriniz her zaman 13.1W enerjiyi koruyacaktır",
     "tips3": "Barındırılan adresler her USDT transferi için bir ücret tahsil eder (hesap bakiyesinden düşüm)",
@@ -298,6 +302,12 @@
     "activationNotice": "Aktivasyon Bildirimi",
     "activationSuccessCount": "Aktive Edilen Adres Sayısı",
     "activationTotalCount": "Adres Sayısı",
+    "skippedCount": "Atlandı",
+    "allSuccess": "{count} adres başarıyla aktive edildi",
+    "partialSuccess": "{activated} adres başarıyla aktive edildi, {skipped} zaten aktif adres atlandı",
+    "allSkipped": "Tüm adresler zaten aktif",
+    "allFailed": "Aktivasyon başarısız",
+    "activationFailed": "Aktivasyon başarısız",
     "tips1": "Toplu aktivasyon için maksimum 1000 adres",
     "tips2": "Aktive edilen adresler için aktivasyon ücreti alınmaz"
   },
@@ -334,7 +344,11 @@
     "registerButton": "Kaydol",
     "usernameRequired": "Lütfen kullanıcı adını girin",
     "telegramRequired": "Lütfen TG kullanıcı adını girin",
-    "registerSuccess": "Kayıt başarılı"
+    "registerSuccess": "Kayıt başarılı",
+    "registerFailed": "Kayıt başarısız",
+    "passwordMismatch": "Şifreler eşleşmiyor",
+    "registerSuccessButLoginFailed": "Kayıt başarılı, ancak otomatik giriş başarısız oldu. Lütfen manuel olarak giriş yapın",
+    "registerAndLoginSuccess": "Kayıt başarılı, otomatik olarak giriş yapıldı"
   },
   "reset": {
     "title": "Şifre Sıfırla",

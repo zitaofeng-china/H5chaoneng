@@ -37,6 +37,8 @@ export interface LoginResponse {
   refreshToken?: string
   userInfo?: UserInfo
   expiresIn?: number
+  expiredAt?: number // Token 过期时间戳（毫秒）
+  expirated_at?: number // 后端返回的过期时间戳（秒）
 }
 
 // 注册请求参数

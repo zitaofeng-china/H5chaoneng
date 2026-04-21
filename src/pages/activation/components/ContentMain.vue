@@ -69,11 +69,22 @@ const feeCardTexts = computed<string[]>(() => {
 const kindTipTexts = computed<string[]>(() => [t('activation.tips1'), t('activation.tips2')])
 
 // 激活通知状态（使用 ref 使其响应式）
-const activationNotice = ref<string>('')
+const activationNoticeData = ref<{
+  time: string
+  totalCount: number
+  activatedCount: number
+  skippedCount: number
+} | null>(null)
 
 // 从 localStorage 加载激活通知（检查是否超过30分钟）
 const loadActivationNotice = () => {
-  const saved = localStorage.getItem('activationNotice')
+  // 清理旧的通知格式（字符串格式）
+  const oldNotice = localStorage.getItem('activationNotice')
+  if (oldNotice) {
+    localStorage.removeItem('activationNotice')
+  }
+  
+  const saved = localStorage.getItem('activationNoticeData')
   const savedTime = localStorage.getItem('activationNoticeTime')
   
   if (saved && savedTime) {
@@ -83,25 +94,33 @@ const loadActivationNotice = () => {
     
     // 如果通知时间在30分钟内，显示通知
     if (now - noticeTime < thirtyMinutes) {
-      activationNotice.value = saved
+      try {
+        activationNoticeData.value = JSON.parse(saved)
+      } catch (e) {
+        console.error('Failed to parse activation notice data:', e)
+        localStorage.removeItem('activationNoticeData')
+        localStorage.removeItem('activationNoticeTime')
+      }
     } else {
       // 超过30分钟，清除通知
-      localStorage.removeItem('activationNotice')
+      localStorage.removeItem('activationNoticeData')
       localStorage.removeItem('activationNoticeTime')
     }
   }
 }
 
 // 保存激活通知到 localStorage（同时保存时间戳）
-const saveActivationNotice = (notice: string) => {
-  activationNotice.value = notice
-  localStorage.setItem('activationNotice', notice)
+const saveActivationNotice = (data: { time: string; totalCount: number; activatedCount: number; skippedCount: number }) => {
+  activationNoticeData.value = data
+  localStorage.setItem('activationNoticeData', JSON.stringify(data))
   localStorage.setItem('activationNoticeTime', Date.now().toString())
 }
 
 const notices = computed<string[]>(() => {
-  if (activationNotice.value) {
-    return [activationNotice.value]
+  if (activationNoticeData.value) {
+    const { time, totalCount, activatedCount, skippedCount } = activationNoticeData.value
+    const notice = `${t('activation.activationNotice')}: ${time} ${t('activation.activationTotalCount')}: ${totalCount}, ${t('activation.activationSuccessCount')}: ${activatedCount}, ${t('activation.skippedCount')}: ${skippedCount}`
+    return [notice]
   }
   return []
 })
@@ -166,9 +185,13 @@ const handleSaveAddress = async () => {
       const now = new Date()
       const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
       
-      // 生成激活通知
-      const notice = `${t('activation.activationNotice')}: ${timeStr} ${t('activation.activationTotalCount')}: ${totalCount}, ${t('activation.activationSuccessCount')}: ${activatedCount}, ${t('activation.skippedCount')}: ${skippedCount}`
-      saveActivationNotice(notice)
+      // 保存激活通知数据（保存原始数据，不保存翻译后的文本）
+      saveActivationNotice({
+        time: timeStr,
+        totalCount,
+        activatedCount,
+        skippedCount,
+      })
       
       // 根据结果显示不同的消息
       if (activatedCount === 0 && skippedCount === 0) {
@@ -208,6 +231,13 @@ const handleSaveAddress = async () => {
     }
   } catch (error: any) {
     console.error('【ERROR INFO】:', error)
+    
+    // 特殊处理未登录错误
+    if (error.message === 'NOT_LOGGED_IN') {
+      ElMessage.warning(t('common.pleaseLogin'))
+      return
+    }
+    
     ElMessage.error(error.message || t('activation.activationFailed'))
   }
 }

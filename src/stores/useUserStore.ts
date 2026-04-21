@@ -1,7 +1,7 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import type { LoginResponse } from '@/api/modules/auth/types'
-import { getToken, setToken, removeToken, setRefreshToken, removeRefreshToken, getUserInfo as getStoredUserInfo, setUserInfo, removeUserInfo } from '@/utils/token'
+import { getToken, setToken, removeToken, setRefreshToken, removeRefreshToken, getUserInfo as getStoredUserInfo, setUserInfo, removeUserInfo, setTokenExpiredAt, removeTokenExpiredAt } from '@/utils/token'
 import { logout as logoutApi, getUserInfo as getUserInfoApi } from '@/api/modules/auth'
 
 export const useUserStore = defineStore('user', () => {
@@ -29,6 +29,11 @@ export const useUserStore = defineStore('user', () => {
     if (response.refreshToken) {
       setRefreshToken(response.refreshToken)
     }
+    
+    // 保存 Token 过期时间
+    if (response.expiredAt) {
+      setTokenExpiredAt(response.expiredAt)
+    }
   }
 
   async function logout() {
@@ -46,6 +51,7 @@ export const useUserStore = defineStore('user', () => {
       removeToken()
       removeRefreshToken()
       removeUserInfo()
+      removeTokenExpiredAt()
     }
   }
 

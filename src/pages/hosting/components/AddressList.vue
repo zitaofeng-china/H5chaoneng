@@ -60,7 +60,13 @@ async function fetchHostingList() {
     }
   } catch (err: any) {
     console.error('[托管列表] 获取失败:', err)
-    error.value = err.message || '网络错误，请稍后重试'
+    // 如果是未登录错误，不显示错误信息，只显示空状态
+    if (err.message === 'NOT_LOGGED_IN') {
+      hostingList.value = []
+      error.value = ''
+    } else {
+      error.value = err.message || '网络错误，请稍后重试'
+    }
   } finally {
     loading.value = false
   }

@@ -98,6 +98,15 @@ async function request<T = any>(
     
     // 错误处理
     if (error instanceof Error) {
+      // 特殊处理 Token 相关错误（不显示错误信息，因为拦截器已经处理了）
+      if (error.message === 'TOKEN_EXPIRED' || error.message === 'NOT_LOGGED_IN') {
+        return {
+          code: -1,
+          msg: '', // 空消息，因为拦截器已经显示了提示
+          data: null as any,
+        }
+      }
+      
       if (error.message === 'Request timeout') {
         return {
           code: -1,

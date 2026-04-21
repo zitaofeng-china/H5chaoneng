@@ -9,6 +9,7 @@ import type { UserInfo } from '@/api/modules/auth/types'
 const TOKENS_KEY = 'tokens'
 const REFRESH_TOKENS_KEY = 'refresh_tokens'
 const USER_INFOS_KEY = 'user_infos'
+const TOKEN_EXPIRED_AT_KEY = 'token_expired_at'
 
 interface TokenStorage {
   [site: string]: string
@@ -16,6 +17,10 @@ interface TokenStorage {
 
 interface UserInfoStorage {
   [site: string]: UserInfo
+}
+
+interface ExpiredAtStorage {
+  [site: string]: number
 }
 
 function getAllTokens(): TokenStorage {
@@ -58,6 +63,20 @@ function getAllUserInfos(): UserInfoStorage {
 
 function saveAllUserInfos(infos: UserInfoStorage): void {
   localStorage.setItem(USER_INFOS_KEY, JSON.stringify(infos))
+}
+
+function getAllExpiredAt(): ExpiredAtStorage {
+  const expiredAtStr = localStorage.getItem(TOKEN_EXPIRED_AT_KEY)
+  if (!expiredAtStr) return {}
+  try {
+    return JSON.parse(expiredAtStr)
+  } catch {
+    return {}
+  }
+}
+
+function saveAllExpiredAt(expiredAt: ExpiredAtStorage): void {
+  localStorage.setItem(TOKEN_EXPIRED_AT_KEY, JSON.stringify(expiredAt))
 }
 
 export function getToken(): string | null {
@@ -126,10 +145,41 @@ export function removeUserInfo(): void {
   saveAllUserInfos(infos)
 }
 
+export function getTokenExpiredAt(): number | null {
+  const site = getSite()
+  if (!site) return null
+  return getAllExpiredAt()[site] || null
+}
+
+export function setTokenExpiredAt(expiredAt: number): void {
+  const site = getSite()
+  if (!site) return
+  const expiredAtMap = getAllExpiredAt()
+  expiredAtMap[site] = expiredAt
+  saveAllExpiredAt(expiredAtMap)
+}
+
+export function removeTokenExpiredAt(): void {
+  const site = getSite()
+  if (!site) return
+  const expiredAtMap = getAllExpiredAt()
+  delete expiredAtMap[site]
+  saveAllExpiredAt(expiredAtMap)
+}
+
+export function isTokenExpired(): boolean {
+  const expiredAt = getTokenExpiredAt()
+  if (!expiredAt) return false
+  
+  // expiredAt 是毫秒时间戳
+  return Date.now() >= expiredAt
+}
+
 export function clearAllTokens(): void {
   localStorage.removeItem(TOKENS_KEY)
   localStorage.removeItem(REFRESH_TOKENS_KEY)
   localStorage.removeItem(USER_INFOS_KEY)
+  localStorage.removeItem(TOKEN_EXPIRED_AT_KEY)
 }
 
 export function hasToken(): boolean {

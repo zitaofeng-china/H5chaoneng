@@ -152,7 +152,7 @@
 
         <div class="balance-display">
           <div class="balance-info">
-            <SvgIcon name="header-USDT" width="24" height="24" />
+            <SvgIcon name="trx" width="24" height="24" />
             <div class="balance-amount">{{ trxBalance }}</div>
           </div>
           <div class="recharge-btn" @click="handleRechange">

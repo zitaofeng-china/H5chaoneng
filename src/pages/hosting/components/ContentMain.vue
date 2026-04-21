@@ -87,6 +87,12 @@ const formRules: FormRules = {
 const handleSaveAddress = async () => {
   if (!formRef.value) return
 
+  // 检查是否登录
+  if (!userStore.isLogin) {
+    ElMessage.warning(t('common.pleaseLogin'))
+    return
+  }
+
   try {
     await formRef.value.validateField('address')
 
@@ -181,6 +187,13 @@ const handleSaveAddress = async () => {
       }
     } catch (error: any) {
       console.error('[添加托管地址] 错误:', error)
+      
+      // 特殊处理未登录错误
+      if (error.message === 'NOT_LOGGED_IN') {
+        ElMessage.warning(t('common.pleaseLogin'))
+        return
+      }
+      
       ElMessage.error(error.message || t('hosting.addFailed'))
     }
   } catch (error) {

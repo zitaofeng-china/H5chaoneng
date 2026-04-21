@@ -30,6 +30,7 @@
     "loadFailed": "Load Failed",
     "loadFailedHint": "Please check your network connection or try again later",
     "retry": "Retry",
+    "checkWalletAddress": "Please verify wallet address during transfer",
     "pleaseLogin": "Please login first"
   },
   "nav": {
@@ -343,7 +344,11 @@
     "registerButton": "Register",
     "usernameRequired": "Please enter username",
     "telegramRequired": "Please enter TG username",
-    "registerSuccess": "Registration successful"
+    "registerSuccess": "Registration successful",
+    "registerFailed": "Registration failed",
+    "passwordMismatch": "Passwords do not match",
+    "registerSuccessButLoginFailed": "Registration successful, but auto-login failed. Please login manually",
+    "registerAndLoginSuccess": "Registration successful, logged in automatically"
   },
   "reset": {
     "title": "Reset Password",

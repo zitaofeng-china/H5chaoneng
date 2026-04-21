@@ -100,12 +100,18 @@ export function useLoginForm() {
         return false
       }
 
-      // 后端返回的 data 直接就是 token 字符串
+      // 后端返回的 data 可能是 token 字符串或包含 token 和 expirated_at 的对象
       const token = typeof response.data === 'string' ? response.data : (response.data as any)?.token || ''
+      // 注意：后端字段名是 expirated_at（下划线），需要转换为毫秒时间戳
+      const expiratedAt = typeof response.data === 'object' ? (response.data as any)?.expirated_at : undefined
+      const expiredAt = expiratedAt ? expiratedAt * 1000 : undefined // 转换为毫秒
+      
+      console.log('[Login] Token 过期时间:', expiredAt, new Date(expiredAt || 0).toLocaleString())
       
       const loginData = {
         token: token,
         userInfo: undefined,
+        expiredAt: expiredAt,
       }
       
       // 保存用户信息和 token
