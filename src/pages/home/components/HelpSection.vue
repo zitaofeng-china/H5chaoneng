@@ -181,4 +181,62 @@ const handleViewProblems = () => {
     border-radius: 6px;
   }
 }
+
+/* 适配 300px 超小屏幕 */
+@media (max-width: 360px) {
+  .help-container {
+    padding: 0 8px;
+  }
+
+  .help-section {
+    padding: 20px 0;
+  }
+
+  .help-content {
+    .help-info {
+      &:not(:last-child) {
+        margin-bottom: 14px;
+      }
+    }
+  }
+
+  .help-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .help-subtitle {
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 0 2px;
+  }
+
+  .help-buttons {
+    gap: 6px;
+    width: 100%;
+    padding: 0 10px;
+    justify-content: center;
+  }
+
+  .help-button {
+    flex: 0 1 auto;
+    max-width: 130px;
+    min-width: 110px;
+    height: 36px;
+    font-size: 11px;
+    border-radius: 4px;
+    padding: 0 8px;
+
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &.secondary {
+      border-width: 1.5px;
+    }
+  }
+}
 </style>

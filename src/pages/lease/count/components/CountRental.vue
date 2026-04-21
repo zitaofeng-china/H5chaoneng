@@ -692,4 +692,150 @@ onMounted(() => {
     }
   }
 }
+
+/* 适配 300px 超小屏幕 */
+@media (max-width: 360px) {
+  .time-rental-page {
+    padding: 4px;
+  }
+
+  .rental-wrapper {
+    padding: 8px;
+  }
+
+  .selection-grid {
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .grid-row {
+    gap: 5px;
+    padding: 3px 0;
+  }
+
+  .row-options {
+    gap: 6px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pill {
+    height: 34px;
+    font-size: 11px;
+    padding: 0 6px;
+    border-radius: 5px;
+  }
+
+  .custom-input-wrapper {
+    margin-top: 8px;
+    padding: 10px;
+
+    .custom-form-item {
+      :deep(.el-form-item__label) {
+        font-size: 12px;
+      }
+
+      :deep(.el-input__inner) {
+        height: 36px;
+        font-size: 13px;
+      }
+
+      :deep(.el-input__suffix) {
+        font-size: 12px;
+      }
+    }
+
+    .max-count-hint {
+      margin-top: 6px;
+      font-size: 11px;
+    }
+  }
+
+  .details-card {
+    padding: 12px;
+
+    .card-title {
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 12px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 12px;
+    padding-bottom: 4px;
+  }
+
+  :deep(.el-input__inner) {
+    font-size: 13px;
+    height: 36px;
+  }
+
+  .btn-wrap {
+    gap: 10px;
+
+    :deep(.el-button) {
+      height: 40px !important;
+      font-size: 14px;
+      padding: 0 12px;
+      line-height: 40px;
+    }
+  }
+
+  :deep(.el-dialog) {
+    width: 94% !important;
+    border-radius: 10px;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 10px 12px;
+  }
+
+  :deep(.el-dialog__title) {
+    font-size: 15px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 12px;
+  }
+
+  .payment-dialog {
+    .payment-tips {
+      margin-bottom: 12px;
+      padding: 10px;
+      border-radius: 6px;
+
+      .tip-item {
+        font-size: 11px;
+        gap: 5px;
+        margin-bottom: 6px;
+        line-height: 1.3;
+
+        svg {
+          width: 12px;
+          height: 12px;
+        }
+      }
+    }
+
+    :deep(.qr-section) {
+      .section-title {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+
+      .qr-code {
+        width: 160px !important;
+        height: 160px !important;
+      }
+
+      .wallet-address {
+        margin-top: 6px;
+        font-size: 11px;
+      }
+    }
+  }
+}
 </style>

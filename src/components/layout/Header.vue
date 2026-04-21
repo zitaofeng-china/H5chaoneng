@@ -1058,4 +1058,132 @@ onUnmounted(() => {
     max-height: calc(100vh - 54px);
   }
 }
+
+/* 适配 300px 超小屏幕 */
+@media (max-width: 360px) {
+  .navbar {
+    height: 50px;
+    padding: 0 6px;
+  }
+
+  .navbar-container {
+    gap: 4px;
+  }
+
+  .m-logo-icon {
+    img {
+      height: 26px;
+    }
+  }
+
+  .right-section {
+    gap: 3px;
+
+    .info-wrap {
+      min-width: 30px;
+      height: 30px;
+      
+      svg {
+        width: 17px;
+        height: 17px;
+      }
+    }
+  }
+
+  .balance-display {
+    height: 30px;
+    padding: 0 2px;
+    font-size: 11px;
+
+    .balance-info {
+      padding: 0 4px 0 3px;
+      gap: 3px;
+      
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+    
+    .balance-amount {
+      font-size: 11px;
+      max-width: 45px;
+    }
+  }
+
+  .recharge-btn {
+    min-width: 48px;
+    height: 24px;
+    padding: 0 4px;
+    
+    .text {
+      font-size: 10px;
+    }
+  }
+
+  .user-icon {
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  .no-login {
+    gap: 3px;
+    font-size: 11px;
+
+    .btn {
+      font-size: 11px;
+    }
+  }
+  
+  .collapse-container {
+    top: 50px;
+    max-height: calc(100vh - 50px);
+
+    :deep(.el-collapse) {
+      padding: 8px 10px 10px;
+    }
+
+    :deep(.el-collapse-item__header) {
+      height: 40px;
+      line-height: 40px;
+      border-radius: 5px;
+      margin-bottom: 2px;
+    }
+
+    :deep(.el-collapse-item__title) {
+      font-size: 13px;
+      padding: 0 10px;
+    }
+
+    :deep(.el-collapse-item__content) {
+      padding-bottom: 4px;
+      padding-top: 2px;
+    }
+
+    :deep(.el-collapse-item) {
+      &:not(:last-child) {
+        margin-bottom: 4px;
+      }
+    }
+
+    .menu-wrap {
+      padding: 0 4px;
+
+      .menu-item {
+        padding: 0 10px;
+        height: 36px;
+        font-size: 12px;
+        border-radius: 4px;
+
+        &::before {
+          left: 5px;
+          width: 2.5px;
+          height: 2.5px;
+        }
+      }
+    }
+  }
+}
 </style>
