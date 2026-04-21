@@ -2,7 +2,7 @@
  * 请求/响应拦截器
  */
 
-import { REQUEST_HEADERS, NO_TOKEN_URLS, ENABLE_REQUEST_LOG, ENABLE_RESPONSE_LOG, RESPONSE_CONFIG } from './config'
+import { NO_TOKEN_URLS, ENABLE_REQUEST_LOG, ENABLE_RESPONSE_LOG, RESPONSE_CONFIG } from './config'
 import type { ApiResponse } from './types'
 import { getSite } from '@/utils/site'
 import { getToken } from '@/utils/token'
@@ -23,27 +23,29 @@ function needsToken(url: string): boolean {
  * 请求拦截器
  */
 export function requestInterceptor(url: string, config: RequestInit): RequestInit {
-  // 构建请求头
-  const configHeaders = (config.headers as Record<string, string>) || {}
-  const headers: Record<string, string> = {
-    ...REQUEST_HEADERS,
-    ...configHeaders,
+  // 构建请求头（只添加必需的请求头）
+  const headers: Record<string, string> = {}
+
+  // 1. Content-Type（只在有 body 的请求中添加）
+  if (config.body) {
+    headers['Content-Type'] = 'application/json'
   }
 
-  // 获取 Site（从 URL 路由参数）
+  // 2. Site（必需，后端用于识别站点）
   const site = getSite()
-  
-  // 添加 Site 请求头
   headers['Site'] = site
 
-  // 添加 Token（从当前 Site 的 Token 存储中获取）
+  // 3. Authorization（仅在需要认证的接口添加）
   if (needsToken(url)) {
     const token = getToken()
     if (token) {
-      // 注意：后端需要的是直接的 Token，不需要 Bearer 前缀
       headers['Authorization'] = token
     }
   }
+
+  // 合并用户自定义的请求头
+  const configHeaders = (config.headers as Record<string, string>) || {}
+  Object.assign(headers, configHeaders)
 
   // 打印请求日志
   if (ENABLE_REQUEST_LOG) {

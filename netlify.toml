@@ -1,0 +1,45 @@
+# Netlify 配置文件
+
+[build]
+  command = "npm install -g pnpm && pnpm install && pnpm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+# 生产环境配置（main 分支）
+[context.production]
+  command = "npm install -g pnpm && pnpm install && pnpm run build"
+  
+# 开发环境配置（develop 分支）
+[context.develop]
+  command = "npm install -g pnpm && pnpm install && pnpm run build"
+  
+# 分支预览配置
+[context.branch-deploy]
+  command = "npm install -g pnpm && pnpm install && pnpm run build"
+
+# API 代理配置（通过 Netlify Functions）
+# 注意：API 路径必须放在 SPA 路由之前
+[[redirects]]
+  from = "/v3/*"
+  to = "/.netlify/functions/api/v3/:splat"
+  status = 200
+  
+[[redirects]]
+  from = "/v2/*"
+  to = "/.netlify/functions/api/v2/:splat"
+  status = 200
+  
+[[redirects]]
+  from = "/v1/*"
+  to = "/.netlify/functions/api/v1/:splat"
+  status = 200
+
+# SPA 路由支持（必须放在最后，匹配所有其他路径）
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -119,11 +119,17 @@ export default defineConfig(({ mode }) => {
         target: 'http://47.84.135.181:8888',
         changeOrigin: true,
         rewrite: (path) => path,
+        timeout: 60000, // 增加超时时间到 60 秒
         // 配置代理请求头
         configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.error('[Proxy Error]', err.message)
+          })
           proxy.on('proxyReq', (proxyReq, req, res) => {
-            // 确保代理请求带上所有必要的请求头
             console.log('[Proxy]', req.method, req.url)
+          })
+          proxy.on('proxyRes', (proxyRes, req, res) => {
+            console.log('[Proxy Response]', proxyRes.statusCode, req.url)
           })
         },
       },
@@ -131,10 +137,12 @@ export default defineConfig(({ mode }) => {
         target: 'http://47.84.135.181:8888',
         changeOrigin: true,
         rewrite: (path) => path,
-        // 配置代理请求头
+        timeout: 60000,
         configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.error('[Proxy Error v2]', err.message)
+          })
           proxy.on('proxyReq', (proxyReq, req, res) => {
-            // 确保代理请求带上所有必要的请求头
             console.log('[Proxy v2]', req.method, req.url)
           })
         },
@@ -143,10 +151,12 @@ export default defineConfig(({ mode }) => {
         target: 'http://47.84.135.181:8888',
         changeOrigin: true,
         rewrite: (path) => path,
-        // 配置代理请求头
+        timeout: 60000,
         configure: (proxy, options) => {
+          proxy.on('error', (err, req, res) => {
+            console.error('[Proxy Error v1]', err.message)
+          })
           proxy.on('proxyReq', (proxyReq, req, res) => {
-            // 确保代理请求带上所有必要的请求头
             console.log('[Proxy v1]', req.method, req.url)
           })
         },

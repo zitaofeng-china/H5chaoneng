@@ -39,9 +39,6 @@ export const NO_TOKEN_URLS: (string | RegExp)[] = [
   '/v3/register',
   '/v3/reset_password',
   '/v3/change_password', // 修改密码不需要 Token，只需要 Site
-  '/auth/register',
-  '/auth/send-code',
-  '/auth/reset-password',
 ]
 
 // 请求头配置

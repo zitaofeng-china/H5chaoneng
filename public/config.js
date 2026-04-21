@@ -6,7 +6,11 @@
  */
 window.__APP_CONFIG__ = {
   // API 基础 URL
-  // 开发环境：留空使用 Vite 代理（避免 CORS 问题）
-  // 生产环境：留空使用 Netlify 代理，或填写实际后端地址
-  API_BASE_URL: ''  // 留空使用 Netlify 代理
+  // 留空（推荐）：使用相对路径，配合 Nginx 代理（同源，无 CORS 问题）
+  // 填写地址：直连后端（跨域，需要后端配置 CORS）
+  // 
+  // 示例：
+  // API_BASE_URL: ''                              // 使用 Nginx 代理（推荐）
+  // API_BASE_URL: ''                              // 直连后端（需要后端支持 CORS）
+  API_BASE_URL: ''
 }
