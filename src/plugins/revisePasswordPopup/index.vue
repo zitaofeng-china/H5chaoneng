@@ -19,18 +19,6 @@
         ref="revisePasswordFormRef"
         class="login-form"
       >
-        <el-form-item :label="t('revisePassword.account')" prop="email">
-          <div class="input-wrapper">
-            <el-input
-              v-model="revisePasswordForm.email"
-              :placeholder="t('revisePassword.accountPlaceholder')"
-              size="large"
-              class="custom-input"
-            >
-            </el-input>
-          </div>
-        </el-form-item>
-
         <el-form-item :label="t('revisePassword.oldPassword')" prop="password">
           <div class="input-wrapper">
             <el-input
@@ -40,6 +28,7 @@
               size="large"
               class="custom-input"
               show-password
+              autocomplete="off"
             >
             </el-input>
           </div>
@@ -54,6 +43,7 @@
               size="large"
               class="custom-input"
               show-password
+              autocomplete="new-password"
             >
             </el-input>
           </div>
@@ -62,7 +52,7 @@
           type="primary"
           size="large"
           class="login-btn"
-          @click="handleLogin"
+          @click="onChangePassword"
           :loading="loading"
         >
           {{ t('revisePassword.button') }}
@@ -73,80 +63,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue'
-import type { FormInstance, FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
+import { useRevisePassword } from '@/hooks/useRevisePassword'
+import type { RevisePasswordEmits } from './types'
 
 defineOptions({
   name: 'RevisePasswordPopup',
 })
-interface RevisePasswordForm {
-  email: string
-  password: string
-  newPassword: string
-}
 
 const { t } = useI18n()
+const emit = defineEmits<RevisePasswordEmits>()
 
-const visible = ref(false)
-const loading = ref(false)
-const revisePasswordFormRef = ref<FormInstance>()
-
-const revisePasswordForm = reactive<RevisePasswordForm>({
-  email: '13600000000',
-  password: '',
-  newPassword: '',
-})
-
-const rules = computed<FormRules<RevisePasswordForm>>(() => ({
-  email: [{ required: true, message: t('login.emailRequired'), trigger: 'blur' }],
-  password: [
-    { required: true, message: t('revisePassword.oldPasswordPlaceholder'), trigger: 'blur' },
-    { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
-  ],
-  newPassword: [
-    { required: true, message: t('revisePassword.newPasswordPlaceholder'), trigger: 'blur' },
-    { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
-  ],
-}))
-
-const emit = defineEmits<{
-  close: []
-}>()
+const {
+  visible,
+  loading,
+  revisePasswordForm,
+  revisePasswordFormRef,
+  rules,
+  handleChangePassword,
+  open,
+  close,
+} = useRevisePassword()
 
 const handleClose = async () => {
-  visible.value = false
-  visible.value = false
-  await revisePasswordFormRef.value?.resetFields()
+  await close()
+  emit('close')
 }
 
-const handleLogin = async () => {
-  if (!revisePasswordFormRef.value) return
-
-  try {
-    await revisePasswordFormRef.value.validate()
-    loading.value = true
-
-    setTimeout(() => {
-      ElMessage.success(t('login.loginSuccess'))
-      visible.value = false
-      emit('close')
-      loading.value = false
-    }, 1000)
-  } catch (error) {
-    console.error('【ERROR INFO】:', error)
-  } finally {
-    loading.value = false
+const onChangePassword = async () => {
+  const success = await handleChangePassword()
+  if (success) {
+    await handleClose()
   }
 }
 
-const open = () => {
-  visible.value = true
-}
-
-const close = () => {
-  visible.value = false
-}
 defineExpose({
   open,
   close,
@@ -155,102 +105,5 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-.revise-dialog {
-  .revise-title {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--theme-text-black);
-  }
-
-  .input-wrapper {
-    width: 100%;
-  }
-
-  .login-btn {
-    margin-top: 10px;
-    width: 100%;
-    height: 50px;
-    font-size: 18px;
-    font-weight: 600;
-    border-radius: 8px;
-    background: var(--theme-bg-blue);
-    border: none;
-    color: var(--theme-text-white);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(64, 158, 255, 0.35);
-    }
-
-    &:active {
-      transform: translateY(0);
-      box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
-    }
-
-    &.is-loading {
-      opacity: 0.8;
-    }
-
-    :deep(.el-icon) {
-      margin-right: 6px;
-    }
-  }
-
-  :deep(.el-form-item) {
-    &:first-child {
-      .el-input__inner {
-        font-weight: 600;
-      }
-    }
-  }
-
-  :deep(.el-form-item__label) {
-    color: var(--theme-text-muted);
-    font-weight: 600;
-
-    &::before {
-      display: none;
-    }
-  }
-
-  :deep(.el-dialog) {
-    border-radius: 8px;
-    padding: 24px;
-  }
-
-  :deep(.el-dialog__title) {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--theme-text-black);
-  }
-
-  :deep(.el-dialog__close) {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--theme-text-black);
-  }
-
-  :deep(.el-dialog__header.show-close) {
-    padding-right: 0;
-  }
-
-  :deep(.el-dialog__headerbtn) {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    top: 24px;
-    right: 24px;
-    background: var(--theme-gray-bg-light);
-  }
-}
-
-@media (max-width: 768px) {
-  :deep(.el-dialog) {
-    --el-dialog-width: 90% !important;
-  }
-}
+@use './styles.scss';
 </style>

@@ -21,11 +21,17 @@
     "trx": "TRX",
     "usdt": "USDT",
     "day": "일",
+    "hour": "시간",
     "purchase": "건",
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "충전"
+    "recharge": "충전",
+    "loadFailed": "로드 실패",
+    "loadFailedHint": "네트워크 연결을 확인하거나 나중에 다시 시도하세요",
+    "retry": "재시도",
+    "checkWalletAddress": "이체 시 지갑 주소를 확인해주세요",
+    "pleaseLogin": "먼저 로그인해주세요"
   },
   "nav": {
     "home": "홈",
@@ -34,7 +40,7 @@
     "services": "서비스",
     "contact": "문의하기",
     "energyRental": "에너지 대여",
-    "quickRent": "빠른 대여",
+    "quickRent": "플래시 에너지 대여",
     "rentByTime": "시간당 대여",
     "rentByCount": "건수당 대여",
     "contractFlash": "계약 즉시 교환",
@@ -44,7 +50,8 @@
     "features": "특징",
     "howItWorks": "작동 방식",
     "fee": "수수료",
-    "contactUs": "문의하기"
+    "contactUs": "문의하기",
+    "userInfo": "사용자 정보"
   },
   "home": {
     "title": "즉시 에너지 대여",
@@ -57,9 +64,12 @@
     "rentNowMessage": "즉시 대여 후 에너지 {energy}가 5초 이내에 귀하의 주소에 추가됩니다",
     "savedAddress": "저장된 주소",
     "selectSavedAddress": "저장된 주소를 선택하세요",
+    "noSavedAddress": "주소 없음",
     "saveAddress": "주소 저장",
-    "quickRent": "빠른 대여",
-    "saveTip": "해당 주소를 선택하면 1건의 에너지를 빠르게 대여할 수 있습니다, '빠른 대여'를 클릭하면 즉시 대여됩니다",
+    "deleteAddressTitle": "주소 삭제",
+    "deleteAddressConfirm": "주소 {address}를 삭제하시겠습니까?",
+    "quickRent": "플래시 에너지 대여",
+    "saveTip": "해당 주소를 선택하면 1건의 에너지를 빠르게 대여할 수 있습니다, '플래시 에너지 대여'를 클릭하면 즉시 대여됩니다",
     "addressLabel": "주소",
     "whyChooseUs": "왜 우리를 선택해야 하나요",
     "subtitle": "안전하고 빠르며 저렴한 스마트 컨트랙트 스왑 서비스를 제공하여, 고객님의 암호화폐 환전을 더욱 편리하게 만들어 드립니다.",
@@ -128,6 +138,7 @@
     "viewFaq": "자주 묻는 질문 보기"
   },
   "transferRental": {
+    "transferTemplate": "{price}TRX 이체 = {count}건 획득",
     "transfer35": "3.5TRX 이체 = 1건 획득",
     "transfer7": "7TRX 이체 = 2건 획득",
     "transfer14": "14TRX 이체 = 4건 획득",
@@ -140,7 +151,7 @@
     "noUsdtTip": "USDT가 없는 주소로 이체에는 두 배의 에너지가 필요합니다",
     "expiryTip": "1시간 이내에 에너지를 사용해주세요, 그렇지 않으면 만료되어 회수됩니다",
     "amountTip": "해당 금액의 TRX를 반드시 이체해주세요, 그렇지 않으면 대여가 실패합니다",
-    "addressTip": "이체时请核对准确的能量租赁钱包地址",
+    "addressTip": "이체 시 정확한 에너지 대여 지갑 주소를 확인해주세요",
     "walletAddress": "대여 지갑 주소"
   },
   "kindTips": {
@@ -160,22 +171,27 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. 모든 권리 보유"
+    "copyright": "© 2026 GAS711. 모든 권리 보유",
+    "rightsReserved": "모든 권리 보유"
   },
   "lease": {
     "byTime": "시간당 대여",
     "byCount": "건수당 대여",
-    "selectCount1Hour": "건수를 선택해주세요, 1시간 유효",
-    "selectCount3Days": "건수를 선택해주세요, 3일 유효",
-    "selectCount1Day": "건수를 선택해주세요, 1일 유효",
-    "selectCount7Days": "건수를 선택해주세요, 7일 유효",
-    "selectCount15Hours": "건수를 선택해주세요, 15시간 유효",
-    "selectCount30Days": "건수를 선택해주세요, 30일 유효",
+    "selectDuration": "기간 선택",
+    "selectQuantity": "수량 선택",
+    "selectCount1Hour": "1시간 유효",
+    "selectCount3Hours": "3시간 유효",
+    "selectCount1Day": "1일 유효",
+    "selectCount3Days": "3일 유효",
+    "selectCount7Days": "7일 유효",
+    "selectCount15Days": "15일 유효",
+    "selectCount30Days": "30일 유효",
     "rentalDetails": "대여 상세정보",
     "unitPrice": "단가",
     "count": "건수",
     "totalPrice": "총 가격",
     "energy": "에너지",
+    "singleEnergy": "단위당 에너지",
     "validity": "유효기간",
     "walletAddress": "대여 지갑 주소",
     "enterAddress": "주소를 입력해주세요",
@@ -188,6 +204,10 @@
     "100Count": "100건",
     "200Count": "200건",
     "custom": "사용자 지정",
+    "customCount": "사용자 지정 수량",
+    "enterCustomCount": "사용자 지정 수량을 입력해주세요",
+    "maxCountHint": "잔액에 따라 최대 {max}건까지 구매 가능합니다",
+    "exceedMaxCount": "최대 구매 가능 건수 {max}를 초과하여 자동 조정되었습니다",
     "trxUnit": "TRX",
     "dayUnit": "일",
     "wUnit": "W"
@@ -200,6 +220,10 @@
     "enterAddress": "주소를 입력해주세요",
     "rentNowButton": "지금 대여",
     "usdtBuy": "USDT 구매",
+    "usdtPaymentTitle": "USDT 결제",
+    "usdtTip1": "{amount} USDT 이체 = 1건 구매 획득",
+    "usdtTip2": "여러 건 구매 시 해당하는 USDT 배수를 이체해주세요",
+    "usdtTip3": "금액에 주의하세요, 잘못된 금액은 1시간 에너지 배송으로 처리됩니다",
     "tips1": "1건 에너지 구매 = 130000",
     "tips2": "시간 제한 없음, 이체 시 1건 차감",
     "tips3": "24시간 이체 없으면 1건 차감",
@@ -211,9 +235,26 @@
     "historyUsed": "과거 사용량",
     "todayUsed": "오늘 사용량",
     "deleteHosting": "호스팅 삭제",
+    "orderId": "주문 ID",
+    "createdAt": "생성 시간",
+    "noAddresses": "호스팅 주소가 없습니다",
+    "enterValidAddress": "유효한 주소를 입력하세요",
+    "addSuccess": "{count}개의 호스팅 주소를 추가했습니다",
+    "addPartialSuccess": "{success}개 성공, {fail}개 실패",
+    "addFailed": "호스팅 주소 추가 실패",
+    "deleteConfirm": "호스팅 주소 {address}를 삭제하시겠습니까?",
+    "deleteConfirmTitle": "호스팅 주소 삭제",
+    "deleteConfirmMessage": "호스팅 주소 {address}를 삭제하시겠습니까? 이 작업은 취소할 수 없습니다.",
+    "deleteSuccess": "호스팅 주소 삭제 성공",
+    "deleteFailed": "호스팅 주소 삭제 실패",
+    "addressNotActivated": "다음 주소가 활성화되지 않았습니다. 활성화 페이지로 이동하시겠습니까?",
+    "goToActivate": "활성화하러 가기",
+    "addingAddresses": "주소 {current}/{total} 추가 중",
     "address": "호스팅할 주소",
     "enterAddresses": "주소를 입력해주세요, 여러 주소는 영어 쉼표로 구분하거나 줄당 하나씩",
     "confirm": "확인",
+    "use65000Energy": "65000 에너지 사용",
+    "use131000Energy": "131000 에너지 사용",
     "tips1": "호스팅 모드 사용 시 30TRX 이상의 잔액 필요",
     "tips2": "호스팅된 주소는 항상 13.1W 에너지를 유지합니다",
     "tips3": "호스팅된 주소는 USDT 이체당 1회 비용 청구 (계정 잔액 차감)",
@@ -245,7 +286,13 @@
     "tips2": "24시간 이체 없으면 1건 차감",
     "tips3": "거래소 지갑으로 이체하지 마세요",
     "tips4": "이체 시 정확한 에너지 대여 지갑 주소를 확인해주세요",
-    "tips5": "잘못 이체或其他 질문 시 고객 서비스에 연락하세요",
+    "tips5": "잘못 이체하거나 기타 질문이 있으시면 고객 서비스에 연락하세요",
+    "minUsdtError": "최소 교환 금액은 {min} USDT입니다",
+    "maxUsdtError": "최대 교환 금액은 {max} USDT입니다",
+    "minTrxError": "최소 교환 금액은 {min} TRX입니다",
+    "maxTrxError": "최대 교환 금액은 {max} TRX입니다",
+    "minExchange": "최소 {min}부터 교환",
+    "maxExchange": "최대 {max}",
     "usdtMinTip": "최소 2 USDT, 최대 70000 USDT",
     "trxMinTip": "최소 10 TRX, 최대 100000 TRX"
   },
@@ -257,6 +304,12 @@
     "activationNotice": "활성화 알림",
     "activationSuccessCount": "활성화된 주소 수",
     "activationTotalCount": "주소 수량",
+    "skippedCount": "건너뜀",
+    "allSuccess": "{count}개 주소를 성공적으로 활성화했습니다",
+    "partialSuccess": "{activated}개 주소를 성공적으로 활성화했습니다, {skipped}개 이미 활성화된 주소를 건너뛰었습니다",
+    "allSkipped": "모든 주소가 이미 활성화되어 있습니다",
+    "allFailed": "활성화 실패",
+    "activationFailed": "활성화 실패",
     "tips1": "일괄 활성화는 최대 1000개 주소까지",
     "tips2": "활성화된 주소는 활성화 비용 청구 안함"
   },
@@ -264,7 +317,8 @@
     "title": "비용 안내",
     "65000Energy": "65000 에너지 사용: 3TRX/건",
     "131000Energy": "131000 에너지 사용: 5TRX/건",
-    "activationPrice": "활성화 단가: 1.2 TRX"
+    "activationPrice": "활성화 단가: 1.2 TRX",
+    "activationPriceLabel": "활성화 단가"
   },
   "login": {
     "title": "로그인",
@@ -279,6 +333,7 @@
     "passwordRequired": "비밀번호를 입력해주세요",
     "passwordMinLength": "비밀번호는 6자 이상이어야 합니다",
     "loginSuccess": "로그인 성공",
+    "loginFailed": "로그인 실패",
     "logout": "로그아웃"
   },
   "register": {
@@ -291,7 +346,11 @@
     "registerButton": "등록",
     "usernameRequired": "사용자명을 입력해주세요",
     "telegramRequired": "TG 사용자명을 입력해주세요",
-    "registerSuccess": "등록 성공"
+    "registerSuccess": "등록 성공",
+    "registerFailed": "등록 실패",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다",
+    "registerSuccessButLoginFailed": "등록 성공, 하지만 자동 로그인 실패. 수동으로 로그인해주세요",
+    "registerAndLoginSuccess": "등록 성공, 자동으로 로그인되었습니다"
   },
   "reset": {
     "title": "비밀번호 재설정",
@@ -302,7 +361,8 @@
     "confirmPassword": "비밀번호 확인",
     "resetButton": "재설정 확인",
     "codeSent": "인증코드가 이메일로 발송되었습니다",
-    "enterEmailFirst": "먼저 이메일을 입력해주세요"
+    "enterEmailFirst": "먼저 이메일을 입력해주세요",
+    "enterPasswordFirst": "먼저 새 비밀번호를 입력해주세요"
   },
   "recharge": {
     "title": "계정 충전",
@@ -313,7 +373,57 @@
     "rechargeAddress": "수령 주소",
     "scanQrcode": "QR 코드 스캔하여 충전",
     "minTransfer": "1TRX 초과 금액이면 자유롭게 이체 가능",
-    "checkAddress": "이체 시 주소를 확인해주세요"
+    "checkAddress": "이체 시 주소를 확인해주세요",
+    "customAmount": "TRX 충전 금액을 사용자 정의하려면 클릭",
+    "enterCustomAmount": "충전 금액을 입력하세요 (최소 1 TRX)",
+    "minAmount": "최소 충전 금액은 1 TRX이며, 소수점 이하 두 자리까지 지원",
+    "confirmAmount": "충전 금액 확인",
+    "rechargeAmount": "충전 금액",
+    "changeAmount": "금액 변경",
+    "transferExactAmount": "다음 주소로 {amount} TRX를 이체해주세요",
+    "finalAmountNote": "클릭하여 금액 복사, 소수점에 주의하세요",
+    "copyAmount": "금액 복사",
+    "copyAmountSuccess": "금액이 클립보드에 복사되었습니다",
+    "invalidAmount": "유효한 충전 금액을 입력하세요",
+    "createOrderFailed": "주문 생성 실패",
+    "noAddressReturned": "충전 주소를 가져오지 못했습니다",
+    "loadingHint": "충전 주문을 생성하는 중입니다. 잠시 기다려 주세요...",
+    "transferDeadline": "{time} 이전에 송금을 완료해 주세요"
+  },
+  "error": {
+    "unknown": "알 수 없는 오류",
+    "badRequest": "요청 매개변수 오류",
+    "badGateway": "게이트웨이 오류",
+    "serviceUnavailable": "서비스 일시적으로 사용 불가",
+    "maintenance": "시스템 유지보수 중, 나중에 다시 시도해주세요",
+    "paramsError": "매개변수 오류",
+    "notFound": "요청한 리소스를 찾을 수 없습니다",
+    "pageNotFound": "페이지를 찾을 수 없습니다",
+    "pageNotFoundDesc": "죄송합니다, 찾으시는 페이지가 존재하지 않거나 대리 링크를 통해 액세스해야 합니다"
+  },
+  "network": {
+    "error": "네트워크 연결 실패, 네트워크 설정을 확인해주세요",
+    "timeout": "요청 시간 초과, 나중에 다시 시도해주세요"
+  },
+  "http": {
+    "badRequest": "요청 매개변수 오류",
+    "unauthorized": "인증되지 않음, 먼저 로그인하세요",
+    "forbidden": "접근 금지",
+    "notFound": "요청한 리소스를 찾을 수 없습니다",
+    "timeout": "요청 시간 초과",
+    "internalServerError": "서버 내부 오류",
+    "badGateway": "게이트웨이 오류",
+    "serviceUnavailable": "서비스 일시적으로 사용 불가",
+    "gatewayTimeout": "게이트웨이 시간 초과",
+    "unknownError": "HTTP 오류 {code}"
+  },
+  "server": {
+    "error": "서버 오류, 나중에 다시 시도해주세요"
+  },
+  "auth": {
+    "tokenExpired": "로그인이 만료되었습니다, 다시 로그인해주세요",
+    "tokenInvalid": "로그인 정보가 유효하지 않습니다, 다시 로그인해주세요",
+    "permissionDenied": "권한 부족, 액세스 거부"
   },
   "revisePassword": {
     "title": "비밀번호 변경",
@@ -323,13 +433,19 @@
     "oldPasswordPlaceholder": "비밀번호를 입력해주세요",
     "newPassword": "새 비밀번호",
     "newPasswordPlaceholder": "새 비밀번호를 입력해주세요",
-    "button": "비밀번호 변경"
+    "button": "비밀번호 변경",
+    "success": "비밀번호가 성공적으로 변경되었습니다",
+    "failed": "비밀번호 변경에 실패했습니다",
+    "logoutTip": "비밀번호가 변경되었습니다. 다시 로그인해주세요",
+    "passwordSameError": "새 비밀번호는 이전 비밀번호와 같을 수 없습니다"
   },
   "formValidation": {
     "unitPriceRequired": "단가를 입력해주세요",
     "unitPriceInvalid": "유효한 숫자를 입력해주세요",
     "addressRequired": "주소를 입력해주세요",
     "addressTooShort": "주소는 10자 이상이어야 합니다",
+    "addressAlreadyExists": "이 주소는 이미 존재합니다",
+    "enterValidAddress": "유효한 주소를 입력하세요",
     "selectAddress": "주소를 선택해주세요",
     "selectEnergy": "에너지 수량을 선택해주세요",
     "walletRequired": "대여 지갑 주소를 입력해주세요",
@@ -338,12 +454,25 @@
     "energyMustBePositive": "에너지는 0보다 커야 합니다",
     "validityMustBePositive": "유효기간은 0보다 커야 합니다",
     "countMustBePositive": "건수는 0보다 커야 합니다",
+    "countRequired": "수량을 입력해주세요",
+    "countMustBeNumber": "수량은 숫자여야 합니다",
+    "countTooLarge": "수량은 1000을 초과할 수 없습니다",
     "unitMustBePositive": "단위는 0보다 커야 합니다",
     "rentalSuccess": "대여 시작, 지불",
     "addressSaveSuccess": "주소가 성공적으로 저장되었습니다",
     "enterAddressToSave": "저장할 주소를 입력해주세요",
     "enterOrSelectAddress": "주소를 입력하거나 선택해주세요",
     "renting": "{energy} 에너지 대여 중...",
-    "energyAdded": "{energy} 에너지가 성공적으로 주소에 추가되었습니다"
+    "energyAdded": "{energy} 에너지가 성공적으로 주소에 추가되었습니다",
+    "customCountSet": "사용자 지정 수량이 성공적으로 설정되었습니다"
+  },
+  "welcome": {
+    "importantNotice": "중요 안내",
+    "iAcknowledge": "위의 모든 정보를 읽고 확인했습니다",
+    "confirmAndContinue": "확인 후 계속",
+    "notice1": "이체 전 반드시 수령 주소를 확인하세요",
+    "notice2": "에너지 대여에는 유효기간이 있습니다. 유효기간 내에 사용해주세요",
+    "notice3": "거래 전 거래 주의사항을 주의 깊게 읽어주세요",
+    "notice4": "문제가 발생하면 즉시 고객 서비스에 연락해주세요"
   }
 }

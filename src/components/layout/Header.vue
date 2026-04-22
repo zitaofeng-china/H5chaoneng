@@ -11,31 +11,37 @@
       </div>
 
       <div class="nav-links">
-        <div class="dropdown-popper-box" :class="{ 'is-active': isActiveHome }">
-          <el-dropdown :teleported="false">
-            <div class="nav-link">
-              <div class="nav-link-text">
+        <!-- 能量租赁下拉菜单 -->
+        <div class="dropdown-popper-box energy-rental-dropdown" :class="{ 'is-active': isActiveHome }">
+          <el-dropdown 
+            trigger="click"
+            :hide-on-click="true"
+            placement="bottom-start"
+            popper-class="energy-rental-popper-unique"
+          >
+            <span class="nav-link">
+              <span class="nav-link-text">
                 {{ $t('nav.energyRental') }}
-              </div>
+              </span>
               <el-icon class="el-icon--right"><IEpArrowDown /></el-icon>
-            </div>
+            </span>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="energy-rental-menu-unique">
                 <el-dropdown-item
                   :class="{ 'is-active': isActive('/') }"
                   @click="handleToRouter('/')"
                 >
-                  {{ $t('nav.quickRent') }}
+                  {{ $t('home.title') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('/lease/time') }"
-                  @click="handleToRouter('/lease/time')"
+                  :class="{ 'is-active': isActive('/lease-time') }"
+                  @click="handleToRouter('/lease-time')"
                 >
                   {{ $t('nav.rentByTime') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('/lease/count') }"
-                  @click="handleToRouter('/lease/count')"
+                  :class="{ 'is-active': isActive('/lease-count') }"
+                  @click="handleToRouter('/lease-count')"
                 >
                   {{ $t('nav.rentByCount') }}
                 </el-dropdown-item>
@@ -44,39 +50,42 @@
           </el-dropdown>
         </div>
 
-        <a
-          href="#"
+        <div
           class="nav-link"
           :class="{ 'is-active': isActive('/contract') }"
           @click="handleToRouter('/contract')"
         >
           {{ $t('nav.contractFlash') }}
-        </a>
-        <a
-          href="#"
+        </div>
+        <div
           class="nav-link"
           :class="{ 'is-active': isActive('/hosting') }"
           @click="handleToRouter('/hosting')"
         >
           {{ $t('nav.smartHosting') }}
-        </a>
-        <a
-          href="#"
+        </div>
+        <div
           class="nav-link"
           :class="{ 'is-active': isActive('/activation') }"
           @click="handleToRouter('/activation')"
         >
           {{ $t('nav.batchActivation') }}
-        </a>
+        </div>
 
-        <div class="dropdown-popper-box">
-          <el-dropdown :teleported="false">
-            <div class="nav-link">
-              <div class="nav-link-text">{{ $t('nav.faq') }}</div>
+        <!-- 常见问题下拉菜单 -->
+        <div class="dropdown-popper-box faq-dropdown" :class="{ 'is-active': isActiveFaq }">
+          <el-dropdown 
+            trigger="click"
+            :hide-on-click="true"
+            placement="bottom-start"
+            popper-class="faq-popper-unique"
+          >
+            <span class="nav-link">
+              <span class="nav-link-text">{{ $t('nav.faq') }}</span>
               <el-icon class="el-icon--right"><IEpArrowDown /></el-icon>
-            </div>
+            </span>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="faq-menu-unique">
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#question') }"
                   @click.stop="handleToRouter('/', '#question')"
@@ -103,7 +112,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#contact') }"
-                  @click.stop="handleOpenToTelegram('GasVipBot')"
+                  @click.stop="handleOpenToTelegram(tgAdmin)"
                 >
                   {{ $t('nav.contactUs') }}
                 </el-dropdown-item>
@@ -118,16 +127,16 @@
             name="header-tg"
             width="24"
             height="24"
-            @click="handleOpenToTelegram('GasVipBot')"
+            @click="handleOpenToTelegram(botName)"
           />
         </div>
-        <div class="dropdown-popper-box">
-          <el-dropdown :teleported="false" @command="handleLanguageChange">
+        <div class="dropdown-popper-box lang-dropdown">
+          <el-dropdown trigger="hover" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
               <SvgIcon name="header-lang" class="icon-svg" width="24" height="24" />
             </div>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="lang-menu">
                 <el-dropdown-item
                   :class="{ 'is-active': localLang === key }"
                   v-for="(value, key) in lang"
@@ -143,21 +152,24 @@
 
         <div class="balance-display">
           <div class="balance-info">
-            <SvgIcon name="header-USDT" width="24" height="24" />
-            <div class="balance-amount">1077</div>
+            <SvgIcon name="trx" width="24" height="24" />
+            <div class="balance-amount">{{ trxBalance }}</div>
           </div>
           <div class="recharge-btn" @click="handleRechange">
             <div class="text">{{ $t('common.recharge') }}</div>
           </div>
         </div>
 
-        <div class="dropdown-popper-box" v-if="isLogin">
-          <el-dropdown :teleported="false">
+        <div class="dropdown-popper-box user-dropdown" v-if="isLogin">
+          <el-dropdown trigger="hover" :teleported="true" popper-class="user-popper">
             <div class="user-icon">
               <img :src="Avatar" alt="" class="user-avatar" />
             </div>
             <template #dropdown>
-              <el-dropdown-menu>
+              <el-dropdown-menu class="user-menu">
+                <el-dropdown-item @click.stop="handleUserInfo">
+                  {{ $t('nav.userInfo') }}
+                </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleModifyPassword">
                   {{ $t('revisePassword.title') }}
                 </el-dropdown-item>
@@ -191,7 +203,7 @@
       <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
-        :class="{ 'is-active': isActive('/') }"
+        :class="{ 'is-active': isActive('') }"
       >
         <div class="menu-wrap">
           <div
@@ -203,15 +215,15 @@
           </div>
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('/lease/time') }"
-            @click="handleToRouter('/lease/time')"
+            :class="{ 'is-active': isActive('/lease-time') }"
+            @click="handleToRouter('/lease-time')"
           >
             {{ $t('nav.rentByTime') }}
           </div>
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('/lease/count') }"
-            @click="handleToRouter('/lease/count')"
+            :class="{ 'is-active': isActive('/lease-count') }"
+            @click="handleToRouter('/lease-count')"
           >
             {{ $t('nav.rentByCount') }}
           </div>
@@ -274,7 +286,7 @@
           <div
             class="menu-item"
             :class="{ 'is-active': isHashActive('#contact') }"
-            @click.stop="handleOpenToTelegram('GasVipBot')"
+            @click.stop="handleOpenToTelegram(tgAdmin)"
           >
             {{ $t('nav.contactUs') }}
           </div>
@@ -285,23 +297,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, getCurrentInstance, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-plus'
 import Avatar from '@/assets/icons/header/avatar.svg'
-import { useLogin } from '@/hooks/useLogin'
-import { useRecharge } from '@/hooks/useRecharge'
-import { useRevisePassword } from '@/hooks/useRevisePassword'
-import { useRegister } from '@/hooks/useRegister'
 import { useUserStore } from '@/stores/useUserStore'
 import { useLangStore } from '@/stores/useLangStore'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { storeToRefs } from 'pinia'
 import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
+import { getSite } from '@/utils/site'
 
 defineOptions({
   name: 'LayoutHeader',
 })
+
+const instance = getCurrentInstance()
+const proxy = instance?.proxy as any // 使用 any 避免类型检查问题
+
+const siteStore = useSiteStore()
+const { tgAdmin, botName } = storeToRefs(siteStore)
 
 const localLang = ref(useLangStore().currentLocale)
 const activeNames = ref(['1'])
@@ -320,22 +337,40 @@ const lang = reactive({
   'zh-TW': '繁體中文',
 })
 
-const isActiveHome = computed(() =>
-  ['/', '/lease/time', '/lease/count'].includes(route.path as string),
-)
+// 判断是否在能量租赁相关页面（首页、按时间租用、按笔数租用）
+const isActiveHome = computed(() => {
+  const site = getSite()
+  const energyRentalPaths = [`/${site}/`, `/${site}/lease-time`, `/${site}/lease-count`]
+  // 只有在这些页面且没有hash时才激活能量租赁下拉菜单
+  // 如果有hash，说明用户在查看FAQ部分，不应该激活能量租赁
+  return energyRentalPaths.includes(route.path as string) && !route.hash
+})
 
-const isLogin = computed(() => useUserStore().isLogin)
+// 判断是否应该激活常见问题下拉菜单
+const isActiveFaq = computed(() => {
+  const site = getSite()
+  // 只有在首页且有hash时才激活常见问题下拉菜单
+  return route.path === `/${site}/` && !!route.hash
+})
+
+const userStore = useUserStore()
+const isLogin = computed(() => userStore.isLogin)
+
+// 获取用户 TRX 余额
+const trxBalance = computed(() => {
+  if (!userStore.userInfo) return '0'
+  return userStore.userInfo.trx_balance || '0'
+})
 
 const route = useRoute()
 const router = useRouter()
-const { open } = useLogin()
-const { open: openRegister } = useRegister()
-const { open: openRecharge } = useRecharge()
-const { open: openRevisePassword } = useRevisePassword()
-const { logout } = useUserStore()
+const { logout } = userStore
 
 const isActive = (path: string) => {
-  return route.path === path
+  const site = getSite()
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const fullPath = `/${site}${normalizedPath}`
+  return route.path === fullPath
 }
 
 const isHashActive = (hash: string) => {
@@ -343,7 +378,16 @@ const isHashActive = (hash: string) => {
 }
 
 const handleToRouter = (path: string, hash?: string) => {
-  router.push({ path, hash })
+  const site = getSite()
+  
+  // 构建完整路径：/:site/path
+  // 确保 path 以 / 开头
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`
+  const fullPath = `/${site}${normalizedPath}`
+  
+  console.log('[Header] 跳转路由:', { site, path, normalizedPath, fullPath, hash })
+  
+  router.push({ path: fullPath, hash })
 
   if (isMobile()) {
     handleMenu('router')
@@ -364,23 +408,59 @@ const handleLanguageChange = (local: Locale) => {
 }
 
 const handleLogin = () => {
-  open()
+  proxy?.$loginPopup?.open()
 }
 
 const handleRegister = () => {
-  openRegister()
+  proxy?.$registerPopup?.open()
 }
 
 const handleRechange = () => {
-  openRecharge()
+  proxy?.$rechargePopup?.open()
 }
 
 const handleModifyPassword = () => {
-  openRevisePassword()
+  proxy?.$revisePasswordPopup?.open()
 }
 
-const handleLogout = () => {
-  logout()
+const handleUserInfo = () => {
+  proxy?.$userInfoPopup?.open()
+}
+
+const handleLogout = async () => {
+  try {
+    await logout()
+    
+    // 保存需要保留的数据
+    const locale = localStorage.getItem('locale')
+    
+    // 清除所有可能的Cookie
+    document.cookie.split(';').forEach((c) => {
+      document.cookie = c
+        .replace(/^ +/, '')
+        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
+    })
+    
+    // 恢复语言设置
+    if (locale) {
+      localStorage.setItem('locale', locale)
+    }
+    
+    // 保留当前URL的站点信息并重定向到首页
+    const currentPath = window.location.pathname
+    const segments = currentPath.split('/').filter(Boolean)
+    const site = segments[0] || ''
+    
+    // 跳转到首页，保留站点信息
+    window.location.href = site ? `/${site}/` : '/'
+  } catch (error) {
+    console.error('退出登录失败:', error)
+    // 即使失败也要刷新页面
+    const currentPath = window.location.pathname
+    const segments = currentPath.split('/').filter(Boolean)
+    const site = segments[0] || ''
+    window.location.href = site ? `/${site}/` : '/'
+  }
 }
 
 const handleChange = (val: CollapseModelValue) => {
@@ -395,6 +475,22 @@ const handleCollapseDestroy = () => {
 const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   isMenu.value = type !== 'menu' ? false : !isMenu.value
 }
+
+// 监听窗口大小变化，当从移动端切换到PC端时自动关闭菜单
+const handleResize = () => {
+  if (!isMobile() && isMenu.value) {
+    isMenu.value = false
+    activeNames.value = ['1']
+  }
+}
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -459,6 +555,7 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
     gap: 5px;
     transition: color 0.3s ease;
     padding: 5px 0;
+    cursor: pointer;
 
     &:active,
     &:focus {
@@ -534,6 +631,16 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   }
 }
 
+/* 能量租赁下拉菜单样式 */
+.energy-rental-popper-unique {
+  z-index: 2000 !important;
+}
+
+/* 常见问题下拉菜单样式 */
+.faq-popper-unique {
+  z-index: 2001 !important;
+}
+
 :deep(.el-dropdown-menu) {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
@@ -563,6 +670,42 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 :deep(.el-tooltip__trigger:focus-visible),
 :deep(.el-dropdown-link:focus) {
   outline: none !important;
+}
+
+@media (max-width: 768px) {
+  :deep(.el-dropdown-menu) {
+    min-width: 100px !important;
+    max-width: 140px !important;
+    padding: 4px 2px !important;
+    max-height: 180px !important;
+    overflow-y: auto !important;
+    
+    /* 美化滚动条 */
+    &::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.05);
+      border-radius: 2px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  :deep(.el-dropdown-menu__item) {
+    font-size: 12px !important;
+    padding: 6px 10px !important;
+    min-height: 32px !important;
+    line-height: 1.3 !important;
+  }
 }
 
 .right-section {
@@ -657,25 +800,44 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 }
 
 .collapse-container {
-  max-height: 100vh;
+  max-height: calc(100vh - 44px);
   position: fixed;
   top: 44px;
   left: 0;
   right: 0;
   z-index: 99;
   background: var(--theme-bg-white);
-  border-radius: 0 0 15px 15px;
-  box-shadow: 0px 3px 6px 0px var(--theme-shadow-soft);
+  border-radius: 0 0 12px 12px;
+  box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   overflow-y: auto;
 
+  /* 美化滚动条 */
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.02);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.15);
+    }
+  }
+
   :deep(.el-collapse) {
-    padding: 16px;
-    border-radius: 0 0 15px 15px;
+    padding: 10px 14px 14px;
+    border-radius: 0 0 12px 12px;
   }
 
   :deep(.el-collapse-item__arrow) {
     transform: rotateZ(90deg);
+    transition: transform 0.3s ease;
 
     &.is-active {
       transform: rotateZ(-90deg);
@@ -683,21 +845,34 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   }
 
   :deep(.el-collapse-item__header) {
-    border-radius: 4px;
+    height: 44px;
+    line-height: 44px;
+    border-radius: 6px;
     border-bottom-color: transparent;
-    background: rgba(2, 15, 45, 0.05);
+    background: rgba(2, 15, 45, 0.03);
+    transition: all 0.3s ease;
+    margin-bottom: 2px;
+
+    &:hover {
+      background: rgba(2, 15, 45, 0.05);
+    }
   }
 
   :deep(.el-collapse-item__content) {
-    padding-bottom: 0;
+    padding-bottom: 6px;
+    padding-top: 2px;
   }
 
   :deep(.el-collapse-item) {
     &:not(:last-child) {
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
     &.is-active {
+      .el-collapse-item__header {
+        background: rgba(54, 211, 153, 0.08);
+      }
+
       .el-collapse-item__title {
         color: var(--theme-text-green);
       }
@@ -707,13 +882,21 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
       .el-icon {
         display: none;
       }
+
+      .el-collapse-item__header {
+        cursor: pointer;
+        
+        &:active {
+          background: rgba(2, 15, 45, 0.08);
+        }
+      }
     }
   }
 
   :deep(.el-collapse-item__title) {
     font-size: 14px;
-    font-weight: bold;
-    padding: 0 12px;
+    font-weight: 600;
+    padding: 0 14px;
     color: var(--theme-text-gray);
   }
 
@@ -723,17 +906,50 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 
   .menu-wrap {
     color: var(--theme-text-gray);
+    padding: 0 6px;
 
     .menu-item {
-      padding: 0 20px;
+      padding: 0 14px;
       height: 40px;
       display: flex;
       align-items: center;
-      font-size: 14px;
-      font-weight: bold;
+      font-size: 13px;
+      font-weight: 500;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 7px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 3px;
+        background: var(--theme-text-green);
+        border-radius: 50%;
+        opacity: 0;
+        transition: all 0.3s ease;
+      }
+
+      &:hover {
+        background: rgba(2, 15, 45, 0.03);
+      }
+
+      &:active {
+        background: rgba(2, 15, 45, 0.06);
+      }
 
       &.is-active {
         color: var(--theme-text-green);
+        background: rgba(54, 211, 153, 0.08);
+        font-weight: 600;
+
+        &::before {
+          opacity: 1;
+        }
       }
     }
   }
@@ -741,61 +957,232 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 
 @media (max-width: 768px) {
   .navbar {
-    height: 44px;
+    height: 54px;
     padding: 0 10px;
   }
 
-  .no-login {
-    gap: 3px;
+  .navbar-container {
+    gap: 6px;
   }
+
+  .no-login {
+    gap: 4px;
+    font-size: 12px;
+  }
+  
   .logo-icon {
     display: none;
   }
 
   .m-logo-icon {
     display: flex;
+    
+    img {
+      height: 30px;
+      width: auto;
+    }
   }
+  
   .nav-links {
     display: none;
   }
 
   .right-section {
-    gap: 4px;
-  }
+    gap: 5px;
+    flex: 1;
+    justify-content: flex-end;
 
-  .right-section {
     .info-wrap {
-      min-width: 32px;
-      height: 32px;
+      min-width: 34px;
+      height: 34px;
+      
+      svg {
+        width: 19px;
+        height: 19px;
+      }
     }
   }
 
   .balance-display {
-    min-width: 32px;
-    height: 32px;
+    min-width: auto;
+    height: 34px;
+    padding: 0 3px;
+    font-size: 12px;
 
     .balance-info {
-      padding-left: 0;
-      padding-right: 8px;
+      padding: 0 6px 0 5px;
+      gap: 4px;
+      
+      svg {
+        width: 18px;
+        height: 18px;
+      }
+    }
+    
+    .balance-amount {
+      font-size: 12px;
+      max-width: 55px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
   }
 
   .recharge-btn {
-    min-width: auto;
+    min-width: 56px;
+    height: 26px;
+    padding: 0 6px;
+    
     .text {
-      max-width: 40px;
+      font-size: 11px;
       white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
+    }
+  }
+
+  .user-icon {
+    .user-avatar {
+      width: 34px;
+      height: 34px;
     }
   }
 
   .no-login {
     .btn {
-      max-width: 40px;
+      font-size: 12px;
       white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow: hidden;
+    }
+  }
+  
+  .collapse-container {
+    top: 54px;
+    max-height: calc(100vh - 54px);
+  }
+}
+
+/* 适配 300px 超小屏幕 */
+@media (max-width: 360px) {
+  .navbar {
+    height: 50px;
+    padding: 0 6px;
+  }
+
+  .navbar-container {
+    gap: 4px;
+  }
+
+  .m-logo-icon {
+    img {
+      height: 26px;
+    }
+  }
+
+  .right-section {
+    gap: 3px;
+
+    .info-wrap {
+      min-width: 30px;
+      height: 30px;
+      
+      svg {
+        width: 17px;
+        height: 17px;
+      }
+    }
+  }
+
+  .balance-display {
+    height: 30px;
+    padding: 0 2px;
+    font-size: 11px;
+
+    .balance-info {
+      padding: 0 4px 0 3px;
+      gap: 3px;
+      
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+    
+    .balance-amount {
+      font-size: 11px;
+      max-width: 45px;
+    }
+  }
+
+  .recharge-btn {
+    min-width: 48px;
+    height: 24px;
+    padding: 0 4px;
+    
+    .text {
+      font-size: 10px;
+    }
+  }
+
+  .user-icon {
+    .user-avatar {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  .no-login {
+    gap: 3px;
+    font-size: 11px;
+
+    .btn {
+      font-size: 11px;
+    }
+  }
+  
+  .collapse-container {
+    top: 50px;
+    max-height: calc(100vh - 50px);
+
+    :deep(.el-collapse) {
+      padding: 8px 10px 10px;
+    }
+
+    :deep(.el-collapse-item__header) {
+      height: 40px;
+      line-height: 40px;
+      border-radius: 5px;
+      margin-bottom: 2px;
+    }
+
+    :deep(.el-collapse-item__title) {
+      font-size: 13px;
+      padding: 0 10px;
+    }
+
+    :deep(.el-collapse-item__content) {
+      padding-bottom: 4px;
+      padding-top: 2px;
+    }
+
+    :deep(.el-collapse-item) {
+      &:not(:last-child) {
+        margin-bottom: 4px;
+      }
+    }
+
+    .menu-wrap {
+      padding: 0 4px;
+
+      .menu-item {
+        padding: 0 10px;
+        height: 36px;
+        font-size: 12px;
+        border-radius: 4px;
+
+        &::before {
+          left: 5px;
+          width: 2.5px;
+          height: 2.5px;
+        }
+      }
     }
   }
 }

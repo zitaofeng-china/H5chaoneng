@@ -21,11 +21,17 @@
     "trx": "TRX",
     "usdt": "USDT",
     "day": "يوم",
+    "hour": "ساعة",
     "purchase": "مرة",
     "w": "واط",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "إعادة الشحن"
+    "recharge": "إعادة الشحن",
+    "loadFailed": "فشل التحميل",
+    "loadFailedHint": "يرجى التحقق من اتصال الشبكة أو المحاولة لاحقاً",
+    "retry": "إعادة المحاولة",
+    "checkWalletAddress": "يرجى التحقق من عنوان المحفظة أثناء التحويل",
+    "pleaseLogin": "الرجاء تسجيل الدخول أولاً"
   },
   "nav": {
     "home": "الرئيسية",
@@ -34,7 +40,7 @@
     "services": "الخدمات",
     "contact": "اتصل بنا",
     "energyRental": "تأجير الطاقة",
-    "quickRent": "تأجير سريع",
+    "quickRent": "استئجار الطاقة الفوري",
     "rentByTime": "التأجير بالوقت",
     "rentByCount": "التأجير بالعدد",
     "contractFlash": "تبادل فلاش العقد",
@@ -44,7 +50,8 @@
     "features": "الميزات",
     "howItWorks": "كيف يعمل",
     "fee": "الرسوم",
-    "contactUs": "اتصل بنا"
+    "contactUs": "اتصل بنا",
+    "userInfo": "معلومات المستخدم"
   },
   "home": {
     "title": "تأجير طاقة فلاش",
@@ -57,9 +64,12 @@
     "rentNowMessage": "بعد التأجير الآن، سيتم إضافة الطاقة {energy} إلى عنوانك خلال 5 ثوانٍ",
     "savedAddress": "العنوان المحفوظ",
     "selectSavedAddress": "الرجاء اختيار العنوان المحفوظ",
+    "noSavedAddress": "لا يوجد عنوان",
     "saveAddress": "حفظ العنوان",
-    "quickRent": "تأجير سريع",
-    "saveTip": "اختر العنوان المقابل لتأجير 1 وحدة طاقة بسرعة، انقر على 'تأجير سريع' للتأجير فوراً",
+    "deleteAddressTitle": "حذف العنوان",
+    "deleteAddressConfirm": "هل أنت متأكد من حذف العنوان {address}؟",
+    "quickRent": "استئجار الطاقة الفوري",
+    "saveTip": "اختر العنوان المقابل لتأجير 1 وحدة طاقة بسرعة، انقر على 'استئجار الطاقة الفوري' للتأجير فوراً",
     "addressLabel": "العنوان",
     "whyChooseUs": "لماذا تختارنا",
     "subtitle": "نحن نقدم خدمة تأجير طاقة آمنة وسريعة وبدون تكاليف",
@@ -128,6 +138,7 @@
     "viewFaq": "عرض الأسئلة الشائعة"
   },
   "transferRental": {
+    "transferTemplate": "تحويل {price}TRX = الحصول على {count} وحدة",
     "transfer35": "تحويل 3.5TRX = الحصول على 1 وحدة",
     "transfer7": "تحويل 7TRX = الحصول على 2 وحدات",
     "transfer14": "تحويل 14TRX = الحصول على 4 وحدات",
@@ -160,22 +171,27 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. جميع الحقوق محفوظة"
+    "copyright": "© 2026 GAS711. جميع الحقوق محفوظة",
+    "rightsReserved": "جميع الحقوق محفوظة"
   },
   "lease": {
     "byTime": "التأجير بالوقت",
     "byCount": "التأجير بالعدد",
-    "selectCount1Hour": "الرجاء اختيار العدد، صالح لمدة ساعة",
-    "selectCount3Days": "الرجاء اختيار العدد، صالح لمدة 3 أيام",
-    "selectCount1Day": "الرجاء اختيار العدد، صالح لمدة يوم",
-    "selectCount7Days": "الرجاء اختيار العدد، صالح لمدة 7 أيام",
-    "selectCount15Hours": "الرجاء اختيار العدد، صالح لمدة 15 ساعة",
-    "selectCount30Days": "الرجاء اختيار العدد، صالح لمدة 30 يوماً",
+    "selectDuration": "اختر المدة",
+    "selectQuantity": "اختر الكمية",
+    "selectCount1Hour": "صالح لمدة ساعة",
+    "selectCount3Hours": "صالح لمدة 3 ساعات",
+    "selectCount1Day": "صالح لمدة يوم",
+    "selectCount3Days": "صالح لمدة 3 أيام",
+    "selectCount7Days": "صالح لمدة 7 أيام",
+    "selectCount15Days": "صالح لمدة 15 يوماً",
+    "selectCount30Days": "صالح لمدة 30 يوماً",
     "rentalDetails": "تفاصيل التأجير",
     "unitPrice": "سعر الوحدة",
     "count": "العدد",
     "totalPrice": "السعر الإجمالي",
     "energy": "الطاقة",
+    "singleEnergy": "الطاقة لكل وحدة",
     "validity": "فترة الصلاحية",
     "walletAddress": "عنوان محفظة التأجير",
     "enterAddress": "الرجاء إدخال العنوان",
@@ -188,6 +204,10 @@
     "100Count": "100 وحدة",
     "200Count": "200 وحدة",
     "custom": "مخصص",
+    "customCount": "كمية مخصصة",
+    "enterCustomCount": "الرجاء إدخال كمية مخصصة",
+    "maxCountHint": "بناءً على رصيدك، يمكنك شراء ما يصل إلى {max} معاملة",
+    "exceedMaxCount": "تجاوز الحد الأقصى لعدد المعاملات {max}، تم التعديل تلقائيًا",
     "trxUnit": "TRX",
     "dayUnit": "يوم",
     "wUnit": "واط"
@@ -200,6 +220,10 @@
     "enterAddress": "الرجاء إدخال العنوان",
     "rentNowButton": "تأجير الآن",
     "usdtBuy": "شراء بـ USDT",
+    "usdtPaymentTitle": "دفع USDT",
+    "usdtTip1": "تحويل {amount} USDT = الحصول على 1 عملية شراء",
+    "usdtTip2": "لعمليات الشراء المتعددة، قم بتحويل المضاعف المقابل من USDT",
+    "usdtTip3": "يرجى ملاحظة المبلغ، سيتم التعامل مع المبلغ الخاطئ على أنه تسليم طاقة لمدة ساعة واحدة",
     "tips1": "شراء 1 وحدة طاقة = 130000",
     "tips2": "لا يوجد حد زمني، يخصم وحدة واحدة لكل تحويل",
     "tips3": "بدون تحويل لمدة 24 ساعة يخصم وحدة واحدة",
@@ -211,9 +235,26 @@
     "historyUsed": "المستخدم تاريخياً",
     "todayUsed": "المستخدم اليوم",
     "deleteHosting": "حذف الاستضافة",
+    "orderId": "معرف الطلب",
+    "createdAt": "وقت الإنشاء",
+    "noAddresses": "لا توجد عناوين مستضافة",
+    "enterValidAddress": "الرجاء إدخال عناوين صالحة",
+    "addSuccess": "تمت إضافة {count} عنوان استضافة بنجاح",
+    "addPartialSuccess": "نجح {success}، فشل {fail}",
+    "addFailed": "فشل في إضافة عنوان الاستضافة",
+    "deleteConfirm": "هل أنت متأكد من حذف عنوان الاستضافة {address}؟",
+    "deleteConfirmTitle": "حذف عنوان الاستضافة",
+    "deleteConfirmMessage": "هل أنت متأكد من حذف عنوان الاستضافة {address}؟ لا يمكن التراجع عن هذا الإجراء.",
+    "deleteSuccess": "تم حذف عنوان الاستضافة بنجاح",
+    "deleteFailed": "فشل في حذف عنوان الاستضافة",
+    "addressNotActivated": "العناوين التالية غير مفعلة. الانتقال إلى صفحة التفعيل؟",
+    "goToActivate": "الذهاب للتفعيل",
+    "addingAddresses": "إضافة العنوان {current}/{total}",
     "address": "العنوان المراد استضافته",
     "enterAddresses": "الرجاء إدخال العناوين، عدة عناوين مفصولة بفاصلة إنجليزية أو عنوان واحد لكل سطر",
     "confirm": "تأكيد",
+    "use65000Energy": "استخدام 65000 طاقة",
+    "use131000Energy": "استخدام 131000 طاقة",
     "tips1": "يتطلب استخدام وضع الاستضافة رصيداً أكبر من 30TRX",
     "tips2": "عناوينك المستضافة ستحافظ دائماً على 13.1W طاقة",
     "tips3": "تُحصَّل رسوم واحدة من عناوين مستضافة لكل تحويل USDT (خصم من رصيد الحساب)",
@@ -246,6 +287,12 @@
     "tips3": "لا تستخدم محفظة الصرف للتحويل",
     "tips4": "يرجى التحقق من عنوان محفظة تأجير الطاقة بدقة أثناء التحويل",
     "tips5": "في حالة التحويل الخاطئ أو أسئلة أخرى، يرجى الاتصال بخدمة العملاء",
+    "minUsdtError": "الحد الأدنى لمبلغ التبادل {min} USDT",
+    "maxUsdtError": "الحد الأقصى لمبلغ التبادل {max} USDT",
+    "minTrxError": "الحد الأدنى لمبلغ التبادل {min} TRX",
+    "maxTrxError": "الحد الأقصى لمبلغ التبادل {max} TRX",
+    "minExchange": "الحد الأدنى {min} للتبادل",
+    "maxExchange": "الحد الأقصى {max}",
     "usdtMinTip": "الحد الأدنى 2 USDT، الحد الأقصى 70000 USDT",
     "trxMinTip": "الحد الأدنى 10 TRX، الحد الأقصى 100000 TRX"
   },
@@ -257,6 +304,12 @@
     "activationNotice": "إشعار التنشيط",
     "activationSuccessCount": "عدد العناوين المنشطة",
     "activationTotalCount": "عدد العناوين",
+    "skippedCount": "تم التخطي",
+    "allSuccess": "تم تنشيط {count} عنوان بنجاح",
+    "partialSuccess": "تم تنشيط {activated} عنوان بنجاح، تم تخطي {skipped} عنوان منشط بالفعل",
+    "allSkipped": "جميع العناوين منشطة بالفعل",
+    "allFailed": "فشل التنشيط",
+    "activationFailed": "فشل التنشيط",
     "tips1": "الحد الأقصى 1000 عنوان للتنشيط الدفعي",
     "tips2": "العناوين المنشطة لا تتحمل رسوم تنشيط"
   },
@@ -264,7 +317,8 @@
     "title": "شرح الرسوم",
     "65000Energy": "استخدام 65000 طاقة: 3TRX/وحدة",
     "131000Energy": "استخدام 131000 طاقة: 5TRX/وحدة",
-    "activationPrice": "سعر التنشيط: 1.2 TRX"
+    "activationPrice": "سعر التنشيط: 1.2 TRX",
+    "activationPriceLabel": "سعر التنشيط"
   },
   "login": {
     "title": "تسجيل الدخول",
@@ -279,6 +333,7 @@
     "passwordRequired": "الرجاء إدخال كلمة المرور",
     "passwordMinLength": "كلمة المرور لا يمكن أن تكون أقل من 6 أحرف",
     "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "loginFailed": "فشل تسجيل الدخول",
     "logout": "تسجيل الخروج"
   },
   "register": {
@@ -291,7 +346,11 @@
     "registerButton": "التسجيل",
     "usernameRequired": "الرجاء إدخال اسم المستخدم",
     "telegramRequired": "الرجاء إدخال اسم مستخدم TG",
-    "registerSuccess": "تم التسجيل بنجاح"
+    "registerSuccess": "تم التسجيل بنجاح",
+    "registerFailed": "فشل التسجيل",
+    "passwordMismatch": "كلمات المرور غير متطابقة",
+    "registerSuccessButLoginFailed": "تم التسجيل بنجاح، لكن فشل تسجيل الدخول التلقائي. يرجى تسجيل الدخول يدويًا",
+    "registerAndLoginSuccess": "تم التسجيل بنجاح، تم تسجيل الدخول تلقائيًا"
   },
   "reset": {
     "title": "إعادة تعيين كلمة المرور",
@@ -302,7 +361,8 @@
     "confirmPassword": "تأكيد كلمة المرور",
     "resetButton": "تأكيد إعادة التعيين",
     "codeSent": "تم إرسال رمز التحقق إلى بريدك الإلكتروني",
-    "enterEmailFirst": "الرجاء إدخال البريد الإلكتروني أولاً"
+    "enterEmailFirst": "الرجاء إدخال البريد الإلكتروني أولاً",
+    "enterPasswordFirst": "الرجاء إدخال كلمة المرور الجديدة أولاً"
   },
   "recharge": {
     "title": "شحن الحساب",
@@ -313,7 +373,57 @@
     "rechargeAddress": "عنوان الاستلام",
     "scanQrcode": "امسح رمز QR للشحن",
     "minTransfer": "يمكن تحويل أي مبلغ أكبر من 1TRX",
-    "checkAddress": "يرجى التحقق من العنوان أثناء التحويل"
+    "checkAddress": "يرجى التحقق من العنوان أثناء التحويل",
+    "customAmount": "انقر لتخصيص مبلغ شحن TRX",
+    "enterCustomAmount": "الرجاء إدخال مبلغ الشحن (الحد الأدنى 1 TRX)",
+    "minAmount": "الحد الأدنى لمبلغ الشحن هو 1 TRX، يدعم منزلتين عشريتين",
+    "confirmAmount": "تأكيد مبلغ الشحن",
+    "rechargeAmount": "مبلغ الشحن",
+    "changeAmount": "تغيير المبلغ",
+    "transferExactAmount": "يرجى تحويل {amount} TRX إلى العنوان التالي",
+    "finalAmountNote": "انقر لنسخ المبلغ، يرجى ملاحظة النقطة العشرية",
+    "copyAmount": "نسخ المبلغ",
+    "copyAmountSuccess": "تم نسخ المبلغ إلى الحافظة",
+    "invalidAmount": "الرجاء إدخال مبلغ إعادة شحن صالح",
+    "createOrderFailed": "فشل في إنشاء الطلب",
+    "noAddressReturned": "فشل في الحصول على عنوان إعادة الشحن",
+    "loadingHint": "جاري إنشاء طلب إعادة الشحن، يرجى الانتظار...",
+    "transferDeadline": "يرجى إكمال التحويل قبل {time}"
+  },
+  "error": {
+    "unknown": "خطأ غير معروف",
+    "badRequest": "معاملات الطلب خاطئة",
+    "badGateway": "خطأ في البوابة",
+    "serviceUnavailable": "الخدمة غير متاحة مؤقتًا",
+    "maintenance": "النظام قيد الصيانة، يرجى المحاولة لاحقًا",
+    "paramsError": "خطأ في المعاملات",
+    "notFound": "المورد المطلوب غير موجود",
+    "pageNotFound": "الصفحة غير موجودة",
+    "pageNotFoundDesc": "عذرًا، الصفحة التي تبحث عنها غير موجودة أو تتطلب الوصول من خلال رابط وكيل"
+  },
+  "network": {
+    "error": "فشل الاتصال بالشبكة، يرجى التحقق من إعدادات الشبكة",
+    "timeout": "انتهت مهلة الطلب، يرجى المحاولة لاحقًا"
+  },
+  "http": {
+    "badRequest": "معاملات الطلب غير صحيحة",
+    "unauthorized": "غير مصرح، يرجى تسجيل الدخول أولاً",
+    "forbidden": "الوصول محظور",
+    "notFound": "المورد المطلوب غير موجود",
+    "timeout": "انتهت مهلة الطلب",
+    "internalServerError": "خطأ داخلي في الخادم",
+    "badGateway": "خطأ في البوابة",
+    "serviceUnavailable": "الخدمة غير متاحة مؤقتًا",
+    "gatewayTimeout": "انتهت مهلة البوابة",
+    "unknownError": "خطأ HTTP {code}"
+  },
+  "server": {
+    "error": "خطأ في الخادم، يرجى المحاولة لاحقًا"
+  },
+  "auth": {
+    "tokenExpired": "انتهت صلاحية تسجيل الدخول، يرجى تسجيل الدخول مرة أخرى",
+    "tokenInvalid": "معلومات تسجيل الدخول غير صالحة، يرجى تسجيل الدخول مرة أخرى",
+    "permissionDenied": "أذونات غير كافية، تم رفض الوصول"
   },
   "revisePassword": {
     "title": "تغيير كلمة المرور",
@@ -323,13 +433,19 @@
     "oldPasswordPlaceholder": "الرجاء إدخال كلمة المرور",
     "newPassword": "كلمة المرور الجديدة",
     "newPasswordPlaceholder": "الرجاء إدخال كلمة مرور جديدة",
-    "button": "تغيير كلمة المرور"
+    "button": "تغيير كلمة المرور",
+    "success": "تم تغيير كلمة المرور بنجاح",
+    "failed": "فشل تغيير كلمة المرور",
+    "logoutTip": "تم تغيير كلمة المرور، يرجى تسجيل الدخول مرة أخرى",
+    "passwordSameError": "لا يمكن أن تكون كلمة المرور الجديدة مطابقة للقديمة"
   },
   "formValidation": {
     "unitPriceRequired": "الرجاء إدخال سعر الوحدة",
     "unitPriceInvalid": "الرجاء إدخال رقم صالح",
     "addressRequired": "الرجاء إدخال العنوان",
     "addressTooShort": "طول العنوان لا يمكن أن يكون أقل من 10 أحرف",
+    "addressAlreadyExists": "هذا العنوان موجود بالفعل",
+    "enterValidAddress": "الرجاء إدخال عنوان صالح",
     "selectAddress": "الرجاء اختيار العنوان",
     "selectEnergy": "الرجاء اختيار كمية الطاقة",
     "walletRequired": "الرجاء إدخال عنوان محفظة التأجير",
@@ -338,12 +454,25 @@
     "energyMustBePositive": "الطاقة يجب أن تكون أكبر من 0",
     "validityMustBePositive": "فترة الصلاحية يجب أن تكون أكبر من 0",
     "countMustBePositive": "العدد يجب أن يكون أكبر من 0",
+    "countRequired": "الرجاء إدخال الكمية",
+    "countMustBeNumber": "الكمية يجب أن تكون رقمًا",
+    "countTooLarge": "الكمية لا يمكن أن تتجاوز 1000",
     "unitMustBePositive": "الوحدة يجب أن تكون أكبر من 0",
     "rentalSuccess": "بدء التأجير، دفع",
     "addressSaveSuccess": "تم حفظ العنوان بنجاح",
     "enterAddressToSave": "الرجاء إدخال العنوان للحفظ",
     "enterOrSelectAddress": "الرجاء إدخال أو اختيار العنوان",
     "renting": "جاري تأجير طاقة {energy}...",
-    "energyAdded": "تم إضافة طاقة {energy} إلى عنوانك بنجاح"
+    "energyAdded": "تم إضافة طاقة {energy} إلى عنوانك بنجاح",
+    "customCountSet": "تم تعيين الكمية المخصصة بنجاح"
+  },
+  "welcome": {
+    "importantNotice": "إشعار مهم",
+    "iAcknowledge": "لقد قرأت وأقر بجميع المعلومات أعلاه",
+    "confirmAndContinue": "تأكيد والمتابعة",
+    "notice1": "يرجى التحقق من عنوان الاستلام قبل التحويل",
+    "notice2": "تأجير الطاقة له حدود زمنية. استخدم خلال فترة الصلاحية",
+    "notice3": "يرجى قراءة إشعار المعاملة بعناية قبل التداول",
+    "notice4": "اتصل بخدمة العملاء فوراً إذا واجهت أي مشاكل"
   }
 }

@@ -1,0 +1,322 @@
+/**
+ * 登录弹窗样式
+ */
+@use '@/assets/styles/_mixins.scss' as *;
+
+.login-header {
+  padding: 0;
+}
+
+.login-dialog {
+  overflow: hidden;
+
+  :deep(.el-dialog) {
+    padding: 0px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  }
+
+  :deep(.el-dialog__header) {
+    display: none;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
+}
+
+.login-container {
+  display: flex;
+}
+
+.login-left {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+}
+
+.login-right {
+  flex: 1;
+  padding: 50px 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.login-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50px;
+
+  .login-title {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+  }
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+
+  .el-form-item {
+    margin-bottom: 24px;
+
+    &:last-of-type {
+      margin-bottom: 28px;
+    }
+
+    .input-wrapper {
+      flex: 1;
+      display: flex;
+      align-items: center;
+
+      &.code-wrapper {
+        gap: 12px;
+      }
+
+      .custom-input {
+        height: 50px;
+        flex: 1;
+
+        :deep(.el-input__wrapper) {
+          border-radius: 4px;
+          padding: 14px;
+          background: var(--theme-bg-white);
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        :deep(.el-input__inner) {
+          font-size: 14px;
+          color: #333;
+          font-weight: 400;
+
+          &::placeholder {
+            color: var(--theme-text-muted-gray);
+            font-size: 14px;
+            font-weight: 400;
+          }
+        }
+      }
+
+      .send-code-btn {
+        height: 50px;
+        padding: 0 20px;
+        font-size: 14px;
+        font-weight: 500;
+        border-radius: 4px;
+        background: var(--theme-bg-blue);
+        border: none;
+        color: var(--theme-text-white);
+        white-space: nowrap;
+        min-width: 100px;
+
+        &:hover:not(:disabled) {
+          background: var(--theme-bg-blue);
+          opacity: 0.9;
+        }
+
+        &:disabled {
+          background: #e0e0e0;
+          color: #999;
+          cursor: not-allowed;
+        }
+      }
+    }
+  }
+}
+
+.form-actions {
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+
+  :deep(.el-checkbox) {
+    height: auto;
+
+    .el-checkbox__label {
+      font-size: 14px;
+      color: var(--theme-text-gray);
+      font-weight: 400;
+      padding: 0 8px;
+    }
+
+    .el-checkbox__input.is-checked .el-checkbox__inner {
+      background-color: var(--theme-bg-blue);
+      border-color: var(--theme-bg-blue);
+    }
+  }
+
+  :deep(.el-link) {
+    font-size: 14px;
+    color: var(--theme-bg-blue);
+    text-decoration: none;
+    font-weight: 500;
+
+    &::after {
+      display: none;
+    }
+
+    &:hover {
+      color: var(--theme-bg-blue);
+      text-decoration: none;
+    }
+  }
+}
+
+.login-btn {
+  width: 100%;
+  height: 50px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 8px;
+  background: var(--theme-bg-blue);
+  border: none;
+  color: var(--theme-text-white);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(64, 158, 255, 0.35);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(64, 158, 255, 0.2);
+  }
+
+  &.is-loading {
+    opacity: 0.8;
+  }
+
+  :deep(.el-icon) {
+    margin-right: 6px;
+  }
+}
+
+.register-link {
+  display: flex;
+  justify-content: center;
+
+  :deep(.el-link) {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--theme-bg-blue);
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+// 移动端适配
+@media (max-width: 768px) {
+  .login-dialog {
+    :deep(.el-dialog) {
+      width: 100% !important;
+      max-width: 100%;
+      margin: 0;
+      border-radius: 0;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 0;
+    }
+  }
+
+  .login-container {
+    min-height: auto;
+    flex-direction: column;
+  }
+
+  .login-left {
+    display: block;
+    flex: none;
+    height: 240px;
+    
+    :deep(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .login-right {
+    padding: 24px 20px 32px;
+  }
+
+  .login-header {
+    margin-bottom: 24px;
+    text-align: center;
+
+    .login-title {
+      font-size: 20px;
+      font-weight: 600;
+    }
+  }
+
+  .login-form {
+    .el-form-item {
+      margin-bottom: 16px;
+
+      &:last-of-type {
+        margin-bottom: 20px;
+      }
+    }
+
+    .input-wrapper {
+      .custom-input {
+        height: 44px;
+
+        :deep(.el-input__wrapper) {
+          padding: 10px 12px;
+        }
+
+        :deep(.el-input__inner) {
+          font-size: 14px;
+        }
+      }
+
+      .send-code-btn {
+        height: 44px;
+        font-size: 13px;
+        padding: 0 16px;
+        min-width: 90px;
+      }
+    }
+  }
+
+  .form-actions {
+    margin-bottom: 24px;
+    font-size: 13px;
+
+    :deep(.el-checkbox__label) {
+      font-size: 13px;
+    }
+
+    :deep(.el-link) {
+      font-size: 13px;
+    }
+  }
+
+  .login-btn {
+    height: 44px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .register-link {
+    margin-top: 16px;
+
+    :deep(.el-link) {
+      font-size: 14px;
+      font-weight: 600;
+    }
+  }
+}
+

@@ -1,21 +1,11 @@
 <template>
   <div class="transfer-rental">
     <div class="top-banner">
-      <div class="banner-item">
+      <div class="banner-item" v-for="banner in priceBanners" :key="banner.count">
         <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer35') }}</div>
-      </div>
-      <div class="banner-item">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer7') }}</div>
-      </div>
-      <div class="banner-item">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer14') }}</div>
-      </div>
-      <div class="banner-item">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">{{ t('transferRental.transfer70') }}</div>
+        <div class="text">
+          {{ t('transferRental.transferTemplate', { price: banner.price, count: banner.count }) }}
+        </div>
       </div>
     </div>
 
@@ -24,22 +14,35 @@
       {{ t('transferRental.note') }}
     </div>
 
-    <div class="qr-section">
-      <div class="section-title">{{ t('transferRental.walletQrcode') }}</div>
-      <div class="qr-code">
-        <img :src="qrCode" alt="Wallet QR Code" class="qr-image" />
-      </div>
-      <div class="wallet-address">
-        <span class="address-text">{{ walletAddress }}</span>
-        <el-button
-          link
-          type="primary"
-          @click="copyAddress"
-          class="copy-button"
-          :loading="isCopying"
-        >
-          <SvgIcon name="transfer-copy" width="24" height="24" />
+    <!-- 二维码区域 -->
+    <div v-if="props.paymentAddress" class="qr-section-wrapper">
+      <QrCodeWithAddress
+        :address="props.paymentAddress"
+        :title="t('transferRental.walletQrcode')"
+        :tip="t('common.checkWalletAddress')"
+      />
+    </div>
+    <div v-else-if="loadingTimeout" class="error-section">
+      <div class="error-title">{{ t('transferRental.walletQrcode') }}</div>
+      <div class="error-placeholder">
+        <el-icon class="error-icon" :size="48">
+          <CircleClose />
+        </el-icon>
+        <div class="error-text">{{ t('common.loadFailed') }}</div>
+        <div class="error-hint">{{ t('common.loadFailedHint') }}</div>
+        <el-button type="primary" @click="handleRetry" class="retry-button">
+          <el-icon class="mr-2"><RefreshRight /></el-icon>
+          {{ t('common.retry') }}
         </el-button>
+      </div>
+    </div>
+    <div v-else class="loading-section">
+      <div class="loading-title">{{ t('transferRental.walletQrcode') }}</div>
+      <div class="loading-placeholder">
+        <el-icon class="is-loading" :size="40">
+          <Loading />
+        </el-icon>
+        <div class="loading-text">{{ t('common.loading') }}...</div>
       </div>
     </div>
 
@@ -48,18 +51,55 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useClipboard } from '@vueuse/core'
-import { useQRCode } from '@vueuse/integrations/useQRCode'
+import { storeToRefs } from 'pinia'
+import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
+import { usePriceStore } from '@/stores/usePriceStore'
+import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
+import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+
+interface Props {
+  paymentAddress?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  paymentAddress: '',
+})
 
 const { t } = useI18n()
+const priceStore = usePriceStore()
+const { priceData } = storeToRefs(priceStore)
 
-const walletAddress = ref('TMpHUncdDoCmaAADteBvSGBzRjAbXiB2pE')
-const isCopying = ref(false)
+const { loadingTimeout, resetTimer } = useAddressLoading({
+  address: () => props.paymentAddress,
+})
 
-const qrCode = useQRCode(walletAddress)
+const emit = defineEmits<{
+  retry: []
+}>()
+
+const handleRetry = () => {
+  resetTimer()
+  emit('retry')
+}
+
+// 动态计算按1小时价格购买的价格
+const hourlyPrice = computed(() => {
+  return Number.parseFloat(priceData.value?.time_1h || '5')
+})
+
+// 动态生成价格横幅（基于1小时价格）
+const priceBanners = computed(() => {
+  const price = hourlyPrice.value
+  return [
+    { count: 1, price: (price * 1).toFixed(1) },
+    { count: 2, price: (price * 2).toFixed(1) },
+    { count: 4, price: (price * 4).toFixed(1) },
+    { count: 20, price: (price * 20).toFixed(1) },
+  ]
+})
 
 const tips = computed(() => [
   t('transferRental.walletTips'),
@@ -68,22 +108,6 @@ const tips = computed(() => [
   t('transferRental.amountTip'),
   t('transferRental.addressTip'),
 ])
-
-const { copy } = useClipboard()
-
-const copyAddress = async () => {
-  isCopying.value = true
-  try {
-    await copy(walletAddress.value)
-    ElMessage.success(t('transferRental.copyAddress'))
-  } catch {
-    ElMessage.error(t('transferRental.copyFailed'))
-  } finally {
-    setTimeout(() => {
-      isCopying.value = false
-    }, 1000)
-  }
-}
 </script>
 
 <style lang="scss" scoped>
@@ -121,49 +145,86 @@ const copyAddress = async () => {
     gap: 6px;
   }
 
-  .qr-section {
+  .loading-section {
     text-align: center;
-    padding: 16px 0 18px;
+    padding: 32px 0;
+    background: rgba(2, 15, 45, 0.02);
+    border-radius: 8px;
+    margin: 16px 0;
 
-    .section-title {
+    .loading-title {
       font-size: 18px;
       font-weight: 700;
       color: var(--theme-text-black);
-      // margin-bottom: 14px;
+      margin-bottom: 24px;
     }
 
-    .qr-code {
-      width: 192px;
-      height: 192px;
-      margin: 0 auto;
+    .loading-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      padding: 40px 0;
 
-      .qr-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
+      .el-icon {
+        color: var(--theme-bg-blue);
+      }
+
+      .loading-text {
+        font-size: 14px;
+        color: var(--theme-text-muted);
       }
     }
+  }
 
-    .wallet-address {
-      margin-top: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      font-size: 14px;
+  .error-section {
+    text-align: center;
+    padding: 32px 0;
+    background: rgba(245, 108, 108, 0.05);
+    border-radius: 8px;
+    border: 1px dashed rgba(245, 108, 108, 0.3);
+    margin: 16px 0;
+
+    .error-title {
+      font-size: 18px;
+      font-weight: 700;
       color: var(--theme-text-black);
+      margin-bottom: 24px;
     }
 
-    .address-text {
-      font-family: 'Courier New', monospace;
-    }
+    .error-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 40px 0;
 
-    .copy-button {
-      padding: 0;
-      height: 18px;
+      .error-icon {
+        color: #F56C6C;
+        margin-bottom: 8px;
+      }
 
-      :deep(svg) {
+      .error-text {
+        font-size: 16px;
+        font-weight: 600;
+        color: #F56C6C;
+      }
+
+      .error-hint {
         font-size: 14px;
+        color: var(--theme-text-muted);
+        margin-bottom: 8px;
+      }
+
+      .retry-button {
+        margin-top: 8px;
+        border-radius: 6px;
+        padding: 10px 24px;
+        font-weight: 600;
+
+        .mr-2 {
+          margin-right: 6px;
+        }
       }
     }
   }
@@ -174,25 +235,94 @@ const copyAddress = async () => {
     .top-banner {
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 8px;
+      padding: 12px;
+      font-size: 13px;
     }
 
-    .qr-section {
-      padding: 12px 0 16px;
-    }
+    .banner-item {
+      gap: 6px;
+      width: 100%;
 
-    .qr-section {
-      .wallet-address {
-        display: initial;
+      svg {
+        flex-shrink: 0;
+      }
+
+      .text {
+        flex: 1;
+        line-height: 1.4;
       }
     }
 
-    .wallet-address {
-      flex-direction: column;
-      gap: 8px;
+    .instruction-note {
+      margin: 16px 0 12px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
 
-      .address-text {
-        text-align: center;
+    .qr-section-wrapper {
+      margin: 12px 0;
+    }
+
+    .loading-section {
+      padding: 24px 16px;
+      margin: 12px 0;
+
+      .loading-title {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .loading-placeholder {
+        padding: 32px 0;
+        gap: 12px;
+
+        .el-icon {
+          font-size: 36px;
+        }
+
+        .loading-text {
+          font-size: 13px;
+        }
+      }
+    }
+
+    .error-section {
+      padding: 24px 16px;
+      margin: 12px 0;
+
+      .error-title {
+        font-size: 16px;
+        margin-bottom: 20px;
+      }
+
+      .error-placeholder {
+        padding: 32px 0;
+        gap: 10px;
+
+        .error-icon {
+          font-size: 40px;
+          margin-bottom: 6px;
+        }
+
+        .error-text {
+          font-size: 15px;
+        }
+
+        .error-hint {
+          font-size: 13px;
+          margin-bottom: 6px;
+        }
+
+        .retry-button {
+          margin-top: 6px;
+          padding: 8px 20px;
+          font-size: 14px;
+
+          .mr-2 {
+            margin-right: 4px;
+          }
+        }
       }
     }
   }

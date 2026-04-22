@@ -4,7 +4,7 @@ import RevisePasswordPopupComponent from './index.vue'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
-    $rechargePopup: { open: () => void; close: () => void }
+    $revisePasswordPopup: { open: () => void; close: () => void }
   }
 }
 

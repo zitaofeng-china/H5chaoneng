@@ -1,7 +1,8 @@
 <template>
   <div class="time-rental-page">
     <div class="rental-wrapper">
-      <div class="selection-grid">
+      <!-- 桌面端：网格布局 -->
+      <div class="selection-grid" v-if="!isMobile">
         <div class="grid-row" v-for="(row, rIdx) in rows" :key="rIdx">
           <div class="row-label">
             <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
@@ -12,7 +13,47 @@
               v-for="(opt, idx) in row.options"
               :key="idx"
               :class="['pill', selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
-              @click="onSelect(rIdx, idx)"
+              @click="onSelect(rIdx, idx, opt)"
+            >
+              {{ opt }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 移动端：下拉选择时长 + 按钮选择数量 -->
+      <div class="mobile-selection" v-else>
+        <div class="selection-item">
+          <label class="selection-label">
+            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            {{ t('lease.selectDuration') }}
+          </label>
+          <el-select
+            v-model="mobileSelectedDuration"
+            :placeholder="t('lease.selectDuration')"
+            @change="onMobileDurationChange"
+            class="duration-select"
+          >
+            <el-option
+              v-for="(row, idx) in rows"
+              :key="idx"
+              :label="row.label"
+              :value="idx"
+            />
+          </el-select>
+        </div>
+
+        <div class="selection-item">
+          <label class="selection-label">
+            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            {{ t('lease.selectQuantity') }}
+          </label>
+          <div class="row-options">
+            <button
+              v-for="(opt, idx) in mobileCountOptions"
+              :key="idx"
+              :class="['pill', mobileSelectedCount === idx ? 'active' : '']"
+              @click="onMobileCountChange(idx, opt)"
             >
               {{ opt }}
             </button>
@@ -55,19 +96,20 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item :label="t('lease.energy')" prop="energy">
+          <el-form-item :label="t('lease.validity')" prop="validity">
+            <el-input v-model="validity" disabled class="m-input" v-if="isMobile">
+              <template #prefix>{{ t('lease.validity') }}</template>
+              <template #suffix> {{ validityUnit }} </template>
+            </el-input>
+            <el-input :model-value="validity + ' ' + validityUnit" disabled v-else />
+          </el-form-item>
+
+          <el-form-item :label="t('lease.singleEnergy')" prop="energy">
             <el-input v-model="energy" disabled class="m-input" v-if="isMobile">
-              <template #prefix v-if="isMobile">{{ t('lease.energy') }}</template>
+              <template #prefix v-if="isMobile">{{ t('lease.singleEnergy') }}</template>
               <template #suffix> {{ t('common.w') }} </template>
             </el-input>
             <el-input :model-value="energy + ' ' + t('common.w')" disabled v-else />
-          </el-form-item>
-
-          <el-form-item :label="t('lease.validity')" prop="validity">
-            <el-input :model-value="validity" :class="{ 'm-input': isMobile }" disabled>
-              <template #prefix v-if="isMobile">{{ t('lease.validity') }}</template>
-              <template #suffix> {{ t('common.day') }} </template>
-            </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.walletAddress')" prop="wallet">
@@ -82,6 +124,34 @@
         </el-form>
       </div>
     </div>
+
+    <!-- 自定义数量对话框 -->
+    <el-dialog
+      v-model="customDialogVisible"
+      :title="t('lease.customCount')"
+      width="400px"
+      :close-on-click-modal="false"
+      align-center
+    >
+      <el-form :model="customForm" :rules="customRules" ref="customFormRef" label-width="80px">
+        <el-form-item :label="t('lease.count')" prop="count">
+          <el-input
+            v-model.number="customForm.count"
+            type="number"
+            :placeholder="t('lease.enterCustomCount')"
+            min="1"
+            clearable
+            @keyup.enter="confirmCustomCount"
+          >
+            <template #suffix>{{ t('common.purchase') }}</template>
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <el-button @click="customDialogVisible = false">{{ t('common.cancel') }}</el-button>
+        <el-button type="primary" @click="confirmCustomCount">{{ t('common.confirm') }}</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -90,6 +160,10 @@ import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { useOrderCreation } from '@/hooks/useOrderCreation'
+import { OrderKind } from '@/api/modules/order/types'
 import { storeToRefs } from 'pinia'
 
 defineOptions({ name: 'TimeRental' })
@@ -106,93 +180,146 @@ interface RentalForm {
 const { t } = useI18n()
 
 const commonStore = useCommonStore()
+const priceStore = usePriceStore()
+const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
+const { priceData } = storeToRefs(priceStore)
+const { userInfo } = storeToRefs(userStore)
+const { loading: orderLoading, createOrder } = useOrderCreation()
 
 const rows = computed(() => [
   {
     label: t('lease.selectCount1Hour'),
+    validity: 1,
+    validityUnit: 'hour',
     options: [
       `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      t('lease.custom'),
-    ],
-  },
-  {
-    label: t('lease.selectCount3Days'),
-    options: [
-      `2${t('common.purchase')}`,
-      `5${t('common.purchase')}`,
-      `10${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[0] ? `${customCounts.value[0]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
     label: t('lease.selectCount1Day'),
+    validity: 1,
+    validityUnit: 'day',
     options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[1] ? `${customCounts.value[1]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
     label: t('lease.selectCount3Days'),
+    validity: 3,
+    validityUnit: 'day',
     options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[2] ? `${customCounts.value[2]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
     label: t('lease.selectCount7Days'),
+    validity: 7,
+    validityUnit: 'day',
     options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[3] ? `${customCounts.value[3]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
-    label: t('lease.selectCount15Hours'),
+    label: t('lease.selectCount15Days'),
+    validity: 15,
+    validityUnit: 'day',
     options: [
+      `1${t('common.purchase')}`,
+      `2${t('common.purchase')}`,
+      `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `30${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      `100${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[4] ? `${customCounts.value[4]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
   {
     label: t('lease.selectCount30Days'),
+    validity: 30,
+    validityUnit: 'day',
     options: [
+      `1${t('common.purchase')}`,
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      `50${t('common.purchase')}`,
-      t('lease.custom'),
+      customCounts.value[5] ? `${customCounts.value[5]}${t('common.purchase')}` : t('lease.custom'),
     ],
   },
 ])
 
 const selecteIndex = ref<[number, number]>([0, 0])
 
-const unitPrice = ref(1.9)
+// 移动端选择状态
+const mobileSelectedDuration = ref(0) // 选中的时长索引
+const mobileSelectedCount = ref(0) // 选中的数量索引
+
+// 移动端数量选项
+const mobileCountOptions = computed(() => {
+  return rows.value[mobileSelectedDuration.value]?.options || []
+})
+
+// 自定义对话框状态
+const customDialogVisible = ref(false)
+const customFormRef = ref<FormInstance>()
+const customForm = reactive({
+  count: 1,
+})
+const customRowIndex = ref<number>(0)
+
+// 存储自定义数量
+const customCounts = ref<Record<number, number>>({})
+
+// 根据选中的行（时长）动态获取单价
+const unitPrice = computed(() => {
+  const [rowIdx] = selecteIndex.value
+  if (!priceData.value) return 1.9
+  
+  // 根据行索引映射到对应的价格字段
+  const priceMap = [
+    priceData.value.time_1h,  // 1小时
+    priceData.value.time_1d,  // 1天
+    priceData.value.time_3d,  // 3天
+    priceData.value.time_7d,  // 7天
+    priceData.value.time_15d, // 15天
+    priceData.value.time_30d, // 30天
+  ]
+  
+  return parseFloat(priceMap[rowIdx] || priceData.value.time_1h)
+})
 const count = computed(() => {
-  const first =
-    rows.value[selecteIndex.value[0]]?.options[selecteIndex.value[1]] || `1${t('common.purchase')}`
-  const num = parseInt(String(first).replace(/[^0-9]/g, '')) || 1
+  const [rowIdx, colIdx] = selecteIndex.value
+  const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
+
+  // 从选项文本中提取数字
+  const num = parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
   return num
 })
 
-const energy = ref(13.0)
-const validity = ref(3)
+const energy = ref(13.1)
+const validity = computed(() => {
+  const [rowIdx] = selecteIndex.value
+  return rows.value[rowIdx]?.validity || 1
+})
+const validityUnit = computed(() => {
+  const [rowIdx] = selecteIndex.value
+  const unit = rows.value[rowIdx]?.validityUnit || 'day'
+  return unit === 'hour' ? t('common.hour') : t('common.day')
+})
 const wallet = ref('')
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
@@ -280,6 +407,26 @@ const rules = computed<FormRules<RentalForm>>(() => ({
   ],
 }))
 
+// 自定义表单验证规则
+const customRules = computed<FormRules>(() => ({
+  count: [
+    { required: true, message: t('formValidation.countRequired'), trigger: 'blur' },
+    { type: 'number', message: t('formValidation.countMustBeNumber'), trigger: 'blur' },
+    {
+      validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
+        if (value < 1) {
+          callback(new Error(t('formValidation.countMustBePositive')))
+        } else if (value > 1000) {
+          callback(new Error(t('formValidation.countTooLarge')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+}))
+
 watch([unitPrice, count, total, energy, validity], () => {
   form.unitPrice = unitPrice.value
   form.count = count.value
@@ -290,15 +437,81 @@ watch([unitPrice, count, total, energy, validity], () => {
 
 watch(wallet, (v) => (form.wallet = v))
 
-function onSelect(rowIdx: number, idx: number) {
+function onSelect(rowIdx: number, idx: number, opt: string) {
   selecteIndex.value = [rowIdx, idx]
+
+  // 判断是否点击了"自定义"或者是最后一个按钮（自定义按钮的位置）
+  if (opt === t('lease.custom') || idx === 4) {
+    customRowIndex.value = rowIdx
+    customForm.count = customCounts.value[rowIdx] || 1
+    customDialogVisible.value = true
+  }
+}
+
+// 移动端时长选择变化
+const onMobileDurationChange = (durationIdx: number) => {
+  mobileSelectedDuration.value = durationIdx
+  mobileSelectedCount.value = 0 // 重置数量选择
+  selecteIndex.value = [durationIdx, 0]
+}
+
+// 移动端数量选择变化
+const onMobileCountChange = (countIdx: number, opt: string) => {
+  mobileSelectedCount.value = countIdx
+  selecteIndex.value = [mobileSelectedDuration.value, countIdx]
+  
+  // 判断是否选择了"自定义"或者是最后一个选项（自定义按钮的位置）
+  if (opt === t('lease.custom') || countIdx === 4) {
+    customRowIndex.value = mobileSelectedDuration.value
+    customForm.count = customCounts.value[mobileSelectedDuration.value] || 1
+    customDialogVisible.value = true
+  }
+}
+
+// 确认自定义数量
+const confirmCustomCount = async () => {
+  if (!customFormRef.value) return
+
+  try {
+    await customFormRef.value.validate()
+    // 保存自定义数量
+    customCounts.value[customRowIndex.value] = customForm.count
+    customDialogVisible.value = false
+    ElMessage.success(t('formValidation.customCountSet'))
+  } catch (error) {
+    console.error('Validation failed:', error)
+  }
 }
 
 const rentNow = async () => {
   if (!formRef.value) return
+  
   try {
     await formRef.value.validate()
-    ElMessage.success(`${t('formValidation.rentalSuccess')} ${totalDisplay.value}`)
+
+    const [rowIdx] = selecteIndex.value
+    const validityValue = rows.value[rowIdx]?.validity || 1
+    const validityUnitValue = rows.value[rowIdx]?.validityUnit || 'day'
+    
+    let durationInSeconds: number | string
+    if (validityUnitValue === 'hour') {
+      durationInSeconds = validityValue * 3600 + "s"
+    } else {
+      durationInSeconds = validityValue * 86400 + "s"
+    }
+
+    const success = await createOrder({
+      count: count.value,
+      duration: durationInSeconds,
+      kind: OrderKind.KindTimeEnergy,
+      target: [wallet.value],
+      userId: userInfo.value?.id || 0,
+      context: 'lease_time',
+    })
+    
+    if (success) {
+      wallet.value = ''
+    }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
   }
@@ -315,11 +528,7 @@ const rentNow = async () => {
 }
 
 .rental-wrapper {
-  width: 856px;
-  background: var(--theme-text-white);
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 6px 24px rgba(16, 24, 40, 0.08);
+  @include rental-card;
 }
 
 .title {
@@ -358,29 +567,160 @@ const rentNow = async () => {
 }
 
 .pill {
-  flex: 1;
-  height: 36px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 600;
-  background: var(--theme-time-bg-light);
-  color: var(--theme-text-light-gray);
-  border: none;
-  cursor: pointer;
-
-  &.active {
-    background: var(--theme-bg-blue);
-    color: var(--theme-text-white);
-  }
+  @include pill-button;
 }
 
 @media (max-width: 768px) {
   .time-rental-page {
-    padding: 18px 16px 16px;
+    padding: 6px;
   }
 
-  .row-options {
-    gap: 8px;
+  .rental-wrapper {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .selection-grid {
+    display: none;
+  }
+
+  .mobile-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-bottom: 18px;
+
+    .selection-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .selection-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      :deep(.el-select) {
+        width: 100%;
+
+        .el-input__wrapper {
+          background: rgba(2, 15, 45, 0.03);
+          border-radius: 4px;
+          box-shadow: none;
+          border: 1px solid rgba(2, 15, 45, 0.08);
+          padding: 0 12px;
+          min-height: 42px;
+        }
+
+        .el-input__inner {
+          height: 42px;
+          font-size: 14px;
+          color: var(--theme-text-black);
+        }
+      }
+
+      .row-options {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        width: 100%;
+      }
+
+      .pill {
+        height: 36px;
+        font-size: 13px;
+        padding: 0 8px;
+        min-width: 0;
+        flex: 1 1 calc(50% - 3px);
+        font-weight: 500;
+        background: rgba(2, 15, 45, 0.03);
+        border: 1px solid rgba(2, 15, 45, 0.08);
+        border-radius: 4px;
+        color: #374151;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:hover {
+          background: rgba(2, 15, 45, 0.05);
+        }
+
+        &.active {
+          background: var(--theme-bg-blue);
+          color: white;
+          border-color: var(--theme-bg-blue);
+        }
+
+        &:last-child {
+          flex: 1 1 100%;
+        }
+      }
+    }
+  }
+
+  .details-card {
+    .card-title {
+      font-size: 15px;
+      margin-bottom: 14px;
+    }
+  }
+
+  :deep(.el-form-item) {
+    margin-bottom: 8px;
+  }
+
+  :deep(.el-form-item__label) {
+    font-size: 13px;
+    padding-bottom: 0;
+  }
+
+  :deep(.el-input__inner) {
+    font-size: 15px;
+    height: 36px;
+    font-weight: 500;
+  }
+
+  :deep(.el-input__prefix),
+  :deep(.el-input__suffix) {
+    font-size: 14px;
+  }
+
+  :deep(.el-input__wrapper) {
+    min-height: 36px;
+  }
+
+  :deep(.rent-btn) {
+    width: 100%;
+    height: 42px;
+    font-size: 14px;
+    margin-top: 6px;
+  }
+
+  :deep(.el-dialog) {
+    width: 90% !important;
+    max-width: 400px;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 16px;
+  }
+
+  :deep(.el-dialog__header) {
+    padding: 14px 16px;
+  }
+
+  :deep(.el-dialog__title) {
+    font-size: 15px;
+  }
+
+  :deep(.el-dialog__footer) {
+    padding: 12px 16px;
   }
 }
 </style>

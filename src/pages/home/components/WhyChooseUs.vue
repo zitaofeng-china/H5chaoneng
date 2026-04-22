@@ -196,21 +196,55 @@ const items: Item[] = [
 
 @media (max-width: 600px) {
   .why-choose-us {
-    padding: 20px 0;
+    padding: 32px 0 40px;
+  }
+
+  .container {
+    padding: 0 16px;
   }
 
   .title {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    margin-top: 10px;
+    line-height: 1.5;
   }
 
   .grid {
-    margin-top: 24px;
+    margin-top: 20px;
     grid-template-columns: 1fr;
-    gap: 24px;
+    gap: 16px;
   }
 
   .card {
-    padding: 20px;
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .icon {
+    width: 40px;
+    height: 40px;
+
+    svg {
+      width: 48px;
+      height: 48px;
+    }
+  }
+
+  .card-title {
+    margin-top: 14px;
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .card-desc {
+    margin-top: 8px;
+    font-size: 12px;
+    line-height: 1.6;
   }
 }
 </style>

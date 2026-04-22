@@ -40,30 +40,90 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
+import { ElMessage } from 'element-plus'
 import FeeCard from '@/components/feeCard/index.vue'
 import KindTips from '@/components/kindTips/index.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { orderApi } from '@/api'
+import { OrderKind } from '@/api/modules/order/types'
+import { handleResponse } from '@/utils/response'
 
 const { t } = useI18n()
 const commonStore = useCommonStore()
+const priceStore = usePriceStore()
+const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
+const { userInfo } = storeToRefs(userStore)
 
-const feeCardTexts = computed<string[]>(() => [t('feeCard.activationPrice')])
+const feeCardTexts = computed<string[]>(() => {
+  const activationPrice = priceStore.priceData?.active || '1.2'
+  return [`${t('feeCard.activationPriceLabel')}：${activationPrice} TRX`]
+})
 
 const kindTipTexts = computed<string[]>(() => [t('activation.tips1'), t('activation.tips2')])
 
-const notices = computed<string[]>(() => [
-  t('activation.activationNotice') +
-    ': 2025-01-02 16:20:30 ' +
-    t('activation.activationTotalCount') +
-    ': 4, ' +
-    t('activation.activationSuccessCount') +
-    ': 2',
-])
+// 激活通知状态（使用 ref 使其响应式）
+const activationNoticeData = ref<{
+  time: string
+  totalCount: number
+  activatedCount: number
+  skippedCount: number
+} | null>(null)
+
+// 从 localStorage 加载激活通知（检查是否超过30分钟）
+const loadActivationNotice = () => {
+  // 清理旧的通知格式（字符串格式）
+  const oldNotice = localStorage.getItem('activationNotice')
+  if (oldNotice) {
+    localStorage.removeItem('activationNotice')
+  }
+  
+  const saved = localStorage.getItem('activationNoticeData')
+  const savedTime = localStorage.getItem('activationNoticeTime')
+  
+  if (saved && savedTime) {
+    const noticeTime = Number.parseInt(savedTime, 10)
+    const now = Date.now()
+    const thirtyMinutes = 30 * 60 * 1000 // 30分钟的毫秒数
+    
+    // 如果通知时间在30分钟内，显示通知
+    if (now - noticeTime < thirtyMinutes) {
+      try {
+        activationNoticeData.value = JSON.parse(saved)
+      } catch (e) {
+        console.error('Failed to parse activation notice data:', e)
+        localStorage.removeItem('activationNoticeData')
+        localStorage.removeItem('activationNoticeTime')
+      }
+    } else {
+      // 超过30分钟，清除通知
+      localStorage.removeItem('activationNoticeData')
+      localStorage.removeItem('activationNoticeTime')
+    }
+  }
+}
+
+// 保存激活通知到 localStorage（同时保存时间戳）
+const saveActivationNotice = (data: { time: string; totalCount: number; activatedCount: number; skippedCount: number }) => {
+  activationNoticeData.value = data
+  localStorage.setItem('activationNoticeData', JSON.stringify(data))
+  localStorage.setItem('activationNoticeTime', Date.now().toString())
+}
+
+const notices = computed<string[]>(() => {
+  if (activationNoticeData.value) {
+    const { time, totalCount, activatedCount, skippedCount } = activationNoticeData.value
+    const notice = `${t('activation.activationNotice')}: ${time} ${t('activation.activationTotalCount')}: ${totalCount}, ${t('activation.activationSuccessCount')}: ${activatedCount}, ${t('activation.skippedCount')}: ${skippedCount}`
+    return [notice]
+  }
+  return []
+})
 
 const formRef = ref<FormInstance>()
 const formData = reactive({
@@ -83,15 +143,124 @@ const handleSaveAddress = async () => {
   try {
     await formRef.value.validateField('address')
 
-    if (formData.address) {
-      ElMessage.success(t('formValidation.addressSaveSuccess'))
-    } else {
+    if (!formData.address) {
       ElMessage.warning(t('formValidation.enterAddressToSave'))
+      return
     }
-  } catch (error) {
-    console.error('Form validation failed:', error)
+
+    // 解析地址列表（支持逗号或换行分隔）
+    const addressList = formData.address
+      .split(/[,，\n\r]+/)  // 支持中英文逗号和换行符
+      .map(addr => addr.trim())  // 去除首尾空格
+      .filter(addr => addr.length > 0)  // 过滤空字符串
+
+    if (addressList.length === 0) {
+      ElMessage.warning(t('formValidation.enterValidAddress'))
+      return
+    }
+
+    // 构建订单参数
+    const orderParams = {
+      count: undefined,                  // 批量激活不需要数量
+      duration: undefined,               // 批量激活不需要时长
+      kind: OrderKind.KindBatchActive,   // kind = 10（批量激活）
+      target: addressList,               // 地址数组
+      user_id: userInfo.value?.id || 0,  // 用户ID
+    }
+
+    // 调用创建订单接口
+    const response = await orderApi.createOrder(orderParams)
+    
+    // 检查响应
+    if (response.code === '000000') {
+      const data = response.data as any
+      // 后端返回的字段名是小写的 target_list 和 skip_list
+      const targetList = data?.target_list || []
+      const skipList = data?.skip_list || []
+      const totalCount = addressList.length
+      const activatedCount = targetList.length
+      const skippedCount = skipList.length
+      
+      // 生成当前时间
+      const now = new Date()
+      const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+      
+      // 保存激活通知数据（保存原始数据，不保存翻译后的文本）
+      saveActivationNotice({
+        time: timeStr,
+        totalCount,
+        activatedCount,
+        skippedCount,
+      })
+      
+      // 根据结果显示不同的消息
+      if (activatedCount === 0 && skippedCount === 0) {
+        // 如果没有target_list和skip_list数据，但code是000000，说明激活成功
+        if (!data || (!data.target_list && !data.skip_list)) {
+          ElMessage.success(t('activation.allSuccess', { count: totalCount }))
+        } else {
+          // 全部失败
+          ElMessage.error(t('activation.allFailed'))
+        }
+      } else if (activatedCount > 0) {
+        // 有激活成功的
+        if (skippedCount > 0) {
+          ElMessage.success(t('activation.partialSuccess', { activated: activatedCount, skipped: skippedCount }))
+        } else {
+          ElMessage.success(t('activation.allSuccess', { count: activatedCount }))
+        }
+        
+        // 刷新用户信息以更新余额
+        if (userStore.isLogin) {
+          await userStore.fetchUserInfo()
+        }
+      } else if (skippedCount > 0) {
+        // 全部跳过（已激活）
+        ElMessage.warning(t('activation.allSkipped'))
+      }
+      
+      // 刷新用户信息以更新余额（无论是否有TargetList，只要code是000000就刷新）
+      if (userStore.isLogin) {
+        await userStore.fetchUserInfo()
+      }
+      
+      // 清空表单
+      formData.address = ''
+    } else {
+      ElMessage.error(response.msg || t('activation.activationFailed'))
+    }
+  } catch (error: any) {
+    console.error('【ERROR INFO】:', error)
+    
+    // 特殊处理未登录错误
+    if (error.message === 'NOT_LOGGED_IN') {
+      ElMessage.warning(t('common.pleaseLogin'))
+      return
+    }
+    
+    ElMessage.error(error.message || t('activation.activationFailed'))
   }
 }
+
+// 初始化时获取价格和用户信息
+onMounted(() => {
+  priceStore.fetchPrice()
+  // 如果用户已登录，获取用户信息
+  if (userStore.isLogin) {
+    userStore.fetchUserInfo()
+  }
+  
+  // 加载激活通知
+  loadActivationNotice()
+  
+  // 检查是否有待激活的地址（从托管页面跳转过来）
+  const pendingAddresses = sessionStorage.getItem('pendingActivationAddresses')
+  if (pendingAddresses) {
+    formData.address = pendingAddresses
+    // 清除 sessionStorage
+    sessionStorage.removeItem('pendingActivationAddresses')
+  }
+})
 </script>
 
 <style lang="scss" scoped>
@@ -139,16 +308,49 @@ const handleSaveAddress = async () => {
 
 @media (max-width: 768px) {
   .content-main {
-    .notice-wrap {
-      .notice-item {
-        align-items: flex-start;
+    border-radius: 8px;
+    box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
+
+    :deep(.el-card__body) {
+      padding: 10px;
+    }
+
+    .details-form {
+      margin-top: 16px;
+
+      :deep(.el-form-item__label) {
+        display: block;
+        height: initial;
+        font-size: 13px;
+        line-height: 1.4;
+        padding-bottom: 8px;
+      }
+
+      :deep(.el-textarea__inner) {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .rent-btn {
+        width: 100%;
+        height: 44px;
+        font-size: 15px;
+        margin: 16px 0 8px;
       }
     }
 
-    :deep(.el-form-item__label) {
-      display: block;
-      height: initial;
+    .notice-wrap {
+      .notice-item {
+        align-items: flex-start;
+        font-size: 12px;
+        padding: 8px 0;
+
+        svg {
+          margin-top: 2px;
+        }
+      }
     }
   }
 }
+
 </style>

@@ -21,11 +21,17 @@
     "trx": "TRX",
     "usdt": "USDT",
     "day": "日",
+    "hour": "時間",
     "purchase": "件",
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "チャージ"
+    "recharge": "チャージ",
+    "loadFailed": "読み込み失敗",
+    "loadFailedHint": "ネットワーク接続を確認するか、後でもう一度お試しください",
+    "retry": "再試行",
+    "checkWalletAddress": "送金時はウォレットアドレスを確認してください",
+    "pleaseLogin": "まずログインしてください"
   },
   "nav": {
     "home": "ホーム",
@@ -34,7 +40,7 @@
     "services": "サービス",
     "contact": "お問い合わせ",
     "energyRental": "エネルギーレンタル",
-    "quickRent": "クイックレンタル",
+    "quickRent": "フラッシュレンタルエネルギー",
     "rentByTime": "時間レンタル",
     "rentByCount": "件数レンタル",
     "contractFlash": "契約即時交換",
@@ -44,7 +50,8 @@
     "features": "特徴",
     "howItWorks": "仕組み",
     "fee": "手数料",
-    "contactUs": "お問い合わせ"
+    "contactUs": "お問い合わせ",
+    "userInfo": "ユーザー情報"
   },
   "home": {
     "title": "即時エネルギーレンタル",
@@ -57,9 +64,12 @@
     "rentNowMessage": "今すぐレンタル後、エネルギー{energy}が5秒以内に入力先住所に追加されます",
     "savedAddress": "保存された住所",
     "selectSavedAddress": "保存された住所を選択してください",
+    "noSavedAddress": "住所なし",
     "saveAddress": "住所を保存",
-    "quickRent": "クイックレンタル",
-    "saveTip": "該当する住所を選択すると、1件のエネルギーを素早くレンタルできます。「クイックレンタル」をクリックすると即座にレンタルされます",
+    "deleteAddressTitle": "住所を削除",
+    "deleteAddressConfirm": "住所 {address} を削除してもよろしいですか？",
+    "quickRent": "フラッシュレンタルエネルギー",
+    "saveTip": "該当する住所を選択すると、1件のエネルギーを素早くレンタルできます。「フラッシュレンタルエネルギー」をクリックすると即座にレンタルされます",
     "addressLabel": "住所",
     "whyChooseUs": "選ばれる理由",
     "subtitle": "安全・迅速・低コストなスマートコントラクト・スワップサービスを提供し、よりスムーズな暗号資産の両替を実現します。",
@@ -128,6 +138,7 @@
     "viewFaq": "よくある質問を見る"
   },
   "transferRental": {
+    "transferTemplate": "{price}TRX送金 = {count}件獲得",
     "transfer35": "3.5TRX送金 = 1件獲得",
     "transfer7": "7TRX送金 = 2件獲得",
     "transfer14": "14TRX送金 = 4件獲得",
@@ -140,7 +151,7 @@
     "noUsdtTip": "USDTのない住所への送金は2倍のエネルギーが必要です",
     "expiryTip": "1時間以内にエネルギーを使用してください、過ぎると期限切れ回收されます",
     "amountTip": "必ず上記該当額のTRXを送金してください、，不然レンタルに失敗します",
-    "addressTip": "送金时请核对准确的能量租赁钱包地址",
+    "addressTip": "送金時にエネルギーレンタルウォレット住所を正確に確認してください",
     "walletAddress": "レンタルウォレット住所"
   },
   "kindTips": {
@@ -160,22 +171,27 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. 無断複写・転載を禁じます"
+    "copyright": "© 2026 GAS711. 無断複写・転載を禁じます",
+    "rightsReserved": "無断複写・転載を禁じます"
   },
   "lease": {
     "byTime": "時間レンタル",
     "byCount": "件数レンタル",
-    "selectCount1Hour": "件数を選択してください、1時間有効",
-    "selectCount3Days": "件数を選択してください、3日間有効",
-    "selectCount1Day": "件数を選択してください、1日間有効",
-    "selectCount7Days": "件数を選択してください、7日間有効",
-    "selectCount15Hours": "件数を選択してください、15時間有効",
-    "selectCount30Days": "件数を選択してください、30日間有効",
+    "selectDuration": "期間を選択",
+    "selectQuantity": "数量を選択",
+    "selectCount1Hour": "1時間有効",
+    "selectCount3Hours": "3時間有効",
+    "selectCount1Day": "1日間有効",
+    "selectCount3Days": "3日間有効",
+    "selectCount7Days": "7日間有効",
+    "selectCount15Days": "15日間有効",
+    "selectCount30Days": "30日間有効",
     "rentalDetails": "レンタル詳細",
     "unitPrice": "単価",
     "count": "件数",
     "totalPrice": "合計価格",
     "energy": "エネルギー",
+    "singleEnergy": "単位あたりエネルギー",
     "validity": "有効期間",
     "walletAddress": "レンタルウォレット住所",
     "enterAddress": "住所を入力してください",
@@ -188,6 +204,10 @@
     "100Count": "100件",
     "200Count": "200件",
     "custom": "カスタム",
+    "customCount": "カスタム数量",
+    "enterCustomCount": "カスタム数量を入力してください",
+    "maxCountHint": "残高に基づいて、最大{max}件まで購入できます",
+    "exceedMaxCount": "最大購入可能件数{max}を超えたため、自動調整されました",
     "trxUnit": "TRX",
     "dayUnit": "日",
     "wUnit": "W"
@@ -200,6 +220,10 @@
     "enterAddress": "住所を入力してください",
     "rentNowButton": "今すぐレンタル",
     "usdtBuy": "USDTで購入",
+    "usdtPaymentTitle": "USDT支払い",
+    "usdtTip1": "{amount} USDT送金 = 1件購入獲得",
+    "usdtTip2": "複数購入の場合は対応するUSDTの倍数を送金してください",
+    "usdtTip3": "金額にご注意ください、誤った金額は1時間エネルギー配送として処理されます",
     "tips1": "1件エネルギー購入 = 130000",
     "tips2": "時間制限なし、送金ごとに1件控除",
     "tips3": "24時間送金がなければ1件控除",
@@ -211,9 +235,26 @@
     "historyUsed": "歴史使用量",
     "todayUsed": "今日使用量",
     "deleteHosting": "ホスティング削除",
+    "orderId": "注文ID",
+    "createdAt": "作成時間",
+    "noAddresses": "ホスティング住所がありません",
+    "enterValidAddress": "有効な住所を入力してください",
+    "addSuccess": "{count}件のホスティング住所を追加しました",
+    "addPartialSuccess": "{success}件成功、{fail}件失敗",
+    "addFailed": "ホスティング住所の追加に失敗しました",
+    "deleteConfirm": "ホスティング住所 {address} を削除してもよろしいですか？",
+    "deleteConfirmTitle": "ホスティング住所を削除",
+    "deleteConfirmMessage": "ホスティング住所 {address} を削除してもよろしいですか？この操作は元に戻せません。",
+    "deleteSuccess": "ホスティング住所を削除しました",
+    "deleteFailed": "ホスティング住所の削除に失敗しました",
+    "addressNotActivated": "以下の住所がアクティベートされていません。アクティベートページに移動しますか？",
+    "goToActivate": "アクティベートへ",
+    "addingAddresses": "住所 {current}/{total} を追加中",
     "address": "ホスティングする住所",
     "enterAddresses": "住所を入力してください、複数の住所は英語カンマで区切るか、1行に1住所",
     "confirm": "確認",
+    "use65000Energy": "65000エネルギー使用",
+    "use131000Energy": "131000エネルギー使用",
     "tips1": "ホスティングモード使用には残高が30TRXより大きい必要",
     "tips2": "ホスティング済み住所は常に13.1Wエネルギーを維持します",
     "tips3": "ホスティング済み住所はUSDT送金ごとに1回料金徴収（アカウント残高から控除）",
@@ -240,12 +281,18 @@
     "flashWalletQrcode": "即時交換ウォレットQRコード",
     "copySuccess": "住所がクリップボードにコピーされました",
     "copyFailed": "コピーに失敗しました、手動でコピーしてください",
-    "checkAddress": "送金时请核对地址",
-    "tips1": "過剰お支払い或不到帳の場合返金のためカスタマーサービスに連絡してください",
+    "checkAddress": "送金時はアドレスを確認してください",
+    "tips1": "過剰お支払いまたは未着金の場合、返金のためカスタマーサービスに連絡してください",
     "tips2": "24時間送金がなければ1件控除",
     "tips3": "取引所ウォレットで送金しないでください",
-    "tips4": "送金时请核对准确的能量租赁钱包地址",
-    "tips5": "送金错误或其他疑问の場合カスタマーサービスに連絡してください",
+    "tips4": "送金時にエネルギーレンタルウォレット住所を正確に確認してください",
+    "tips5": "送金エラーまたはその他の質問がある場合は、カスタマーサービスに連絡してください",
+    "minUsdtError": "最小交換金額は {min} USDT です",
+    "maxUsdtError": "最大交換金額は {max} USDT です",
+    "minTrxError": "最小交換金額は {min} TRX です",
+    "maxTrxError": "最大交換金額は {max} TRX です",
+    "minExchange": "最小 {min}から交換",
+    "maxExchange": "最大 {max}",
     "usdtMinTip": "最小 2 USDT、最大 70000 USDT",
     "trxMinTip": "最小 10 TRX、最大 100000 TRX"
   },
@@ -257,6 +304,12 @@
     "activationNotice": "活性化お知らせ",
     "activationSuccessCount": "活性化済み住所数",
     "activationTotalCount": "住所数量",
+    "skippedCount": "スキップ済み",
+    "allSuccess": "{count}件の住所を活性化しました",
+    "partialSuccess": "{activated}件の住所を活性化しました、{skipped}件の活性化済み住所をスキップしました",
+    "allSkipped": "すべての住所が活性化済みです",
+    "allFailed": "活性化に失敗しました",
+    "activationFailed": "活性化に失敗しました",
     "tips1": "一括活性化は最大1000住所まで",
     "tips2": "活性化済み住所は活性化料金を徴収しません"
   },
@@ -264,7 +317,8 @@
     "title": "料金説明",
     "65000Energy": "65000エネルギー使用：3TRX/件",
     "131000Energy": "131000エネルギー使用：5TRX/件",
-    "activationPrice": "活性化単価：1.2 TRX"
+    "activationPrice": "活性化単価：1.2 TRX",
+    "activationPriceLabel": "活性化単価"
   },
   "login": {
     "title": "ログイン",
@@ -279,6 +333,7 @@
     "passwordRequired": "パスワードを入力してください",
     "passwordMinLength": "パスワードは6文字以上必要です",
     "loginSuccess": "ログイン成功",
+    "loginFailed": "ログイン失敗",
     "logout": "ログアウト"
   },
   "register": {
@@ -291,7 +346,11 @@
     "registerButton": "登録",
     "usernameRequired": "ユーザー名を入力してください",
     "telegramRequired": "TGユーザー名を入力してください",
-    "registerSuccess": "登録成功"
+    "registerSuccess": "登録成功",
+    "registerFailed": "登録失敗",
+    "passwordMismatch": "パスワードが一致しません",
+    "registerSuccessButLoginFailed": "登録成功、しかし自動ログインに失敗しました。手動でログインしてください",
+    "registerAndLoginSuccess": "登録成功、自動的にログインしました"
   },
   "reset": {
     "title": "パスワードリセット",
@@ -302,7 +361,8 @@
     "confirmPassword": "パスワード確認",
     "resetButton": "リセット確認",
     "codeSent": "認証コードがメールアドレスに送信されました",
-    "enterEmailFirst": "まずメールアドレスを入力してください"
+    "enterEmailFirst": "まずメールアドレスを入力してください",
+    "enterPasswordFirst": "まず新しいパスワードを入力してください"
   },
   "recharge": {
     "title": "アカウント入金",
@@ -313,7 +373,57 @@
     "rechargeAddress": "受取住所",
     "scanQrcode": "QRコードをスキャンして入金",
     "minTransfer": "1TRXより大きい金額は自由に送金可能",
-    "checkAddress": "送金时请核对地址"
+    "checkAddress": "送金時はアドレスを確認してください",
+    "customAmount": "TRX入金額をカスタマイズするにはクリック",
+    "enterCustomAmount": "入金額を入力してください（最小1 TRX）",
+    "minAmount": "最小入金額は1 TRXで、小数点以下2桁まで対応",
+    "confirmAmount": "入金額を確認",
+    "rechargeAmount": "入金額",
+    "changeAmount": "金額を変更",
+    "transferExactAmount": "以下のアドレスに {amount} TRX を送金してください",
+    "finalAmountNote": "クリックして金額をコピー、小数点にご注意ください",
+    "copyAmount": "金額をコピー",
+    "copyAmountSuccess": "金額がクリップボードにコピーされました",
+    "invalidAmount": "有効なチャージ金額を入力してください",
+    "createOrderFailed": "注文の作成に失敗しました",
+    "noAddressReturned": "チャージアドレスの取得に失敗しました",
+    "loadingHint": "チャージ注文を作成中です。お待ちください...",
+    "transferDeadline": "{time} までに送金を完了してください"
+  },
+  "error": {
+    "unknown": "不明なエラー",
+    "badRequest": "リクエストパラメータエラー",
+    "badGateway": "ゲートウェイエラー",
+    "serviceUnavailable": "サービス一時的に利用不可",
+    "maintenance": "システムメンテナンス中、後ほどお試しください",
+    "paramsError": "パラメータエラー",
+    "notFound": "リクエストされたリソースが見つかりません",
+    "pageNotFound": "ページが見つかりません",
+    "pageNotFoundDesc": "申し訳ございません、お探しのページは存在しないか、代理リンクを通じてアクセスする必要があります"
+  },
+  "network": {
+    "error": "ネットワーク接続に失敗しました、ネットワーク設定を確認してください",
+    "timeout": "リクエストタイムアウト、後ほどお試しください"
+  },
+  "http": {
+    "badRequest": "リクエストパラメータエラー",
+    "unauthorized": "未認証、先にログインしてください",
+    "forbidden": "アクセス禁止",
+    "notFound": "リクエストされたリソースが見つかりません",
+    "timeout": "リクエストタイムアウト",
+    "internalServerError": "サーバー内部エラー",
+    "badGateway": "ゲートウェイエラー",
+    "serviceUnavailable": "サービス一時的に利用不可",
+    "gatewayTimeout": "ゲートウェイタイムアウト",
+    "unknownError": "HTTPエラー {code}"
+  },
+  "server": {
+    "error": "サーバーエラー、後ほどお試しください"
+  },
+  "auth": {
+    "tokenExpired": "ログインが期限切れです、再度ログインしてください",
+    "tokenInvalid": "ログイン情報が無効です、再度ログインしてください",
+    "permissionDenied": "権限不足、アクセスできません"
   },
   "revisePassword": {
     "title": "パスワード変更",
@@ -323,13 +433,19 @@
     "oldPasswordPlaceholder": "パスワードを入力してください",
     "newPassword": "新しいパスワード",
     "newPasswordPlaceholder": "新しいパスワードを入力してください",
-    "button": "パスワード変更"
+    "button": "パスワード変更",
+    "success": "パスワードが正常に変更されました",
+    "failed": "パスワードの変更に失敗しました",
+    "logoutTip": "パスワードが変更されました。再度ログインしてください",
+    "passwordSameError": "新しいパスワードは以前のパスワードと同じにできません"
   },
   "formValidation": {
     "unitPriceRequired": "単価を入力してください",
     "unitPriceInvalid": "有効な数字を入力してください",
     "addressRequired": "住所を入力してください",
     "addressTooShort": "住所の長さは10文字以上必要です",
+    "addressAlreadyExists": "このアドレスは既に存在します",
+    "enterValidAddress": "有効なアドレスを入力してください",
     "selectAddress": "住所を選択してください",
     "selectEnergy": "エネルギー数量を選択してください",
     "walletRequired": "レンタルウォレット住所を入力してください",
@@ -338,12 +454,25 @@
     "energyMustBePositive": "エネルギーは0より大きい必要があります",
     "validityMustBePositive": "有効期間は0より大きい必要があります",
     "countMustBePositive": "件数は0より大きい必要があります",
+    "countRequired": "数量を入力してください",
+    "countMustBeNumber": "数量は数字である必要があります",
+    "countTooLarge": "数量は1000を超えることはできません",
     "unitMustBePositive": "単価は0より大きい必要があります",
     "rentalSuccess": "レンタル開始、支払い",
     "addressSaveSuccess": "住所が正常に保存されました",
     "enterAddressToSave": "保存する住所を入力してください",
     "enterOrSelectAddress": "住所を入力或は選択してください",
     "renting": "{energy} エネルギーをレンタル中...",
-    "energyAdded": "{energy} エネルギーが正常にご使用の住所に追加されました"
+    "energyAdded": "{energy} エネルギーが正常にご使用の住所に追加されました",
+    "customCountSet": "カスタム数量が正常に設定されました"
+  },
+  "welcome": {
+    "importantNotice": "重要なお知らせ",
+    "iAcknowledge": "上記のすべての情報を読み、確認しました",
+    "confirmAndContinue": "確認して続行",
+    "notice1": "送金前に必ず受取アドレスを確認してください",
+    "notice2": "エネルギーレンタルには有効期限があります。期限内にご使用ください",
+    "notice3": "取引前に取引注意事項をよくお読みください",
+    "notice4": "問題が発生した場合は、すぐにカスタマーサービスにお問い合わせください"
   }
 }

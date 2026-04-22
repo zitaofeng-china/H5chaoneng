@@ -8,13 +8,20 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import TimeRental from './components/TimeRental.vue'
+import { usePriceStore } from '@/stores/usePriceStore'
 
 const { t } = useI18n()
+const priceStore = usePriceStore()
 
 defineOptions({
   name: 'TimeRentPage',
+})
+
+onMounted(async () => {
+  await priceStore.fetchPrice()
 })
 </script>
 
@@ -40,8 +47,8 @@ defineOptions({
 
     .time-head {
       .time-title {
-        font-size: 24px;
-        margin-bottom: 2px;
+        font-size: 20px;
+        margin-bottom: 10px;
       }
     }
   }

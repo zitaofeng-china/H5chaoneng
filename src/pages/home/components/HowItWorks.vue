@@ -183,28 +183,64 @@ defineOptions({
 
 @media (max-width: 768px) {
   .container {
-    padding: 0 16px;
+    padding: 0 6px;
   }
 
   .how-it-works {
-    padding: 50px 0;
+    padding: 40px 0;
   }
 
   .title {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 600;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    margin-top: 10px;
+    line-height: 1.5;
   }
 
   .cards {
-    margin-top: 24px;
-    gap: 32px;
+    margin-top: 20px;
+    gap: 20px;
   }
 
   .card {
-    padding: 20px;
+    padding: 18px;
+    border-radius: 10px;
+  }
+
+  .card-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.5;
   }
 
   .card-description {
-    line-height: initial;
+    font-size: 13px;
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+
+  .list {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .list-item {
+    gap: 8px;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+    }
+  }
+
+  .text {
+    font-size: 13px;
+    line-height: 1.5;
   }
 }
 </style>

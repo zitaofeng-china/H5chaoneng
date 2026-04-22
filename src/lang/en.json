@@ -21,11 +21,17 @@
     "trx": "TRX",
     "usdt": "USDT",
     "day": "Day",
+    "hour": "Hour",
     "purchase": "Count",
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "Recharge"
+    "recharge": "Recharge",
+    "loadFailed": "Load Failed",
+    "loadFailedHint": "Please check your network connection or try again later",
+    "retry": "Retry",
+    "checkWalletAddress": "Please verify wallet address during transfer",
+    "pleaseLogin": "Please login first"
   },
   "nav": {
     "home": "Home",
@@ -34,7 +40,7 @@
     "services": "Services",
     "contact": "Contact Us",
     "energyRental": "Energy Rental",
-    "quickRent": "Quick Rent",
+    "quickRent": "Flash Rent Energy",
     "rentByTime": "Rent by Time",
     "rentByCount": "Rent by Count",
     "contractFlash": "Contract Flash",
@@ -44,7 +50,8 @@
     "features": "Features",
     "howItWorks": "How It Works",
     "fee": "Fee",
-    "contactUs": "Contact Us"
+    "contactUs": "Contact Us",
+    "userInfo": "User Info"
   },
   "home": {
     "title": "Flash Rent Energy",
@@ -57,9 +64,12 @@
     "rentNowMessage": "After renting now, energy {energy} will be added to your address within 5 seconds",
     "savedAddress": "Saved Address",
     "selectSavedAddress": "Please select saved address",
+    "noSavedAddress": "No address",
     "saveAddress": "Save Address",
-    "quickRent": "Quick Rent",
-    "saveTip": "Select the corresponding address to quickly rent 1 count of energy. Click 'Quick Rent' to rent immediately",
+    "deleteAddressTitle": "Delete Address",
+    "deleteAddressConfirm": "Are you sure you want to delete address {address}?",
+    "quickRent": "Flash Rent Energy",
+    "saveTip": "Select the corresponding address to quickly rent 1 count of energy. Click 'Flash Rent Energy' to rent immediately",
     "addressLabel": "Address",
     "whyChooseUs": "Why Choose Us",
     "subtitle": "We provide safe, fast, and low-cost smart contract flash exchange service, making your cryptocurrency exchange more convenient",
@@ -128,6 +138,7 @@
     "viewFaq": "View FAQ"
   },
   "transferRental": {
+    "transferTemplate": "Transfer {price}TRX = Get {count} Count",
     "transfer35": "Transfer 3.5TRX = Get 1 Count",
     "transfer7": "Transfer 7TRX = Get 2 Counts",
     "transfer14": "Transfer 14TRX = Get 4 Counts",
@@ -160,22 +171,27 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. All rights reserved"
+    "copyright": "© 2026 GAS711. All rights reserved",
+    "rightsReserved": "All rights reserved"
   },
   "lease": {
     "byTime": "Rent by Time",
     "byCount": "Rent by Count",
-    "selectCount1Hour": "Please select count, valid for 1 hour",
-    "selectCount3Days": "Please select count, valid for 3 days",
-    "selectCount1Day": "Please select count, valid for 1 day",
-    "selectCount7Days": "Please select count, valid for 7 days",
-    "selectCount15Hours": "Please select count, valid for 15 hours",
-    "selectCount30Days": "Please select count, valid for 30 days",
+    "selectDuration": "Select Duration",
+    "selectQuantity": "Select Quantity",
+    "selectCount1Hour": "Valid for 1 hour",
+    "selectCount3Hours": "Valid for 3 hours",
+    "selectCount1Day": "Valid for 1 day",
+    "selectCount3Days": "Valid for 3 days",
+    "selectCount7Days": "Valid for 7 days",
+    "selectCount15Days": "Valid for 15 days",
+    "selectCount30Days": "Valid for 30 days",
     "rentalDetails": "Rental Details",
     "unitPrice": "Unit Price",
     "count": "Count",
     "totalPrice": "Total Price",
     "energy": "Energy",
+    "singleEnergy": "Energy per Unit",
     "validity": "Validity",
     "walletAddress": "Rental Wallet Address",
     "enterAddress": "Please enter address",
@@ -188,6 +204,10 @@
     "100Count": "100 Counts",
     "200Count": "200 Counts",
     "custom": "Custom",
+    "customCount": "Custom Count",
+    "enterCustomCount": "Please enter custom count",
+    "maxCountHint": "Based on your balance, you can purchase up to {max} counts",
+    "exceedMaxCount": "Exceeded maximum purchasable count {max}, automatically adjusted",
     "trxUnit": "TRX",
     "dayUnit": "Day",
     "wUnit": "W"
@@ -200,6 +220,10 @@
     "enterAddress": "Please enter address",
     "rentNowButton": "Rent Now",
     "usdtBuy": "Buy with USDT",
+    "usdtPaymentTitle": "USDT Payment",
+    "usdtTip1": "Transfer {amount} USDT = Get 1 purchase",
+    "usdtTip2": "For multiple purchases, transfer the corresponding multiple of USDT",
+    "usdtTip3": "Please note the amount, incorrect amount will be treated as 1-hour energy delivery",
     "tips1": "Purchasing 1 count of energy is 130000",
     "tips2": "No time limit, deduct one count per transfer",
     "tips3": "No transfer in 24 hours deduct one count",
@@ -211,9 +235,26 @@
     "historyUsed": "History Used",
     "todayUsed": "Today Used",
     "deleteHosting": "Delete Hosting",
+    "orderId": "Order ID",
+    "createdAt": "Created At",
+    "noAddresses": "No hosted addresses",
+    "enterValidAddress": "Please enter valid addresses",
+    "addSuccess": "Successfully added {count} hosting address(es)",
+    "addPartialSuccess": "Successfully added {success}, failed {fail}",
+    "addFailed": "Failed to add hosting address",
+    "deleteConfirm": "Are you sure you want to delete hosting address {address}?",
+    "deleteConfirmTitle": "Delete Hosting Address",
+    "deleteConfirmMessage": "Are you sure you want to delete hosting address {address}? This action cannot be undone.",
+    "deleteSuccess": "Hosting address deleted successfully",
+    "deleteFailed": "Failed to delete hosting address",
+    "addressNotActivated": "The following addresses are not activated. Go to activation page?",
+    "goToActivate": "Go to Activate",
+    "addingAddresses": "Adding address {current}/{total}",
     "address": "Address to Host",
     "enterAddresses": "Please enter addresses, multiple addresses separated by English comma, or one address per line",
     "confirm": "Confirm",
+    "use65000Energy": "Using 65000 energy",
+    "use131000Energy": "Using 131000 energy",
     "tips1": "Using hosting mode requires balance greater than 30TRX",
     "tips2": "Your hosted addresses will always maintain 13.1W energy",
     "tips3": "Hosted addresses are charged one fee per USDT transfer (account balance deduction)",
@@ -246,6 +287,12 @@
     "tips3": "Do not use exchange wallet for transfer",
     "tips4": "Please verify the energy rental wallet address accurately during transfer",
     "tips5": "If transferred wrong or other questions, please contact customer service",
+    "minUsdtError": "Minimum exchange amount is {min} USDT",
+    "maxUsdtError": "Maximum exchange amount is {max} USDT",
+    "minTrxError": "Minimum exchange amount is {min} TRX",
+    "maxTrxError": "Maximum exchange amount is {max} TRX",
+    "minExchange": "Minimum {min} to exchange",
+    "maxExchange": "Maximum not exceed {max}",
     "usdtMinTip": "Minimum 2 USDT, maximum 70000 USDT",
     "trxMinTip": "Minimum 10 TRX, maximum 100000 TRX"
   },
@@ -257,6 +304,12 @@
     "activationNotice": "Activation Notice",
     "activationSuccessCount": "Activated Address Count",
     "activationTotalCount": "Address Count",
+    "skippedCount": "Skipped",
+    "allSuccess": "Successfully activated {count} address(es)",
+    "partialSuccess": "Successfully activated {activated} address(es), skipped {skipped} already activated",
+    "allSkipped": "All addresses are already activated, no need to activate again",
+    "allFailed": "Activation failed, please check if addresses are valid",
+    "activationFailed": "Activation failed",
     "tips1": "Maximum 1000 addresses for batch activation",
     "tips2": "Activated addresses do not charge activation fee"
   },
@@ -264,7 +317,8 @@
     "title": "Fee Description",
     "65000Energy": "Using 65000 energy: 3TRX/count",
     "131000Energy": "Using 131000 energy: 5TRX/count",
-    "activationPrice": "Activation Price: 1.2 TRX"
+    "activationPrice": "Activation Price: 1.2 TRX",
+    "activationPriceLabel": "Activation Price"
   },
   "login": {
     "title": "Login",
@@ -279,6 +333,7 @@
     "passwordRequired": "Please enter password",
     "passwordMinLength": "Password cannot be less than 6 characters",
     "loginSuccess": "Login successful",
+    "loginFailed": "Login failed",
     "logout": "Logout"
   },
   "register": {
@@ -291,7 +346,11 @@
     "registerButton": "Register",
     "usernameRequired": "Please enter username",
     "telegramRequired": "Please enter TG username",
-    "registerSuccess": "Registration successful"
+    "registerSuccess": "Registration successful",
+    "registerFailed": "Registration failed",
+    "passwordMismatch": "Passwords do not match",
+    "registerSuccessButLoginFailed": "Registration successful, but auto-login failed. Please login manually",
+    "registerAndLoginSuccess": "Registration successful, logged in automatically"
   },
   "reset": {
     "title": "Reset Password",
@@ -302,7 +361,8 @@
     "confirmPassword": "Confirm Password",
     "resetButton": "Confirm Reset",
     "codeSent": "Verification code has been sent to your email",
-    "enterEmailFirst": "Please enter email first"
+    "enterEmailFirst": "Please enter email first",
+    "enterPasswordFirst": "Please enter new password first"
   },
   "recharge": {
     "title": "Account Recharge",
@@ -313,7 +373,22 @@
     "rechargeAddress": "Receiving Address",
     "scanQrcode": "Scan QR Code to Recharge",
     "minTransfer": "Any amount greater than 1TRX can be transferred",
-    "checkAddress": "Please verify address during transfer"
+    "checkAddress": "Please verify address during transfer",
+    "customAmount": "Click to customize TRX recharge amount",
+    "enterCustomAmount": "Please enter recharge amount (minimum 1 TRX)",
+    "minAmount": "Minimum recharge amount is 1 TRX, supports two decimal places",
+    "confirmAmount": "Confirm Recharge Amount",
+    "rechargeAmount": "Recharge Amount",
+    "changeAmount": "Change Amount",
+    "transferExactAmount": "Please transfer {amount} TRX to the following address",
+    "finalAmountNote": "Click to copy amount, please note the decimal point",
+    "copyAmount": "Copy Amount",
+    "copyAmountSuccess": "Amount copied to clipboard",
+    "invalidAmount": "Please enter a valid recharge amount",
+    "createOrderFailed": "Failed to create order",
+    "noAddressReturned": "Failed to get recharge address",
+    "loadingHint": "Creating recharge order, please wait...",
+    "transferDeadline": "Please complete the transfer before {time}"
   },
   "revisePassword": {
     "title": "Change Password",
@@ -323,13 +398,54 @@
     "oldPasswordPlaceholder": "Please enter password",
     "newPassword": "New Password",
     "newPasswordPlaceholder": "Please enter new password",
-    "button": "Change Password"
+    "button": "Change Password",
+    "success": "Password changed successfully",
+    "failed": "Failed to change password",
+    "logoutTip": "Password has been changed, please login again",
+    "passwordSameError": "New password cannot be the same as old password"
+  },
+  "error": {
+    "unknown": "Unknown error",
+    "badRequest": "Bad request parameters",
+    "badGateway": "Bad gateway",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "maintenance": "System under maintenance, please try again later",
+    "paramsError": "Parameter error",
+    "notFound": "Requested resource not found",
+    "pageNotFound": "Page Not Found",
+    "pageNotFoundDesc": "Sorry, the page you are looking for does not exist or requires access through an agent link"
+  },
+  "network": {
+    "error": "Network connection failed, please check your network settings",
+    "timeout": "Request timeout, please try again later"
+  },
+  "http": {
+    "badRequest": "Bad request parameters",
+    "unauthorized": "Unauthorized, please login first",
+    "forbidden": "Access forbidden",
+    "notFound": "Requested resource not found",
+    "timeout": "Request timeout",
+    "internalServerError": "Internal server error",
+    "badGateway": "Bad gateway",
+    "serviceUnavailable": "Service temporarily unavailable",
+    "gatewayTimeout": "Gateway timeout",
+    "unknownError": "HTTP error {code}"
+  },
+  "server": {
+    "error": "Server error, please try again later"
+  },
+  "auth": {
+    "tokenExpired": "Login expired, please login again",
+    "tokenInvalid": "Invalid login information, please login again",
+    "permissionDenied": "Insufficient permissions, access denied"
   },
   "formValidation": {
     "unitPriceRequired": "Please enter unit price",
     "unitPriceInvalid": "Please enter valid number",
     "addressRequired": "Please enter address",
     "addressTooShort": "Address length cannot be less than 10 characters",
+    "addressAlreadyExists": "This address already exists",
+    "enterValidAddress": "Please enter a valid address",
     "selectAddress": "Please select address",
     "selectEnergy": "Please select energy quantity",
     "walletRequired": "Please enter rental wallet address",
@@ -338,12 +454,25 @@
     "energyMustBePositive": "Energy must be greater than 0",
     "validityMustBePositive": "Validity must be greater than 0",
     "countMustBePositive": "Count must be greater than 0",
+    "countRequired": "Please enter count",
+    "countMustBeNumber": "Count must be a number",
+    "countTooLarge": "Count cannot exceed 1000",
     "unitMustBePositive": "Unit must be greater than 0",
     "rentalSuccess": "Initiate rental, pay",
     "addressSaveSuccess": "Address saved successfully",
     "enterAddressToSave": "Please enter address to save",
     "enterOrSelectAddress": "Please enter or select address",
     "renting": "Renting {energy} energy...",
-    "energyAdded": "{energy} energy has been successfully added to your address"
+    "energyAdded": "{energy} energy has been successfully added to your address",
+    "customCountSet": "Custom count set successfully"
+  },
+  "welcome": {
+    "importantNotice": "Important Notice",
+    "iAcknowledge": "I have read and acknowledged all the above information",
+    "confirmAndContinue": "Confirm and Continue",
+    "notice1": "Please verify the receiving address before transfer",
+    "notice2": "Energy rental has time limits. Use within validity period",
+    "notice3": "Please read the transaction notice carefully before trading",
+    "notice4": "Contact customer service immediately if you encounter any issues"
   }
 }

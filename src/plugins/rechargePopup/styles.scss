@@ -1,0 +1,600 @@
+/**
+ * 充值弹窗样式
+ */
+@use '@/assets/styles/_mixins.scss' as *;
+
+.recharge-dialog {
+  .arrow-left-icon {
+    display: none;
+  }
+
+  .recharge-title {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--theme-text-black);
+  }
+
+  :deep(.el-dialog) {
+    border-radius: 8px;
+    padding: 24px;
+  }
+
+  :deep(.el-dialog__title) {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--theme-text-black);
+  }
+
+  :deep(.el-dialog__close) {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--theme-text-black);
+  }
+
+  :deep(.el-dialog__header.show-close) {
+    padding-right: 0;
+  }
+
+  :deep(.el-dialog__headerbtn) {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    top: 24px;
+    right: 24px;
+    background: var(--theme-gray-bg-light);
+  }
+}
+
+.desc-wrap {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--theme-shadow-strong);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--theme-text-black);
+
+  .desc-item {
+    height: 40px;
+    display: flex;
+    align-items: center;
+
+    .desc-label {
+      height: 40px;
+      flex-basis: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--theme-card-bg-light);
+      border-right: 1px solid var(--theme-shadow-strong);
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid var(--theme-shadow-strong);
+    }
+
+    .desc-value {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.address-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+
+  .address-text {
+    flex: 1;
+    color: #1f2937;
+    font-size: 12px;
+    font-family: monospace;
+    word-break: break-all;
+  }
+
+  .copy-btn {
+    flex-shrink: 0;
+    color: var(--theme-text-black);
+    transition: color 0.3s ease;
+
+    :deep(.el-icon) {
+      font-size: 18px;
+    }
+  }
+}
+
+.qrcode-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.qrcode-title {
+  margin-top: 24px;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--theme-text-black);
+}
+
+.qrcode-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 192px;
+  height: 192px;
+  background: var(--theme-bg-white);
+
+  .qrcode-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    .loading-text {
+      font-size: 14px;
+      color: var(--theme-text-light-gray-muted);
+    }
+
+    .is-loading {
+      color: var(--el-color-primary);
+    }
+  }
+
+  .error-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    .error-text {
+      font-size: 14px;
+      color: #DC2626;
+      font-weight: 500;
+    }
+  }
+}
+
+.loading-text {
+  color: var(--theme-text-light-gray-muted);
+  font-style: italic;
+}
+
+.tips-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+
+  .tips-title,
+  .tips-text {
+    display: flex;
+    align-items: center;
+
+    svg {
+      padding-right: 3px;
+    }
+  }
+
+  .tips-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--theme-text-black);
+  }
+
+  .tips-address {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+
+    .address-text {
+      font-size: 14px;
+      font-family: monospace;
+      color: var(--theme-text-black);
+      word-break: break-all;
+      text-align: center;
+    }
+
+    .loading-text {
+      font-size: 14px;
+      color: var(--theme-text-light-gray-muted);
+    }
+
+    .copy-address-btn {
+      flex-shrink: 0;
+      padding: 4px;
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+
+  .tips-text {
+    font-size: 12px;
+    color: #DC2626;
+    font-weight: 500;
+    line-height: 0;
+  }
+}
+
+// 移动端适配
+@media (max-width: 768px) {
+  .recharge-dialog {
+    @include dialog-style;
+
+    :deep(.el-dialog) {
+      padding: 16px 12px 14px;
+      width: 90% !important;
+      max-width: 400px;
+      border-radius: 12px;
+      margin: auto !important;
+    }
+
+    :deep(.el-dialog--center) {
+      width: 90%;
+      max-width: 400px;
+      height: auto;
+      max-height: 85vh;
+      overflow-y: auto;
+    }
+
+    :deep(.el-dialog__header) {
+      padding: 0 0 12px 0;
+      margin: 0;
+      text-align: center;
+    }
+
+    :deep(.el-overlay) {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .recharge-title {
+      font-size: 16px;
+      margin-top: 0;
+      margin-bottom: 0;
+      font-weight: 600;
+      text-align: center;
+      width: 100%;
+    }
+
+    :deep(.el-dialog__headerbtn) {
+      top: 16px;
+      right: 12px;
+      width: 26px;
+      height: 26px;
+    }
+
+    :deep(.el-dialog__close) {
+      font-size: 15px;
+    }
+
+    :deep(.el-dialog__body) {
+      padding: 0;
+    }
+  }
+
+  .desc-wrap {
+    font-size: 12px;
+    border-radius: 6px;
+
+    .desc-item {
+      height: 38px;
+
+      .desc-label {
+        flex-basis: 100px;
+        font-size: 11px;
+      }
+
+      .desc-value {
+        word-break: break-all;
+        padding: 0 10px;
+        font-size: 12px;
+      }
+    }
+  }
+
+  .address-row {
+    gap: 6px;
+
+    .address-text {
+      font-size: 10px;
+    }
+
+    .copy-btn {
+      :deep(.el-icon) {
+        font-size: 15px;
+      }
+    }
+  }
+
+  .qrcode-title {
+    margin-top: 16px;
+    font-size: 15px;
+  }
+
+  .qrcode-container {
+    width: 160px;
+    height: 160px;
+  }
+
+  .tips-container {
+    gap: 8px;
+    margin-top: 10px;
+
+    .tips-title {
+      font-size: 13px;
+      
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    .tips-address {
+      gap: 6px;
+
+      .address-text {
+        font-size: 11px;
+      }
+
+      .copy-address-btn {
+        :deep(.el-icon) {
+          font-size: 14px;
+        }
+      }
+    }
+
+    .tips-text {
+      font-size: 10px;
+      line-height: 1.3;
+    }
+  }
+}
+
+
+// 第一步：选择充值金额
+.step-one {
+  padding: 40px 60px 30px;
+
+  .amount-selection {
+    .preset-amounts {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+
+      .amount-btn {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(2, 15, 45, 0.03);
+        border: 2px solid rgba(2, 15, 45, 0.08);
+        border-radius: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--theme-text-black);
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: rgba(22, 93, 255, 0.05);
+          border-color: rgba(22, 93, 255, 0.3);
+        }
+
+        &.active {
+          background: var(--theme-bg-blue);
+          border-color: var(--theme-bg-blue);
+          color: #fff;
+          box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+        }
+      }
+    }
+
+    .custom-amount-section {
+      margin-bottom: 20px;
+
+      .custom-amount-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--theme-text-black);
+      }
+
+      .custom-amount-input {
+        :deep(.el-input__wrapper) {
+          height: 54px;
+          font-size: 16px;
+        }
+      }
+    }
+
+    .confirm-amount-btn {
+      width: 100%;
+      height: 54px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+  }
+}
+
+// 第二步：显示地址和二维码
+.step-two {
+  .selected-amount-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(54, 211, 153, 0.08) 100%);
+    border-radius: 12px;
+    margin-bottom: 24px;
+
+    .amount-label {
+      font-size: 14px;
+      color: var(--theme-text-muted);
+    }
+
+    .amount-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--theme-bg-blue);
+
+      .copy-amount-btn {
+        padding: 4px;
+        font-size: 14px;
+        
+        &:hover {
+          opacity: 0.8;
+        }
+      }
+    }
+
+    .amount-note {
+      font-size: 12px;
+      color: #DC2626;
+      font-weight: 500;
+    }
+
+    .change-amount-btn {
+      font-size: 14px;
+      margin-top: 4px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .step-one {
+    padding: 14px 12px 12px;
+
+    .amount-selection {
+      .preset-amounts {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        margin-bottom: 14px;
+
+        .amount-btn {
+          height: 44px;
+          font-size: 14px;
+          border-radius: 6px;
+          font-weight: 600;
+        }
+      }
+
+      .custom-amount-section {
+        margin-bottom: 14px;
+
+        .custom-amount-label {
+          font-size: 13px;
+          margin-bottom: 8px;
+          font-weight: 600;
+          
+          .el-icon {
+            font-size: 16px;
+          }
+        }
+
+        .custom-amount-input {
+          :deep(.el-input__wrapper) {
+            height: 44px;
+            font-size: 13px;
+          }
+
+          :deep(.el-input__suffix) {
+            font-size: 13px;
+          }
+        }
+      }
+
+      .confirm-amount-btn {
+        height: 44px;
+        font-size: 14px;
+        font-weight: 600;
+      }
+    }
+  }
+
+  .step-two {
+    .selected-amount-display {
+      gap: 5px;
+      padding: 14px 12px;
+      margin-bottom: 16px;
+      border-radius: 10px;
+
+      .amount-label {
+        font-size: 12px;
+      }
+
+      .amount-value {
+        font-size: 18px;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        
+        .copy-amount-btn {
+          font-size: 12px;
+          
+          :deep(.el-icon) {
+            font-size: 14px;
+          }
+        }
+      }
+
+      .amount-note {
+        font-size: 10px;
+        text-align: center;
+        line-height: 1.3;
+      }
+
+      .deadline-note {
+        font-size: 10px;
+        text-align: center;
+        line-height: 1.3;
+        color: #DC2626;
+        font-weight: 500;
+        margin-top: 2px;
+      }
+
+      .change-amount-btn {
+        font-size: 12px;
+        margin-top: 2px;
+      }
+    }
+
+    .tips-container {
+      .tips-address {
+        flex-wrap: wrap;
+
+        .address-text {
+          font-size: 11px;
+        }
+      }
+    }
+  }
+}

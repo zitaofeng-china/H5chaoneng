@@ -3,41 +3,52 @@ import { createRouter, createWebHistory } from 'vue-router'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // 独立的 404 路由（不带 site 前缀）
     {
-      path: '/',
-      name: 'Home',
-      component: () => import('@/pages/home/index.vue'),
+      path: '/404',
+      name: 'NotFoundStandalone',
+      component: () => import('@/pages/404/index.vue'),
     },
     {
-      path: '/lease',
-      name: 'LeasePage',
+      path: '/:site',
       children: [
         {
-          path: 'time',
+          path: '',
+          name: 'Home',
+          component: () => import('@/pages/home/index.vue'),
+        },
+        {
+          path: 'lease-time',
           name: 'TimeRentPage',
           component: () => import('@/pages/lease/time/index.vue'),
         },
         {
-          path: 'count',
+          path: 'lease-count',
           name: 'CountRentPage',
           component: () => import('@/pages/lease/count/index.vue'),
         },
+        {
+          path: 'contract',
+          name: 'Contract',
+          component: () => import('@/pages/contract/index.vue'),
+        },
+        {
+          path: 'hosting',
+          name: 'Hosting',
+          component: () => import('@/pages/hosting/index.vue'),
+        },
+        {
+          path: 'activation',
+          name: 'Activation',
+          component: () => import('@/pages/activation/index.vue'),
+        },
+        // 在 site 路由组内的 404
+        {
+          path: ':pathMatch(.*)*',
+          name: 'NotFound',
+          component: () => import('@/pages/404/index.vue'),
+        },
       ],
-    },
-    {
-      path: '/contract',
-      name: 'Contract',
-      component: () => import('@/pages/contract/index.vue'),
-    },
-    {
-      path: '/hosting',
-      name: 'Hosting',
-      component: () => import('@/pages/hosting/index.vue'),
-    },
-    {
-      path: '/activation',
-      name: 'Activation',
-      component: () => import('@/pages/activation/index.vue'),
     },
   ],
   scrollBehavior(to) {

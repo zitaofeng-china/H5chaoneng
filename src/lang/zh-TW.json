@@ -25,7 +25,12 @@
     "w": "W",
     "65000": "65000",
     "131000": "131000",
-    "recharge": "充值"
+    "recharge": "充值",
+    "loadFailed": "載入失敗",
+    "loadFailedHint": "請檢查網絡連接或稍後重試",
+    "retry": "重試",
+    "checkWalletAddress": "轉帳時請核對錢包地址",
+    "pleaseLogin": "請先登錄"
   },
   "nav": {
     "home": "首頁",
@@ -34,7 +39,7 @@
     "services": "服務",
     "contact": "聯繫我們",
     "energyRental": "能量租賃",
-    "quickRent": "快速租用",
+    "quickRent": "閃租能量",
     "rentByTime": "按時間租用",
     "rentByCount": "按筆數租用",
     "contractFlash": "合約閃兌",
@@ -44,7 +49,8 @@
     "features": "特點",
     "howItWorks": "工作原理",
     "fee": "手續費",
-    "contactUs": "聯繫我們"
+    "contactUs": "聯繫我們",
+    "userInfo": "基本信息"
   },
   "home": {
     "title": "閃租能量",
@@ -57,9 +63,12 @@
     "rentNowMessage": "立即租用後,能量{energy}將在5秒內添加到您的地址",
     "savedAddress": "已保存地址",
     "selectSavedAddress": "請選擇已保存地址",
+    "noSavedAddress": "暫無地址",
     "saveAddress": "保存地址",
-    "quickRent": "快速租用",
-    "saveTip": "選擇相應的地址,可快速租用1筆能量,點擊「快速租用」後會立即租用",
+    "deleteAddressTitle": "刪除地址",
+    "deleteAddressConfirm": "確定要刪除地址 {address} 嗎？",
+    "quickRent": "閃租能量",
+    "saveTip": "選擇相應的地址,可快速租用1筆能量,點擊「閃租能量」後會立即租用",
     "addressLabel": "地址",
     "whyChooseUs": "為什麼選擇我們",
     "subtitle": "我們提供安全、快速、低成本的智能合約閃兌服務，讓您的加密貨幣兌換更加便捷",
@@ -128,6 +137,7 @@
     "viewFaq": "查看常見問題"
   },
   "transferRental": {
+    "transferTemplate": "轉帳{price}TRX=獲取購買{count}筆",
     "transfer35": "轉帳3.5TRX=獲取購買1筆",
     "transfer7": "轉帳7TRX=獲取購買2筆",
     "transfer14": "轉帳14TRX=獲取購買4筆",
@@ -160,22 +170,26 @@
     "telegramContact": "{'@'}GasVipBot",
     "emailContact": "VipTronGas{'@'}Gmail.Com",
     "twitterContact": "{'@'}TronGasVipBot",
-    "copyright": "© 2026 GAS711. 保留所有權利"
+    "copyright": "© 2026 GAS711. 保留所有權利",
+    "rightsReserved": "保留所有權利"
   },
   "lease": {
     "byTime": "按時間租用",
     "byCount": "按筆數租用",
-    "selectCount1Hour": "請選擇筆數，有效1小時",
-    "selectCount3Days": "請選擇筆數，有效3天",
-    "selectCount1Day": "請選擇筆數，有效1天",
-    "selectCount7Days": "請選擇筆數，有效7天",
-    "selectCount15Hours": "請選擇筆數，有效15小時",
-    "selectCount30Days": "請選擇筆數，有效30天",
+    "selectDuration": "選擇租用時長",
+    "selectQuantity": "選擇購買數量",
+    "selectCount1Hour": "有效1小時",
+    "selectCount3Days": "有效3天",
+    "selectCount1Day": "有效1天",
+    "selectCount7Days": "有效7天",
+    "selectCount15Days": "有效15天",
+    "selectCount30Days": "有效30天",
     "rentalDetails": "租用詳情",
     "unitPrice": "單筆",
     "count": "筆數",
     "totalPrice": "總價",
     "energy": "能量",
+    "singleEnergy": "單筆能量",
     "validity": "有效期",
     "walletAddress": "租用錢包地址",
     "enterAddress": "請輸入租用錢包地址",
@@ -188,6 +202,10 @@
     "100Count": "100筆",
     "200Count": "200筆",
     "custom": "自定義",
+    "customCount": "自定義數量",
+    "enterCustomCount": "請輸入自定義數量",
+    "maxCountHint": "根據您的餘額，最多可購買 {max} 筆",
+    "exceedMaxCount": "超過最大可購買筆數 {max}，已自動調整",
     "trxUnit": "TRX",
     "dayUnit": "天",
     "wUnit": "W"
@@ -200,6 +218,10 @@
     "enterAddress": "請輸入地址",
     "rentNowButton": "立即租用",
     "usdtBuy": "USDT購買",
+    "usdtPaymentTitle": "USDT 付款",
+    "usdtTip1": "轉帳 {amount} USDT = 獲取購買1筆",
+    "usdtTip2": "購買多筆請轉對應USDT的倍數金額",
+    "usdtTip3": "請注意金額，錯誤金額將當成1小時能量發貨",
     "tips1": "購買1筆能量數為130000",
     "tips2": "不限制使用時間，每轉帳一次扣一筆",
     "tips3": "24小時不用扣一筆",
@@ -211,9 +233,26 @@
     "historyUsed": "歷史已用",
     "todayUsed": "今天已用",
     "deleteHosting": "刪除託管",
+    "orderId": "訂單ID",
+    "createdAt": "創建時間",
+    "noAddresses": "暫無託管地址",
+    "enterValidAddress": "請輸入有效的地址",
+    "addSuccess": "成功添加 {count} 個託管地址",
+    "addPartialSuccess": "成功添加 {success} 個，失敗 {fail} 個",
+    "addFailed": "添加託管地址失敗",
+    "deleteConfirm": "確定要刪除託管地址 {address} 嗎？",
+    "deleteConfirmTitle": "刪除託管地址",
+    "deleteConfirmMessage": "確定要刪除託管地址 {address} 嗎？刪除後將無法恢復。",
+    "deleteSuccess": "刪除託管地址成功",
+    "deleteFailed": "刪除託管地址失敗",
+    "addressNotActivated": "檢測到以下地址未激活，是否前往激活頁面？",
+    "goToActivate": "前往激活",
+    "addingAddresses": "正在添加第 {current}/{total} 個地址",
     "address": "需要託管的地址",
     "enterAddresses": "請輸入地址，多個地址，請使用英文逗號分隔，或一行一個地址，",
     "confirm": "確定",
+    "use65000Energy": "使用65000能量",
+    "use131000Energy": "使用131000能量",
     "tips1": "使用託管模式需要餘額大於30TRX",
     "tips2": "您的託管地址將會始終保持13.1W能量",
     "tips3": "託管地址每USDT轉帳一次計一筆費用（帳戶餘額扣費）",
@@ -246,6 +285,12 @@
     "tips3": "切勿用交易所錢包轉帳",
     "tips4": "轉帳時請核對準確能量租賃錢包地址",
     "tips5": "如有轉錯或其他疑問，請聯繫客服",
+    "minUsdtError": "最低兌換金額為 {min} USDT",
+    "maxUsdtError": "最大兌換金額為 {max} USDT",
+    "minTrxError": "最低兌換金額為 {min} TRX",
+    "maxTrxError": "最大兌換金額為 {max} TRX",
+    "minExchange": "最小 {min} 起兌",
+    "maxExchange": "最大不超過 {max}",
     "usdtMinTip": "2 USDT 起兌，最大不超過70000 USDT",
     "trxMinTip": "10 TRX 起兌，最大不超過100000 TRX"
   },
@@ -257,6 +302,12 @@
     "activationNotice": "激活通知",
     "activationSuccessCount": "已激活地址數",
     "activationTotalCount": "地址數量",
+    "skippedCount": "已跳過",
+    "allSuccess": "成功激活 {count} 個地址",
+    "partialSuccess": "成功激活 {activated} 個地址，跳過 {skipped} 個已激活地址",
+    "allSkipped": "所有地址均已激活",
+    "allFailed": "激活失敗",
+    "activationFailed": "激活失敗",
     "tips1": "批量激活地址數量最多為1000個",
     "tips2": "已激活的地址不收取激活費用"
   },
@@ -264,7 +315,8 @@
     "title": "費用說明",
     "65000Energy": "使用65000能量：3TRX/筆",
     "131000Energy": "使用131000能量：5TRX/筆",
-    "activationPrice": "激活單價：1.2 TRX"
+    "activationPrice": "激活單價：1.2 TRX",
+    "activationPriceLabel": "激活單價"
   },
   "login": {
     "title": "登入",
@@ -279,6 +331,7 @@
     "passwordRequired": "請輸入密碼",
     "passwordMinLength": "密碼長度不能少於6位",
     "loginSuccess": "登入成功",
+    "loginFailed": "登入失敗",
     "logout": "退出系統"
   },
   "register": {
@@ -291,7 +344,11 @@
     "registerButton": "註冊",
     "usernameRequired": "請輸入用戶名",
     "telegramRequired": "請輸入TG用戶名",
-    "registerSuccess": "註冊成功"
+    "registerSuccess": "註冊成功",
+    "registerFailed": "註冊失敗",
+    "passwordMismatch": "兩次輸入的密碼不一致",
+    "registerSuccessButLoginFailed": "註冊成功，但自動登入失敗，請手動登入",
+    "registerAndLoginSuccess": "註冊成功，已自動登入"
   },
   "reset": {
     "title": "重置密碼",
@@ -302,7 +359,8 @@
     "confirmPassword": "確認密碼",
     "resetButton": "確認重置",
     "codeSent": "驗證碼已發送到您的郵箱",
-    "enterEmailFirst": "請先輸入郵箱"
+    "enterEmailFirst": "請先輸入郵箱",
+    "enterPasswordFirst": "請先輸入新密碼"
   },
   "recharge": {
     "title": "帳戶充值",
@@ -313,7 +371,57 @@
     "rechargeAddress": "收款地址",
     "scanQrcode": "掃描二維碼充值",
     "minTransfer": "可轉入大於1TRX的任意金額",
-    "checkAddress": "轉帳時請核對地址"
+    "checkAddress": "轉帳時請核對地址",
+    "customAmount": "點我自定義充值TRX金額",
+    "enterCustomAmount": "請輸入充值金額（最小1 TRX）",
+    "minAmount": "最小充值金額為 1 TRX，支持小數點後兩位",
+    "confirmAmount": "確認充值金額",
+    "rechargeAmount": "充值金額",
+    "changeAmount": "修改金額",
+    "transferExactAmount": "請轉帳 {amount} TRX 到以下地址",
+    "finalAmountNote": "點擊可複製金額，請注意小數點",
+    "copyAmount": "複製金額",
+    "copyAmountSuccess": "金額已複製到剪貼板",
+    "invalidAmount": "請輸入有效的充值金額",
+    "createOrderFailed": "創建訂單失敗",
+    "noAddressReturned": "未獲取到充值地址",
+    "loadingHint": "正在創建充值訂單，請稍候...",
+    "transferDeadline": "請在 {time} 之前完成轉帳"
+  },
+  "error": {
+    "unknown": "未知錯誤",
+    "badRequest": "請求參數錯誤",
+    "badGateway": "網關錯誤",
+    "serviceUnavailable": "服務暫時不可用",
+    "maintenance": "系統維護中，請稍後再試",
+    "paramsError": "參數錯誤",
+    "notFound": "請求的資源不存在",
+    "pageNotFound": "頁面未找到",
+    "pageNotFoundDesc": "抱歉，您訪問的頁面不存在或需要通過代理鏈接訪問"
+  },
+  "network": {
+    "error": "網絡連接失敗，請檢查網絡設置",
+    "timeout": "請求超時，請稍後重試"
+  },
+  "http": {
+    "badRequest": "請求參數錯誤",
+    "unauthorized": "未授權，請先登錄",
+    "forbidden": "禁止訪問",
+    "notFound": "請求的資源不存在",
+    "timeout": "請求超時",
+    "internalServerError": "服務器內部錯誤",
+    "badGateway": "網關錯誤",
+    "serviceUnavailable": "服務暫時不可用",
+    "gatewayTimeout": "網關超時",
+    "unknownError": "HTTP 錯誤 {code}"
+  },
+  "server": {
+    "error": "服務器錯誤，請稍後重試"
+  },
+  "auth": {
+    "tokenExpired": "登入已過期，請重新登入",
+    "tokenInvalid": "登入信息無效，請重新登入",
+    "permissionDenied": "權限不足，無法訪問"
   },
   "revisePassword": {
     "title": "修改密碼",
@@ -323,13 +431,19 @@
     "oldPasswordPlaceholder": "請輸入密碼",
     "newPassword": "新密碼",
     "newPasswordPlaceholder": "請輸入新密碼",
-    "button": "修改密碼"
+    "button": "修改密碼",
+    "success": "密碼修改成功",
+    "failed": "密碼修改失敗",
+    "logoutTip": "密碼已修改，請重新登入",
+    "passwordSameError": "新舊密碼不可相同"
   },
   "formValidation": {
     "unitPriceRequired": "請輸入單價",
     "unitPriceInvalid": "請輸入有效的數字",
     "addressRequired": "請輸入地址",
     "addressTooShort": "地址長度不能少於10個字符",
+    "addressAlreadyExists": "該地址已存在",
+    "enterValidAddress": "請輸入有效的地址",
     "selectAddress": "請選擇地址",
     "selectEnergy": "請選擇能量數量",
     "walletRequired": "請輸入租用錢包地址",
@@ -338,12 +452,25 @@
     "energyMustBePositive": "能量必須大於 0",
     "validityMustBePositive": "有效期必須大於 0",
     "countMustBePositive": "筆數必須大於 0",
+    "countRequired": "請輸入數量",
+    "countMustBeNumber": "數量必須是數字",
+    "countTooLarge": "數量不能超過1000",
     "unitMustBePositive": "單筆必須大於 0",
     "rentalSuccess": "發起租用，支付",
     "addressSaveSuccess": "地址保存成功",
     "enterAddressToSave": "請輸入要保存的地址",
     "enterOrSelectAddress": "請輸入或選擇地址",
     "renting": "正在租用 {energy} 能量...",
-    "energyAdded": "{energy} 能量已成功添加到您的地址"
+    "energyAdded": "{energy} 能量已成功添加到您的地址",
+    "customCountSet": "自定義數量設置成功"
+  },
+  "welcome": {
+    "importantNotice": "重要提示",
+    "iAcknowledge": "我已閱讀並知悉以上所有提示內容",
+    "confirmAndContinue": "確認並繼續",
+    "notice1": "轉帳前務必核對收款地址",
+    "notice2": "能量租賃有時效性，請在有效期內使用",
+    "notice3": "請在交易前仔細查看交易須知",
+    "notice4": "如遇問題請及時聯繫客服"
   }
 }

@@ -25,19 +25,25 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { handleOpenToTelegram } from '@/utils'
+import { getSite } from '@/utils/site'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { storeToRefs } from 'pinia'
 
 defineOptions({
   name: 'HelpSection',
 })
 
 const router = useRouter()
+const siteStore = useSiteStore()
+const { tgAdmin } = storeToRefs(siteStore)
 
 const handleContactService = () => {
-  handleOpenToTelegram('GasVipBot')
+  handleOpenToTelegram(tgAdmin.value)
 }
 
 const handleViewProblems = () => {
-  router.push({ path: '/', hash: '#question' })
+  const site = getSite()
+  router.push({ path: `/${site}/`, hash: '#question' })
 }
 </script>
 
@@ -133,32 +139,104 @@ const handleViewProblems = () => {
 @media (max-width: 768px) {
   .help-container {
     max-width: initial;
-    padding: 0 16px;
+    padding: 0 6px;
   }
 
   .help-content {
     .help-info {
       &:not(:last-child) {
-        margin-bottom: 32px;
+        margin-bottom: 20px;
       }
     }
   }
 
-  .help-buttons {
-    gap: 15px;
-  }
-
-  .help-button {
-    min-width: 180px;
-    max-width: 200px;
-  }
-
   .help-section {
-    padding: 50px 0;
+    padding: 32px 0;
   }
 
   .help-title {
-    font-size: 24px;
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .help-subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+    opacity: 0.9;
+  }
+
+  .help-buttons {
+    gap: 12px;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .help-button {
+    flex: 1;
+    max-width: 160px;
+    min-width: 140px;
+    height: 44px;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+}
+
+/* 适配 300px 超小屏幕 */
+@media (max-width: 360px) {
+  .help-container {
+    padding: 0 8px;
+  }
+
+  .help-section {
+    padding: 20px 0;
+  }
+
+  .help-content {
+    .help-info {
+      &:not(:last-child) {
+        margin-bottom: 14px;
+      }
+    }
+  }
+
+  .help-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .help-subtitle {
+    font-size: 11px;
+    line-height: 1.4;
+    padding: 0 2px;
+  }
+
+  .help-buttons {
+    gap: 6px;
+    width: 100%;
+    padding: 0 10px;
+    justify-content: center;
+  }
+
+  .help-button {
+    flex: 0 1 auto;
+    max-width: 130px;
+    min-width: 110px;
+    height: 36px;
+    font-size: 11px;
+    border-radius: 4px;
+    padding: 0 8px;
+
+    span {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &.secondary {
+      border-width: 1.5px;
+    }
   }
 }
 </style>
