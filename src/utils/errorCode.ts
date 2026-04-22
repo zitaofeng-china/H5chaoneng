@@ -128,7 +128,9 @@ export const CONTEXT_ERROR_MAP: Record<string, Record<string, string>> = {
   // 托管场景
   hosting: {
     '000007': '托管失败',
+    '000009': '账户余额不足，请先充值',
     '003001': '地址格式不正确',
+    '004002': '余额不足，请先充值',
     '005001': '能量不足',
   },
 

@@ -262,6 +262,7 @@
     "tips5": "El alojamiento de direcciones se puede encender y apagar en cualquier momento, sin más tarifas de alojamiento después de cerrar",
     "tips6": "Recomendado transferir al menos una vez al día",
     "tips7": "Después de cada transferencia USDT, se cobrará automáticamente una tarifa de alojamiento hasta que el saldo sea insuficiente",
+    "insufficientBalance": "Saldo de cuenta insuficiente, por favor recargue primero",
     "65000EnergyFee": "Usando 65000 energía: 3TRX/unidad",
     "131000EnergyFee": "Usando 131000 energía: 5TRX/unidad"
   },

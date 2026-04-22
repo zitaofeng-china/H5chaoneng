@@ -138,11 +138,21 @@ const handleSaveAddress = async () => {
               return // 停止继续添加
             }
             
+            // 检查是否是余额不足错误（通过 code 或 msg 判断）
+            const errorMsg = response.msg || ''
+            if (
+              response.code === '000009' || 
+              response.code === '004002' || 
+              (response.code === '000007' && errorMsg.includes('余额不足'))
+            ) {
+              ElMessage.error(t('hosting.insufficientBalance'))
+              return // 停止继续添加
+            }
+            
             failedCount++
             failedAddresses.push(address)
             
             // 检查是否是地址未激活的错误
-            const errorMsg = response.msg || ''
             if (errorMsg.includes('未激活') || errorMsg.includes('not activated')) {
               // 弹窗询问是否跳转到激活页面
               handleUnactivatedAddresses([address])
