@@ -206,6 +206,8 @@
     "custom": "Özel",
     "customCount": "Özel Miktar",
     "enterCustomCount": "Lütfen özel miktar girin",
+    "maxCountHint": "Bakiyenize göre, en fazla {max} işlem satın alabilirsiniz",
+    "exceedMaxCount": "Maksimum satın alınabilir işlem sayısı {max} aşıldı, otomatik olarak ayarlandı",
     "trxUnit": "TRX",
     "dayUnit": "Gün",
     "wUnit": "W"

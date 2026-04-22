@@ -204,6 +204,8 @@
     "custom": "自定義",
     "customCount": "自定義數量",
     "enterCustomCount": "請輸入自定義數量",
+    "maxCountHint": "根據您的餘額，最多可購買 {max} 筆",
+    "exceedMaxCount": "超過最大可購買筆數 {max}，已自動調整",
     "trxUnit": "TRX",
     "dayUnit": "天",
     "wUnit": "W"

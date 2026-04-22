@@ -206,6 +206,8 @@
     "custom": "Personalizado",
     "customCount": "Cantidad Personalizada",
     "enterCustomCount": "Por favor ingrese cantidad personalizada",
+    "maxCountHint": "Según su saldo, puede comprar hasta {max} transacciones",
+    "exceedMaxCount": "Excedió el número máximo de transacciones {max}, ajustado automáticamente",
     "trxUnit": "TRX",
     "dayUnit": "Día",
     "wUnit": "W"

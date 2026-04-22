@@ -206,6 +206,8 @@
     "custom": "Custom",
     "customCount": "Custom Count",
     "enterCustomCount": "Please enter custom count",
+    "maxCountHint": "Based on your balance, you can purchase up to {max} counts",
+    "exceedMaxCount": "Exceeded maximum purchasable count {max}, automatically adjusted",
     "trxUnit": "TRX",
     "dayUnit": "Day",
     "wUnit": "W"

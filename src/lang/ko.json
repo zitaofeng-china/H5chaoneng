@@ -206,6 +206,8 @@
     "custom": "사용자 지정",
     "customCount": "사용자 지정 수량",
     "enterCustomCount": "사용자 지정 수량을 입력해주세요",
+    "maxCountHint": "잔액에 따라 최대 {max}건까지 구매 가능합니다",
+    "exceedMaxCount": "최대 구매 가능 건수 {max}를 초과하여 자동 조정되었습니다",
     "trxUnit": "TRX",
     "dayUnit": "일",
     "wUnit": "W"

@@ -206,6 +206,8 @@
     "custom": "مخصص",
     "customCount": "كمية مخصصة",
     "enterCustomCount": "الرجاء إدخال كمية مخصصة",
+    "maxCountHint": "بناءً على رصيدك، يمكنك شراء ما يصل إلى {max} معاملة",
+    "exceedMaxCount": "تجاوز الحد الأقصى لعدد المعاملات {max}، تم التعديل تلقائيًا",
     "trxUnit": "TRX",
     "dayUnit": "يوم",
     "wUnit": "واط"

@@ -206,6 +206,8 @@
     "custom": "カスタム",
     "customCount": "カスタム数量",
     "enterCustomCount": "カスタム数量を入力してください",
+    "maxCountHint": "残高に基づいて、最大{max}件まで購入できます",
+    "exceedMaxCount": "最大購入可能件数{max}を超えたため、自動調整されました",
     "trxUnit": "TRX",
     "dayUnit": "日",
     "wUnit": "W"
