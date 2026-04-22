@@ -1,8 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+const DEFAULT_SITE = 'c8UKwuXu'
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    // 根路径重定向到默认 Site
+    {
+      path: '/',
+      redirect: `/${DEFAULT_SITE}`,
+    },
     // 独立的 404 路由（不带 site 前缀）
     {
       path: '/404',
