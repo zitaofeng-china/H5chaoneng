@@ -21,7 +21,12 @@
             </div>
           </div>
           <div class="faq-answer" v-show="activeIndex === index" @click.stop="() => {}">
-            {{ $t(item.answerKey) }}
+            <template v-if="item.questionKey === 'faq.problemsSupport'">
+              {{ formatAnswerWithTgAdmin($t(item.answerKey)) }}
+            </template>
+            <template v-else>
+              {{ $t(item.answerKey) }}
+            </template>
           </div>
         </div>
       </div>
@@ -31,11 +36,13 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useSiteStore } from '@/stores/useSiteStore'
 
 defineOptions({
   name: 'FaqSection',
 })
 
+const siteStore = useSiteStore()
 const activeIndex = ref(0)
 
 type FaqItem = {
@@ -68,6 +75,14 @@ const faqItems = ref<FaqItem[]>([
 
 const toggleItem = (index: number) => {
   activeIndex.value = activeIndex.value === index ? -1 : index
+}
+
+/**
+ * 格式化答案，将 @GasVipBot 替换为实际的 tg_admin
+ */
+const formatAnswerWithTgAdmin = (answer: string) => {
+  const tgAdmin = siteStore.tgAdmin || '@GasVipBot'
+  return answer.replace(/@GasVipBot/g, tgAdmin)
 }
 </script>
 
