@@ -53,6 +53,9 @@ importers:
       vue-router:
         specifier: ^5.0.1
         version: 5.0.2(pinia@3.0.4(typescript@5.9.3)(vue@3.6.0-beta.5(typescript@5.9.3)))(vue@3.6.0-beta.5(typescript@5.9.3))
+      whatwg-url:
+        specifier: ^5.0.0
+        version: 5.0.0
     devDependencies:
       '@iconify-json/ep':
         specifier: ^1.2.4
