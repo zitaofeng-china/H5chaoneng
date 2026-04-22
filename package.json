@@ -23,9 +23,11 @@
     "node-fetch": "^2.7.0",
     "pinia": "^3.0.4",
     "sass": "^1.97.3",
+    "tr46": "^0.0.3",
     "vue": "^3.5.27",
     "vue-i18n": "^11.2.8",
     "vue-router": "^5.0.1",
+    "webidl-conversions": "^3.0.1",
     "whatwg-url": "^5.0.0"
   },
   "devDependencies": {

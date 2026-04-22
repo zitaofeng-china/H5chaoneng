@@ -44,6 +44,9 @@ importers:
       sass:
         specifier: ^1.97.3
         version: 1.97.3
+      tr46:
+        specifier: ^0.0.3
+        version: 0.0.3
       vue:
         specifier: beta
         version: 3.6.0-beta.5(typescript@5.9.3)
@@ -53,6 +56,9 @@ importers:
       vue-router:
         specifier: ^5.0.1
         version: 5.0.2(pinia@3.0.4(typescript@5.9.3)(vue@3.6.0-beta.5(typescript@5.9.3)))(vue@3.6.0-beta.5(typescript@5.9.3))
+      webidl-conversions:
+        specifier: ^3.0.1
+        version: 3.0.1
       whatwg-url:
         specifier: ^5.0.0
         version: 5.0.0
