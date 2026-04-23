@@ -112,6 +112,14 @@
             <el-input :model-value="energy + ' ' + t('common.w')" disabled v-else />
           </el-form-item>
 
+          <el-form-item :label="t('lease.totalEnergy')" prop="totalEnergy">
+            <el-input v-model="totalEnergy" disabled class="m-input" v-if="isMobile">
+              <template #prefix v-if="isMobile">{{ t('lease.totalEnergy') }}</template>
+              <template #suffix> {{ t('common.w') }} </template>
+            </el-input>
+            <el-input :model-value="totalEnergy + ' ' + t('common.w')" disabled v-else />
+          </el-form-item>
+
           <el-form-item :label="t('lease.walletAddress')" prop="wallet">
             <el-input v-model="wallet" :placeholder="t('lease.enterAddress')" />
           </el-form-item>
@@ -173,6 +181,7 @@ interface RentalForm {
   count: number
   total: number
   energy: number
+  totalEnergy: number
   validity: number
   wallet: string
 }
@@ -310,7 +319,11 @@ const count = computed(() => {
   return num
 })
 
-const energy = ref(13.1)
+const energy = ref(6.5)
+const totalEnergy = computed(() => {
+  // 单笔能量 × 笔数，保留1位小数
+  return +(energy.value * count.value).toFixed(1)
+})
 const validity = computed(() => {
   const [rowIdx] = selecteIndex.value
   return rows.value[rowIdx]?.validity || 1
@@ -331,6 +344,7 @@ const form = reactive<RentalForm>({
   count: count.value,
   total: total.value,
   energy: energy.value,
+  totalEnergy: totalEnergy.value,
   validity: validity.value,
   wallet: wallet.value,
 })
@@ -388,6 +402,19 @@ const rules = computed<FormRules<RentalForm>>(() => ({
       trigger: 'blur',
     },
   ],
+  totalEnergy: [
+    {
+      required: true,
+      validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
+        if (Number(value) <= 0) {
+          callback(new Error(t('formValidation.totalEnergyMustBePositive')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
   validity: [
     {
       required: true,
@@ -427,11 +454,12 @@ const customRules = computed<FormRules>(() => ({
   ],
 }))
 
-watch([unitPrice, count, total, energy, validity], () => {
+watch([unitPrice, count, total, energy, totalEnergy, validity], () => {
   form.unitPrice = unitPrice.value
   form.count = count.value
   form.total = total.value
   form.energy = energy.value
+  form.totalEnergy = totalEnergy.value
   form.validity = validity.value
 })
 
