@@ -46,6 +46,7 @@
     "smartHosting": "智能託管",
     "batchActivation": "批量激活",
     "faq": "常見問題",
+    "contactCustomerService": "聯繫客服",
     "features": "特點",
     "howItWorks": "工作原理",
     "fee": "手續費",
@@ -398,7 +399,8 @@
     "paramsError": "參數錯誤",
     "notFound": "請求的資源不存在",
     "pageNotFound": "頁面未找到",
-    "pageNotFoundDesc": "抱歉，您訪問的頁面不存在或需要通過代理鏈接訪問"
+    "pageNotFoundDesc": "抱歉，您訪問的頁面不存在或需要通過代理鏈接訪問",
+    "siteNotExist": "網站不存在"
   },
   "network": {
     "error": "網絡連接失敗，請檢查網絡設置",

@@ -122,14 +122,20 @@
         </div>
       </div>
       <div class="right-section">
-        <div class="info-wrap">
-          <SvgIcon
-            name="header-tg"
-            width="24"
-            height="24"
-            @click="handleOpenToTelegram(botName)"
-          />
-        </div>
+        <el-tooltip
+          :content="$t('nav.contactCustomerService')"
+          placement="bottom"
+          effect="dark"
+        >
+          <div class="info-wrap">
+            <SvgIcon
+              name="header-tg"
+              width="24"
+              height="24"
+              @click="handleOpenToTelegram(botName)"
+            />
+          </div>
+        </el-tooltip>
         <div class="dropdown-popper-box lang-dropdown">
           <el-dropdown trigger="hover" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
@@ -398,13 +404,6 @@ const handleLanguageChange = (local: Locale) => {
   localLang.value = local
   console.log(local)
   setLocale(local)
-
-  // TODO 处理阿拉伯语言时，页面版式
-  // if (local.startsWith('ar')) {
-  //   document.documentElement.setAttribute('dir', 'rtl')
-  // } else {
-  //   document.documentElement.removeAttribute('dir')
-  // }
 }
 
 const handleLogin = () => {

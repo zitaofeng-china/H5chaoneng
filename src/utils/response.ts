@@ -5,6 +5,7 @@
 import { ElMessage } from 'element-plus'
 import type { ApiResponse } from '@/api/types'
 import { getErrorMessage, getSuccessMessage } from './errorCode'
+import i18n from '@/lang'
 
 /**
  * 成功状态码
@@ -110,10 +111,16 @@ export function handleResponse<T = any>(
     }
   } else {
     if (showError) {
-      const message =
+      let message =
         errorMessage ||
         (useBackendMsg ? response.msg : null) ||
         getErrorMessage(response.code, context, response.msg)
+
+      // 处理国际化标记：如果消息以 'i18n:' 开头，则使用 i18n 翻译
+      if (message.startsWith('i18n:')) {
+        const i18nKey = message.substring(5) // 移除 'i18n:' 前缀
+        message = i18n.global.t(i18nKey)
+      }
 
       ElMessage.error(message)
     }

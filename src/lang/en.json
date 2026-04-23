@@ -47,6 +47,7 @@
     "smartHosting": "Smart Hosting",
     "batchActivation": "Batch Activation",
     "faq": "FAQ",
+    "contactCustomerService": "Contact Customer Service",
     "features": "Features",
     "howItWorks": "How It Works",
     "fee": "Fee",
@@ -414,7 +415,8 @@
     "paramsError": "Parameter error",
     "notFound": "Requested resource not found",
     "pageNotFound": "Page Not Found",
-    "pageNotFoundDesc": "Sorry, the page you are looking for does not exist or requires access through an agent link"
+    "pageNotFoundDesc": "Sorry, the page you are looking for does not exist or requires access through an agent link",
+    "siteNotExist": "Site does not exist"
   },
   "network": {
     "error": "Network connection failed, please check your network settings",

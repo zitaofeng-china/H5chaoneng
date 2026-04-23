@@ -47,6 +47,7 @@
     "smartHosting": "スマートホスティング",
     "batchActivation": "一括有効化",
     "faq": "よくある質問",
+    "contactCustomerService": "カスタマーサービスに連絡",
     "features": "特徴",
     "howItWorks": "仕組み",
     "fee": "手数料",
@@ -400,7 +401,8 @@
     "paramsError": "パラメータエラー",
     "notFound": "リクエストされたリソースが見つかりません",
     "pageNotFound": "ページが見つかりません",
-    "pageNotFoundDesc": "申し訳ございません、お探しのページは存在しないか、代理リンクを通じてアクセスする必要があります"
+    "pageNotFoundDesc": "申し訳ございません、お探しのページは存在しないか、代理リンクを通じてアクセスする必要があります",
+    "siteNotExist": "サイトが存在しません"
   },
   "network": {
     "error": "ネットワーク接続に失敗しました、ネットワーク設定を確認してください",

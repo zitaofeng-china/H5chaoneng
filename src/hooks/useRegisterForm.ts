@@ -65,6 +65,7 @@ export function useRegisterForm() {
       const success = handleResponse(response, {
         context: 'register',
         showSuccess: false, // 不显示默认的成功消息，我们会在自动登录后显示
+        showError: true, // 显示错误消息（会通过 errorCode.ts 和 response.ts 处理国际化）
       })
       
       if (!success) {

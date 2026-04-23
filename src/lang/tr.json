@@ -47,6 +47,7 @@
     "smartHosting": "Akıllı Barındırma",
     "batchActivation": "Toplu Aktivasyon",
     "faq": "SSS",
+    "contactCustomerService": "Müşteri Hizmetleri ile İletişime Geçin",
     "features": "Özellikler",
     "howItWorks": "Nasıl Çalışır",
     "fee": "Ücret",
@@ -400,7 +401,8 @@
     "paramsError": "Parametre hatası",
     "notFound": "İstenen kaynak bulunamadı",
     "pageNotFound": "Sayfa bulunamadı",
-    "pageNotFoundDesc": "Üzgünüz, aradığınız sayfa mevcut değil veya bir acente bağlantısı üzerinden erişim gerektirir"
+    "pageNotFoundDesc": "Üzgünüz, aradığınız sayfa mevcut değil veya bir acente bağlantısı üzerinden erişim gerektirir",
+    "siteNotExist": "Site mevcut değil"
   },
   "network": {
     "error": "Ağ bağlantısı başarısız, ağ ayarlarını kontrol edin",

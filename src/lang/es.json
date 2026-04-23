@@ -47,6 +47,7 @@
     "smartHosting": "Alojamiento Inteligente",
     "batchActivation": "Activación Masiva",
     "faq": "Preguntas Frecuentes",
+    "contactCustomerService": "Contactar Servicio al Cliente",
     "features": "Características",
     "howItWorks": "Cómo Funciona",
     "fee": "Comisiones",
@@ -400,7 +401,8 @@
     "paramsError": "Error de parámetros",
     "notFound": "Recurso solicitado no encontrado",
     "pageNotFound": "Página no encontrada",
-    "pageNotFoundDesc": "Lo sentimos, la página que busca no existe o requiere acceso a través de un enlace de agente"
+    "pageNotFoundDesc": "Lo sentimos, la página que busca no existe o requiere acceso a través de un enlace de agente",
+    "siteNotExist": "El sitio no existe"
   },
   "network": {
     "error": "Error de conexión de red, verifique la configuración de red",

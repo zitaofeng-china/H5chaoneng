@@ -8,10 +8,13 @@ import { useRouter } from 'vue-router'
 import { siteApi, priceApi } from '@/api'
 import { getSite, clearSite, DEFAULT_SITE } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
+import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 
 export function useSiteVerification() {
   const router = useRouter()
   const siteStore = useSiteStore()
+  const { t } = useI18n()
   
   const isVerifying = ref(false)
   const isValid = ref(false)
@@ -45,6 +48,12 @@ export function useSiteVerification() {
         isValid.value = true
         return true
       } else {
+        // 检查是否是"网站不存在"错误
+        if (siteResponse.code === '000007' && siteResponse.msg === '网站不存在') {
+          // 显示国际化的错误消息
+          ElMessage.error(t('error.siteNotExist'))
+        }
+        
         // 验证失败，如果当前不是默认 Site，则使用默认 Site 重试
         if (site !== DEFAULT_SITE) {
           console.log('[Site验证] 当前 Site 验证失败，使用默认 Site:', DEFAULT_SITE)
