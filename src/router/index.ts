@@ -25,6 +25,11 @@ const router = createRouter({
           component: () => import('@/pages/home/index.vue'),
         },
         {
+          path: 'flash',
+          name: 'FlashRent',
+          component: () => import('@/pages/flash/index.vue'),
+        },
+        {
           path: 'lease-time',
           name: 'TimeRentPage',
           component: () => import('@/pages/lease/time/index.vue'),

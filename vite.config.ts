@@ -14,6 +14,7 @@ import Icons from 'unplugin-icons/vite'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 import IconsResolver from 'unplugin-icons/resolver'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { codeInspectorPlugin } from 'code-inspector-plugin'
 // import viteCompression from 'vite-plugin-compression'
 
 // https://vite.dev/config/
@@ -26,6 +27,13 @@ export default defineConfig(({ mode }) => {
     vue(),
     vueJsx(),
     vueDevTools(),
+    codeInspectorPlugin({
+      bundler: 'vite',
+      hotKeys: ['altKey', 'shiftKey'],
+      showSwitch: true,
+      autoToggle: true,
+      editor: 'code',
+    }),
     AutoImport({
       resolvers: [ElementPlusResolver(), IconsResolver({ prefix: 'Icon' })],
       dts: 'auto-imports.d.ts',

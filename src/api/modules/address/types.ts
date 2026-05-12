@@ -10,6 +10,7 @@ export enum AddressKind {
   FLASH_EXCHANGE = 3, // 闪兑（USDT/TRX互换）
   FLASH_ENERGY_TRANSFER = 4, // 闪租能量-转账租赁
   COUNT_RENTAL = 5, // 按笔数租用（USDT购买）
+  WELFARE_ORDER = 6, // 福利订单
   FLASH_ENERGY_BALANCE = 7, // 闪租能量-余额支付
   // 可以根据需要添加其他类别
 }
