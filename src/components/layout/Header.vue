@@ -226,7 +226,7 @@
       <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
-        :class="{ 'is-active': isActive('') }"
+        :class="{ 'is-active': isActiveHome }"
       >
         <div class="menu-wrap">
           <div

@@ -62,7 +62,7 @@
     "welfareOrderSubtitle": "限时优惠特惠能量租赁",
     "welfareInfo1": "向下方地址转{price}TRX转U不扣TRX！",
     "welfareInfo2": "{price} TRX = 65000能量",
-    "welfareInfo3": "无预对方地址是否有U",
+    "welfareInfo3": "无需对方地址是否有U",
     "welfareTipsTitle": "温馨提示",
     "welfareTip1": "转账地址非固定地址，每次转账前请先获取最新地址",
     "welfareTip2": "能量下发后10分钟内有效，请尽快使用",
