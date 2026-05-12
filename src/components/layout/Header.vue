@@ -219,14 +219,14 @@
         :title="$t('nav.welfareOrder')"
         name="0"
         disabled
-        :class="{ 'is-active': isActive('/') }"
+        :class="{ 'route-active': isActive('/') }"
         @click="handleToRouter('/')"
       >
       </el-collapse-item>
       <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
-        :class="{ 'is-active': isActiveHome }"
+        :class="{ 'route-active': isActiveHome }"
       >
         <div class="menu-wrap">
           <div
@@ -256,7 +256,7 @@
         :title="$t('nav.contractFlash')"
         name="2"
         disabled
-        :class="{ 'is-active': isActive('/contract') }"
+        :class="{ 'route-active': isActive('/contract') }"
         @click="handleToRouter('/contract')"
       >
       </el-collapse-item>
@@ -264,7 +264,7 @@
         :title="$t('nav.smartHosting')"
         name="3"
         disabled
-        :class="{ 'is-active': isActive('/hosting') }"
+        :class="{ 'route-active': isActive('/hosting') }"
         @click="handleToRouter('/hosting')"
       >
       </el-collapse-item>
@@ -272,7 +272,7 @@
         :title="$t('nav.batchActivation')"
         name="4"
         disabled
-        :class="{ 'is-active': isActive('/activation') }"
+        :class="{ 'route-active': isActive('/activation') }"
         @click="handleToRouter('/activation')"
       >
       </el-collapse-item>
@@ -344,7 +344,7 @@ const siteStore = useSiteStore()
 const { tgAdmin, botName } = storeToRefs(siteStore)
 
 const localLang = ref(useLangStore().currentLocale)
-const activeNames = ref(['1'])
+const activeNames = ref<string[]>([])
 const isMenu = ref(false)
 const menuBtn = ref(null)
 
@@ -485,7 +485,7 @@ const handleChange = (val: CollapseModelValue) => {
 
 const handleCollapseDestroy = () => {
   isMenu.value = false
-  activeNames.value = ['1']
+  activeNames.value = []
 }
 
 const handleMenu = (type: 'menu' | 'router' = 'menu') => {
@@ -496,7 +496,7 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 const handleResize = () => {
   if (!isMobile() && isMenu.value) {
     isMenu.value = false
-    activeNames.value = ['1']
+    activeNames.value = []
   }
 }
 
@@ -884,7 +884,15 @@ onUnmounted(() => {
       margin-bottom: 6px;
     }
 
+    // Element Plus 自动添加的展开状态（不显示绿色）
     &.is-active {
+      .el-collapse-item__header {
+        background: rgba(2, 15, 45, 0.05);
+      }
+    }
+
+    // 我们自定义的路由激活状态（显示绿色）
+    &.route-active {
       .el-collapse-item__header {
         background: rgba(54, 211, 153, 0.08);
       }
