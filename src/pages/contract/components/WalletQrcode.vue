@@ -1,9 +1,9 @@
 <template>
   <div class="transfer-rental">
-    <div class="instruction-note">
+    <!-- <div class="instruction-note">
       <span>*</span>
       {{ t('transferRental.note') }}
-    </div>
+    </div> -->
 
     <!-- 二维码区域 -->
     <div v-if="props.paymentAddress" class="qr-section-wrapper">
