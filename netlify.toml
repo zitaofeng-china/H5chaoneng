@@ -8,6 +8,8 @@
 [build.environment]
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
+  # 启用 pnpm
+  NETLIFY_USE_PNPM = "true"
 
 # 生产环境配置（main 分支）
 [context.production]
