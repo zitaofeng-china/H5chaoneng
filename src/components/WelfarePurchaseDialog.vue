@@ -3,7 +3,7 @@
     v-model="dialogVisible"
     :title="$t('home.welfareOrder')"
     width="90%"
-    :style="{ maxWidth: '600px' }"
+    :style="{ maxWidth: '500px' }"
     :close-on-click-modal="false"
     @close="handleClose"
   >
@@ -231,37 +231,87 @@ defineExpose({
 
 @media (max-width: 768px) {
   .welfare-dialog {
+    padding: 5px 0;
+
     .tip-message {
-      font-size: 13px;
-      padding: 12px 16px;
+      font-size: 14px;
+      padding: 14px 16px;
       margin-bottom: 20px;
+      line-height: 1.5;
     }
 
     .address-validity {
-      font-size: 14px;
+      font-size: 15px;
       margin-bottom: 20px;
 
       .countdown {
         font-size: 18px;
+        margin-left: 6px;
+      }
+    }
+
+    .address-section {
+      .address-wrapper {
+        flex-direction: column;
+        border-radius: 6px;
+
+        .address-input {
+          padding: 14px 12px;
+          font-size: 13px;
+          text-align: center;
+          word-break: break-all;
+          line-height: 1.4;
+        }
+
+        .copy-button {
+          padding: 14px 20px;
+          font-size: 15px;
+          font-weight: 700;
+          border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+      }
+
+      .address-notice {
+        margin-top: 14px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .welfare-dialog {
+    .tip-message {
+      font-size: 13px;
+      padding: 12px 14px;
+      margin-bottom: 16px;
+    }
+
+    .address-validity {
+      font-size: 14px;
+      margin-bottom: 16px;
+
+      .countdown {
+        font-size: 17px;
       }
     }
 
     .address-section {
       .address-wrapper {
         .address-input {
-          padding: 10px 12px;
-          font-size: 13px;
+          padding: 12px 10px;
+          font-size: 12px;
         }
 
         .copy-button {
-          padding: 0 16px;
-          font-size: 13px;
+          padding: 12px 16px;
+          font-size: 14px;
         }
       }
 
       .address-notice {
-        margin-top: 10px;
-        padding: 0;
+        margin-top: 12px;
         font-size: 12px;
       }
     }
