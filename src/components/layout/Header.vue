@@ -393,6 +393,12 @@ const isActive = (path: string) => {
   const site = getSite()
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   const fullPath = `/${site}${normalizedPath}`
+  
+  // 特殊处理首页：/:site 和 /:site/ 都应该匹配
+  if (normalizedPath === '/') {
+    return route.path === `/${site}` || route.path === `/${site}/`
+  }
+  
   return route.path === fullPath
 }
 
