@@ -244,8 +244,7 @@
     "usdtTip3": "Lütfen miktara dikkat edin, yanlış miktar 1 saatlik enerji teslimatı olarak işlenecektir",
     "tips1": "1 adet enerji satın almak = 130000",
     "tips2": "Zaman sınırı yok, her transferde bir adet düşülür",
-    "tips3": "24 saat içinde transfer yapılmazsa bir adet düşülür",
-    "tips4": "Günlük kullanım için transfer yapmanız önerilir"
+    "tips3": "Günlük kullanım için transfer yapmanız önerilir"
   },
   "hosting": {
     "title": "Akıllı Barındırma",
@@ -302,10 +301,9 @@
     "copyFailed": "Kopyalama başarısız, lütfen manuel olarak kopyalayın",
     "checkAddress": "Transfer yaparken lütfen adresi doğrulayın",
     "tips1": "Fazla ödeme yaparsanız veya hesaba geçmezse, iade için müşteri hizmetleriyle iletişime geçin",
-    "tips2": "24 saat içinde transfer yapılmazsa bir adet düşülür",
-    "tips3": "Borsa cüzdanı kullanarak transfer yapmayın",
-    "tips4": "Transfer yaparken lütfen enerji kiralama cüzdanı adresini doğrulayın",
-    "tips5": "Yanlış transfer veya diğer sorular için lütfen müşteri hizmetleriyle iletişime geçin",
+    "tips2": "Borsa cüzdanı kullanarak transfer yapmayın",
+    "tips3": "Transfer yaparken lütfen cüzdan adresini doğrulayın",
+    "tips4": "Yanlış transfer veya diğer sorular için lütfen müşteri hizmetleriyle iletişime geçin",
     "minUsdtError": "Minimum değişim tutarı {min} USDT",
     "maxUsdtError": "Maksimum değişim tutarı {max} USDT",
     "minTrxError": "Minimum değişim tutarı {min} TRX",

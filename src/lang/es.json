@@ -244,8 +244,7 @@
     "usdtTip3": "Tenga en cuenta el monto, un monto incorrecto se tratará como entrega de energía de 1 hora",
     "tips1": "Comprar 1 unidad de energía es 130000",
     "tips2": "Sin límite de tiempo, descuenta una unidad por transferencia",
-    "tips3": "Sin transferencia en 24 horas descuenta una unidad",
-    "tips4": "Recomendado transferir diariamente para usar"
+    "tips3": "Recomendado transferir diariamente para usar"
   },
   "hosting": {
     "title": "Alojamiento Inteligente",
@@ -302,10 +301,9 @@
     "copyFailed": "Error al copiar, por favor copie manualmente",
     "checkAddress": "Por favor verifique la dirección durante la transferencia",
     "tips1": "Si pagaste de más o no recibiste, contacta al servicio al cliente para reembolso",
-    "tips2": "Sin transferencia en 24 horas descuenta una unidad",
-    "tips3": "No uses billetera de intercambio para transferir",
-    "tips4": "Por favor verifique la dirección de la billetera de alquiler de energía con precisión durante la transferencia",
-    "tips5": "Si transferiste mal o tienes otras preguntas, contacta al servicio al cliente",
+    "tips2": "No uses billetera de intercambio para transferir",
+    "tips3": "Por favor verifique la dirección de la billetera con precisión durante la transferencia",
+    "tips4": "Si transferiste mal o tienes otras preguntas, contacta al servicio al cliente",
     "minUsdtError": "El monto mínimo de intercambio es {min} USDT",
     "maxUsdtError": "El monto máximo de intercambio es {max} USDT",
     "minTrxError": "El monto mínimo de intercambio es {min} TRX",
