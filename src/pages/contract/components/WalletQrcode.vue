@@ -91,7 +91,6 @@ const tips = computed(() => [
   t('contract.tips2'),
   t('contract.tips3'),
   t('contract.tips4'),
-  t('contract.tips5'),
 ])
 
 const getCoinTips = computed(() => {
