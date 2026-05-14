@@ -174,7 +174,7 @@
     "noUsdtTip": "向无U的地址转账,需要双倍的能量",
     "expiryTip": "请在1小时内使用能量,否则会过期回收",
     "amountTip": "务必转入以上对应金额的TRX,否则会租用失败",
-    "addressTip": "转账时请核对准确能量租赁钱包地址",
+    "addressTip": "转账时请核对准确钱包地址",
     "walletAddress": "租用钱包地址",
     "importantNotice": "重要提示",
     "iAcknowledge": "我已阅读并知悉以上所有提示内容",
@@ -259,8 +259,7 @@
     "usdtAddressTip": "转账时请核对准确USDT付款钱包地址",
     "tips1": "购买1笔能量数为130000",
     "tips2": "不限制使用时间，每转账一次扣一笔",
-    "tips3": "24小时不用扣一笔",
-    "tips4": "建议每天转账使用"
+    "tips3": "建议每天转账使用"
   },
   "hosting": {
     "title": "智能托管",
@@ -318,10 +317,9 @@
     "copyFailed": "复制失败，请手动复制",
     "checkAddress": "转账时请核对地址",
     "tips1": "如有超额或不到账请联系客服退款",
-    "tips2": "24小时不用扣一笔",
-    "tips3": "切勿用交易所钱包转账",
-    "tips4": "转账时请核对准确能量租赁钱包地址",
-    "tips5": "如有转错或其他疑问，请联系客服",
+    "tips2": "切勿用交易所钱包转账",
+    "tips3": "转账时请核对准确钱包地址",
+    "tips4": "如有转错或其他疑问，请联系客服",
     "minUsdtError": "最低兑换金额为 {min} USDT",
     "maxUsdtError": "最大兑换金额为 {max} USDT",
     "minTrxError": "最低兑换金额为 {min} TRX",

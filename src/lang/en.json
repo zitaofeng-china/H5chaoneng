@@ -163,7 +163,6 @@
     "transfer7": "Transfer 7TRX = Get 2 Counts",
     "transfer14": "Transfer 14TRX = Get 4 Counts",
     "transfer70": "Transfer 70TRX = Get 20 Counts",
-    "note": "After transfer, energy will be added to your address within 3 seconds",
     "walletQrcode": "Rental Wallet QR Code",
     "copyAddress": "Address copied to clipboard",
     "copyFailed": "Copy failed, please copy manually",
@@ -247,8 +246,7 @@
     "usdtTip3": "Please note the amount, incorrect amount will be treated as 1-hour energy delivery",
     "tips1": "Purchasing 1 count of energy is 130000",
     "tips2": "No time limit, deduct one count per transfer",
-    "tips3": "No transfer in 24 hours deduct one count",
-    "tips4": "Recommended to transfer daily for use"
+    "tips3": "Recommended to transfer daily for use"
   },
   "hosting": {
     "title": "Smart Hosting",
@@ -305,10 +303,9 @@
     "copyFailed": "Copy failed, please copy manually",
     "checkAddress": "Please verify address during transfer",
     "tips1": "If overpaid or not received, please contact customer service for refund",
-    "tips2": "No transfer in 24 hours deduct one count",
-    "tips3": "Do not use exchange wallet for transfer",
-    "tips4": "Please verify the energy rental wallet address accurately during transfer",
-    "tips5": "If transferred wrong or other questions, please contact customer service",
+    "tips2": "Do not use exchange wallet for transfer",
+    "tips3": "Please verify the wallet address accurately during transfer",
+    "tips4": "If transferred wrong or other questions, please contact customer service",
     "minUsdtError": "Minimum exchange amount is {min} USDT",
     "maxUsdtError": "Maximum exchange amount is {max} USDT",
     "minTrxError": "Minimum exchange amount is {min} TRX",
