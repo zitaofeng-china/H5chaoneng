@@ -35,6 +35,7 @@ interface ImportMetaEnv {
   readonly VITE_SOURCEMAP: string // 是否生成 sourcemap
   readonly VITE_HMR: string // 是否开启热更新
   readonly VITE_TEST_MODE: string // 是否为测试模式
+  readonly VITE_DEFAULT_SITE: string // 默认 SITE 标识
 }
 
 interface ImportMeta {
