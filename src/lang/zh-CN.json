@@ -75,6 +75,8 @@
     "welfareAddressNotice": "说明：地址有效10分钟，请尽快转账购买",
     "addressExpired": "支付地址已过期",
     "getAddressFailed": "获取支付地址失败",
+    "welfareRateLimit": "福利申请频繁，请稍后再试！",
+    "welfareReplenishing": "福利正在补充，请稍后重试",
     "welfareRentMessage": "立即租用后,能量{energy}将在5秒内添加到您的地址（福利价格）",
     "welfareTip": "福利订单享受8折优惠，数量有限，先到先得",
     "originalPrice": "原价",

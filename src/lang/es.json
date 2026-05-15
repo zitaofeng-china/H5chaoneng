@@ -72,6 +72,8 @@
     "welfareAddressNotice": "Aviso: La dirección es válida durante 10 minutos, transfiera lo antes posible",
     "addressExpired": "La dirección de pago ha caducado",
     "getAddressFailed": "No se pudo obtener la dirección de pago",
+    "welfareRateLimit": "Solicitudes de bienestar demasiado frecuentes, ¡inténtelo más tarde!",
+    "welfareReplenishing": "El bienestar se está reponiendo, inténtelo más tarde",
     "balancePayment": "Pago con Saldo",
     "transferRental": "Alquiler por Transferencia",
     "totalPrice": "Precio Total",

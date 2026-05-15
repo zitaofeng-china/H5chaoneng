@@ -71,6 +71,8 @@
     "welfareAddressNotice": "說明：地址有效10分鐘，請盡快轉帳購買",
     "addressExpired": "支付地址已過期",
     "getAddressFailed": "獲取支付地址失敗",
+    "welfareRateLimit": "福利申請頻繁，請稍後再試！",
+    "welfareReplenishing": "福利正在補充，請稍後重試",
     "balancePayment": "餘額支付",
     "transferRental": "轉帳租賃",
     "totalPrice": "總價",

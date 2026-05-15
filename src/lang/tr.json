@@ -72,6 +72,8 @@
     "welfareAddressNotice": "Uyarı: Adres 10 dakika geçerlidir, lütfen mümkün olan en kısa sürede transfer edin",
     "addressExpired": "Ödeme adresinin süresi doldu",
     "getAddressFailed": "Ödeme adresi alınamadı",
+    "welfareRateLimit": "Refah başvuruları çok sık, lütfen daha sonra tekrar deneyin!",
+    "welfareReplenishing": "Refah yenileniyor, lütfen daha sonra tekrar deneyin",
     "balancePayment": "Bakiye Ödemesi",
     "transferRental": "Transfer Kiralama",
     "totalPrice": "Toplam Fiyat",

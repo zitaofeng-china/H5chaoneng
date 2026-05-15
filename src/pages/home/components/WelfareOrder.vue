@@ -98,36 +98,70 @@ const handleVisibilityChange = () => {
 }
 
 const handleBuyNow = async () => {
-  // 检查是否登录
-  if (!userStore.isLogin) {
-    ElMessage.warning(t('common.pleaseLogin'))
-    return
-  }
-
   loading.value = true
   
   try {
+    console.log('[WelfareOrder] 开始获取福利订单地址, kind=6')
+    
     // 调用地址接口获取福利订单支付地址 (kind=6)
     const response = await addressApi.getAddress({ kind: AddressKind.WELFARE_ORDER })
     
-    if (response.code === '000000' && response.data) {
+    console.log('[WelfareOrder] 地址接口响应:', response)
+    
+    // 检查状态码 000006 - IP频率限制
+    if (response.code === '000006') {
+      console.warn('[WelfareOrder] IP频率限制:', response.msg)
+      ElMessage({
+        message: t('home.welfareRateLimit'),
+        type: 'error',
+        customClass: 'welfare-message-large',
+      })
+      return
+    }
+    
+    if (response.code === '000000') {
+      // 检查 data 是否为空
+      if (!response.data) {
+        console.warn('[WelfareOrder] 福利正在补充，data 为空')
+        ElMessage({
+          message: t('home.welfareReplenishing'),
+          type: 'warning',
+          customClass: 'welfare-message-large',
+        })
+        return
+      }
+      
       // 判断 data 是字符串还是对象
       const paymentAddress = typeof response.data === 'string' 
         ? response.data 
         : response.data.address
       
+      console.log('[WelfareOrder] 解析的支付地址:', paymentAddress)
+      
       if (paymentAddress) {
         // 打开弹窗显示支付地址
         purchaseDialogRef.value?.open(paymentAddress)
       } else {
-        ElMessage.error(t('home.getAddressFailed'))
+        console.error('[WelfareOrder] 支付地址为空')
+        ElMessage({
+          message: t('home.welfareReplenishing'),
+          type: 'warning',
+          customClass: 'welfare-message-large',
+        })
       }
+    } else {
+      console.error('[WelfareOrder] 接口返回失败:', response)
+      ElMessage.error(response.msg || t('home.getAddressFailed'))
+    }
+  } catch (error) {
+    console.error('[WelfareOrder] 获取支付地址失败:', error)
+    
+    // 如果是未登录错误，不显示额外的错误提示（拦截器已经显示了）
+    if (error instanceof Error && error.message === 'NOT_LOGGED_IN') {
+      console.log('[WelfareOrder] 用户未登录，已由拦截器处理')
     } else {
       ElMessage.error(t('home.getAddressFailed'))
     }
-  } catch (error) {
-    console.error('获取支付地址失败:', error)
-    ElMessage.error(t('home.getAddressFailed'))
   } finally {
     loading.value = false
   }
@@ -320,6 +354,43 @@ onUnmounted(() => {
       margin: 20px 16px;
       height: 48px;
       font-size: 16px;
+    }
+  }
+}
+</style>
+
+<style lang="scss">
+/* 全局样式：让福利订单的提示更明显 */
+.welfare-message-large {
+  min-width: 420px !important;
+  padding: 20px 24px !important;
+  font-size: 18px !important;
+  font-weight: 600 !important;
+  text-align: center !important;
+  
+  .el-message__content {
+    font-size: 18px !important;
+    text-align: center !important;
+  }
+  
+  .el-message__icon {
+    font-size: 28px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .welfare-message-large {
+    min-width: 90vw !important;
+    max-width: 90vw !important;
+    padding: 18px 20px !important;
+    font-size: 16px !important;
+    
+    .el-message__content {
+      font-size: 16px !important;
+    }
+    
+    .el-message__icon {
+      font-size: 24px !important;
     }
   }
 }

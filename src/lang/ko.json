@@ -72,6 +72,8 @@
     "welfareAddressNotice": "안내: 주소는 10분간 유효합니다. 가능한 한 빨리 송금하세요",
     "addressExpired": "결제 주소가 만료되었습니다",
     "getAddressFailed": "결제 주소를 가져오지 못했습니다",
+    "welfareRateLimit": "복지 신청이 너무 빈번합니다. 나중에 다시 시도해주세요!",
+    "welfareReplenishing": "복지를 보충하는 중입니다. 나중에 다시 시도해주세요",
     "balancePayment": "잔액 결제",
     "transferRental": "이체 대여",
     "totalPrice": "총 가격",

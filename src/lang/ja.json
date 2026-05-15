@@ -72,6 +72,8 @@
     "welfareAddressNotice": "注意：アドレスは10分間有効です。できるだけ早く送金してください",
     "addressExpired": "支払いアドレスの有効期限が切れました",
     "getAddressFailed": "支払いアドレスの取得に失敗しました",
+    "welfareRateLimit": "福利申請が頻繁です、しばらくしてから再試行してください！",
+    "welfareReplenishing": "福利を補充中です、しばらくしてから再試行してください",
     "balancePayment": "残高支払い",
     "transferRental": "振込レンタル",
     "totalPrice": "合計価格",

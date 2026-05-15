@@ -72,6 +72,8 @@
     "welfareAddressNotice": "Notice: Address is valid for 10 minutes, please transfer as soon as possible",
     "addressExpired": "Payment address has expired",
     "getAddressFailed": "Failed to get payment address",
+    "welfareRateLimit": "Welfare application too frequent, please try again later!",
+    "welfareReplenishing": "Welfare is being replenished, please try again later",
     "welfareRentMessage": "After renting now, energy {energy} will be added to your address within 5 seconds (Welfare Price)",
     "welfareTip": "Welfare orders enjoy 20% discount, limited quantity, first come first served",
     "originalPrice": "Original Price",

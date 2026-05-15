@@ -41,7 +41,7 @@ export const NO_TOKEN_URLS: (string | RegExp)[] = [
   '/v3/change_password', // 修改密码不需要 Token，只需要 Site
   '/v3/site', // 获取站点信息
   '/v3/price', // 获取价格信息
-  '/v3/address', // 获取付款地址（二维码）
+  '/v3/address', // 获取付款地址（二维码）- 包括福利订单 kind=6
   '/v3/exchange/rate', // 获取汇率信息
 ]
 

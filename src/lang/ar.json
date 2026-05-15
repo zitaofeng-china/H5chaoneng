@@ -72,6 +72,8 @@
     "welfareAddressNotice": "ملاحظة: العنوان صالح لمدة 10 دقائق، يرجى التحويل في أقرب وقت ممكن",
     "addressExpired": "انتهت صلاحية عنوان الدفع",
     "getAddressFailed": "فشل في الحصول على عنوان الدفع",
+    "welfareRateLimit": "طلبات الرعاية متكررة جدًا، يرجى المحاولة لاحقًا!",
+    "welfareReplenishing": "يتم تجديد الرعاية، يرجى المحاولة لاحقًا",
     "balancePayment": "دفع الرصيد",
     "transferRental": "نقل التأجير",
     "totalPrice": "السعر الإجمالي",
