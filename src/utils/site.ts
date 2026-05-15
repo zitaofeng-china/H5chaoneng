@@ -6,7 +6,7 @@
 import { useRoute } from 'vue-router'
 
 // 默认 Site 标识（从环境变量读取，如果未配置则使用默认值）
-export const DEFAULT_SITE = import.meta.env.VITE_DEFAULT_SITE || 'c8UKwuXu'
+export const DEFAULT_SITE = import.meta.env.VITE_DEFAULT_SITE || '1ih5zt8q'
 
 export function getSite(): string {
   const path = window.location.pathname

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-const DEFAULT_SITE = import.meta.env.VITE_DEFAULT_SITE || 'c8UKwuXu'
+const DEFAULT_SITE = import.meta.env.VITE_DEFAULT_SITE || '1ih5zt8q'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
