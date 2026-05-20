@@ -20,12 +20,12 @@ export const useBury = () => {
       const key = `bury_${type}`
       if (!localStorage.getItem(key)) {
         localStorage.setItem(key, '1')
-        window?.umami?.track('埋点', { [type]: type })
+        ;(window as any)?.umami?.track('埋点', { [type]: type })
       }
       return
     }
 
-    window?.umami?.track('埋点', { [type]: type })
+    ;(window as any)?.umami?.track('埋点', { [type]: type })
   }
 
   return { track }
