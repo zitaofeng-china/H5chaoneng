@@ -14,12 +14,6 @@ defineOptions({
 
 <style lang="scss" scoped>
 .welfare-page {
-  min-height: calc(100vh - 66px);
-}
-
-@media (max-width: 768px) {
-  .welfare-page {
-    min-height: calc(100vh - 54px);
-  }
+  padding-bottom: 40px;
 }
 </style>

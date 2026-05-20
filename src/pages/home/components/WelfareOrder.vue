@@ -69,6 +69,29 @@ const { priceData } = storeToRefs(priceStore)
 const purchaseDialogRef = ref<InstanceType<typeof WelfarePurchaseDialog>>()
 const loading = ref(false)
 
+// 福利地址缓存（10分钟有效，存 sessionStorage 刷新不丢失）
+const CACHE_DURATION = 10 * 60 * 1000 // 10 分钟
+const CACHE_KEY = 'welfare_address_cache'
+
+function getCachedAddress(): string | null {
+  try {
+    const raw = sessionStorage.getItem(CACHE_KEY)
+    if (!raw) return null
+    const { address, timestamp } = JSON.parse(raw)
+    if (Date.now() - timestamp < CACHE_DURATION) {
+      return address
+    }
+    sessionStorage.removeItem(CACHE_KEY)
+  } catch {
+    sessionStorage.removeItem(CACHE_KEY)
+  }
+  return null
+}
+
+function setCachedAddress(address: string) {
+  sessionStorage.setItem(CACHE_KEY, JSON.stringify({ address, timestamp: Date.now() }))
+}
+
 defineOptions({
   name: 'WelfareOrder',
 })
@@ -101,6 +124,14 @@ const handleBuyNow = async () => {
   loading.value = true
   
   try {
+    // 检查缓存是否有效（10分钟内）
+    const cached = getCachedAddress()
+    if (cached) {
+      console.log('[WelfareOrder] 使用缓存地址:', cached)
+      purchaseDialogRef.value?.open(cached)
+      return
+    }
+
     console.log('[WelfareOrder] 开始获取福利订单地址, kind=6')
     
     // 调用地址接口获取福利订单支付地址 (kind=6)
@@ -139,6 +170,10 @@ const handleBuyNow = async () => {
       console.log('[WelfareOrder] 解析的支付地址:', paymentAddress)
       
       if (paymentAddress) {
+        // 缓存地址到 sessionStorage
+        setCachedAddress(paymentAddress)
+        console.log('[WelfareOrder] 地址已缓存，有效期10分钟')
+        
         // 打开弹窗显示支付地址
         purchaseDialogRef.value?.open(paymentAddress)
       } else {
@@ -185,7 +220,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .welfare-order {
   background: var(--theme-bg-light);
-  padding: 40px 20px 80px;
+  padding: 40px 20px 40px;
 
   .welfare-card {
     max-width: 960px;
@@ -306,7 +341,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .welfare-order {
-    padding: 20px 10px 40px;
+    padding: 20px 10px 20px;
 
     .welfare-header {
       font-size: 18px;

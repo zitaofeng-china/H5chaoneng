@@ -43,6 +43,7 @@ export const NO_TOKEN_URLS: (string | RegExp)[] = [
   '/v3/price', // 获取价格信息
   '/v3/address', // 获取付款地址（二维码）- 包括福利订单 kind=6
   '/v3/exchange/rate', // 获取汇率信息
+  '/v3/captcha/email', // 获取邮箱验证码
 ]
 
 // 请求头配置

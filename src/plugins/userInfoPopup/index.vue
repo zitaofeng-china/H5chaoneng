@@ -37,6 +37,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useUserStore } from '@/stores/useUserStore'
+import { useSiteStore } from '@/stores/useSiteStore'
 import { useI18n } from 'vue-i18n'
 import type { UserInfoRow } from './types'
 
@@ -47,6 +48,7 @@ defineOptions({
 const { t } = useI18n()
 const commonStore = useCommonStore()
 const userStore = useUserStore()
+const siteStore = useSiteStore()
 const { isMobile } = storeToRefs(commonStore)
 
 const visible = defineModel<boolean>({ default: false })
@@ -60,7 +62,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
     return [
       { label: t('recharge.account'), value: '-' },
       { label: t('recharge.email'), value: '-' },
-      { label: t('recharge.tgOfficial'), value: '-' },
+      { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
       { label: t('recharge.trxBalance'), value: '0 TRX' },
     ]
   }
@@ -68,15 +70,18 @@ const userInfoData = computed<UserInfoRow[]>(() => {
   return [
     { label: t('recharge.account'), value: userInfo.username || '-' },
     { label: t('recharge.email'), value: userInfo.email || '-' },
-    { label: t('recharge.tgOfficial'), value: userInfo.tg_user_name || '-' },
+    { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
     { label: t('recharge.trxBalance'), value: `${userInfo.trx_balance || '0'} TRX` },
   ]
 })
 
 const open = async () => {
   visible.value = true
-  // 打开弹窗时刷新用户信息
-  await userStore.fetchUserInfo()
+  // 打开弹窗时刷新用户信息和站点信息
+  await Promise.all([
+    userStore.fetchUserInfo(),
+    siteStore.fetchSiteInfo()
+  ])
 }
 
 const close = () => {
