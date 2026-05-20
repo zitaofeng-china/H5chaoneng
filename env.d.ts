@@ -46,5 +46,8 @@ interface ImportMeta {
 declare global {
   interface Window {
     __tokenExpiredHandled?: boolean
+    umami?: {
+      track: (event: string, data?: Record<string, string>) => void
+    }
   }
 }

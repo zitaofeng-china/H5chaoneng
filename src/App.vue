@@ -6,11 +6,13 @@ import WelcomeDialog from '@/components/WelcomeDialog.vue'
 import { useSiteVerification } from '@/hooks/useSiteVerification'
 import { useUserStore } from '@/stores/useUserStore'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useBury } from '@/hooks/useBury'
 
 const route = useRoute()
 const { verifySite } = useSiteVerification()
 const userStore = useUserStore()
 const priceStore = usePriceStore()
+const { track } = useBury()
 
 const is404Page = computed(() => route.name === 'NotFound')
 
@@ -25,6 +27,9 @@ function handleVisibilityChange() {
 }
 
 onMounted(async () => {
+  // 埋点：统计设备数（只触发一次）
+  track('运行过项目设备数', true)
+  
   if (!is404Page.value) {
     const isValid = await verifySite()
     if (isValid) {
