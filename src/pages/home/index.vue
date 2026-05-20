@@ -1,5 +1,5 @@
 <template>
-  <WelfareOrder />
+  <EnergyRental />
   <WhyChooseUs />
   <HowItWorks />
   <FeeDescription />
@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts">
-import WelfareOrder from './components/WelfareOrder.vue'
+import EnergyRental from './components/EnergyRental.vue'
 import HelpSection from './components/HelpSection.vue'
 import FaqSection from './components/FaqSection.vue'
 import FeeDescription from './components/FeeDescription.vue'

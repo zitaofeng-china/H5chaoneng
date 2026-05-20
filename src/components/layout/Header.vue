@@ -11,15 +11,6 @@
       </div>
 
       <div class="nav-links">
-        <!-- 福利订单独立菜单项 -->
-        <div
-          class="nav-link"
-          :class="{ 'is-active': isActive('/') }"
-          @click="handleToRouter('/')"
-        >
-          {{ $t('nav.welfareOrder') }}
-        </div>
-
         <!-- 能量租赁下拉菜单 -->
         <div class="dropdown-popper-box energy-rental-dropdown" :class="{ 'is-active': isActiveHome }">
           <el-dropdown 
@@ -37,8 +28,8 @@
             <template #dropdown>
               <el-dropdown-menu class="energy-rental-menu-unique">
                 <el-dropdown-item
-                  :class="{ 'is-active': isActive('/flash') }"
-                  @click="handleToRouter('/flash')"
+                  :class="{ 'is-active': isActive('/') }"
+                  @click="handleToRouter('/')"
                 >
                   {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
@@ -79,6 +70,15 @@
           @click="handleToRouter('/activation')"
         >
           {{ $t('nav.batchActivation') }}
+        </div>
+
+        <!-- 福利订单独立菜单项 -->
+        <div
+          class="nav-link"
+          :class="{ 'is-active': isActive('/welfare') }"
+          @click="handleToRouter('/welfare')"
+        >
+          {{ $t('nav.welfareOrder') }}
         </div>
 
         <!-- 常见问题下拉菜单 -->
@@ -216,14 +216,6 @@
   <div class="collapse-container" v-if="isMenu" v-click-outside:[menuBtn]="handleCollapseDestroy">
     <el-collapse v-model="activeNames" @change="handleChange">
       <el-collapse-item
-        :title="$t('nav.welfareOrder')"
-        name="0"
-        disabled
-        :class="{ 'route-active': isActive('/') }"
-        @click="handleToRouter('/')"
-      >
-      </el-collapse-item>
-      <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
         :class="{ 'route-active': isActiveHome }"
@@ -231,8 +223,8 @@
         <div class="menu-wrap">
           <div
             class="menu-item"
-            :class="{ 'is-active': isActive('/flash') }"
-            @click="handleToRouter('/flash')"
+            :class="{ 'is-active': isActive('/') }"
+            @click="handleToRouter('/')"
           >
             {{ $t('nav.quickRent') }}
           </div>
@@ -274,6 +266,14 @@
         disabled
         :class="{ 'route-active': isActive('/activation') }"
         @click="handleToRouter('/activation')"
+      >
+      </el-collapse-item>
+      <el-collapse-item
+        :title="$t('nav.welfareOrder')"
+        name="0"
+        disabled
+        :class="{ 'route-active': isActive('/welfare') }"
+        @click="handleToRouter('/welfare')"
       >
       </el-collapse-item>
       <el-collapse-item :title="$t('nav.faq')" name="5">
@@ -360,20 +360,22 @@ const lang = reactive({
   'zh-TW': '繁體中文',
 })
 
-// 判断是否在能量租赁相关页面（闪租、按时间租用、按笔数租用）
+// 判断是否在能量租赁相关页面（首页闪租、按时间租用、按笔数租用）
 const isActiveHome = computed(() => {
   const site = getSite()
-  const energyRentalPaths = [`/${site}/flash`, `/${site}/lease-time`, `/${site}/lease-count`]
-  // 只有在这些页面且没有hash时才激活能量租赁下拉菜单
-  // 如果有hash，说明用户在查看FAQ部分，不应该激活能量租赁
-  return energyRentalPaths.includes(route.path as string) && !route.hash
+  // 只有这些页面且没有 hash 时才激活能量租赁下拉菜单
+  // 如果有 hash，说明用户在查看 FAQ 部分，不应该激活能量租赁
+  if (route.hash) return false
+  const energyRentalPaths = [`/${site}/lease-time`, `/${site}/lease-count`]
+  // 首页（带或不带尾斜杠）也算闪租命中
+  return route.path === `/${site}` || route.path === `/${site}/` || energyRentalPaths.includes(route.path as string)
 })
 
 // 判断是否应该激活常见问题下拉菜单
 const isActiveFaq = computed(() => {
   const site = getSite()
-  // 只有在首页且有hash时才激活常见问题下拉菜单
-  return route.path === `/${site}/` && !!route.hash
+  // 只有在首页且有 hash 时才激活常见问题下拉菜单
+  return (route.path === `/${site}` || route.path === `/${site}/`) && !!route.hash
 })
 
 const userStore = useUserStore()
