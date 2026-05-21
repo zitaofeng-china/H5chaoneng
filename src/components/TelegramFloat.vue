@@ -43,7 +43,7 @@ const onDragStart = (e: MouseEvent | TouchEvent) => {
   isDragging = true
   hasMoved = false
 
-  const event = 'touches' in e ? e.touches[0] : e
+  const event = 'touches' in e ? e.touches[0]! : e
   startX = event.clientX
   startY = event.clientY
   offsetX = event.clientX - position.x
@@ -59,7 +59,7 @@ const onDragMove = (e: MouseEvent | TouchEvent) => {
   if (!isDragging) return
   e.preventDefault()
 
-  const event = 'touches' in e ? e.touches[0] : e
+  const event = 'touches' in e ? e.touches[0]! : e
   const dx = event.clientX - startX
   const dy = event.clientY - startY
 
