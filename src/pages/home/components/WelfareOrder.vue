@@ -44,6 +44,13 @@
       >
         {{ t('home.buyWelfareNow') }}
       </el-button>
+
+      <!-- 跳转到闪租能量 -->
+      <div class="page-link-section">
+        <el-button type="primary" plain size="large" class="page-link-btn" @click="goToFlashRent">
+          {{ t('home.goToNormalEnergy') }} →
+        </el-button>
+      </div>
     </el-card>
 
     <!-- 购买弹窗 -->
@@ -54,6 +61,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -61,8 +69,10 @@ import { addressApi } from '@/api'
 import { AddressKind } from '@/api/modules/address/types'
 import { storeToRefs } from 'pinia'
 import WelfarePurchaseDialog from '@/components/WelfarePurchaseDialog.vue'
+import { getSite } from '@/utils/site'
 
 const { t } = useI18n()
+const router = useRouter()
 const userStore = useUserStore()
 const priceStore = usePriceStore()
 const { priceData } = storeToRefs(priceStore)
@@ -202,6 +212,11 @@ const handleBuyNow = async () => {
   }
 }
 
+const goToFlashRent = () => {
+  const site = getSite()
+  router.push(`/${site}/`)
+}
+
 // 组件挂载时获取价格
 onMounted(() => {
   console.log('[WelfareOrder] 组件挂载，获取价格数据')
@@ -337,6 +352,19 @@ onUnmounted(() => {
       transform: translateY(0);
     }
   }
+
+  .page-link-section {
+    padding: 0 40px 30px;
+    text-align: center;
+
+    .page-link-btn {
+      width: 100%;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+  }
 }
 
 @media (max-width: 768px) {
@@ -389,6 +417,15 @@ onUnmounted(() => {
       margin: 20px 16px;
       height: 48px;
       font-size: 16px;
+    }
+
+    .page-link-section {
+      padding: 0 16px 20px;
+
+      .page-link-btn {
+        height: 44px;
+        font-size: 14px;
+      }
     }
   }
 }

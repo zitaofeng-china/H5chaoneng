@@ -65,6 +65,8 @@
     "welfareTip1": "轉帳地址不固定，每次轉帳前請獲取最新地址",
     "welfareTip2": "能量發放後10分鐘內有效，請盡快使用",
     "buyWelfareNow": "立即購買福利訂單",
+    "goToNormalEnergy": "請移步正常能量",
+    "goToWelfareOrder": "請移步福利訂單",
     "welfarePurchaseTip": "請複製下方地址進行交易",
     "addressValidity": "地址有效期剩餘",
     "copyAddress": "點擊複製",

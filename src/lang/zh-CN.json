@@ -68,6 +68,8 @@
     "welfareTip2": "能量下发后10分钟内有效，请尽快使用",
     "welfareTip3": "请在 2026-05-09 19:54:48 前完成购买，超时将取消订单！！！",
     "buyWelfareNow": "立即购买福利订单",
+    "goToNormalEnergy": "请移步正常能量",
+    "goToWelfareOrder": "请移步福利订单",
     "welfareComingSoon": "福利订单功能即将上线",
     "welfarePurchaseTip": "请复制下方地址进行交易",
     "addressValidity": "地址有效期剩余",

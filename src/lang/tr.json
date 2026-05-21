@@ -66,6 +66,8 @@
     "welfareTip1": "Transfer adresi sabit değildir, her transferden önce en son adresi alın",
     "welfareTip2": "Enerji dağıtımdan sonra 10 dakika geçerlidir, lütfen mümkün olan en kısa sürede kullanın",
     "buyWelfareNow": "Şimdi Refah Siparişi Satın Al",
+    "goToNormalEnergy": "Normal Enerjiye Git",
+    "goToWelfareOrder": "Refah Siparişine Git",
     "welfarePurchaseTip": "İşlem yapmak için aşağıdaki adresi kopyalayın",
     "addressValidity": "Kalan adres geçerliliği",
     "copyAddress": "Kopyalamak için tıklayın",
