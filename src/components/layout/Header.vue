@@ -34,12 +34,14 @@
                   {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!isLite"
                   :class="{ 'is-active': isActive('/lease-time') }"
                   @click="handleToRouter('/lease-time')"
                 >
                   {{ $t('nav.rentByTime') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!isLite"
                   :class="{ 'is-active': isActive('/lease-count') }"
                   @click="handleToRouter('/lease-count')"
                 >
@@ -58,6 +60,7 @@
           {{ $t('nav.contractFlash') }}
         </div>
         <div
+          v-if="!isLite"
           class="nav-link"
           :class="{ 'is-active': isActive('/hosting') }"
           @click="handleToRouter('/hosting')"
@@ -65,6 +68,7 @@
           {{ $t('nav.smartHosting') }}
         </div>
         <div
+          v-if="!isLite"
           class="nav-link"
           :class="{ 'is-active': isActive('/activation') }"
           @click="handleToRouter('/activation')"
@@ -131,22 +135,8 @@
         </div>
       </div>
       <div class="right-section">
-        <el-tooltip
-          :content="$t('nav.contactCustomerService')"
-          placement="bottom"
-          effect="dark"
-        >
-          <div class="info-wrap">
-            <SvgIcon
-              name="header-tg"
-              width="24"
-              height="24"
-              @click="handleOpenToTelegram(botName)"
-            />
-          </div>
-        </el-tooltip>
         <div class="dropdown-popper-box lang-dropdown">
-          <el-dropdown trigger="hover" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
+          <el-dropdown trigger="click" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
               <SvgIcon name="header-lang" class="icon-svg" width="24" height="24" />
             </div>
@@ -165,13 +155,10 @@
           </el-dropdown>
         </div>
 
-        <div class="balance-display">
+        <div class="balance-display" v-if="isLogin">
           <div class="balance-info">
             <SvgIcon name="trx" width="24" height="24" />
             <div class="balance-amount">{{ trxBalance }}</div>
-          </div>
-          <div class="recharge-btn" @click="handleRechange">
-            <div class="text">{{ $t('common.recharge') }}</div>
           </div>
         </div>
 
@@ -182,6 +169,9 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu class="user-menu">
+                <el-dropdown-item @click.stop="handleRechange">
+                  {{ $t('common.recharge') }}
+                </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleUserInfo">
                   {{ $t('nav.userInfo') }}
                 </el-dropdown-item>
@@ -196,12 +186,8 @@
           </el-dropdown>
         </div>
         <div class="no-login" v-else>
-          <div class="login-btn btn" @click="handleLogin">
+          <div v-if="!isLite" class="login-btn btn" @click="handleLogin">
             {{ $t('login.title') }}
-          </div>
-          /
-          <div class="register-btn btn" @click="handleRegister">
-            {{ $t('register.title') }}
           </div>
         </div>
         <div class="info-wrap" ref="menuBtn" v-if="isMobile()" @click="handleMenu('menu')">
@@ -229,6 +215,7 @@
             {{ $t('nav.quickRent') }}
           </div>
           <div
+            v-if="!isLite"
             class="menu-item"
             :class="{ 'is-active': isActive('/lease-time') }"
             @click="handleToRouter('/lease-time')"
@@ -236,6 +223,7 @@
             {{ $t('nav.rentByTime') }}
           </div>
           <div
+            v-if="!isLite"
             class="menu-item"
             :class="{ 'is-active': isActive('/lease-count') }"
             @click="handleToRouter('/lease-count')"
@@ -253,6 +241,7 @@
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="!isLite"
         :title="$t('nav.smartHosting')"
         name="3"
         disabled
@@ -261,6 +250,7 @@
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="!isLite"
         :title="$t('nav.batchActivation')"
         name="4"
         disabled
@@ -331,7 +321,7 @@ import { storeToRefs } from 'pinia'
 import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
-import { getSite } from '@/utils/site'
+import { getSite, isLiteSite } from '@/utils/site'
 
 defineOptions({
   name: 'LayoutHeader',
@@ -347,6 +337,9 @@ const localLang = ref(useLangStore().currentLocale)
 const activeNames = ref<string[]>([])
 const isMenu = ref(false)
 const menuBtn = ref(null)
+
+// 精简模式：站点 1ExAgznu 隐藏部分功能
+const isLite = computed(() => isLiteSite())
 
 const lang = reactive({
   en: 'English',
@@ -698,37 +691,18 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   :deep(.el-dropdown-menu) {
-    min-width: 100px !important;
-    max-width: 140px !important;
-    padding: 4px 2px !important;
-    max-height: 180px !important;
-    overflow-y: auto !important;
-    
-    /* 美化滚动条 */
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 2px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 2px;
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.3);
-      }
-    }
+    min-width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   :deep(.el-dropdown-menu__item) {
-    font-size: 12px !important;
-    padding: 6px 10px !important;
-    min-height: 32px !important;
-    line-height: 1.3 !important;
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    min-height: auto !important;
+    line-height: 1.4 !important;
   }
 }
 
