@@ -9,7 +9,7 @@ import { useRoute } from 'vue-router'
 export const DEFAULT_SITE = import.meta.env.VITE_DEFAULT_SITE || '1ih5zt8q'
 
 // 精简模式站点（隐藏部分功能）
-export const LITE_SITE = '1ExAgznu'
+export const LITE_SITE = '1ih5zt8q'
 
 export function getSite(): string {
   const path = window.location.pathname
