@@ -321,7 +321,7 @@ import { storeToRefs } from 'pinia'
 import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
-import { getSite, isLiteSite } from '@/utils/site'
+import { getSite, isLiteSite, LITE_SITE, DEFAULT_SITE } from '@/utils/site'
 
 defineOptions({
   name: 'LayoutHeader',
@@ -338,8 +338,11 @@ const activeNames = ref<string[]>([])
 const isMenu = ref(false)
 const menuBtn = ref(null)
 
-// 精简模式：站点 1ExAgznu 隐藏部分功能
-const isLite = computed(() => isLiteSite())
+// 精简模式：依赖响应式的路由参数判断，确保路由切换后能正确更新
+const isLite = computed(() => {
+  const site = (route.params.site as string) || getSite()
+  return site === DEFAULT_SITE
+})
 
 const lang = reactive({
   en: 'English',

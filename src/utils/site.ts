@@ -3,13 +3,20 @@
  * 用于提取、保存和清除代理标识
  */
 
-import { useRoute } from 'vue-router'
+// 默认 Site 标识
+// 优先级：运行时配置(config.js) > 环境变量 > 硬编码兜底
+function getDefaultSite(): string {
+  const runtimeConfig = (window as any).__APP_CONFIG__?.DEFAULT_SITE
+  if (runtimeConfig) {
+    return runtimeConfig
+  }
+  return import.meta.env.VITE_DEFAULT_SITE || '1ih5zt8q'
+}
 
-// 默认 Site 标识（从环境变量读取，如果未配置则使用默认值）
-export const DEFAULT_SITE = import.meta.env.VITE_DEFAULT_SITE || '1ih5zt8q'
+export const DEFAULT_SITE = getDefaultSite()
 
-// 精简模式站点（隐藏部分功能）
-export const LITE_SITE = '1ih5zt8q'
+// 精简模式站点 = 默认站点（定制化跟着默认站点走）
+export const LITE_SITE = DEFAULT_SITE
 
 export function getSite(): string {
   const path = window.location.pathname

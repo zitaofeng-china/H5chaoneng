@@ -54,11 +54,13 @@ export function useSiteVerification() {
           ElMessage.error(t('error.siteNotExist'))
         }
         
-        // 验证失败，如果当前不是默认 Site，则使用默认 Site 重试
+        // 验证失败，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
         if (site !== DEFAULT_SITE) {
-          console.log('[Site验证] 当前 Site 验证失败，使用默认 Site:', DEFAULT_SITE)
-          await router.replace(`/${DEFAULT_SITE}${router.currentRoute.value.path.replace(`/${site}`, '')}`)
-          return false
+          console.log('[Site验证] 当前 Site 验证失败，重定向到默认 Site:', DEFAULT_SITE)
+          const subPath = router.currentRoute.value.path.replace(`/${site}`, '') || ''
+          await router.replace(`/${DEFAULT_SITE}${subPath}`)
+          // 重定向后重新验证，确保定制化数据正确加载
+          return verifySite()
         }
         
         // 如果是默认 Site 验证失败，也继续使用默认 Site（不跳转 404）
@@ -69,12 +71,14 @@ export function useSiteVerification() {
     } catch (error) {
       console.error('[Site验证] 验证出错:', error)
       
-      // 验证出错，如果当前不是默认 Site，则使用默认 Site 重试
+      // 验证出错，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
       const currentSite = getSite()
       if (currentSite !== DEFAULT_SITE) {
-        console.log('[Site验证] 验证出错，使用默认 Site:', DEFAULT_SITE)
-        await router.replace(`/${DEFAULT_SITE}${router.currentRoute.value.path.replace(`/${currentSite}`, '')}`)
-        return false
+        console.log('[Site验证] 验证出错，重定向到默认 Site:', DEFAULT_SITE)
+        const subPath = router.currentRoute.value.path.replace(`/${currentSite}`, '') || ''
+        await router.replace(`/${DEFAULT_SITE}${subPath}`)
+        // 重定向后重新验证
+        return verifySite()
       }
       
       // 如果是默认 Site 出错，也继续使用默认 Site（不跳转 404）
