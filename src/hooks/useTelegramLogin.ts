@@ -11,17 +11,13 @@ import { setToken, setTokenExpiredAt } from '@/utils/token'
 
 // 使用后端 /v3/login 接口，InitData 放在 Header 中
 async function tgLoginApi(initData: string, site: string) {
-  const headers = {
-    'Content-Type': 'application/json',
-    'Site': site,
-    'InitData': initData,
-  }
-  // 调试：打印发送的 headers
-  console.log('[Telegram] 请求 headers:', JSON.stringify({ Site: site, InitData: initData.substring(0, 50) + '...' }))
-  
   const response = await fetch('/v3/login', {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      'Site': site,
+      'InitData': initData,
+    },
     body: JSON.stringify({}),
   })
   return response.json()
@@ -90,12 +86,7 @@ export function useTelegramLogin() {
     tgLoginError.value = ''
 
     try {
-      console.log('[Telegram] 开始自动登录...')
       const response = await tgLoginApi(initData, site)
-      
-      // 调试：打印接口返回的完整数据
-      console.log('[Telegram] 接口响应:', JSON.stringify(response))
-      tgLoginError.value = `API响应: ${JSON.stringify(response)}`
 
       if (response.code === '000000' && response.data) {
         const { token, user_info, site: responseSite } = response.data
