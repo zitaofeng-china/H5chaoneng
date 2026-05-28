@@ -8,15 +8,16 @@ import { useUserStore } from '@/stores/useUserStore'
 import { isTelegramMiniApp, getTelegramInitData, getTelegramUser, telegramReady, telegramExpand } from '@/utils/telegram'
 import { getSite } from '@/utils/site'
 
-// TODO: 后端接口 ready 后确认返回格式
+// 使用后端 /v3/login 接口，InitData 放在 Header 中
 async function tgLoginApi(initData: string, site: string) {
-  const response = await fetch('/v3/tg_login', {
+  const response = await fetch('/v3/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Site': site,
+      'InitData': initData,
     },
-    body: JSON.stringify({ init_data: initData }),
+    body: JSON.stringify({}),
   })
   return response.json()
 }

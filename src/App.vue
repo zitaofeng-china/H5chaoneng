@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
@@ -10,7 +10,6 @@ import { usePriceStore } from '@/stores/usePriceStore'
 import { useBury } from '@/hooks/useBury'
 import { useTelegramLogin } from '@/hooks/useTelegramLogin'
 import { getSite } from '@/utils/site'
-import { getTelegramInitData, getTelegramUser, isTelegramMiniApp } from '@/utils/telegram'
 
 const route = useRoute()
 const { verifySite } = useSiteVerification()
@@ -20,20 +19,6 @@ const { track } = useBury()
 const { isInTelegram, initTelegram } = useTelegramLogin()
 
 const is404Page = computed(() => route.name === 'NotFound')
-
-// ===== 临时调试：显示 Telegram 数据 =====
-const showTgDebug = ref(false)
-const tgDebugData = ref('')
-
-function initTgDebug() {
-  if (isTelegramMiniApp()) {
-    const initData = getTelegramInitData()
-    const user = getTelegramUser()
-    tgDebugData.value = JSON.stringify({ initData, user }, null, 2)
-    showTgDebug.value = true
-  }
-}
-// ===== 调试结束 =====
 
 /**
  * 监听页面可见性变化，自动刷新用户信息
@@ -46,9 +31,6 @@ function handleVisibilityChange() {
 }
 
 onMounted(async () => {
-  // 临时调试：初始化 TG 数据显示
-  initTgDebug()
-  
   // 埋点：统计设备数（只触发一次）
   track('运行过项目设备数', true)
   
@@ -80,15 +62,6 @@ onUnmounted(() => {
 
 <template>
   <div id="app" :class="{ 'is-404': is404Page }">
-    <!-- 临时调试面板：显示 Telegram 数据 -->
-    <div v-if="showTgDebug" style="position:fixed;top:0;left:0;right:0;z-index:99999;background:#000;color:#0f0;padding:10px;font-size:12px;max-height:40vh;overflow:auto;white-space:pre-wrap;word-break:break-all;">
-      <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
-        <strong>🔧 TG Debug</strong>
-        <span style="cursor:pointer;color:red;" @click="showTgDebug=false">✕ 关闭</span>
-      </div>
-      {{ tgDebugData }}
-    </div>
-
     <Layout v-if="!is404Page" />
     <router-view v-else />
     
