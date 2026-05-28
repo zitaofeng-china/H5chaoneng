@@ -171,6 +171,8 @@ export default defineConfig(({ mode }) => {
       },
     },
   },
+  // 生产环境打包时移除 console 和 debugger
+  esbuild: isProduction ? { drop: ['console', 'debugger'] } : {},
   build: {
     target: 'es2015', // 目标浏览器
     assetsInlineLimit: 0, // 调到 4kb
@@ -178,7 +180,6 @@ export default defineConfig(({ mode }) => {
     sourcemap: false, // 生产环境不生成 sourcemap
     cssCodeSplit: true, // CSS 代码分割
     minify: 'esbuild', // 使用 esbuild 压缩（比 terser 快很多）
-    // terserOptions 在使用 esbuild 时不需要
     rollupOptions: {
       output: {
         manualChunks(id) {
