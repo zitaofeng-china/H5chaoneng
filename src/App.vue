@@ -66,6 +66,7 @@ onMounted(async () => {
       
       // Telegram Mini App 自动登录
       debugLog(`开始 TG 自动登录, site: ${getSite()}`)
+      debugLog(`请求 Headers: Site=${getSite()}, InitData长度=${getTelegramInitData()?.length}`)
       const loginResult = await initTelegram(getSite())
       debugLog(`TG 登录结果: ${loginResult}, error: ${tgLoginError.value}`)
       debugLog(`isLogin: ${userStore.isLogin}`)

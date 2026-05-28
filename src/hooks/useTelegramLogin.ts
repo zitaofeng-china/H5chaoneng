@@ -10,13 +10,17 @@ import { getSite } from '@/utils/site'
 
 // 使用后端 /v3/login 接口，InitData 放在 Header 中
 async function tgLoginApi(initData: string, site: string) {
+  const headers = {
+    'Content-Type': 'application/json',
+    'Site': site,
+    'InitData': initData,
+  }
+  // 调试：打印发送的 headers
+  console.log('[Telegram] 请求 headers:', JSON.stringify({ Site: site, InitData: initData.substring(0, 50) + '...' }))
+  
   const response = await fetch('/v3/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Site': site,
-      'InitData': initData,
-    },
+    headers,
     body: JSON.stringify({}),
   })
   return response.json()
