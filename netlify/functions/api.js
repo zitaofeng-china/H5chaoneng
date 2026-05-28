@@ -1,5 +1,5 @@
 // Netlify Function - API 代理
-const fetch = require('node-fetch')
+// Node 18+ 内置 fetch，不需要 node-fetch
 
 exports.handler = async (event, context) => {
   // 允许 CORS
@@ -45,6 +45,11 @@ exports.handler = async (event, context) => {
     // 添加 Authorization 请求头
     if (event.headers['authorization']) {
       requestHeaders['Authorization'] = event.headers['authorization']
+    }
+    
+    // 添加 InitData 请求头（TG Mini App 登录）
+    if (event.headers['initdata']) {
+      requestHeaders['InitData'] = event.headers['initdata']
     }
     
     // 发送请求到后端
