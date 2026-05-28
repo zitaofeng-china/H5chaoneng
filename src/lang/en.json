@@ -357,7 +357,8 @@
     "passwordMinLength": "Password cannot be less than 6 characters",
     "loginSuccess": "Login successful",
     "loginFailed": "Login failed",
-    "logout": "Logout"
+    "logout": "Logout",
+    "relogin": "Re-login"
   },
   "register": {
     "title": "Register",

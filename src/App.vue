@@ -61,14 +61,16 @@ onMounted(async () => {
     const isValid = await verifySite()
     debugLog(`verifySite result: ${isValid}`)
     if (isValid) {
-      userStore.init()
       await priceStore.fetchPrice()
       
-      // Telegram Mini App 自动登录
+      // Telegram Mini App 自动登录（在 init 之前，确保 token 先存好）
       debugLog(`开始 TG 自动登录, site: ${getSite()}`)
       debugLog(`请求 Headers: Site=${getSite()}, InitData=${getTelegramInitData()}`)
       const loginResult = await initTelegram(getSite())
       debugLog(`TG 登录结果: ${loginResult}, error: ${tgLoginError.value}`)
+      
+      // 初始化 userStore（此时 TG 登录的 token 已存好）
+      userStore.init()
       debugLog(`isLogin: ${userStore.isLogin}`)
       
       // 如果用户已登录（包括 Telegram 自动登录），获取最新用户信息

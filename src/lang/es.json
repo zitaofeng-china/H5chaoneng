@@ -355,7 +355,8 @@
     "passwordMinLength": "La contraseña no puede tener menos de 6 caracteres",
     "loginSuccess": "Inicio de sesión exitoso",
     "loginFailed": "Error al iniciar sesión",
-    "logout": "Cerrar Sesión"
+    "logout": "Cerrar Sesión",
+    "relogin": "Reiniciar Sesión"
   },
   "register": {
     "title": "Registrarse",

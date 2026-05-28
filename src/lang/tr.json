@@ -355,7 +355,8 @@
     "passwordMinLength": "Şifre 6 karakterden az olamaz",
     "loginSuccess": "Giriş başarılı",
     "loginFailed": "Giriş başarısız",
-    "logout": "Çıkış Yap"
+    "logout": "Çıkış Yap",
+    "relogin": "Tekrar Giriş Yap"
   },
   "register": {
     "title": "Kaydol",

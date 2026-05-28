@@ -354,7 +354,8 @@
     "passwordMinLength": "Пароль не может быть короче 6 символов",
     "loginSuccess": "Вход успешен",
     "loginFailed": "Ошибка входа",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "relogin": "Войти снова"
   },
   "register": {
     "title": "Регистрация",

@@ -354,7 +354,8 @@
     "passwordMinLength": "パスワードは6文字以上必要です",
     "loginSuccess": "ログイン成功",
     "loginFailed": "ログイン失敗",
-    "logout": "ログアウト"
+    "logout": "ログアウト",
+    "relogin": "再ログイン"
   },
   "register": {
     "title": "登録",

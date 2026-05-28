@@ -7,6 +7,7 @@ import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/useUserStore'
 import { isTelegramMiniApp, getTelegramInitData, getTelegramUser, telegramReady, telegramExpand } from '@/utils/telegram'
 import { getSite } from '@/utils/site'
+import { setToken, setTokenExpiredAt } from '@/utils/token'
 
 // 使用后端 /v3/login 接口，InitData 放在 Header 中
 async function tgLoginApi(initData: string, site: string) {
@@ -101,8 +102,14 @@ export function useTelegramLogin() {
 
         // 保存 token
         if (token) {
+          setToken(token)
           userStore.token = token
-          localStorage.setItem('token', token)
+        }
+
+        // 保存过期时间（后端返回秒级时间戳，需要转为毫秒）
+        const expiredAt = response.data.expired_at || response.data.expirated_at
+        if (expiredAt) {
+          setTokenExpiredAt(Number(expiredAt) * 1000)
         }
 
         // 保存用户信息

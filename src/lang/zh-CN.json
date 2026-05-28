@@ -387,7 +387,8 @@
     "verifyCodeLength": "验证码必须是6位",
     "loginSuccess": "登录成功",
     "loginFailed": "登录失败",
-    "logout": "退出系统"
+    "logout": "退出系统",
+    "relogin": "重新登录"
   },
   "register": {
     "title": "注册",

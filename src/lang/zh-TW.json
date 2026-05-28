@@ -353,7 +353,8 @@
     "passwordMinLength": "密碼長度不能少於6位",
     "loginSuccess": "登入成功",
     "loginFailed": "登入失敗",
-    "logout": "退出系統"
+    "logout": "退出系統",
+    "relogin": "重新登入"
   },
   "register": {
     "title": "註冊",

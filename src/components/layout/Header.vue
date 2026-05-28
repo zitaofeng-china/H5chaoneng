@@ -175,11 +175,11 @@
                 <el-dropdown-item @click.stop="handleUserInfo">
                   {{ $t('nav.userInfo') }}
                 </el-dropdown-item>
-                <el-dropdown-item @click.stop="handleModifyPassword">
+                <el-dropdown-item v-if="!isTgEnv" @click.stop="handleModifyPassword">
                   {{ $t('revisePassword.title') }}
                 </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleLogout">
-                  {{ $t('login.logout') }}
+                  {{ isTgEnv ? $t('login.relogin') : $t('login.logout') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -322,6 +322,7 @@ import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
 import { getSite, isLiteSite, LITE_SITE, DEFAULT_SITE } from '@/utils/site'
+import { isTelegramMiniApp } from '@/utils/telegram'
 
 defineOptions({
   name: 'LayoutHeader',
@@ -343,6 +344,9 @@ const isLite = computed(() => {
   const site = (route.params.site as string) || getSite()
   return site === DEFAULT_SITE
 })
+
+// TG Mini App 环境判断
+const isTgEnv = isTelegramMiniApp()
 
 const lang = reactive({
   en: 'English',
@@ -445,6 +449,11 @@ const handleModifyPassword = () => {
 
 const handleUserInfo = () => {
   proxy?.$userInfoPopup?.open()
+}
+
+// TG 环境重新登录：刷新页面触发自动登录
+const handleTgRelogin = () => {
+  window.location.reload()
 }
 
 const handleLogout = async () => {
