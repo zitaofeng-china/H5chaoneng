@@ -95,8 +95,15 @@ export function useLoginForm() {
 
       // 检查响应是否成功
       if (response.code !== '000000') {
-        // 显示后端返回的错误信息
-        ElMessage.error(response.msg || t('login.loginFailed'))
+        // 特殊处理：网站不存在错误
+        let errorMessage = response.msg || t('login.loginFailed')
+        const trimmedMsg = (response.msg || '').trim()
+        if (response.code === '000007' && (trimmedMsg === '网站不存在' || trimmedMsg.includes('网站不存在'))) {
+          errorMessage = t('error.siteNotExist')
+        }
+        
+        // 显示错误信息
+        ElMessage.error(errorMessage)
         return false
       }
 

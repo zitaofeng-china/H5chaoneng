@@ -5,6 +5,10 @@
     </div>
     <el-card class="rental-card">
       <el-tabs v-model="activeTab" class="rental-tabs">
+        <el-tab-pane :label="$t('home.transferRental')" name="transfer">
+          <TransferRental :payment-address="paymentAddress" @retry="handleRetryFetchAddress" />
+        </el-tab-pane>
+
         <el-tab-pane :label="$t('home.balancePayment')" name="balance">
           <el-form
             ref="formRef"
@@ -122,10 +126,6 @@
             </el-form-item>
           </el-form>
         </el-tab-pane>
-
-        <el-tab-pane :label="$t('home.transferRental')" name="transfer">
-          <TransferRental :payment-address="paymentAddress" @retry="handleRetryFetchAddress" />
-        </el-tab-pane>
       </el-tabs>
     </el-card>
   </div>
@@ -158,7 +158,7 @@ const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
 
-const activeTab = ref('balance')
+const activeTab = ref('transfer')
 const formRef = ref<FormInstance>()
 
 // 使用统一的地址管理 hook
@@ -174,7 +174,7 @@ watch(activeTab, async (newTab) => {
   if (newTab === 'transfer' && !paymentAddress.value) {
     await fetchPaymentAddress()
   }
-})
+}, { immediate: true }) // 添加 immediate: true，组件挂载时立即执行
 
 // 处理重试
 const handleRetryFetchAddress = () => {

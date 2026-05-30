@@ -21,6 +21,29 @@
     display: none;
   }
 
+  :deep(.el-dialog__headerbtn) {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    z-index: 10;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    
+    .el-dialog__close {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: bold;
+      
+      &:hover {
+        color: rgba(255, 255, 255, 1);
+      }
+    }
+  }
+
   :deep(.el-dialog__body) {
     padding: 0;
   }
@@ -175,6 +198,15 @@
       max-width: 100%;
       margin: 0;
       border-radius: 0;
+    }
+
+    :deep(.el-dialog__header) {
+      display: block !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      border: none !important;
     }
 
     :deep(.el-dialog__body) {

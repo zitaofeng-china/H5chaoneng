@@ -128,7 +128,9 @@ export const CONTEXT_ERROR_MAP: Record<string, Record<string, string>> = {
   // 托管场景
   hosting: {
     '000007': '托管失败',
+    '000009': '账户余额不足，请先充值',
     '003001': '地址格式不正确',
+    '004002': '余额不足，请先充值',
     '005001': '能量不足',
   },
 
@@ -152,6 +154,13 @@ export function getErrorMessage(
   fallback?: string
 ): string {
   const codeStr = String(code)
+
+  // 特殊处理：code 为 000007 且 msg 为 "网站不存在" 时，返回国际化的 key
+  // 这个检测需要在 response.ts 中的 handleResponse 函数里处理
+  // 因为这里无法访问 i18n 实例，所以返回一个特殊标记
+  if (codeStr === '000007' && fallback === '网站不存在') {
+    return 'i18n:error.siteNotExist'
+  }
 
   // 1. 优先使用场景特定的映射
   if (context && CONTEXT_ERROR_MAP[context]?.[codeStr]) {

@@ -151,7 +151,9 @@ function needsToken(url: string): boolean {
  */
 export function requestInterceptor(url: string, config: RequestInit): RequestInit {
   // 检查是否需要认证
-  if (needsToken(url)) {
+  const requiresAuth = needsToken(url)
+  
+  if (requiresAuth) {
     const token = getToken()
     
     // 情况1：未登录（没有 token）
@@ -180,6 +182,9 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
       // 抛出错误，阻止请求继续
       throw new Error('TOKEN_EXPIRED')
     }
+  } else {
+    // 不需要认证的接口，记录日志
+    console.log('[Request] 无需认证的接口:', url)
   }
 
   // 构建请求头（只添加必需的请求头）
@@ -195,7 +200,7 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
   headers['Site'] = site
 
   // 3. Authorization（仅在需要认证的接口添加）
-  if (needsToken(url)) {
+  if (requiresAuth) {
     const token = getToken()
     if (token) {
       headers['Authorization'] = token

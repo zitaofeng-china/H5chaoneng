@@ -12,5 +12,10 @@ window.__APP_CONFIG__ = {
   // 示例：
   // API_BASE_URL: ''                              // 使用 Nginx 代理（推荐）
   // API_BASE_URL: ''                              // 直连后端（需要后端支持 CORS）
-  API_BASE_URL: ''
+  API_BASE_URL: '',
+
+  // 默认站点标识
+  // 当用户访问根路径 / 或输入无效站点时，会重定向到此站点
+  // 留空则使用构建时的 VITE_DEFAULT_SITE 环境变量
+  DEFAULT_SITE: ''
 }

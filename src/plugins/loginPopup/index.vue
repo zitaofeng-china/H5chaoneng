@@ -2,7 +2,7 @@
   <div class="login-dialog">
     <el-dialog
       v-model="visible"
-      :show-close="isMobile"
+      :show-close="true"
       :width="864"
       :height="600"
       header-class="login-header"

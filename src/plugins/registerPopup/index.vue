@@ -2,7 +2,7 @@
   <div class="register-dialog">
     <el-dialog
       v-model="visible"
-      :show-close="isMobile"
+      :show-close="true"
       :width="864"
       :height="552"
       header-class="register-header"

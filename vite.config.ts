@@ -14,6 +14,7 @@ import Icons from 'unplugin-icons/vite'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 import IconsResolver from 'unplugin-icons/resolver'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { codeInspectorPlugin } from 'code-inspector-plugin'
 // import viteCompression from 'vite-plugin-compression'
 
 // https://vite.dev/config/
@@ -26,6 +27,13 @@ export default defineConfig(({ mode }) => {
     vue(),
     vueJsx(),
     vueDevTools(),
+    codeInspectorPlugin({
+      bundler: 'vite',
+      hotKeys: ['altKey', 'shiftKey'],
+      showSwitch: true,
+      autoToggle: true,
+      editor: 'code',
+    }),
     AutoImport({
       resolvers: [ElementPlusResolver(), IconsResolver({ prefix: 'Icon' })],
       dts: 'auto-imports.d.ts',
@@ -163,6 +171,8 @@ export default defineConfig(({ mode }) => {
       },
     },
   },
+  // 生产环境打包时移除 console 和 debugger
+  esbuild: isProduction ? { drop: ['console', 'debugger'] } : {},
   build: {
     target: 'es2015', // 目标浏览器
     assetsInlineLimit: 0, // 调到 4kb
@@ -170,7 +180,6 @@ export default defineConfig(({ mode }) => {
     sourcemap: false, // 生产环境不生成 sourcemap
     cssCodeSplit: true, // CSS 代码分割
     minify: 'esbuild', // 使用 esbuild 压缩（比 terser 快很多）
-    // terserOptions 在使用 esbuild 时不需要
     rollupOptions: {
       output: {
         manualChunks(id) {

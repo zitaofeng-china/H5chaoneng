@@ -1,5 +1,12 @@
 /// <reference types="vite/client" />
 
+// Vue 文件类型声明
+declare module '*.vue' {
+  import type { DefineComponent } from 'vue'
+  const component: DefineComponent<{}, {}, any>
+  export default component
+}
+
 /**
  * 环境变量类型声明
  */
@@ -28,6 +35,7 @@ interface ImportMetaEnv {
   readonly VITE_SOURCEMAP: string // 是否生成 sourcemap
   readonly VITE_HMR: string // 是否开启热更新
   readonly VITE_TEST_MODE: string // 是否为测试模式
+  readonly VITE_DEFAULT_SITE: string // 默认 SITE 标识
 }
 
 interface ImportMeta {
@@ -38,5 +46,8 @@ interface ImportMeta {
 declare global {
   interface Window {
     __tokenExpiredHandled?: boolean
+    umami?: {
+      track: (event: string, data?: Record<string, string>) => void
+    }
   }
 }

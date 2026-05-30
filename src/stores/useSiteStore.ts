@@ -34,6 +34,11 @@ export const useSiteStore = defineStore('site', () => {
     return siteInfo.value?.describe || ''
   })
 
+  // 福利价格
+  const wealPrice = computed(() => {
+    return siteInfo.value?.weal_price || '0'
+  })
+
   /**
    * 获取站点信息
    */
@@ -79,6 +84,7 @@ export const useSiteStore = defineStore('site', () => {
     botName,
     siteName,
     siteDescribe,
+    wealPrice,
     fetchSiteInfo,
     updateSiteInfo,
     clearSiteInfo,

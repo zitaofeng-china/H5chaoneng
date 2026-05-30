@@ -11,9 +11,21 @@
     <link rel="stylesheet" href="/icons/sprite.svg" />
     <!-- 运行时配置：运维可以在部署后修改 config.js 中的 API 地址 -->
     <script src="/config.js"></script>
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
   </head>
   <body>
     <div id="app"></div>
     <script type="module" src="/src/main.ts"></script>
+    <!-- Umami 数据埋点（仅生产环境加载） -->
+    <script type="module">
+      if (import.meta.env.PROD) {
+        var script = document.createElement('script');
+        script.src = 'https://umami.gaod2o.shop/script.js';
+        script.defer = true;
+        script.setAttribute('data-website-id', '2784fbb9-4b6b-4187-85d4-a47d6c83d611');
+        document.head.appendChild(script);
+      }
+    </script>
   </body>
 </html>

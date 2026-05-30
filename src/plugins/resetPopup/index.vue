@@ -2,7 +2,7 @@
   <div class="reset-dialog">
     <el-dialog
       v-model="visible"
-      :show-close="isMobile"
+      :show-close="true"
       :width="864"
       :height="552"
       header-class="reset-header"

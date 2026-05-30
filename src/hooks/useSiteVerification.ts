@@ -6,12 +6,15 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { siteApi, priceApi } from '@/api'
-import { getSite, clearSite } from '@/utils/site'
+import { getSite, clearSite, DEFAULT_SITE } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
+import { ElMessage } from 'element-plus'
+import { useI18n } from 'vue-i18n'
 
 export function useSiteVerification() {
   const router = useRouter()
   const siteStore = useSiteStore()
+  const { t } = useI18n()
   
   const isVerifying = ref(false)
   const isValid = ref(false)
@@ -19,11 +22,12 @@ export function useSiteVerification() {
   const priceInfo = ref<any>(null)
 
   async function verifySite(): Promise<boolean> {
-    const site = getSite()
+    let site = getSite()
+    
+    // 如果没有 Site，使用默认 Site 并重定向
     if (!site) {
-      clearSite()
-      await router.push('/404')
-      return false
+      site = DEFAULT_SITE
+      await router.replace(`/${DEFAULT_SITE}${router.currentRoute.value.path}`)
     }
 
     isVerifying.value = true
@@ -44,14 +48,43 @@ export function useSiteVerification() {
         isValid.value = true
         return true
       } else {
-        clearSite()
-        await router.push('/404')
-        return false
+        // 检查是否是"网站不存在"错误
+        if (siteResponse.code === '000007' && siteResponse.msg === '网站不存在') {
+          // 显示国际化的错误消息
+          ElMessage.error(t('error.siteNotExist'))
+        }
+        
+        // 验证失败，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
+        if (site !== DEFAULT_SITE) {
+          console.log('[Site验证] 当前 Site 验证失败，重定向到默认 Site:', DEFAULT_SITE)
+          const subPath = router.currentRoute.value.path.replace(`/${site}`, '') || ''
+          await router.replace(`/${DEFAULT_SITE}${subPath}`)
+          // 重定向后重新验证，确保定制化数据正确加载
+          return verifySite()
+        }
+        
+        // 如果是默认 Site 验证失败，也继续使用默认 Site（不跳转 404）
+        console.warn('[Site验证] 默认 Site 验证失败，但继续使用默认 Site')
+        isValid.value = true // 标记为有效，允许继续
+        return true
       }
     } catch (error) {
-      clearSite()
-      await router.push('/404')
-      return false
+      console.error('[Site验证] 验证出错:', error)
+      
+      // 验证出错，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
+      const currentSite = getSite()
+      if (currentSite !== DEFAULT_SITE) {
+        console.log('[Site验证] 验证出错，重定向到默认 Site:', DEFAULT_SITE)
+        const subPath = router.currentRoute.value.path.replace(`/${currentSite}`, '') || ''
+        await router.replace(`/${DEFAULT_SITE}${subPath}`)
+        // 重定向后重新验证
+        return verifySite()
+      }
+      
+      // 如果是默认 Site 出错，也继续使用默认 Site（不跳转 404）
+      console.warn('[Site验证] 默认 Site 验证出错，但继续使用默认 Site')
+      isValid.value = true // 标记为有效，允许继续
+      return true
     } finally {
       isVerifying.value = false
     }

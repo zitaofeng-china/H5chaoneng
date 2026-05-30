@@ -35,9 +35,11 @@ import { useI18n } from 'vue-i18n'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import ActivationCard from './AddressCard.vue'
 import { addressApi } from '@/api'
+import { useUserStore } from '@/stores/useUserStore'
 import type { HostingAddressItem } from '@/api/modules/address/types'
 
 const { t } = useI18n()
+const userStore = useUserStore()
 const loading = ref(false)
 const error = ref('')
 const hostingList = ref<HostingAddressItem[]>([])
@@ -46,6 +48,14 @@ const hostingList = ref<HostingAddressItem[]>([])
  * 获取托管列表
  */
 async function fetchHostingList() {
+  // 未登录时不调用接口
+  if (!userStore.isLogin) {
+    hostingList.value = []
+    loading.value = false
+    error.value = ''
+    return
+  }
+  
   loading.value = true
   error.value = ''
   

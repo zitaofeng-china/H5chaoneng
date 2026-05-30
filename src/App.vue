@@ -3,14 +3,20 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
+import TelegramFloat from '@/components/TelegramFloat.vue'
 import { useSiteVerification } from '@/hooks/useSiteVerification'
 import { useUserStore } from '@/stores/useUserStore'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useBury } from '@/hooks/useBury'
+import { useTelegramLogin } from '@/hooks/useTelegramLogin'
+import { getSite } from '@/utils/site'
 
 const route = useRoute()
 const { verifySite } = useSiteVerification()
 const userStore = useUserStore()
 const priceStore = usePriceStore()
+const { track } = useBury()
+const { isInTelegram, initTelegram } = useTelegramLogin()
 
 const is404Page = computed(() => route.name === 'NotFound')
 
@@ -25,13 +31,21 @@ function handleVisibilityChange() {
 }
 
 onMounted(async () => {
+  // 埋点：统计设备数（只触发一次）
+  track('运行过项目设备数', true)
+  
   if (!is404Page.value) {
     const isValid = await verifySite()
     if (isValid) {
-      userStore.init()
       await priceStore.fetchPrice()
       
-      // 如果用户已登录，获取最新用户信息
+      // Telegram Mini App 自动登录（在 init 之前，确保 token 先存好）
+      await initTelegram(getSite())
+      
+      // 初始化 userStore（此时 TG 登录的 token 已存好）
+      userStore.init()
+      
+      // 如果用户已登录（包括 Telegram 自动登录），获取最新用户信息
       if (userStore.isLogin) {
         await userStore.fetchUserInfo()
       }
@@ -55,6 +69,9 @@ onUnmounted(() => {
     
     <!-- 首次访问欢迎弹窗 -->
     <WelcomeDialog v-if="!is404Page" />
+    
+    <!-- Telegram 浮窗按钮（非 Telegram 环境才显示） -->
+    <TelegramFloat v-if="!is404Page && !isInTelegram" />
   </div>
 </template>
 

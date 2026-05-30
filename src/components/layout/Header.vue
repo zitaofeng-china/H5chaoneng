@@ -31,15 +31,17 @@
                   :class="{ 'is-active': isActive('/') }"
                   @click="handleToRouter('/')"
                 >
-                  {{ $t('home.title') }}
+                  {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!isLite"
                   :class="{ 'is-active': isActive('/lease-time') }"
                   @click="handleToRouter('/lease-time')"
                 >
                   {{ $t('nav.rentByTime') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!isLite"
                   :class="{ 'is-active': isActive('/lease-count') }"
                   @click="handleToRouter('/lease-count')"
                 >
@@ -58,6 +60,7 @@
           {{ $t('nav.contractFlash') }}
         </div>
         <div
+          v-if="!isLite"
           class="nav-link"
           :class="{ 'is-active': isActive('/hosting') }"
           @click="handleToRouter('/hosting')"
@@ -65,11 +68,21 @@
           {{ $t('nav.smartHosting') }}
         </div>
         <div
+          v-if="!isLite"
           class="nav-link"
           :class="{ 'is-active': isActive('/activation') }"
           @click="handleToRouter('/activation')"
         >
           {{ $t('nav.batchActivation') }}
+        </div>
+
+        <!-- 福利订单独立菜单项 -->
+        <div
+          class="nav-link"
+          :class="{ 'is-active': isActive('/welfare') }"
+          @click="handleToRouter('/welfare')"
+        >
+          {{ $t('nav.welfareOrder') }}
         </div>
 
         <!-- 常见问题下拉菜单 -->
@@ -122,16 +135,8 @@
         </div>
       </div>
       <div class="right-section">
-        <div class="info-wrap">
-          <SvgIcon
-            name="header-tg"
-            width="24"
-            height="24"
-            @click="handleOpenToTelegram(botName)"
-          />
-        </div>
         <div class="dropdown-popper-box lang-dropdown">
-          <el-dropdown trigger="hover" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
+          <el-dropdown trigger="click" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
               <SvgIcon name="header-lang" class="icon-svg" width="24" height="24" />
             </div>
@@ -150,13 +155,10 @@
           </el-dropdown>
         </div>
 
-        <div class="balance-display">
+        <div class="balance-display" v-if="isLogin">
           <div class="balance-info">
             <SvgIcon name="trx" width="24" height="24" />
             <div class="balance-amount">{{ trxBalance }}</div>
-          </div>
-          <div class="recharge-btn" @click="handleRechange">
-            <div class="text">{{ $t('common.recharge') }}</div>
           </div>
         </div>
 
@@ -167,26 +169,25 @@
             </div>
             <template #dropdown>
               <el-dropdown-menu class="user-menu">
+                <el-dropdown-item @click.stop="handleRechange">
+                  {{ $t('common.recharge') }}
+                </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleUserInfo">
                   {{ $t('nav.userInfo') }}
                 </el-dropdown-item>
-                <el-dropdown-item @click.stop="handleModifyPassword">
+                <el-dropdown-item v-if="!isTgEnv" @click.stop="handleModifyPassword">
                   {{ $t('revisePassword.title') }}
                 </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleLogout">
-                  {{ $t('login.logout') }}
+                  {{ isTgEnv ? $t('login.relogin') : $t('login.logout') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
         <div class="no-login" v-else>
-          <div class="login-btn btn" @click="handleLogin">
+          <div v-if="!isLite" class="login-btn btn" @click="handleLogin">
             {{ $t('login.title') }}
-          </div>
-          /
-          <div class="register-btn btn" @click="handleRegister">
-            {{ $t('register.title') }}
           </div>
         </div>
         <div class="info-wrap" ref="menuBtn" v-if="isMobile()" @click="handleMenu('menu')">
@@ -203,7 +204,7 @@
       <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
-        :class="{ 'is-active': isActive('') }"
+        :class="{ 'route-active': isActiveHome }"
       >
         <div class="menu-wrap">
           <div
@@ -214,6 +215,7 @@
             {{ $t('nav.quickRent') }}
           </div>
           <div
+            v-if="!isLite"
             class="menu-item"
             :class="{ 'is-active': isActive('/lease-time') }"
             @click="handleToRouter('/lease-time')"
@@ -221,6 +223,7 @@
             {{ $t('nav.rentByTime') }}
           </div>
           <div
+            v-if="!isLite"
             class="menu-item"
             :class="{ 'is-active': isActive('/lease-count') }"
             @click="handleToRouter('/lease-count')"
@@ -233,24 +236,34 @@
         :title="$t('nav.contractFlash')"
         name="2"
         disabled
-        :class="{ 'is-active': isActive('/contract') }"
+        :class="{ 'route-active': isActive('/contract') }"
         @click="handleToRouter('/contract')"
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="!isLite"
         :title="$t('nav.smartHosting')"
         name="3"
         disabled
-        :class="{ 'is-active': isActive('/hosting') }"
+        :class="{ 'route-active': isActive('/hosting') }"
         @click="handleToRouter('/hosting')"
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="!isLite"
         :title="$t('nav.batchActivation')"
         name="4"
         disabled
-        :class="{ 'is-active': isActive('/activation') }"
+        :class="{ 'route-active': isActive('/activation') }"
         @click="handleToRouter('/activation')"
+      >
+      </el-collapse-item>
+      <el-collapse-item
+        :title="$t('nav.welfareOrder')"
+        name="0"
+        disabled
+        :class="{ 'route-active': isActive('/welfare') }"
+        @click="handleToRouter('/welfare')"
       >
       </el-collapse-item>
       <el-collapse-item :title="$t('nav.faq')" name="5">
@@ -308,7 +321,8 @@ import { storeToRefs } from 'pinia'
 import { handleOpenToTelegram, isMobile } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
-import { getSite } from '@/utils/site'
+import { getSite, isLiteSite, LITE_SITE, DEFAULT_SITE } from '@/utils/site'
+import { isTelegramMiniApp } from '@/utils/telegram'
 
 defineOptions({
   name: 'LayoutHeader',
@@ -321,9 +335,18 @@ const siteStore = useSiteStore()
 const { tgAdmin, botName } = storeToRefs(siteStore)
 
 const localLang = ref(useLangStore().currentLocale)
-const activeNames = ref(['1'])
+const activeNames = ref<string[]>([])
 const isMenu = ref(false)
 const menuBtn = ref(null)
+
+// 精简模式：依赖响应式的路由参数判断，确保路由切换后能正确更新
+const isLite = computed(() => {
+  const site = (route.params.site as string) || getSite()
+  return site === DEFAULT_SITE
+})
+
+// TG Mini App 环境判断
+const isTgEnv = isTelegramMiniApp()
 
 const lang = reactive({
   en: 'English',
@@ -337,20 +360,22 @@ const lang = reactive({
   'zh-TW': '繁體中文',
 })
 
-// 判断是否在能量租赁相关页面（首页、按时间租用、按笔数租用）
+// 判断是否在能量租赁相关页面（首页闪租、按时间租用、按笔数租用）
 const isActiveHome = computed(() => {
   const site = getSite()
-  const energyRentalPaths = [`/${site}/`, `/${site}/lease-time`, `/${site}/lease-count`]
-  // 只有在这些页面且没有hash时才激活能量租赁下拉菜单
-  // 如果有hash，说明用户在查看FAQ部分，不应该激活能量租赁
-  return energyRentalPaths.includes(route.path as string) && !route.hash
+  // 只有这些页面且没有 hash 时才激活能量租赁下拉菜单
+  // 如果有 hash，说明用户在查看 FAQ 部分，不应该激活能量租赁
+  if (route.hash) return false
+  const energyRentalPaths = [`/${site}/lease-time`, `/${site}/lease-count`]
+  // 首页（带或不带尾斜杠）也算闪租命中
+  return route.path === `/${site}` || route.path === `/${site}/` || energyRentalPaths.includes(route.path as string)
 })
 
 // 判断是否应该激活常见问题下拉菜单
 const isActiveFaq = computed(() => {
   const site = getSite()
-  // 只有在首页且有hash时才激活常见问题下拉菜单
-  return route.path === `/${site}/` && !!route.hash
+  // 只有在首页且有 hash 时才激活常见问题下拉菜单
+  return (route.path === `/${site}` || route.path === `/${site}/`) && !!route.hash
 })
 
 const userStore = useUserStore()
@@ -370,6 +395,12 @@ const isActive = (path: string) => {
   const site = getSite()
   const normalizedPath = path.startsWith('/') ? path : `/${path}`
   const fullPath = `/${site}${normalizedPath}`
+  
+  // 特殊处理首页：/:site 和 /:site/ 都应该匹配
+  if (normalizedPath === '/') {
+    return route.path === `/${site}` || route.path === `/${site}/`
+  }
+  
   return route.path === fullPath
 }
 
@@ -398,13 +429,6 @@ const handleLanguageChange = (local: Locale) => {
   localLang.value = local
   console.log(local)
   setLocale(local)
-
-  // TODO 处理阿拉伯语言时，页面版式
-  // if (local.startsWith('ar')) {
-  //   document.documentElement.setAttribute('dir', 'rtl')
-  // } else {
-  //   document.documentElement.removeAttribute('dir')
-  // }
 }
 
 const handleLogin = () => {
@@ -425,6 +449,11 @@ const handleModifyPassword = () => {
 
 const handleUserInfo = () => {
   proxy?.$userInfoPopup?.open()
+}
+
+// TG 环境重新登录：刷新页面触发自动登录
+const handleTgRelogin = () => {
+  window.location.reload()
 }
 
 const handleLogout = async () => {
@@ -469,7 +498,7 @@ const handleChange = (val: CollapseModelValue) => {
 
 const handleCollapseDestroy = () => {
   isMenu.value = false
-  activeNames.value = ['1']
+  activeNames.value = []
 }
 
 const handleMenu = (type: 'menu' | 'router' = 'menu') => {
@@ -480,7 +509,7 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
 const handleResize = () => {
   if (!isMobile() && isMenu.value) {
     isMenu.value = false
-    activeNames.value = ['1']
+    activeNames.value = []
   }
 }
 
@@ -674,37 +703,18 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   :deep(.el-dropdown-menu) {
-    min-width: 100px !important;
-    max-width: 140px !important;
-    padding: 4px 2px !important;
-    max-height: 180px !important;
-    overflow-y: auto !important;
-    
-    /* 美化滚动条 */
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 2px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 2px;
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.3);
-      }
-    }
+    min-width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   :deep(.el-dropdown-menu__item) {
-    font-size: 12px !important;
-    padding: 6px 10px !important;
-    min-height: 32px !important;
-    line-height: 1.3 !important;
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    min-height: auto !important;
+    line-height: 1.4 !important;
   }
 }
 
@@ -868,7 +878,15 @@ onUnmounted(() => {
       margin-bottom: 6px;
     }
 
+    // Element Plus 自动添加的展开状态（不显示绿色）
     &.is-active {
+      .el-collapse-item__header {
+        background: rgba(2, 15, 45, 0.05);
+      }
+    }
+
+    // 我们自定义的路由激活状态（显示绿色）
+    &.route-active {
       .el-collapse-item__header {
         background: rgba(54, 211, 153, 0.08);
       }

@@ -47,18 +47,27 @@
     </div>
 
     <KindTips :tips="tips" />
+    
+    <!-- 跳转到福利订单 -->
+    <div class="page-link-section">
+      <el-button type="warning" plain size="large" class="page-link-btn" @click="goToWelfare">
+        {{ t('home.goToWelfareOrder') }} →
+      </el-button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { getSite } from '@/utils/site'
 
 interface Props {
   paymentAddress?: string
@@ -108,11 +117,32 @@ const tips = computed(() => [
   t('transferRental.amountTip'),
   t('transferRental.addressTip'),
 ])
+
+const router = useRouter()
+
+const goToWelfare = () => {
+  const site = getSite()
+  router.push(`/${site}/welfare`)
+}
 </script>
 
 <style lang="scss" scoped>
 .transfer-rental {
   padding: 0;
+
+  .page-link-section {
+    margin-top: 20px;
+    text-align: center;
+
+    .page-link-btn {
+      width: 100%;
+      max-width: 400px;
+      height: 48px;
+      font-size: 16px;
+      font-weight: 600;
+      border-radius: 8px;
+    }
+  }
 
   .instruction-note {
     margin: 24px 0 16px;
@@ -232,6 +262,15 @@ const tips = computed(() => [
 
 @media (max-width: 768px) {
   .transfer-rental {
+    .page-link-section {
+      margin-top: 16px;
+
+      .page-link-btn {
+        height: 44px;
+        font-size: 14px;
+      }
+    }
+
     .top-banner {
       flex-direction: column;
       align-items: flex-start;
