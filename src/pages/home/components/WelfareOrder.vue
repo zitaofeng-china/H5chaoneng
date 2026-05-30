@@ -64,20 +64,21 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
-import { usePriceStore } from '@/stores/usePriceStore'
+import { useSiteStore } from '@/stores/useSiteStore'
 import { addressApi } from '@/api'
 import { AddressKind } from '@/api/modules/address/types'
-import { storeToRefs } from 'pinia'
 import WelfarePurchaseDialog from '@/components/WelfarePurchaseDialog.vue'
 import { getSite } from '@/utils/site'
 
 const { t } = useI18n()
 const router = useRouter()
 const userStore = useUserStore()
-const priceStore = usePriceStore()
-const { priceData } = storeToRefs(priceStore)
+const siteStore = useSiteStore()
 const purchaseDialogRef = ref<InstanceType<typeof WelfarePurchaseDialog>>()
 const loading = ref(false)
+
+// 福利价格（取站点信息的 weal_price 字段）
+const welfarePrice = computed(() => siteStore.wealPrice)
 
 // 福利地址缓存（10分钟有效，存 sessionStorage 刷新不丢失）
 const CACHE_DURATION = 10 * 60 * 1000 // 10 分钟
@@ -106,26 +107,18 @@ defineOptions({
   name: 'WelfareOrder',
 })
 
-// 福利价格（从价格接口获取 weal 字段）
-const welfarePrice = computed(() => {
-  return priceData.value?.weal || '0'
-})
-
-// 获取价格数据
+// 获取站点信息（含福利价格 weal_price）
 const fetchPriceData = async () => {
   try {
-    await priceStore.fetchPrice()
-    console.log('[WelfareOrder] 价格数据已更新:', priceData.value)
+    await siteStore.fetchSiteInfo()
   } catch (error) {
-    console.error('[WelfareOrder] 获取价格失败:', error)
+    console.error('[WelfareOrder] 获取福利价格失败:', error)
   }
 }
 
-// 处理页面可见性变化
+// 处理页面可见性变化：页面变为可见时刷新价格
 const handleVisibilityChange = () => {
   if (!document.hidden) {
-    // 页面变为可见时，刷新价格数据
-    console.log('[WelfareOrder] 页面可见，刷新价格数据')
     fetchPriceData()
   }
 }
