@@ -4,10 +4,31 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
 import { isTelegramMiniApp, getTelegramInitData, getTelegramUser, telegramReady, telegramExpand } from '@/utils/telegram'
 import { getSite } from '@/utils/site'
 import { setToken, setTokenExpiredAt } from '@/utils/token'
+
+const TG_LOGIN_ERROR_MESSAGE = '账号异常，请联系客服'
+const TG_LOGIN_DISABLED_MESSAGE = '功能不全禁止登录-“已禁用客服”'
+const TG_LOGIN_SUCCESS_MESSAGE = '登录成功'
+const TG_LOGIN_EXPIRE_TIME_PREFIX = '登录有效期至'
+const TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE = '登录过期时间异常，请联系客服'
+
+function isEmptyData(data: unknown): boolean {
+  if (data == null) return true
+  if (typeof data === 'object' && !Array.isArray(data)) {
+    return Object.keys(data).length === 0
+  }
+  return false
+}
+
+function formatExpireTime(time: number): string {
+  const date = new Date(time)
+  const pad = (value: number) => String(value).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
 
 // 使用后端 /v3/login 接口，InitData 放在 Header 中
 async function tgLoginApi(initData: string, site: string) {
@@ -78,7 +99,8 @@ export function useTelegramLogin() {
     const initData = getTelegramInitData()
     if (!initData) {
       console.warn('[Telegram] 无法获取 initData')
-      tgLoginError.value = '无法获取 Telegram 登录信息'
+      tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
+      ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
       return false
     }
 
@@ -87,9 +109,24 @@ export function useTelegramLogin() {
 
     try {
       const response = await tgLoginApi(initData, site)
+      const data = response?.data
 
-      if (response.code === '000000' && response.data) {
-        const { token, user_info, site: responseSite } = response.data
+      if (String(response?.code) === '200013') {
+        console.error('[Telegram] 用户已禁用:', response)
+        tgLoginError.value = TG_LOGIN_DISABLED_MESSAGE
+        ElMessage.error(TG_LOGIN_DISABLED_MESSAGE)
+        return false
+      }
+
+      if (isEmptyData(data)) {
+        console.error('[Telegram] 登录返回 data 为空:', response)
+        tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
+        ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
+        return false
+      }
+
+      if (response.code === '000000') {
+        const { token, user_info, site: responseSite } = data
 
         // 保存 token
         if (token) {
@@ -98,9 +135,13 @@ export function useTelegramLogin() {
         }
 
         // 保存过期时间（后端返回秒级时间戳，需要转为毫秒）
-        const expiredAt = response.data.expired_at || response.data.expirated_at
-        if (expiredAt) {
-          setTokenExpiredAt(Number(expiredAt) * 1000)
+        const expiredAt = data.expired_at || data.expirated_at
+        const expiredAtMs = Number(expiredAt) * 1000
+        if (Number.isFinite(expiredAtMs) && expiredAtMs > 0) {
+          setTokenExpiredAt(expiredAtMs)
+          ElMessage.info(`${TG_LOGIN_EXPIRE_TIME_PREFIX}：${formatExpireTime(expiredAtMs)}`)
+        } else {
+          ElMessage.warning(TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE)
         }
 
         // 保存用户信息
@@ -109,6 +150,7 @@ export function useTelegramLogin() {
         }
 
         console.log('[Telegram] 自动登录成功')
+        ElMessage.success(TG_LOGIN_SUCCESS_MESSAGE)
 
         // 动态站点跳转：后端返回站点标识时，跳转到对应站点
         if (responseSite && responseSite !== getSite()) {
@@ -119,12 +161,14 @@ export function useTelegramLogin() {
         return true
       } else {
         console.error('[Telegram] 登录失败:', response.msg)
-        tgLoginError.value = response.msg || '登录失败'
+        tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
+        ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
         return false
       }
     } catch (error) {
       console.error('[Telegram] 登录请求失败:', error)
-      tgLoginError.value = '网络错误，请重试'
+      tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
+      ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
       return false
     } finally {
       tgLoginLoading.value = false
