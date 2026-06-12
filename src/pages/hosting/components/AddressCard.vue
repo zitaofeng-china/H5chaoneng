@@ -43,14 +43,16 @@ const { isMobile } = storeToRefs(commonStore)
 
 /**
  * 格式化日期时间
- * @param timestamp Unix时间戳（秒）
+ * @param value 后端时间，支持秒级时间戳、毫秒级时间戳和时间字符串
  */
-function formatDate(timestamp: number | undefined): string {
-  if (!timestamp) return '-'
+function formatDate(value: string | number | undefined): string {
+  if (!value) return '-'
   
   try {
-    // 将秒级时间戳转换为毫秒级
-    const date = new Date(timestamp * 1000)
+    const rawValue = typeof value === 'string' ? value.trim() : value
+    const date = typeof rawValue === 'number' || /^\d+$/.test(rawValue)
+      ? new Date(Number(rawValue) < 1000000000000 ? Number(rawValue) * 1000 : Number(rawValue))
+      : new Date(rawValue.replace(' ', 'T'))
     
     // 检查日期是否有效
     if (isNaN(date.getTime())) {
@@ -76,7 +78,7 @@ function formatDate(timestamp: number | undefined): string {
   align-items: center;
   justify-content: space-between;
   border-radius: 8px;
-  margin-bottom: 12px;
+  margin-bottom: 0;
   gap: 10px;
 }
 
@@ -143,7 +145,7 @@ function formatDate(timestamp: number | undefined): string {
   .address-card {
     flex-direction: column;
     gap: 8px;
-    margin-bottom: 10px;
+    margin-bottom: 0;
   }
 
   .card-info {

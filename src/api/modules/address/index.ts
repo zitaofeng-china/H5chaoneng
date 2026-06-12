@@ -26,8 +26,10 @@ export function getAddress(params: GetAddressParams): Promise<ApiResponse<Addres
  * @param params - 请求参数
  * @returns 托管列表数据
  */
-export function getHostingList(params: GetHostingListParams): Promise<ApiResponse<HostingListData>> {
-  return get<HostingListData>('/v3/hosting/list', params)
+export function getHostingList(
+  params: GetHostingListParams = {}
+): Promise<ApiResponse<HostingListData>> {
+  return get<HostingListData>('/v3/hosting', params)
 }
 
 /**
