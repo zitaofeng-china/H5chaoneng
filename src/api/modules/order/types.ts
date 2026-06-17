@@ -27,6 +27,7 @@ export interface CreateOrderParams {
   duration?: number | string  // 时长（秒数，按笔数租用/托管时可不传）
   kind: OrderKind | number    // 订单类型
   target: string[]            // 目标地址列表
+  txid?: string               // 交易哈希
   user_id: number             // 用户ID
 }
 

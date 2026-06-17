@@ -14,6 +14,7 @@ interface CreateOrderOptions {
   duration?: number | string
   kind: OrderKind
   target: string[]
+  txid?: string
   userId: number
   context?: string
 }
@@ -32,6 +33,7 @@ export function useOrderCreation() {
         duration: options.duration,
         kind: options.kind,
         target: options.target,
+        txid: options.txid,
         user_id: options.userId,
       }
 
