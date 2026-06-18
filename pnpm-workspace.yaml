@@ -17,8 +17,8 @@ peerDependencyRules:
   allowAny:
     - 'vue'
 
-onlyBuiltDependencies:
-  - '@parcel/watcher'
-  - 'esbuild'
-  - 'sharp'
-  - 'vue-demi'
+allowBuilds:
+  '@parcel/watcher': true
+  'esbuild': true
+  'sharp': true
+  'vue-demi': true
