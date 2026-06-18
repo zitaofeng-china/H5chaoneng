@@ -16,6 +16,13 @@ export enum AddressKind {
 }
 
 /**
+ * 托管地址类型
+ */
+export enum HostingKind {
+  DEFAULT = 20, // 托管地址
+}
+
+/**
  * 获取付款地址请求参数
  */
 export interface GetAddressParams {
@@ -85,6 +92,7 @@ export interface GetHostingListParams {
   agent_id?: number // 代理ID
   bot_id?: number // 机器人ID
   current_page?: number // 当前页码
+  kind?: HostingKind | number // 托管类型
   keyword?: string // 关键词
   order?: string // 排序，示例：column ASC 或 column DESC
   origin?: number // 来源
@@ -97,7 +105,22 @@ export interface GetHostingListParams {
  * 添加托管地址请求参数
  */
 export interface AddHostingAddressParams {
-  address: string[] // 托管地址数组
+  address: string // 托管地址
+  agent_id?: number // 代理ID
+  bot_id?: number // 机器人ID
+  count?: number // 数量
+  created_at?: string // 创建时间
+  id?: number // 托管记录ID
+  kind?: HostingKind | number // 托管类型，默认20
+  maximum?: number // 最大值
+  minimum?: number // 最小值
+  order_id?: string // 订单ID
+  origin?: number // 来源
+  status?: number // 状态
+  threshold?: number // 阈值
+  total?: number // 总使用次数
+  updated_at?: string // 更新时间
+  user_id?: number // 用户ID
 }
 
 /**

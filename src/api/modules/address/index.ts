@@ -3,6 +3,7 @@
  */
 import { get, post, deleteRequest } from '@/api/request'
 import type { ApiResponse } from '@/api/types'
+import { HostingKind } from './types'
 import type { 
   GetAddressParams, 
   AddressData, 
@@ -29,7 +30,10 @@ export function getAddress(params: GetAddressParams): Promise<ApiResponse<Addres
 export function getHostingList(
   params: GetHostingListParams = {}
 ): Promise<ApiResponse<HostingListData>> {
-  return get<HostingListData>('/v3/hosting', params)
+  return get<HostingListData>('/v3/hosting', {
+    kind: HostingKind.DEFAULT,
+    ...params,
+  })
 }
 
 /**
@@ -38,9 +42,10 @@ export function getHostingList(
  * @returns 添加结果
  */
 export function addHostingAddress(params: AddHostingAddressParams): Promise<ApiResponse<string>> {
-  // 将地址数组拼接成逗号分隔的字符串作为路径参数
-  const addressPath = params.address.join(',')
-  return post<string>(`/v3/hosting/${addressPath}`)
+  return post<string>('/v3/hosting', {
+    kind: HostingKind.DEFAULT,
+    ...params,
+  })
 }
 
 /**
@@ -49,5 +54,7 @@ export function addHostingAddress(params: AddHostingAddressParams): Promise<ApiR
  * @returns 删除结果
  */
 export function deleteHostingAddress(params: DeleteHostingAddressParams): Promise<ApiResponse<string>> {
-  return deleteRequest<string>(`/v3/hosting/${params.address}`)
+  return deleteRequest<string>('/v3/hosting', {
+    address: params.address,
+  })
 }

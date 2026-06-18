@@ -44,6 +44,7 @@ import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { addressApi } from '@/api'
+import { HostingKind } from '@/api/modules/address/types'
 import { getSite } from '@/utils/site'
 
 const { t } = useI18n()
@@ -127,7 +128,10 @@ const handleSaveAddress = async () => {
         
         try {
           // 调用接口添加单个地址
-          const response = await addressApi.addHostingAddress({ address: [address] })
+          const response = await addressApi.addHostingAddress({
+            address,
+            kind: HostingKind.DEFAULT,
+          })
           
           if (response.code === '000000') {
             successCount++
