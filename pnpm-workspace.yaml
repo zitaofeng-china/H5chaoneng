@@ -16,3 +16,9 @@ overrides:
 peerDependencyRules:
   allowAny:
     - 'vue'
+
+onlyBuiltDependencies:
+  - '@parcel/watcher'
+  - 'esbuild'
+  - 'sharp'
+  - 'vue-demi'
