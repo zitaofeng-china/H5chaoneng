@@ -112,6 +112,13 @@ export function getSecretKey() {
 }
 
 /**
+ * 刷新接口密钥
+ */
+export function refreshSecretKey() {
+  return put<string>('/v3/key')
+}
+
+/**
  * 更新用户信息
  */
 export function updateUserInfo(params: Partial<UserInfo>) {

@@ -42,7 +42,7 @@
                 :disabled="secretKeyLoading"
                 title="刷新"
                 aria-label="刷新 Key"
-                @click.stop="fetchSecretKey"
+                @click.stop="refreshSecretKey"
               >
                 <el-icon :class="{ 'is-loading': secretKeyLoading }">
                   <RefreshRight />
@@ -119,15 +119,44 @@ const startSecretKeyTimer = () => {
   }, 1000)
 }
 
+const applySecretKey = (key: string) => {
+  secretKey.value = key
+  startSecretKeyTimer()
+}
+
+const refreshSecretKey = async () => {
+  if (secretKeyLoading.value) return
+
+  secretKeyLoading.value = true
+  try {
+    const response = await authApi.refreshSecretKey()
+    if (response.code === '000000' && response.data) {
+      applySecretKey(response.data)
+      return
+    }
+
+    resetSecretKey()
+    ElMessage.error(response.msg || '刷新 Key 失败')
+  } catch (error) {
+    resetSecretKey()
+    ElMessage.error(error instanceof Error ? error.message : '刷新 Key 失败')
+  } finally {
+    secretKeyLoading.value = false
+  }
+}
+
 const fetchSecretKey = async () => {
   if (secretKeyLoading.value) return
 
   secretKeyLoading.value = true
   try {
-    const response = await authApi.getSecretKey()
+    const getResponse = await authApi.getSecretKey()
+    const response = getResponse.code === '000000' && !getResponse.data
+      ? await authApi.refreshSecretKey()
+      : getResponse
+
     if (response.code === '000000' && response.data) {
-      secretKey.value = response.data
-      startSecretKeyTimer()
+      applySecretKey(response.data)
       return
     }
 
@@ -270,7 +299,7 @@ onBeforeUnmount(() => {
 
     .desc-label {
       height: 50px;
-      flex-basis: 180px;
+      flex: 0 0 120px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -332,8 +361,6 @@ onBeforeUnmount(() => {
 
   span {
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
   }
 
@@ -455,6 +482,11 @@ onBeforeUnmount(() => {
 
   .key-text-button {
     max-width: calc(100% - 68px);
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   .key-refresh-button {
