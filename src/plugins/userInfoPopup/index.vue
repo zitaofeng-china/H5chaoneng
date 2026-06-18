@@ -22,7 +22,37 @@
         <div class="desc-wrap">
           <div class="desc-item" v-for="row in userInfoData" :key="row.label">
             <div class="desc-label">{{ row.label }}</div>
-            <div class="desc-value">
+            <div v-if="row.type === 'secretKey'" class="desc-value key-value">
+              <button
+                type="button"
+                class="key-text-button"
+                :class="{ 'has-key': Boolean(secretKey) }"
+                :disabled="secretKeyLoading"
+                @click="handleSecretKeyClick"
+              >
+                <el-icon v-if="secretKeyLoading" class="is-loading">
+                  <Loading />
+                </el-icon>
+                <span>{{ secretKeyDisplay }}</span>
+              </button>
+              <button
+                v-if="secretKey"
+                type="button"
+                class="key-refresh-button"
+                :disabled="secretKeyLoading"
+                title="刷新"
+                aria-label="刷新 Key"
+                @click.stop="fetchSecretKey"
+              >
+                <el-icon :class="{ 'is-loading': secretKeyLoading }">
+                  <RefreshRight />
+                </el-icon>
+              </button>
+              <span v-if="secretKey" class="key-refresh-countdown">
+                {{ secretKeyCountdown }}s
+              </span>
+            </div>
+            <div v-else class="desc-value">
               <span>{{ row.value }}</span>
             </div>
           </div>
@@ -33,12 +63,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useSiteStore } from '@/stores/useSiteStore'
+import { authApi } from '@/api'
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
+import { ElMessage } from 'element-plus'
+import { Loading, RefreshRight } from '@element-plus/icons-vue'
 import type { UserInfoRow } from './types'
 
 defineOptions({
@@ -50,8 +84,71 @@ const commonStore = useCommonStore()
 const userStore = useUserStore()
 const siteStore = useSiteStore()
 const { isMobile } = storeToRefs(commonStore)
+const { copyText } = useCopyToClipboard()
 
 const visible = defineModel<boolean>({ default: false })
+const secretKey = ref('')
+const secretKeyLoading = ref(false)
+const secretKeyCountdown = ref(60)
+let secretKeyTimer: ReturnType<typeof window.setInterval> | null = null
+
+const secretKeyDisplay = computed(() => secretKey.value || '点击获取')
+
+const clearSecretKeyTimer = () => {
+  if (secretKeyTimer) {
+    window.clearInterval(secretKeyTimer)
+    secretKeyTimer = null
+  }
+}
+
+const resetSecretKey = () => {
+  secretKey.value = ''
+  secretKeyCountdown.value = 60
+  clearSecretKeyTimer()
+}
+
+const startSecretKeyTimer = () => {
+  clearSecretKeyTimer()
+  secretKeyCountdown.value = 60
+  secretKeyTimer = window.setInterval(() => {
+    secretKeyCountdown.value -= 1
+
+    if (secretKeyCountdown.value <= 0) {
+      resetSecretKey()
+    }
+  }, 1000)
+}
+
+const fetchSecretKey = async () => {
+  if (secretKeyLoading.value) return
+
+  secretKeyLoading.value = true
+  try {
+    const response = await authApi.getSecretKey()
+    if (response.code === '000000' && response.data) {
+      secretKey.value = response.data
+      startSecretKeyTimer()
+      return
+    }
+
+    resetSecretKey()
+    ElMessage.error(response.msg || '获取 Key 失败')
+  } catch (error) {
+    resetSecretKey()
+    ElMessage.error(error instanceof Error ? error.message : '获取 Key 失败')
+  } finally {
+    secretKeyLoading.value = false
+  }
+}
+
+const handleSecretKeyClick = async () => {
+  if (secretKey.value) {
+    await copyText(secretKey.value, 'Key 已复制')
+    return
+  }
+
+  await fetchSecretKey()
+}
 
 /**
  * 用户信息数据
@@ -64,6 +161,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
       { label: t('recharge.email'), value: '-' },
       { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
       { label: t('recharge.trxBalance'), value: '0 TRX' },
+      { label: 'Key', value: '', type: 'secretKey' },
     ]
   }
 
@@ -72,6 +170,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
     { label: t('recharge.email'), value: userInfo.email || '-' },
     { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
     { label: t('recharge.trxBalance'), value: `${userInfo.trx_balance || '0'} TRX` },
+    { label: 'Key', value: '', type: 'secretKey' },
   ]
 })
 
@@ -86,6 +185,7 @@ const open = async () => {
 
 const close = () => {
   visible.value = false
+  resetSecretKey()
 }
 
 const handleClose = () => {
@@ -96,6 +196,10 @@ defineExpose({
   open,
   close,
   visible,
+})
+
+onBeforeUnmount(() => {
+  clearSecretKeyTimer()
 })
 </script>
 
@@ -159,10 +263,10 @@ defineExpose({
   font-weight: 500;
   color: var(--theme-text-black);
 
-  .desc-item {
-    height: 50px;
-    display: flex;
-    align-items: center;
+    .desc-item {
+      height: 50px;
+      display: flex;
+      align-items: center;
 
     .desc-label {
       height: 50px;
@@ -186,6 +290,72 @@ defineExpose({
       padding: 0 16px;
       word-break: break-all;
     }
+  }
+}
+
+.key-value {
+  gap: 8px;
+  min-width: 0;
+}
+
+.key-refresh-countdown {
+  flex: 0 0 28px;
+  color: var(--theme-text-gray);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.key-text-button,
+.key-refresh-button {
+  border: 0;
+  background: transparent;
+  color: var(--theme-text-black);
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.key-text-button {
+  min-width: 0;
+  max-width: calc(100% - 72px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  font: inherit;
+
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:not(:disabled):hover,
+  &.has-key {
+    color: var(--theme-bg-blue);
+  }
+}
+
+.key-refresh-button {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 16px;
+
+  &:not(:disabled):hover {
+    background: var(--theme-card-bg-light);
+    color: var(--theme-bg-blue);
   }
 }
 
@@ -281,6 +451,15 @@ defineExpose({
         font-weight: 500;
       }
     }
+  }
+
+  .key-text-button {
+    max-width: calc(100% - 68px);
+  }
+
+  .key-refresh-button {
+    width: 26px;
+    height: 26px;
   }
 }
 </style>
