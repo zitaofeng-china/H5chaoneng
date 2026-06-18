@@ -374,7 +374,9 @@
     "registerFailed": "Registration failed",
     "passwordMismatch": "Passwords do not match",
     "registerSuccessButLoginFailed": "Registration successful, but auto-login failed. Please login manually",
-    "registerAndLoginSuccess": "Registration successful, logged in automatically"
+    "registerAndLoginSuccess": "Registration successful, logged in automatically",
+    "hasAccount": "Already have an account?",
+    "login": "Back to login"
   },
   "reset": {
     "title": "Reset Password",

@@ -371,7 +371,9 @@
     "registerFailed": "登録失敗",
     "passwordMismatch": "パスワードが一致しません",
     "registerSuccessButLoginFailed": "登録成功、しかし自動ログインに失敗しました。手動でログインしてください",
-    "registerAndLoginSuccess": "登録成功、自動的にログインしました"
+    "registerAndLoginSuccess": "登録成功、自動的にログインしました",
+    "hasAccount": "すでにアカウントをお持ちですか？",
+    "login": "ログインへ戻る"
   },
   "reset": {
     "title": "パスワードリセット",

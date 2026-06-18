@@ -116,6 +116,11 @@
                 {{ $t('register.registerButton') }}
               </el-button>
             </el-form-item>
+
+            <div class="login-link">
+              <span>{{ $t('register.hasAccount') }}</span>
+              <el-link type="primary" @click="switchToLogin">{{ $t('register.login') }}</el-link>
+            </div>
           </el-form>
         </div>
       </div>
@@ -128,6 +133,7 @@ import { storeToRefs } from 'pinia'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useRegisterForm } from '@/hooks/useRegisterForm'
 import LoginBackground from '@/components/logo/LoginBackground.vue'
+import { getPopup } from '@/plugins/popupRegistry'
 import type { RegisterEmits } from './types'
 
 defineOptions({
@@ -159,6 +165,14 @@ const onRegister = async () => {
   if (success) {
     await handleClose()
   }
+}
+
+const switchToLogin = () => {
+  getPopup('loginPopup')?.open()
+  setTimeout(() => {
+    handleClose()
+  }, 50)
+  emit('switchToLogin')
 }
 
 defineExpose({

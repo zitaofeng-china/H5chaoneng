@@ -372,7 +372,9 @@
     "registerFailed": "فشل التسجيل",
     "passwordMismatch": "كلمات المرور غير متطابقة",
     "registerSuccessButLoginFailed": "تم التسجيل بنجاح، لكن فشل تسجيل الدخول التلقائي. يرجى تسجيل الدخول يدويًا",
-    "registerAndLoginSuccess": "تم التسجيل بنجاح، تم تسجيل الدخول تلقائيًا"
+    "registerAndLoginSuccess": "تم التسجيل بنجاح، تم تسجيل الدخول تلقائيًا",
+    "hasAccount": "هل لديك حساب بالفعل؟",
+    "login": "العودة إلى تسجيل الدخول"
   },
   "reset": {
     "title": "إعادة تعيين كلمة المرور",

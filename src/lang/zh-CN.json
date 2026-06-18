@@ -404,7 +404,9 @@
     "registerFailed": "注册失败",
     "passwordMismatch": "两次输入的密码不一致",
     "registerSuccessButLoginFailed": "注册成功，但自动登录失败，请手动登录",
-    "registerAndLoginSuccess": "注册成功，已自动登录"
+    "registerAndLoginSuccess": "注册成功，已自动登录",
+    "hasAccount": "已有账号？",
+    "login": "返回登录"
   },
   "reset": {
     "title": "重置密码",

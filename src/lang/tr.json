@@ -372,7 +372,9 @@
     "registerFailed": "Kayıt başarısız",
     "passwordMismatch": "Şifreler eşleşmiyor",
     "registerSuccessButLoginFailed": "Kayıt başarılı, ancak otomatik giriş başarısız oldu. Lütfen manuel olarak giriş yapın",
-    "registerAndLoginSuccess": "Kayıt başarılı, otomatik olarak giriş yapıldı"
+    "registerAndLoginSuccess": "Kayıt başarılı, otomatik olarak giriş yapıldı",
+    "hasAccount": "Zaten hesabınız var mı?",
+    "login": "Girişe dön"
   },
   "reset": {
     "title": "Şifre Sıfırla",

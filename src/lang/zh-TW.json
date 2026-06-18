@@ -370,7 +370,9 @@
     "registerFailed": "註冊失敗",
     "passwordMismatch": "兩次輸入的密碼不一致",
     "registerSuccessButLoginFailed": "註冊成功，但自動登入失敗，請手動登入",
-    "registerAndLoginSuccess": "註冊成功，已自動登入"
+    "registerAndLoginSuccess": "註冊成功，已自動登入",
+    "hasAccount": "已有帳號？",
+    "login": "返回登入"
   },
   "reset": {
     "title": "重置密碼",

@@ -15,4 +15,5 @@ export interface RegisterEmits {
   close: []
   switchToReset: []
   switchToRegister: []
+  switchToLogin: []
 }

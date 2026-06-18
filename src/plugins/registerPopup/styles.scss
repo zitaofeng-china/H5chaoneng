@@ -190,6 +190,25 @@
   }
 }
 
+.login-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--theme-text-gray);
+  font-size: 14px;
+
+  :deep(.el-link) {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-bg-blue);
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
 // 移动端适配
 @media (max-width: 768px) {
   .register-dialog {
@@ -276,5 +295,12 @@
     font-weight: 600;
     margin-top: 6px;
   }
-}
 
+  .login-link {
+    font-size: 13px;
+
+    :deep(.el-link) {
+      font-size: 13px;
+    }
+  }
+}
