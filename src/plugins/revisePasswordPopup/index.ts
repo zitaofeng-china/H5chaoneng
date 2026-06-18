@@ -1,6 +1,7 @@
 import { createVNode, render } from 'vue'
 import type { App, Plugin } from 'vue'
 import RevisePasswordPopupComponent from './index.vue'
+import { registerPopup } from '../popupRegistry'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -27,6 +28,7 @@ const RevisePasswordPopupPlugin: Plugin = {
 
     app.config.globalProperties.$revisePasswordPopup = { open, close }
     app.provide('revisePasswordPopup', { open, close })
+    registerPopup('revisePasswordPopup', { open, close })
   },
 }
 

@@ -1,0 +1,22 @@
+export interface PopupControl {
+  open: () => void
+  close: () => void
+}
+
+type PopupName =
+  | 'loginPopup'
+  | 'registerPopup'
+  | 'resetPopup'
+  | 'revisePasswordPopup'
+  | 'rechargePopup'
+  | 'userInfoPopup'
+
+const popupRegistry = new Map<PopupName, PopupControl>()
+
+export function registerPopup(name: PopupName, popup: PopupControl): void {
+  popupRegistry.set(name, popup)
+}
+
+export function getPopup(name: PopupName): PopupControl | undefined {
+  return popupRegistry.get(name)
+}

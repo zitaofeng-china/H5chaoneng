@@ -1,6 +1,7 @@
 import { createVNode, render } from 'vue'
 import type { App, Plugin } from 'vue'
 import ResetPopupComponent from './index.vue'
+import { registerPopup } from '../popupRegistry'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -27,6 +28,7 @@ const ResetPopupPlugin: Plugin = {
 
     app.config.globalProperties.$resetPopup = { open, close }
     app.provide('resetPopup', { open, close })
+    registerPopup('resetPopup', { open, close })
   },
 }
 

@@ -5,9 +5,10 @@
 import { NO_TOKEN_URLS, ENABLE_REQUEST_LOG, ENABLE_RESPONSE_LOG, RESPONSE_CONFIG } from './config'
 import type { ApiResponse } from './types'
 import { getSite } from '@/utils/site'
-import { getToken, isTokenExpired, removeToken, removeRefreshToken, removeUserInfo, removeTokenExpiredAt } from '@/utils/token'
+import { getToken, isTokenExpired } from '@/utils/token'
+import { clearAuthSession } from '@/utils/session'
 import { ElMessage } from 'element-plus'
-import i18n from '@/lang'
+import { getPopup } from '@/plugins/popupRegistry'
 
 // 防止重复弹出登录框的标志
 let isShowingLoginPopup = false
@@ -66,50 +67,6 @@ function getTranslation(key: string, fallback: string): string {
 }
 
 /**
- * 清除用户认证信息（包括 store 状态）
- */
-function clearAuthData() {
-  // 保存需要保留的数据
-  const locale = localStorage.getItem('locale')
-  
-  // 清除认证相关存储
-  removeToken()
-  removeRefreshToken()
-  removeUserInfo()
-  removeTokenExpiredAt()
-  localStorage.removeItem('remember_password')
-  localStorage.removeItem('saved_username')
-  localStorage.removeItem('saved_password')
-  
-  // 恢复语言设置
-  if (locale) {
-    localStorage.setItem('locale', locale)
-  }
-  
-  // 清除sessionStorage
-  sessionStorage.clear()
-  
-  // 清除所有Cookie
-  document.cookie.split(';').forEach((c) => {
-    document.cookie = c
-      .replace(/^ +/, '')
-      .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
-  })
-  
-  // 清除 Pinia store 状态
-  try {
-    // 动态导入 userStore 以避免循环依赖
-    import('@/stores/useUserStore').then(({ useUserStore }) => {
-      const userStore = useUserStore()
-      // 直接设置响应式状态为空
-      userStore.token = ''
-      userStore.userInfo = null
-    })
-  } catch (error) {
-    console.warn('[Interceptor] 清除 store 状态失败:', error)
-  }
-}
-/**
  * 显示登录弹窗
  */
 function showLoginPopup(message?: string) {
@@ -122,11 +79,7 @@ function showLoginPopup(message?: string) {
     ElMessage.warning(message)
   }
   
-  // 使用 Vue 的全局属性访问登录弹窗
-  const app = (window as any).__VUE_APP__
-  if (app?.config?.globalProperties?.$loginPopup) {
-    app.config.globalProperties.$loginPopup.open()
-  }
+  getPopup('loginPopup')?.open()
   
   // 3秒后重置标志，允许再次弹出
   setTimeout(() => {
@@ -173,7 +126,7 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
       console.warn('[Request] Token 已过期，清除认证信息')
       
       // 清除认证数据（包括 store 状态）
-      clearAuthData()
+      void clearAuthSession()
       
       // Token 过期时显示登录弹窗
       const message = getTranslation('auth.tokenExpired', '登录已过期，请重新登录')
@@ -256,7 +209,7 @@ export function responseInterceptor<T = any>(
   const TOKEN_EXPIRED_CODES = ['100003', '100004', '401']
   if (TOKEN_EXPIRED_CODES.includes(code)) {
     // 清除认证数据（包括 store 状态）
-    clearAuthData()
+    void clearAuthSession()
     
     // 显示登录弹窗
     const message = getTranslation('auth.tokenExpired', '登录已过期，请重新登录')

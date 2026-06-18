@@ -1,6 +1,7 @@
 import { createVNode, render } from 'vue'
 import type { App, Plugin } from 'vue'
 import UserInfoPopupComponent from './index.vue'
+import { registerPopup } from '../popupRegistry'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -27,6 +28,7 @@ const UserInfoPopupPlugin: Plugin = {
 
     app.config.globalProperties.$userInfoPopup = { open, close }
     app.provide('userInfoPopup', { open, close })
+    registerPopup('userInfoPopup', { open, close })
   },
 }
 

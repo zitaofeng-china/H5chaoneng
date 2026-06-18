@@ -1,6 +1,7 @@
 import { createVNode, render } from 'vue'
 import type { App, Plugin } from 'vue'
 import LoginPopupComponent from './index.vue'
+import { registerPopup } from '../popupRegistry'
 
 declare module 'vue' {
   export interface ComponentCustomProperties {
@@ -27,6 +28,7 @@ const LoginPopupPlugin: Plugin = {
 
     app.config.globalProperties.$loginPopup = { open, close }
     app.provide('loginPopup', { open, close })
+    registerPopup('loginPopup', { open, close })
   },
 }
 

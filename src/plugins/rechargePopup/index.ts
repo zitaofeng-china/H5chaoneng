@@ -1,6 +1,7 @@
 import { createVNode, render } from 'vue'
 import type { App, Plugin } from 'vue'
 import RechargePopupComponent from './index.vue'
+import { registerPopup } from '../popupRegistry'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
@@ -27,6 +28,7 @@ const RechargePopupPlugin: Plugin = {
 
     app.config.globalProperties.$rechargePopup = { open, close }
     app.provide('rechargePopup', { open, close })
+    registerPopup('rechargePopup', { open, close })
   },
 }
 
