@@ -86,7 +86,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   #app {
     padding-top: 54px;
   }

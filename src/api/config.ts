@@ -13,7 +13,7 @@ function getBaseUrl(): string {
   }
   
   // 生产环境：优先使用运行时配置
-  const runtimeConfig = (window as any).__APP_CONFIG__?.API_BASE_URL
+  const runtimeConfig = typeof window !== 'undefined' ? (window as any).__APP_CONFIG__?.API_BASE_URL : undefined
   if (runtimeConfig !== undefined && runtimeConfig !== null) {
     return runtimeConfig
   }

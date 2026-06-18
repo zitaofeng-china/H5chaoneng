@@ -292,7 +292,7 @@ const handleToRouter = (path: string, hash?: string) => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .footer {
     min-height: auto;
     padding: 24px 0 0;

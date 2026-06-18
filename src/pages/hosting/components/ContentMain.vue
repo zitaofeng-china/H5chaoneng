@@ -272,6 +272,7 @@ onMounted(() => {
 
 .content-main {
   max-width: 896px;
+  width: 100%;
   margin: 0 auto;
   border-radius: 8px;
   border: none;
@@ -279,6 +280,10 @@ onMounted(() => {
 
   .details-form {
     margin-top: 24px;
+
+    :deep(.el-form-item__content) {
+      min-width: 0;
+    }
 
     .rent-btn {
       margin: 10px 0;
@@ -290,7 +295,7 @@ onMounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .content-main {
     border-radius: 8px;
     box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);

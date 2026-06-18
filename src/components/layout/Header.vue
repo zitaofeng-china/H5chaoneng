@@ -190,7 +190,7 @@
             {{ $t('login.title') }}
           </div>
         </div>
-        <div class="info-wrap" ref="menuBtn" v-if="isMobile()" @click="handleMenu('menu')">
+        <div class="info-wrap" ref="menuBtn" v-if="isMobileView" @click="handleMenu('menu')">
           <div class="dropdown-popper-box">
             <SvgIcon name="menu" width="24" height="24" />
           </div>
@@ -310,19 +310,21 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, getCurrentInstance, onMounted, onUnmounted } from 'vue'
+import { computed, reactive, ref, getCurrentInstance, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-plus'
 import Avatar from '@/assets/icons/header/avatar.svg'
+import { useCommonStore } from '@/stores/useCommonStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useLangStore } from '@/stores/useLangStore'
 import { useSiteStore } from '@/stores/useSiteStore'
 import { storeToRefs } from 'pinia'
-import { handleOpenToTelegram, isMobile } from '@/utils'
+import { handleOpenToTelegram } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
 import { getSite, isLiteSite, LITE_SITE, DEFAULT_SITE } from '@/utils/site'
 import { isTelegramMiniApp } from '@/utils/telegram'
+import { clearAuthSession } from '@/utils/session'
 
 defineOptions({
   name: 'LayoutHeader',
@@ -331,7 +333,9 @@ defineOptions({
 const instance = getCurrentInstance()
 const proxy = instance?.proxy as any // 使用 any 避免类型检查问题
 
+const commonStore = useCommonStore()
 const siteStore = useSiteStore()
+const { isMobile: isMobileView } = storeToRefs(commonStore)
 const { tgAdmin, botName } = storeToRefs(siteStore)
 
 const localLang = ref(useLangStore().currentLocale)
@@ -420,7 +424,7 @@ const handleToRouter = (path: string, hash?: string) => {
   
   router.push({ path: fullPath, hash })
 
-  if (isMobile()) {
+  if (isMobileView.value) {
     handleMenu('router')
   }
 }
@@ -459,21 +463,7 @@ const handleTgRelogin = () => {
 const handleLogout = async () => {
   try {
     await logout()
-    
-    // 保存需要保留的数据
-    const locale = localStorage.getItem('locale')
-    
-    // 清除所有可能的Cookie
-    document.cookie.split(';').forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, '')
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
-    })
-    
-    // 恢复语言设置
-    if (locale) {
-      localStorage.setItem('locale', locale)
-    }
+    await clearAuthSession()
     
     // 保留当前URL的站点信息并重定向到首页
     const currentPath = window.location.pathname
@@ -505,20 +495,10 @@ const handleMenu = (type: 'menu' | 'router' = 'menu') => {
   isMenu.value = type !== 'menu' ? false : !isMenu.value
 }
 
-// 监听窗口大小变化，当从移动端切换到PC端时自动关闭菜单
-const handleResize = () => {
-  if (!isMobile() && isMenu.value) {
-    isMenu.value = false
-    activeNames.value = []
+watch(isMobileView, (mobile) => {
+  if (!mobile && isMenu.value) {
+    handleCollapseDestroy()
   }
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -701,7 +681,7 @@ onUnmounted(() => {
   outline: none !important;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   :deep(.el-dropdown-menu) {
     min-width: auto !important;
     max-width: none !important;
@@ -973,7 +953,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .navbar {
     height: 54px;
     padding: 0 10px;

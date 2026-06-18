@@ -19,7 +19,13 @@
             <div class="login-title">{{ $t('login.title') }}</div>
           </div>
 
-          <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
+          <el-form
+            :model="loginForm"
+            :rules="rules"
+            ref="loginFormRef"
+            class="login-form"
+            autocomplete="on"
+          >
             <el-form-item prop="username">
               <div class="input-wrapper">
                 <el-input
@@ -27,7 +33,10 @@
                   :placeholder="$t('login.placeholder')"
                   size="large"
                   class="custom-input"
+                  name="username"
                   autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-user" width="24" height="24" />
@@ -44,8 +53,11 @@
                   :placeholder="$t('login.passwordPlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="password"
                   show-password
                   autocomplete="current-password"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -107,8 +119,11 @@ const {
   loading,
   loginForm,
   loginFormRef,
+  rememberedPreview,
   rules,
   handleLogin,
+  saveRememberedDemo,
+  clearRememberedDemo,
   open,
   close,
 } = useLoginForm()

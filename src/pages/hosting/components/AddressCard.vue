@@ -77,6 +77,7 @@ function formatDate(value: string | number | undefined): string {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
   border-radius: 8px;
   margin-bottom: 0;
   gap: 10px;
@@ -96,7 +97,9 @@ function formatDate(value: string | number | undefined): string {
 }
 
 .card-content {
-  width: 610px;
+  width: auto;
+  flex: 1;
+  min-width: 0;
   padding: 12px;
   font-size: 14px;
   background: var(--theme-card-bg-light);
@@ -129,6 +132,7 @@ function formatDate(value: string | number | undefined): string {
 .delete-btn {
   width: 100px;
   height: 64px;
+  flex-shrink: 0;
   background: var(--theme-bg-red);
   color: var(--theme-text-white);
   border-radius: 4px;
@@ -141,7 +145,7 @@ function formatDate(value: string | number | undefined): string {
   text-align: center;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .address-card {
     flex-direction: column;
     gap: 8px;

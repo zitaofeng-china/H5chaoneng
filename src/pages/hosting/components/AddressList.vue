@@ -260,7 +260,7 @@ onUnmounted(() => {
   color: var(--theme-text-light-gray-muted);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .activation-list {
     gap: 10px;
     max-height: 360px;

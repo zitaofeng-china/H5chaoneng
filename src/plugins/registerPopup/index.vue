@@ -19,7 +19,13 @@
             <div class="register-title">{{ $t('register.title') }}</div>
           </div>
 
-          <el-form :model="registerForm" :rules="rules" ref="registerFormRef" class="register-form">
+          <el-form
+            :model="registerForm"
+            :rules="rules"
+            ref="registerFormRef"
+            class="register-form"
+            autocomplete="on"
+          >
             <el-form-item prop="username">
               <div class="input-wrapper">
                 <el-input
@@ -27,7 +33,10 @@
                   :placeholder="$t('register.usernamePlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="username"
                   autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-user" width="24" height="24" />
@@ -42,7 +51,10 @@
                   :placeholder="$t('register.emailPlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="email"
                   autocomplete="email"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-email" width="24" height="24" />
@@ -59,8 +71,11 @@
                   :placeholder="$t('register.passwordPlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="new-password"
                   show-password
                   autocomplete="new-password"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -77,8 +92,11 @@
                   :placeholder="$t('register.confirmPassword')"
                   size="large"
                   class="custom-input"
+                  name="confirm-password"
                   show-password
                   autocomplete="new-password"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />

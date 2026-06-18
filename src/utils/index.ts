@@ -1,4 +1,5 @@
 import { useCommonStore } from '@/stores/useCommonStore'
+import { MOBILE_BREAKPOINT } from '@/constants/responsive'
 
 /**
  * 打开Telegram链接
@@ -63,8 +64,5 @@ export const handleOpenEmail = (mailto: string) => {
 export const isMobile = () => {
   const commonStore = useCommonStore()
 
-  return (
-    commonStore.isMobile ||
-    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  )
+  return window.innerWidth <= MOBILE_BREAKPOINT || commonStore.isMobile
 }

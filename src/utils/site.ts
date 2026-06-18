@@ -6,7 +6,7 @@
 // 默认 Site 标识
 // 优先级：运行时配置(config.js) > 环境变量 > 硬编码兜底
 function getDefaultSite(): string {
-  const runtimeConfig = (window as any).__APP_CONFIG__?.DEFAULT_SITE
+  const runtimeConfig = typeof window !== 'undefined' ? (window as any).__APP_CONFIG__?.DEFAULT_SITE : undefined
   if (runtimeConfig) {
     return runtimeConfig
   }
@@ -35,5 +35,5 @@ export function isLiteSite(): boolean {
 }
 
 export function clearSite(): void {
-  localStorage.clear()
+  // Site 依赖 URL，不在本地持久化，这里仅保留兼容方法。
 }
