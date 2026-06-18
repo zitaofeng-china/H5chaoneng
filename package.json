@@ -41,7 +41,6 @@
     "@vue/eslint-config-typescript": "^14.6.0",
     "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
-    "claude-skills-frontend": "^1.4.0",
     "code-inspector-plugin": "^1.5.1",
     "eslint": "^9.39.2",
     "eslint-config-prettier": "^10.1.8",
