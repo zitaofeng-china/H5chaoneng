@@ -10,47 +10,12 @@ import { loginSimple } from '@/api/modules/auth'
 import { authApi } from '@/api'
 import { useFormValidation } from './useFormValidation'
 import type { LoginForm } from '@/plugins/loginPopup/types'
-
-// 记住密码的存储 key
-const REMEMBER_PASSWORD_KEY = 'remember_password'
-const SAVED_USERNAME_KEY = 'saved_username'
-const SAVED_PASSWORD_KEY = 'saved_password'
-
-interface RememberPasswordData {
-  username: string
-  password: string
-}
-
-/**
- * 保存记住的密码
- */
-function saveRememberPassword(username: string, password: string) {
-  localStorage.setItem(REMEMBER_PASSWORD_KEY, 'true')
-  localStorage.setItem(SAVED_USERNAME_KEY, username)
-  localStorage.setItem(SAVED_PASSWORD_KEY, password)
-}
-
-/**
- * 获取记住的密码
- */
-function getRememberPassword(): RememberPasswordData | null {
-  const remember = localStorage.getItem(REMEMBER_PASSWORD_KEY)
-  if (remember === 'true') {
-    const username = localStorage.getItem(SAVED_USERNAME_KEY) || ''
-    const password = localStorage.getItem(SAVED_PASSWORD_KEY) || ''
-    return { username, password }
-  }
-  return null
-}
-
-/**
- * 清除记住的密码
- */
-function clearRememberPassword() {
-  localStorage.removeItem(REMEMBER_PASSWORD_KEY)
-  localStorage.removeItem(SAVED_USERNAME_KEY)
-  localStorage.removeItem(SAVED_PASSWORD_KEY)
-}
+import {
+  clearRememberedLogin,
+  getRememberedLogin,
+  saveRememberedLogin,
+  type RememberedLogin,
+} from '@/utils/session'
 
 export function useLoginForm() {
   const { t } = useI18n()
@@ -60,6 +25,7 @@ export function useLoginForm() {
   const visible = ref(false)
   const loading = ref(false)
   const loginFormRef = ref<FormInstance>()
+  const rememberedPreview = ref<RememberedLogin | null>(null)
 
   const loginForm = reactive<LoginForm>({
     username: '',
@@ -137,10 +103,11 @@ export function useLoginForm() {
       
       // 处理记住密码
       if (loginForm.remember) {
-        saveRememberPassword(loginForm.username, loginForm.password)
+        saveRememberedLogin(loginForm.username, loginForm.password)
       } else {
-        clearRememberPassword()
+        clearRememberedLogin()
       }
+      refreshRememberedPreview()
       
       ElMessage.success(t('login.loginSuccess'))
       
@@ -182,16 +149,41 @@ export function useLoginForm() {
     resetForm()
   }
 
+  const refreshRememberedPreview = () => {
+    rememberedPreview.value = getRememberedLogin()
+  }
+
   /**
    * 加载记住的密码
    */
   const loadRememberPassword = () => {
-    const saved = getRememberPassword()
+    const saved = getRememberedLogin()
     if (saved) {
       loginForm.username = saved.username
       loginForm.password = saved.password
-      loginForm.remember = true
+      loginForm.remember = saved.remember
+      refreshRememberedPreview()
+      return
     }
+
+    loginForm.username = ''
+    loginForm.password = ''
+    loginForm.remember = false
+    refreshRememberedPreview()
+  }
+
+  const saveRememberedDemo = () => {
+    saveRememberedLogin(loginForm.username, loginForm.password)
+    loginForm.remember = true
+    refreshRememberedPreview()
+    ElMessage.success('Demo：账号和密码已写入 localStorage')
+  }
+
+  const clearRememberedDemo = () => {
+    clearRememberedLogin()
+    loginForm.remember = false
+    refreshRememberedPreview()
+    ElMessage.success('Demo：本地记住密码缓存已清除')
   }
 
   // 组件挂载时加载记住的密码
@@ -204,9 +196,12 @@ export function useLoginForm() {
     loading,
     loginForm,
     loginFormRef,
+    rememberedPreview,
     rules,
     handleLogin,
     resetForm,
+    saveRememberedDemo,
+    clearRememberedDemo,
     open,
     close,
   }

@@ -5,6 +5,7 @@
 import { ElMessage } from 'element-plus'
 import i18n from '@/lang'
 import type { ApiResponse } from './types'
+import { clearAuthSession } from '@/utils/session'
 
 /**
  * 显示错误提示
@@ -59,32 +60,8 @@ export function handleHttpError(
 ): ApiResponse {
   // 检查是否为token过期（401）
   if (code === 401) {
-    // 保存需要保留的数据
-    const locale = localStorage.getItem('locale')
-    
-    // 清除认证相关存储
-    localStorage.removeItem('tokens')
-    localStorage.removeItem('refresh_tokens')
-    localStorage.removeItem('user_infos')
-    localStorage.removeItem('remember_password')
-    localStorage.removeItem('saved_username')
-    localStorage.removeItem('saved_password')
-    
-    // 恢复语言设置
-    if (locale) {
-      localStorage.setItem('locale', locale)
-    }
-    
-    // 清除sessionStorage
-    sessionStorage.clear()
-    
-    // 清除所有Cookie
-    document.cookie.split(';').forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, '')
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
-    })
-    
+    void clearAuthSession()
+
     // 不跳转，只返回错误信息
     return {
       code,
@@ -107,4 +84,3 @@ export function handleHttpError(
     data: null as any,
   }
 }
-
