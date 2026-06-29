@@ -225,6 +225,7 @@
     "100Count": "100건",
     "200Count": "200건",
     "custom": "사용자 지정",
+    "customSelected": "사용자 지정 건수({count}{unit}, 클릭하여 다시 입력)",
     "customCount": "사용자 지정 수량",
     "enterCustomCount": "사용자 지정 수량을 입력해주세요",
     "maxCountHint": "잔액에 따라 최대 {max}건까지 구매 가능합니다",

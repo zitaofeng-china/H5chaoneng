@@ -196,6 +196,18 @@ const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
 
+const getCustomOptionLabel = (rowIdx: number) => {
+  const customCount = customCounts.value[rowIdx]
+  if (!customCount) {
+    return t('lease.custom')
+  }
+
+  return t('lease.customSelected', {
+    count: customCount,
+    unit: t('common.purchase'),
+  })
+}
+
 const rows = computed(() => [
   {
     label: t('lease.selectCount1Hour'),
@@ -206,7 +218,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[0] ? `${customCounts.value[0]}${t('common.purchase')}` : t('lease.custom'),
+      getCustomOptionLabel(0),
     ],
   },
   {
@@ -218,7 +230,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[1] ? `${customCounts.value[1]}${t('common.purchase')}` : t('lease.custom'),
+      getCustomOptionLabel(1),
     ],
   },
   {
@@ -230,7 +242,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[2] ? `${customCounts.value[2]}${t('common.purchase')}` : t('lease.custom'),
+      getCustomOptionLabel(2),
     ],
   },
   {
@@ -242,7 +254,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[3] ? `${customCounts.value[3]}${t('common.purchase')}` : t('lease.custom'),
+      getCustomOptionLabel(3),
     ],
   },
   {
@@ -254,7 +266,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[4] ? `${customCounts.value[4]}${t('common.purchase')}` : t('lease.custom'),
+      getCustomOptionLabel(4),
     ],
   },
   {
@@ -266,7 +278,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[5] ? `${customCounts.value[5]}${t('common.purchase')}` : t('lease.custom'),
+      getCustomOptionLabel(5),
     ],
   },
 ])

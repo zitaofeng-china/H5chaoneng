@@ -240,6 +240,7 @@
     "100Count": "100笔",
     "200Count": "200笔",
     "custom": "自定义",
+    "customSelected": "自定义笔数（{count}{unit}，点击重填）",
     "customCount": "自定义数量",
     "enterCustomCount": "请输入自定义数量",
     "maxCountHint": "根据您的余额，最多可购买 {max} 笔",

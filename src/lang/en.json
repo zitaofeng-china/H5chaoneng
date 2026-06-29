@@ -228,6 +228,7 @@
     "100Count": "100 Counts",
     "200Count": "200 Counts",
     "custom": "Custom",
+    "customSelected": "Custom count ({count} {unit}, click to refill)",
     "customCount": "Custom Count",
     "enterCustomCount": "Please enter custom count",
     "maxCountHint": "Based on your balance, you can purchase up to {max} counts",

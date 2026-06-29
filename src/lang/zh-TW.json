@@ -224,6 +224,7 @@
     "100Count": "100筆",
     "200Count": "200筆",
     "custom": "自定義",
+    "customSelected": "自定義筆數（{count}{unit}，點擊重填）",
     "customCount": "自定義數量",
     "enterCustomCount": "請輸入自定義數量",
     "maxCountHint": "根據您的餘額，最多可購買 {max} 筆",

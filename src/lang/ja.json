@@ -225,6 +225,7 @@
     "100Count": "100件",
     "200Count": "200件",
     "custom": "カスタム",
+    "customSelected": "カスタム件数（{count}{unit}、クリックして再入力）",
     "customCount": "カスタム数量",
     "enterCustomCount": "カスタム数量を入力してください",
     "maxCountHint": "残高に基づいて、最大{max}件まで購入できます",

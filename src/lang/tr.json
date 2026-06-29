@@ -226,6 +226,7 @@
     "100Count": "100 Adet",
     "200Count": "200 Adet",
     "custom": "Özel",
+    "customSelected": "Ozel adet ({count} {unit}, yeniden doldurmak icin tiklayin)",
     "customCount": "Özel Miktar",
     "enterCustomCount": "Lütfen özel miktar girin",
     "maxCountHint": "Bakiyenize göre, en fazla {max} işlem satın alabilirsiniz",

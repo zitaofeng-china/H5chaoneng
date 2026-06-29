@@ -226,6 +226,7 @@
     "100Count": "100 Unidades",
     "200Count": "200 Unidades",
     "custom": "Personalizado",
+    "customSelected": "Cantidad personalizada ({count} {unit}, haga clic para volver a llenar)",
     "customCount": "Cantidad Personalizada",
     "enterCustomCount": "Por favor ingrese cantidad personalizada",
     "maxCountHint": "Según su saldo, puede comprar hasta {max} transacciones",

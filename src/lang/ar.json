@@ -226,6 +226,7 @@
     "100Count": "100 وحدة",
     "200Count": "200 وحدة",
     "custom": "مخصص",
+    "customSelected": "عدد مخصص ({count} {unit}، اضغط لإعادة التعبئة)",
     "customCount": "كمية مخصصة",
     "enterCustomCount": "الرجاء إدخال كمية مخصصة",
     "maxCountHint": "بناءً على رصيدك، يمكنك شراء ما يصل إلى {max} معاملة",
