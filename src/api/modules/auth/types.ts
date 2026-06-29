@@ -2,6 +2,8 @@
  * 认证模块类型定义
  */
 
+export type BindAddressMap = Partial<Record<number, string[]>>
+
 // 用户信息
 export interface UserInfo {
   id: number // 用户ID
@@ -10,7 +12,7 @@ export interface UserInfo {
   agent_id: number // 代理ID
   trx_balance: string // TRX 余额
   usdt_balance: number // USDT 余额
-  address_list: string[] | null // 地址列表
+  bind_address: BindAddressMap | null // 按订单类型绑定的地址列表
   status: number // 状态：1-正常
   username: string // 用户名
   email: string // 邮箱

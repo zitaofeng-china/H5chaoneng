@@ -141,6 +141,7 @@ import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { authApi } from '@/api'
+import { type BindAddressMap } from '@/api/modules/auth/types'
 import { OrderKind } from '@/api/modules/order/types'
 import { AddressKind } from '@/api/modules/address/types'
 import { handleResponse } from '@/utils/response'
@@ -186,6 +187,16 @@ const formData = reactive({
   address: '',
   selectedAddress: '',
 })
+
+const bindAddressKind = AddressKind.FLASH_ENERGY_BALANCE
+
+const getBindAddressMap = (): BindAddressMap => {
+  return { ...(userInfo.value?.bind_address || {}) }
+}
+
+const getSavedAddressesByKind = (kind: number): string[] => {
+  return getBindAddressMap()[kind] || []
+}
 
 // 根据选择的能量数量计算总价
 // 65000 能量 = flash 价格
@@ -241,9 +252,8 @@ const formRules = computed<FormRules>(() => ({
 }))
 
 const addressOptions = computed(() => {
-  // 从用户信息的 address_list 中获取地址列表
-  const addresses = userInfo.value?.address_list || []
-  return addresses.map((addr, index) => ({
+  const addresses = getSavedAddressesByKind(bindAddressKind)
+  return addresses.map((addr) => ({
     label: addr,
     value: addr,
   }))
@@ -261,15 +271,15 @@ const handleSaveAddress = async () => {
     }
 
     // 检查地址是否已存在
-    const existingAddresses = userInfo.value?.address_list || []
+    const bindAddress = getBindAddressMap()
+    const existingAddresses = getSavedAddressesByKind(bindAddressKind)
     if (existingAddresses.includes(formData.address)) {
       ElMessage.warning(t('formValidation.addressAlreadyExists'))
       return
     }
 
-    // 更新用户地址列表
-    const updatedAddressList = [...existingAddresses, formData.address]
-    const response = await authApi.updateUserInfo({ address_list: updatedAddressList })
+    bindAddress[bindAddressKind] = [...existingAddresses, formData.address]
+    const response = await authApi.updateUserInfo({ bind_address: bindAddress })
 
     // 处理响应并显示提示（使用场景上下文）
     const success = handleResponse(response, {
@@ -302,10 +312,11 @@ const handleDeleteAddress = async (address: string) => {
     )
 
     // 从地址列表中删除该地址
-    const existingAddresses = userInfo.value?.address_list || []
-    const updatedAddressList = existingAddresses.filter(addr => addr !== address)
-    
-    const response = await authApi.updateUserInfo({ address_list: updatedAddressList })
+    const bindAddress = getBindAddressMap()
+    const existingAddresses = getSavedAddressesByKind(bindAddressKind)
+    bindAddress[bindAddressKind] = existingAddresses.filter(addr => addr !== address)
+
+    const response = await authApi.updateUserInfo({ bind_address: bindAddress })
 
     // 处理响应并显示提示
     const success = handleResponse(response, {
