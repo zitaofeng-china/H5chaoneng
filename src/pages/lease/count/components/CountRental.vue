@@ -62,9 +62,61 @@
           <el-form-item :label="t('lease.walletAddress')" prop="wallet">
             <el-input v-model="wallet" :placeholder="t('lease.enterAddress')" />
           </el-form-item>
+          <el-form-item :label="$t('home.savedAddress')" prop="selectedAddress">
+            <el-select
+              v-model="selectedAddress"
+              :placeholder="$t('home.selectSavedAddress')"
+              style="width: 100%"
+              :class="{ 'm-input': isMobile }"
+            >
+              <template #empty>
+                <div class="custom-empty">
+                  {{ $t('home.noSavedAddress') }}
+                </div>
+              </template>
+              <el-option
+                v-for="addr in addressOptions"
+                :key="addr.value"
+                :label="addr.label"
+                :value="addr.value"
+              >
+                <div class="address-option">
+                  <span class="address-text">{{ addr.label }}</span>
+                  <svg
+                    class="delete-icon"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                    @click.stop="handleDeleteAddress(addr.value)"
+                  >
+                    <rect opacity="0.1" width="24" height="24" rx="4.5" fill="#020F2D"/>
+                    <g opacity="0.6" clip-path="url(#count-rental-delete-icon)">
+                      <path d="M12.0002 11.1161L8.46101 7.57695C8.22392 7.33985 7.82483 7.3365 7.58076 7.58057C7.33498 7.82635 7.33506 8.21876 7.57713 8.46083L11.1163 12L7.57713 15.5391C7.34003 15.7762 7.33668 16.1753 7.58076 16.4194C7.82654 16.6652 8.21894 16.6651 8.46102 16.423L12.0002 12.8839L15.5393 16.423C15.7764 16.6601 16.1755 16.6635 16.4196 16.4194C16.6654 16.1736 16.6653 15.7812 16.4232 15.5392L12.8841 12L16.4232 8.46083C16.6603 8.22373 16.6637 7.82465 16.4196 7.58057C16.1738 7.33479 15.7814 7.33487 15.5393 7.57695L12.0002 11.1161Z" fill="white"/>
+                    </g>
+                    <defs>
+                      <clipPath id="count-rental-delete-icon">
+                        <rect width="10" height="10" fill="white" transform="translate(7 7)"/>
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </div>
+              </el-option>
+            </el-select>
+          </el-form-item>
+          <div class="tip-row">
+            <SvgIcon name="fee-info" width="12" height="12" />
+            <span class="tip-text">
+              {{ $t('home.saveTip') }}
+            </span>
+          </div>
 
           <el-form-item>
             <div class="btn-wrap">
+              <el-button type="primary" class="rent-btn" @click="handleSaveAddress">
+                {{ $t('home.saveAddress') }}
+              </el-button>
               <el-button type="primary" class="rent-btn" @click="handleRent">
                 {{ t('lease.rentNowButton') }}
               </el-button>
@@ -120,17 +172,20 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import KindTips from '@/components/kindTips/index.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
+import { authApi } from '@/api'
+import { type BindAddressMap } from '@/api/modules/auth/types'
 import { useAddress } from '@/hooks/useAddress'
 import { useOrderCreation } from '@/hooks/useOrderCreation'
 import { AddressKind } from '@/api/modules/address/types'
 import { OrderKind } from '@/api/modules/order/types'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { handleResponse } from '@/utils/response'
 
 defineOptions({ name: 'CountRental' })
 
@@ -141,6 +196,7 @@ interface RentalForm {
   energy: number
   validity: number
   wallet: string
+  selectedAddress: string
 }
 
 const { t } = useI18n()
@@ -216,6 +272,16 @@ const paymentTips = computed(() => [
 const selecteIndex = ref<[number, number]>([0, 0])
 const isCustom = ref(false)
 const customCount = ref<number>(1)
+const selectedAddress = ref('')
+const bindAddressKind = AddressKind.COUNT_RENTAL
+
+const getBindAddressMap = (): BindAddressMap => {
+  return { ...(userInfo.value?.bind_address || {}) }
+}
+
+const getSavedAddressesByKind = (kind: number): string[] => {
+  return getBindAddressMap()[kind] || []
+}
 
 // 使用动态价格
 const unitPrice = computed(() => strokePrice.value)
@@ -235,6 +301,12 @@ const count = computed(() => {
 const energy = ref(13.0)
 const validity = ref(3)
 const wallet = ref('')
+const addressOptions = computed(() => {
+  return getSavedAddressesByKind(bindAddressKind).map((addr) => ({
+    label: addr,
+    value: addr,
+  }))
+})
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
 const totalDisplay = computed(() => `${total.value}`)
@@ -247,6 +319,7 @@ const form = reactive<RentalForm>({
   energy: energy.value,
   validity: validity.value,
   wallet: wallet.value,
+  selectedAddress: selectedAddress.value,
 })
 
 const rules = computed<FormRules<RentalForm>>(() => ({
@@ -264,8 +337,34 @@ const rules = computed<FormRules<RentalForm>>(() => ({
     },
   ],
   wallet: [
-    { required: true, message: t('formValidation.walletRequired'), trigger: 'blur' },
-    { min: 5, message: t('formValidation.walletTooShort'), trigger: 'blur' },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: string | Error) => void) => {
+        if (selectedAddress.value) {
+          callback()
+        } else if (!value) {
+          callback(new Error(t('formValidation.walletRequired')))
+        } else if (value.length < 5) {
+          callback(new Error(t('formValidation.walletTooShort')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
+  selectedAddress: [
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: string | Error) => void) => {
+        if (wallet.value) {
+          callback()
+        } else if (!value) {
+          callback(new Error(t('formValidation.selectAddress')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'change',
+    },
   ],
 }))
 
@@ -278,6 +377,83 @@ watch([total, unitPrice, count], () => {
 }, { immediate: true })
 
 watch(wallet, (v) => (form.wallet = v))
+watch(selectedAddress, (v) => {
+  form.selectedAddress = v
+})
+
+const handleSaveAddress = async () => {
+  if (!formRef.value) return
+
+  try {
+    await formRef.value.validateField('wallet')
+
+    if (!wallet.value) {
+      ElMessage.warning(t('formValidation.enterAddressToSave'))
+      return
+    }
+
+    const bindAddress = getBindAddressMap()
+    const existingAddresses = getSavedAddressesByKind(bindAddressKind)
+    if (existingAddresses.includes(wallet.value)) {
+      ElMessage.warning(t('formValidation.addressAlreadyExists'))
+      return
+    }
+
+    bindAddress[bindAddressKind] = [...existingAddresses, wallet.value]
+    const response = await authApi.updateUserInfo({ bind_address: bindAddress })
+    const success = handleResponse(response, {
+      context: 'address_save',
+    })
+
+    if (success) {
+      const userResponse = await authApi.getUserInfo()
+      if (userResponse.data) {
+        userStore.updateUserInfo(userResponse.data)
+      }
+    }
+  } catch (error) {
+    console.error('【ERROR INFO】:', error)
+  }
+}
+
+const handleDeleteAddress = async (address: string) => {
+  try {
+    await ElMessageBox.confirm(
+      t('home.deleteAddressConfirm', { address }),
+      t('home.deleteAddressTitle'),
+      {
+        confirmButtonText: t('common.confirm'),
+        cancelButtonText: t('common.cancel'),
+        type: 'warning',
+      }
+    )
+
+    const bindAddress = getBindAddressMap()
+    const existingAddresses = getSavedAddressesByKind(bindAddressKind)
+    bindAddress[bindAddressKind] = existingAddresses.filter(addr => addr !== address)
+
+    const response = await authApi.updateUserInfo({ bind_address: bindAddress })
+    const success = handleResponse(response, {
+      context: 'address_delete',
+    })
+
+    if (success) {
+      if (selectedAddress.value === address) {
+        selectedAddress.value = ''
+      }
+
+      const userResponse = await authApi.getUserInfo()
+      if (userResponse.data) {
+        userStore.updateUserInfo(userResponse.data)
+      }
+    }
+  } catch (error) {
+    if (error === 'cancel') {
+      return
+    }
+    console.error('【ERROR INFO】:', error)
+  }
+}
 
 function onSelect(rowIdx: number, idx: number) {
   selecteIndex.value = [rowIdx, idx]
@@ -306,17 +482,20 @@ const handleRent = async () => {
   try {
     await formRef.value.validate()
 
+    const targetAddress = wallet.value || selectedAddress.value
+
     const success = await createOrder({
       count: count.value,
       duration: undefined,
       kind: OrderKind.KindStrokeEnergy,
-      target: [wallet.value],
+      target: [targetAddress],
       userId: userInfo.value?.id || 0,
       context: 'lease_count',
     })
     
     if (success) {
       wallet.value = ''
+      selectedAddress.value = ''
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
@@ -363,6 +542,45 @@ onMounted(() => {
   font-weight: 700;
   color: #1f2937;
   margin: 6px 0 12px;
+}
+
+.custom-empty {
+  padding: 10px 0;
+  text-align: center;
+  color: var(--theme-text-light-gray);
+  font-size: 14px;
+}
+
+.address-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.address-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.delete-icon {
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.tip-row {
+  margin: -4px 0 18px 115px;
+  display: flex;
+  align-items: center;
+  color: var(--theme-text-black);
+  opacity: 0.6;
+  font-size: 12px;
+
+  .tip-text {
+    padding-left: 4px;
+  }
 }
 
 .selection-grid {
@@ -471,6 +689,10 @@ onMounted(() => {
       font-size: 15px;
       margin-bottom: 16px;
     }
+  }
+
+  .tip-row {
+    margin-left: 0;
   }
 
   :deep(.el-form-item) {
