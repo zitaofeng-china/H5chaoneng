@@ -34,6 +34,14 @@ export function useRecharge() {
   const actualCoin = ref<string>('TRX')   // 币种
   const deadline = ref<string>('')        // 转账截止时间
 
+  const normalizeIntegerAmount = (value: string) => {
+    return (value.split(/[.。]/)[0] ?? '').replace(/\D/g, '')
+  }
+
+  const getSelectedIntegerAmount = () => {
+    return Number.isInteger(selectedAmount.value) ? selectedAmount.value : Math.trunc(selectedAmount.value)
+  }
+
   /**
    * 选择预设金额
    */
@@ -49,7 +57,9 @@ export function useRecharge() {
   const handleCustomAmountFocus = () => {
     isCustomAmount.value = true
     if (customAmountInput.value) {
-      selectedAmount.value = parseFloat(customAmountInput.value) || 0
+      const normalizedAmount = normalizeIntegerAmount(customAmountInput.value)
+      customAmountInput.value = normalizedAmount
+      selectedAmount.value = Number.parseInt(normalizedAmount, 10) || 0
     }
   }
 
@@ -58,7 +68,9 @@ export function useRecharge() {
    */
   const handleCustomAmountInput = (value: string) => {
     isCustomAmount.value = true
-    const amount = parseFloat(value) || 0
+    const normalizedAmount = normalizeIntegerAmount(value)
+    customAmountInput.value = normalizedAmount
+    const amount = Number.parseInt(normalizedAmount, 10) || 0
     selectedAmount.value = amount
   }
 
@@ -66,10 +78,17 @@ export function useRecharge() {
    * 确认金额，创建充值订单并进入第二步
    */
   const confirmAmount = async () => {
+    const depositAmount = getSelectedIntegerAmount()
+
     // 验证金额
-    if (selectedAmount.value < 1) {
+    if (depositAmount < 1) {
       ElMessage.warning(t('recharge.invalidAmount') || '请输入有效的充值金额')
       return
+    }
+
+    selectedAmount.value = depositAmount
+    if (isCustomAmount.value) {
+      customAmountInput.value = depositAmount.toString()
     }
     
     // 检查登录状态
@@ -84,14 +103,14 @@ export function useRecharge() {
     
     try {
       console.log('[Recharge] 创建充值订单:', {
-        amount: selectedAmount.value,
+        amount: depositAmount,
         coin: 'TRX',
         userId
       })
       
       // 创建充值订单
       const response = await orderApi.createDepositOrder({
-        amount: selectedAmount.value,
+        amount: depositAmount,
         coin: 'TRX',
         user_id: userId
       })

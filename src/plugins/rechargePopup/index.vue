@@ -40,9 +40,9 @@
             </div>
             <el-input
               v-model="customAmountInput"
-              type="number"
-              min="1"
-              step="0.01"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]*"
               :placeholder="t('recharge.enterCustomAmount')"
               class="custom-amount-input"
               @focus="handleCustomAmountFocus"
