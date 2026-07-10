@@ -45,6 +45,7 @@ export const NO_TOKEN_URLS: (string | RegExp)[] = [
   '/v3/exchange/rate', // 获取汇率信息
   '/v3/captcha/email', // 获取邮箱验证码
   '/v3/tg_login', // Telegram Mini App 登录
+  '/v1/ticker/price', // 获取 TRX/USDT 实时行情
 ]
 
 // 请求头配置
