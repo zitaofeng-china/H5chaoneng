@@ -13,6 +13,9 @@ import { useI18n } from 'vue-i18n'
 import { formatCryptoAmount } from '@/utils/number'
 import { formatDeadline } from '@/utils/time'
 
+/** TRX / USDT 最低充值金额（前端拦截） */
+export const MIN_RECHARGE_AMOUNT = 2
+
 export function useRecharge() {
   const { t } = useI18n()
   const userStore = useUserStore()
@@ -70,6 +73,9 @@ export function useRecharge() {
 
     return Number(selectedAmount.value.toFixed(2))
   }
+
+  /** 金额是否达到最低充值门槛（TRX/USDT 均为 2） */
+  const isAmountValid = computed(() => getSelectedAmount() >= MIN_RECHARGE_AMOUNT)
 
   // /v3/price 的 usdt_2_trx 是 USDT→TRX 的手续费比例，例如 0.06 代表 6%。
   const usdtFeeRate = computed<number | null>(() => {
@@ -191,9 +197,18 @@ export function useRecharge() {
   const confirmAmount = async () => {
     const depositAmount = getSelectedAmount()
 
-    // 验证金额
-    if (depositAmount <= 0 || (selectedCoin.value === 'TRX' && depositAmount < 1)) {
+    // 验证金额：TRX / USDT 均不得低于最低充值金额
+    if (!Number.isFinite(depositAmount) || depositAmount <= 0) {
       ElMessage.warning(t('recharge.invalidAmount') || '请输入有效的充值金额')
+      return
+    }
+    if (depositAmount < MIN_RECHARGE_AMOUNT) {
+      ElMessage.warning(
+        t('recharge.minAmountError', {
+          min: MIN_RECHARGE_AMOUNT,
+          coin: selectedCoin.value,
+        }) || `充值金额不能低于 ${MIN_RECHARGE_AMOUNT} ${selectedCoin.value}`
+      )
       return
     }
 
@@ -345,7 +360,7 @@ export function useRecharge() {
     currentStep.value = 1
     selectedCoin.value = 'TRX'
     selectedAmount.value = 0
-    customAmountInput.value = '1'
+    customAmountInput.value = ''
     isCustomAmount.value = false
     resetOrderData()
     
@@ -386,7 +401,7 @@ export function useRecharge() {
     currentStep.value = 1
     selectedCoin.value = 'TRX'
     selectedAmount.value = 0
-    customAmountInput.value = '1'
+    customAmountInput.value = ''
     isCustomAmount.value = false
     resetOrderData()
   }
@@ -398,6 +413,8 @@ export function useRecharge() {
     isLoadingAddress,
     currentStep,
     selectedCoin,
+    minRechargeAmount: MIN_RECHARGE_AMOUNT,
+    isAmountValid,
     
     // 用户输入
     selectedAmount,

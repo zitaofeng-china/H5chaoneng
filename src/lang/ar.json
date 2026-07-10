@@ -1,4 +1,4 @@
-﻿{
+{
   "common": {
     "confirm": "تأكيد",
     "cancel": "إلغاء",
@@ -401,11 +401,12 @@
     "rateLoading": "جارٍ جلب السعر...",
     "rechargeAddress": "عنوان الاستلام",
     "scanQrcode": "امسح رمز QR للشحن",
-    "minTransfer": "يمكن تحويل أي مبلغ أكبر من 1TRX",
+    "minTransfer": "الحد الأدنى للشحن 2 TRX / 2 USDT",
     "checkAddress": "يرجى التحقق من العنوان أثناء التحويل",
     "customAmount": "انقر لتخصيص مبلغ شحن {coin}",
-    "enterCustomAmount": "يرجى إدخال مبلغ شحن {coin}",
-    "minAmount": "الحد الأدنى لـ TRX هو 1 وبأعداد صحيحة؛ يدعم USDT الكسور العشرية",
+    "enterCustomAmount": "أدخل مبلغًا >{min} {coin} للشحن",
+    "minAmount": "الحد الأدنى لـ TRX و USDT هو 2؛ TRX أعداد صحيحة فقط و USDT يدعم الكسور",
+    "minAmountError": "لا يمكن أن يكون مبلغ الشحن أقل من {min} {coin}",
     "confirmAmount": "تأكيد مبلغ الشحن",
     "rechargeAmount": "مبلغ الشحن",
     "changeAmount": "تغيير المبلغ",

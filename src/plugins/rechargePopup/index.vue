@@ -52,7 +52,12 @@
               type="text"
               :inputmode="amountInputmode"
               :pattern="amountPattern"
-              :placeholder="t('recharge.enterCustomAmount', { coin: selectedCoin })"
+              :placeholder="
+                t('recharge.enterCustomAmount', {
+                  coin: selectedCoin,
+                  min: minRechargeAmount,
+                })
+              "
               class="custom-amount-input"
               @focus="handleCustomAmountFocus"
               @input="handleCustomAmountInput"
@@ -82,9 +87,7 @@
             type="primary"
             size="large"
             class="confirm-amount-btn"
-            :disabled="
-              !selectedAmount || (selectedCoin === 'TRX' && selectedAmount < 1)
-            "
+            :disabled="!isAmountValid"
             @click="confirmAmount"
           >
             {{ t('recharge.confirmAmount') }}
@@ -167,6 +170,8 @@ const {
   customAmountInput,
   isCustomAmount,
   presetAmounts,
+  isAmountValid,
+  minRechargeAmount,
   amountInputmode,
   amountPattern,
   rechargeAddress,
