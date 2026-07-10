@@ -74,11 +74,11 @@
           :class="{ 'derail-form-m': isMobile }"
         >
           <el-form-item :label="t('lease.unitPrice')" prop="unitPrice">
-            <el-input v-model="unitPrice" disabled class="m-input" v-if="isMobile">
+            <el-input :model-value="unitPriceDisplay" disabled class="m-input" v-if="isMobile">
               <template #prefix>{{ t('lease.unitPrice') }}</template>
               <template #suffix> {{ t('common.trx') }} </template>
             </el-input>
-            <el-input :model-value="unitPrice + ' ' + t('common.trx')" disabled v-else />
+            <el-input :model-value="unitPriceDisplay + ' ' + t('common.trx')" disabled v-else />
           </el-form-item>
 
           <el-form-item :label="t('lease.count')" prop="count">
@@ -173,6 +173,7 @@ import { useUserStore } from '@/stores/useUserStore'
 import { useOrderCreation } from '@/hooks/useOrderCreation'
 import { OrderKind } from '@/api/modules/order/types'
 import { storeToRefs } from 'pinia'
+import { formatCryptoAmount } from '@/utils/number'
 
 defineOptions({ name: 'TimeRental' })
 
@@ -322,6 +323,7 @@ const unitPrice = computed(() => {
   
   return parseFloat(priceMap[rowIdx] || priceData.value.time_1h)
 })
+const unitPriceDisplay = computed(() => formatCryptoAmount(unitPrice.value))
 const count = computed(() => {
   const [rowIdx, colIdx] = selecteIndex.value
   const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
@@ -348,7 +350,7 @@ const validityUnit = computed(() => {
 const wallet = ref('')
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
-const totalDisplay = computed(() => `${total.value}`)
+const totalDisplay = computed(() => formatCryptoAmount(total.value))
 
 const formRef = ref<FormInstance>()
 const form = reactive<RentalForm>({

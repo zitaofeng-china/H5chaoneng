@@ -52,6 +52,7 @@ import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { orderApi } from '@/api'
 import { OrderKind } from '@/api/modules/order/types'
+import { formatCryptoAmount } from '@/utils/number'
 import { handleResponse } from '@/utils/response'
 
 const { t } = useI18n()
@@ -63,7 +64,7 @@ const { userInfo } = storeToRefs(userStore)
 
 const feeCardTexts = computed<string[]>(() => {
   const activationPrice = priceStore.priceData?.active || '1.2'
-  return [`${t('feeCard.activationPriceLabel')}：${activationPrice} TRX`]
+  return [`${t('feeCard.activationPriceLabel')}：${formatCryptoAmount(activationPrice)} TRX`]
 })
 
 const kindTipTexts = computed<string[]>(() => [t('activation.tips1'), t('activation.tips2')])

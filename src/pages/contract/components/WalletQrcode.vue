@@ -48,6 +48,7 @@ import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { formatCryptoAmount } from '@/utils/number'
 
 const { t } = useI18n()
 
@@ -98,8 +99,8 @@ const getCoinTips = computed(() => {
   const maxTrx = maxLimits.value.trx
   
   return props.coin.toUpperCase() === 'USDT'
-    ? [`${t('contract.minExchange', { min: 2 })} USDT，${t('contract.maxExchange', { max: maxUsdt })} USDT`].concat(tips.value)
-    : [`${t('contract.minExchange', { min: 10 })} TRX，${t('contract.maxExchange', { max: maxTrx })} TRX`].concat(tips.value)
+    ? [`${t('contract.minExchange', { min: formatCryptoAmount(2) })} USDT，${t('contract.maxExchange', { max: formatCryptoAmount(maxUsdt) })} USDT`].concat(tips.value)
+    : [`${t('contract.minExchange', { min: formatCryptoAmount(10) })} TRX，${t('contract.maxExchange', { max: formatCryptoAmount(maxTrx) })} TRX`].concat(tips.value)
 })
 </script>
 

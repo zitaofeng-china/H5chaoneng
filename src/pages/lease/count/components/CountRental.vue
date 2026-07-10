@@ -185,6 +185,7 @@ import { useOrderCreation } from '@/hooks/useOrderCreation'
 import { AddressKind } from '@/api/modules/address/types'
 import { OrderKind } from '@/api/modules/order/types'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { formatCryptoAmount } from '@/utils/number'
 import { handleResponse } from '@/utils/response'
 
 defineOptions({ name: 'CountRental' })
@@ -248,7 +249,7 @@ const rows = computed(() => {
   return [
     {
       options: counts.map(count => {
-        const total = (count * strokePrice.value).toFixed(1)
+        const total = formatCryptoAmount(count * strokePrice.value)
         return `${count}${t('common.purchase')}(${total}${t('common.trx')})`
       }),
       counts: counts, // 保存原始笔数数组
@@ -264,7 +265,7 @@ const tips = computed(() => [
 ])
 
 const paymentTips = computed(() => [
-  t('countRental.usdtTip1', { amount: usdtUnitPrice.value }), // 转账 {amount} USDT = 获取购买1笔
+  t('countRental.usdtTip1', { amount: formatCryptoAmount(usdtUnitPrice.value) }), // 转账 {amount} USDT = 获取购买1笔
   t('countRental.usdtTip2'), // 购买多笔请转对应USDT的倍数金额
   t('countRental.usdtTip3'), // 请注意金额，错误金额将当成1小时能量发货
 ])
@@ -309,7 +310,7 @@ const addressOptions = computed(() => {
 })
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
-const totalDisplay = computed(() => `${total.value}`)
+const totalDisplay = computed(() => formatCryptoAmount(total.value))
 
 const formRef = ref<FormInstance>()
 const form = reactive<RentalForm>({

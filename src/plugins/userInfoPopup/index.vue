@@ -68,6 +68,7 @@ import { storeToRefs } from 'pinia'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useSiteStore } from '@/stores/useSiteStore'
+import { formatBalance } from '@/utils/number'
 import { authApi } from '@/api'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
@@ -189,7 +190,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
       { label: t('recharge.account'), value: '-' },
       { label: t('recharge.email'), value: '-' },
       { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
-      { label: t('recharge.trxBalance'), value: '0 TRX' },
+      { label: t('recharge.trxBalance'), value: '0.00 TRX' },
       { label: 'Key', value: '', type: 'secretKey' },
     ]
   }
@@ -198,7 +199,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
     { label: t('recharge.account'), value: userInfo.username || '-' },
     { label: t('recharge.email'), value: userInfo.email || '-' },
     { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
-    { label: t('recharge.trxBalance'), value: `${userInfo.trx_balance || '0'} TRX` },
+    { label: t('recharge.trxBalance'), value: `${formatBalance(userInfo.trx_balance)} TRX` },
     { label: 'Key', value: '', type: 'secretKey' },
   ]
 })

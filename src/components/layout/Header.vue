@@ -323,6 +323,7 @@ import { handleOpenToTelegram } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
 import { getSite, isLiteSite, LITE_SITE, DEFAULT_SITE } from '@/utils/site'
+import { formatBalance } from '@/utils/number'
 import { isTelegramMiniApp } from '@/utils/telegram'
 import { clearAuthSession } from '@/utils/session'
 
@@ -387,8 +388,8 @@ const isLogin = computed(() => userStore.isLogin)
 
 // 获取用户 TRX 余额
 const trxBalance = computed(() => {
-  if (!userStore.userInfo) return '0'
-  return userStore.userInfo.trx_balance || '0'
+  if (!userStore.userInfo) return '0.00'
+  return formatBalance(userStore.userInfo.trx_balance)
 })
 
 const route = useRoute()

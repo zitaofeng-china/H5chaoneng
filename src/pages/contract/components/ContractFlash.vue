@@ -18,7 +18,9 @@
                 type="number"
                 :min="minValue"
                 :max="maxValue"
+                step="0.01"
                 :placeholder="t('contract.enterAmountPlaceholder')"
+                @input="handleAmountInput"
                 @blur="handleBlur"
               >
                 <template #prefix>{{ t('contract.enterAmount') }}</template>
@@ -63,6 +65,7 @@ import type { ExchangeRateData } from '@/api/modules/exchange/types'
 import { AddressKind } from '@/api/modules/address/types'
 import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { logger } from '@/utils/logger'
+import { formatCryptoAmount } from '@/utils/number'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
@@ -77,7 +80,7 @@ const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymen
 const exchangeRateData = ref<ExchangeRateData | null>(null)
 
 const formData = reactive({
-  unitPrice: '2',
+  unitPrice: '2.00',
   coinAmount: '',
 })
 
@@ -135,27 +138,27 @@ const maxLimits = computed(() => {
 const minValue = computed(() => activeTab.value === 'USDT' ? 2 : 10)
 const maxValue = computed(() => activeTab.value === 'USDT' ? maxLimits.value.usdt : maxLimits.value.trx)
 
-// 计算显示的汇率（使用最小值，保留5位小数）
+// 计算显示的汇率（统一保留两位小数）
 const displayRate = computed(() => {
   if (activeTab.value === 'USDT') {
     // USDT→TRX: 2 USDT 能兑换多少 TRX
-    return (2 * exchangeRate.value.usdtToTrx).toFixed(5)
+    return formatCryptoAmount(2 * exchangeRate.value.usdtToTrx)
   } else {
     // TRX→USDT: 10 TRX 能兑换多少 USDT
-    return (10 * exchangeRate.value.trxToUsdt).toFixed(5)
+    return formatCryptoAmount(10 * exchangeRate.value.trxToUsdt)
   }
 })
 
 // 显示库存（使用接口返回的库存数据）
 const displayStock = computed(() => {
-  if (!exchangeRateData.value) return '0'
+  if (!exchangeRateData.value) return '0.00'
   
   if (activeTab.value === 'USDT') {
     // USDT→TRX，显示 TRX 库存
-    return exchangeRateData.value.stock_trx
+    return formatCryptoAmount(exchangeRateData.value.stock_trx)
   } else {
     // TRX→USDT，显示 USDT 库存
-    return exchangeRateData.value.stock_usdt
+    return formatCryptoAmount(exchangeRateData.value.stock_usdt)
   }
 })
 
@@ -184,7 +187,7 @@ watch(() => formData.unitPrice, (newValue) => {
     // USDT→TRX
     const rate = exchangeRate.value.usdtToTrx
     if (rate > 0) {
-      formData.coinAmount = (amount * rate).toFixed(2)
+      formData.coinAmount = formatCryptoAmount(amount * rate)
     } else {
       formData.coinAmount = '0.00'
     }
@@ -192,7 +195,7 @@ watch(() => formData.unitPrice, (newValue) => {
     // TRX→USDT
     const rate = exchangeRate.value.trxToUsdt
     if (rate > 0) {
-      formData.coinAmount = (amount * rate).toFixed(2)
+      formData.coinAmount = formatCryptoAmount(amount * rate)
     } else {
       formData.coinAmount = '0.00'
     }
@@ -201,7 +204,7 @@ watch(() => formData.unitPrice, (newValue) => {
 
 // 监听切换标签，重置表单并重新获取汇率
 watch(activeTab, (newTab) => {
-  formData.unitPrice = newTab === 'USDT' ? '2' : '10'
+  formData.unitPrice = formatCryptoAmount(newTab === 'USDT' ? 2 : 10)
   formData.coinAmount = ''
   // 切换标签时重新获取汇率
   fetchExchangeRate()
@@ -233,13 +236,24 @@ watch(() => exchangeRateData.value, (newData) => {
   }
 }, { immediate: true })
 
+const handleAmountInput = (value: string | number) => {
+  const rawValue = String(value).replace(/[^\d.]/g, '')
+  const [integerPart = '', decimalPart = ''] = rawValue.split('.')
+  const decimal = rawValue.includes('.') ? `.${decimalPart.slice(0, 2)}` : ''
+
+  formData.unitPrice = `${integerPart}${decimal}`
+}
+
 // 失焦时检查并恢复最小值
 const handleBlur = () => {
   const amount = Number.parseFloat(formData.unitPrice)
   
   if (formData.unitPrice === '' || Number.isNaN(amount) || amount < minValue.value) {
-    formData.unitPrice = String(minValue.value)
+    formData.unitPrice = formatCryptoAmount(minValue.value)
+    return
   }
+
+  formData.unitPrice = formatCryptoAmount(Math.min(amount, maxValue.value))
 }
 
 // 初始化时获取汇率和付款地址

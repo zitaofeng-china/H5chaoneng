@@ -5,15 +5,15 @@
       <div class="rate-main">
         <span class="rate-label-inline">{{ t('contract.realtimeRate') }}</span>
         <span class="rate-text" v-if="coin.toUpperCase() === 'USDT'">
-          2 <span class="rate-unit">{{ t('common.usdt') }}</span>
+          {{ formatCryptoAmount(2) }} <span class="rate-unit">{{ t('common.usdt') }}</span>
           <span class="rate-symbol">≈</span>
-          <span class="rate-value">{{ rate }}</span>
+          <span class="rate-value">{{ displayRate }}</span>
           <span class="rate-unit">{{ t('common.trx') }}</span>
         </span>
         <span class="rate-text" v-else>
-          10 <span class="rate-unit">{{ coin.toUpperCase() }}</span>
+          {{ formatCryptoAmount(10) }} <span class="rate-unit">{{ coin.toUpperCase() }}</span>
           <span class="rate-symbol">≈</span>
-          <span class="rate-value">{{ rate }}</span>
+          <span class="rate-value">{{ displayRate }}</span>
           <span class="rate-unit">{{ t('common.usdt') }}</span>
         </span>
       </div>
@@ -24,10 +24,10 @@
       <div class="note-text">{{ t('contract.rateNote') }}</div>
       <div class="limits-row">
         <span class="limit-item">
-          <span class="rate-unit">{{ t('common.usdt') }}</span> ≥ 2
+          <span class="rate-unit">{{ t('common.usdt') }}</span> ≥ {{ formatCryptoAmount(2) }}
         </span>
         <span class="limit-item">
-          <span class="rate-unit">{{ t('common.trx') }}</span> ≥ 10
+          <span class="rate-unit">{{ t('common.trx') }}</span> ≥ {{ formatCryptoAmount(10) }}
         </span>
       </div>
     </div>
@@ -35,7 +35,7 @@
     <!-- 剩余库存 -->
     <div class="stock-section">
       <span class="stock-label">{{ t('contract.remainingStock') }}</span>
-      <span class="stock-value">{{ stock }}</span>
+      <span class="stock-value">{{ displayStock }}</span>
       <span class="rate-unit">{{
         coin.toUpperCase() === 'USDT' ? t('common.trx') : t('common.usdt')
       }}</span>
@@ -44,7 +44,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { formatCryptoAmount } from '@/utils/number'
 
 const { t } = useI18n()
 
@@ -56,11 +58,14 @@ interface Props {
   stock?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   coin: 'USDT',
   rate: '6.34',
   stock: '34430.21964',
 })
+
+const displayRate = computed(() => formatCryptoAmount(props.rate))
+const displayStock = computed(() => formatCryptoAmount(props.stock))
 </script>
 
 <style scoped lang="scss">

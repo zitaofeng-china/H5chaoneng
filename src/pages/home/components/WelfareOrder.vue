@@ -68,6 +68,7 @@ import { useSiteStore } from '@/stores/useSiteStore'
 import { addressApi } from '@/api'
 import { AddressKind } from '@/api/modules/address/types'
 import WelfarePurchaseDialog from '@/components/WelfarePurchaseDialog.vue'
+import { formatCryptoAmount } from '@/utils/number'
 import { getSite } from '@/utils/site'
 
 const { t } = useI18n()
@@ -78,7 +79,7 @@ const purchaseDialogRef = ref<InstanceType<typeof WelfarePurchaseDialog>>()
 const loading = ref(false)
 
 // 福利价格（取站点信息的 weal_price 字段）
-const welfarePrice = computed(() => siteStore.wealPrice)
+const welfarePrice = computed(() => formatCryptoAmount(siteStore.wealPrice))
 
 // 福利地址缓存（10分钟有效，存 sessionStorage 刷新不丢失）
 const CACHE_DURATION = 10 * 60 * 1000 // 10 分钟

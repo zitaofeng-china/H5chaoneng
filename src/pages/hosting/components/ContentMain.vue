@@ -45,6 +45,7 @@ import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { addressApi } from '@/api'
 import { HostingKind } from '@/api/modules/address/types'
+import { formatCryptoAmount } from '@/utils/number'
 import { getSite } from '@/utils/site'
 
 const { t } = useI18n()
@@ -58,8 +59,8 @@ const texts = computed(() => {
   const price65k = priceStore.priceData?.hosting_65k || '3'
   const price131k = priceStore.priceData?.hosting_131k || '5'
   return [
-    `${t('hosting.use65000Energy')}：${price65k}TRX/${t('common.purchase')}`,
-    `${t('hosting.use131000Energy')}：${price131k}TRX/${t('common.purchase')}`,
+    `${t('hosting.use65000Energy')}：${formatCryptoAmount(price65k)}TRX/${t('common.purchase')}`,
+    `${t('hosting.use131000Energy')}：${formatCryptoAmount(price131k)}TRX/${t('common.purchase')}`,
   ]
 })
 

@@ -148,6 +148,7 @@ import { handleResponse } from '@/utils/response'
 import { useOrderCreation } from '@/hooks/useOrderCreation'
 import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { storeToRefs } from 'pinia'
+import { formatCryptoAmount } from '@/utils/number'
 
 const { t } = useI18n()
 const langStore = useLangStore()
@@ -203,7 +204,7 @@ const getSavedAddressesByKind = (kind: number): string[] => {
 // 131000 能量 = flash 价格 × 2
 const unitPrice = computed(() => {
   const flashPrice = Number.parseFloat(priceData.value?.flash || '1.9')
-  return formData.energy === 131000 ? (flashPrice * 2).toFixed(2) : flashPrice.toFixed(2)
+  return formatCryptoAmount(formData.energy === 131000 ? flashPrice * 2 : flashPrice)
 })
 
 watch([() => formData.energy, () => langStore.currentLocale], () => {

@@ -67,6 +67,7 @@ import { usePriceStore } from '@/stores/usePriceStore'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { formatCryptoAmount } from '@/utils/number'
 import { getSite } from '@/utils/site'
 
 interface Props {
@@ -103,10 +104,10 @@ const hourlyPrice = computed(() => {
 const priceBanners = computed(() => {
   const price = hourlyPrice.value
   return [
-    { count: 1, price: (price * 1).toFixed(1) },
-    { count: 2, price: (price * 2).toFixed(1) },
-    { count: 4, price: (price * 4).toFixed(1) },
-    { count: 20, price: (price * 20).toFixed(1) },
+    { count: 1, price: formatCryptoAmount(price) },
+    { count: 2, price: formatCryptoAmount(price * 2) },
+    { count: 4, price: formatCryptoAmount(price * 4) },
+    { count: 20, price: formatCryptoAmount(price * 20) },
   ]
 })
 
