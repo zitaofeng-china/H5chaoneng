@@ -2,44 +2,138 @@
  * 充值弹窗业务逻辑 Hook
  */
 
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
-import { authApi, orderApi } from '@/api'
+import { authApi, binanceApi, orderApi } from '@/api'
+import type { RechargeCoin } from '@/api/modules/order/types'
+import { usePriceStore } from '@/stores/usePriceStore'
 import { useCopyToClipboard } from './useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
+import { formatCryptoAmount } from '@/utils/number'
 import { formatDeadline } from '@/utils/time'
 
 export function useRecharge() {
   const { t } = useI18n()
   const userStore = useUserStore()
+  const priceStore = usePriceStore()
   const { isCopying, copyText } = useCopyToClipboard()
 
   // 弹窗状态
   const visible = ref(false)
   const isLoadingAddress = ref(false)
+  const isLoadingExchangeRate = ref(false)
   
   // 充值流程状态
   const currentStep = ref(1) // 1: 选择金额, 2: 显示地址
   
   // 用户输入的金额
+  const selectedCoin = ref<RechargeCoin>('TRX')
   const selectedAmount = ref<number>(0)
   const customAmountInput = ref<string>('')
   const isCustomAmount = ref(false)
   const presetAmounts = [10, 30, 50, 200, 500, 1000]
+  const amountInputmode = computed(() => (selectedCoin.value === 'USDT' ? 'decimal' : 'numeric'))
+  const amountPattern = computed(() =>
+    selectedCoin.value === 'USDT' ? '[0-9]*[.]?[0-9]*' : '[0-9]*'
+  )
   
   // 订单返回的实际数据
   const rechargeAddress = ref<string>('') // 充值地址
   const actualAmount = ref<string>('')    // 实际充值金额
   const actualCoin = ref<string>('TRX')   // 币种
   const deadline = ref<string>('')        // 转账截止时间
+  const usdtToTrxMarketRate = ref(0)      // 1 USDT = X TRX
+  let exchangeRateRequestId = 0
 
-  const normalizeIntegerAmount = (value: string) => {
-    return (value.split(/[.。]/)[0] ?? '').replace(/\D/g, '')
+  const normalizeAmountInput = (value: string) => {
+    const normalized = value.replace(/[。]/g, '.').replace(/[^\d.]/g, '')
+    if (!normalized) return ''
+
+    const [integerPart = '', decimalPart = ''] = normalized.split('.')
+    const normalizedInteger = integerPart.replace(/^0+(?=\d)/, '')
+
+    if (selectedCoin.value === 'TRX') {
+      return normalizedInteger
+    }
+
+    const decimal = normalized.includes('.') ? `.${decimalPart.slice(0, 2)}` : ''
+    return `${normalizedInteger || '0'}${decimal}`
   }
 
-  const getSelectedIntegerAmount = () => {
-    return Number.isInteger(selectedAmount.value) ? selectedAmount.value : Math.trunc(selectedAmount.value)
+  const getSelectedAmount = () => {
+    if (!Number.isFinite(selectedAmount.value)) return 0
+
+    if (selectedCoin.value === 'TRX') {
+      return Math.trunc(selectedAmount.value)
+    }
+
+    return Number(selectedAmount.value.toFixed(2))
+  }
+
+  // /v3/price 的 usdt_2_trx 是 USDT→TRX 的手续费比例，例如 0.06 代表 6%。
+  const usdtFeeRate = computed<number | null>(() => {
+    const rawValue = priceStore.priceData?.usdt_2_trx
+    if (rawValue === undefined || rawValue === null || rawValue === '') return null
+
+    const value = Number(rawValue)
+    return Number.isFinite(value) && value >= 0 && value < 1 ? value : null
+  })
+
+  const usdtExchangeRate = computed(() => {
+    if (usdtToTrxMarketRate.value <= 0 || usdtFeeRate.value === null) return 0
+
+    // 实时 1 USDT→TRX 汇率，扣减站点配置的手续费比例。
+    return usdtToTrxMarketRate.value * (1 - usdtFeeRate.value)
+  })
+
+  const usdtExchangeRateText = computed(() =>
+    usdtExchangeRate.value > 0 ? formatCryptoAmount(usdtExchangeRate.value) : ''
+  )
+  const estimatedTrxAmount = computed(() => {
+    if (selectedCoin.value !== 'USDT' || selectedAmount.value <= 0 || usdtExchangeRate.value <= 0) {
+      return ''
+    }
+
+    return formatCryptoAmount(selectedAmount.value * usdtExchangeRate.value)
+  })
+  const displayActualAmount = computed(() => {
+    if (actualAmount.value) return actualAmount.value
+
+    const amount = getSelectedAmount()
+    return amount > 0 ? amount.toString() : ''
+  })
+
+  const fetchUsdtExchangeRate = async () => {
+    const requestId = ++exchangeRateRequestId
+    isLoadingExchangeRate.value = true
+    usdtToTrxMarketRate.value = 0
+
+    try {
+      const [, response] = await Promise.all([
+        priceStore.fetchPrice(),
+        binanceApi.getTrxUsdtPrice(),
+      ])
+      // 行情返回 1 TRX = X USDT，USDT 充值展示需要反向换算为 1 USDT = X TRX。
+      const trxUsdtPrice = Number(response.price)
+      const marketRate = 1 / trxUsdtPrice
+
+      if (
+        requestId === exchangeRateRequestId &&
+        Number.isFinite(marketRate) &&
+        marketRate > 0
+      ) {
+        usdtToTrxMarketRate.value = marketRate
+      }
+    } catch (error) {
+      if (requestId === exchangeRateRequestId) {
+        console.error('[Recharge] 获取 USDT 兑换汇率失败:', error)
+      }
+    } finally {
+      if (requestId === exchangeRateRequestId) {
+        isLoadingExchangeRate.value = false
+      }
+    }
   }
 
   /**
@@ -51,15 +145,32 @@ export function useRecharge() {
     customAmountInput.value = ''
   }
 
+  const handleCoinChange = (coin: string | number | boolean | undefined) => {
+    if (coin !== 'TRX' && coin !== 'USDT') return
+
+    selectedCoin.value = coin
+    selectedAmount.value = 0
+    customAmountInput.value = ''
+    isCustomAmount.value = false
+
+    if (coin === 'USDT') {
+      void fetchUsdtExchangeRate()
+    } else {
+      exchangeRateRequestId += 1
+      isLoadingExchangeRate.value = false
+      usdtToTrxMarketRate.value = 0
+    }
+  }
+
   /**
    * 自定义金额输入框获得焦点
    */
   const handleCustomAmountFocus = () => {
     isCustomAmount.value = true
     if (customAmountInput.value) {
-      const normalizedAmount = normalizeIntegerAmount(customAmountInput.value)
+      const normalizedAmount = normalizeAmountInput(customAmountInput.value)
       customAmountInput.value = normalizedAmount
-      selectedAmount.value = Number.parseInt(normalizedAmount, 10) || 0
+      selectedAmount.value = Number(normalizedAmount) || 0
     }
   }
 
@@ -68,9 +179,9 @@ export function useRecharge() {
    */
   const handleCustomAmountInput = (value: string) => {
     isCustomAmount.value = true
-    const normalizedAmount = normalizeIntegerAmount(value)
+    const normalizedAmount = normalizeAmountInput(value)
     customAmountInput.value = normalizedAmount
-    const amount = Number.parseInt(normalizedAmount, 10) || 0
+    const amount = Number(normalizedAmount) || 0
     selectedAmount.value = amount
   }
 
@@ -78,10 +189,10 @@ export function useRecharge() {
    * 确认金额，创建充值订单并进入第二步
    */
   const confirmAmount = async () => {
-    const depositAmount = getSelectedIntegerAmount()
+    const depositAmount = getSelectedAmount()
 
     // 验证金额
-    if (depositAmount < 1) {
+    if (depositAmount <= 0 || (selectedCoin.value === 'TRX' && depositAmount < 1)) {
       ElMessage.warning(t('recharge.invalidAmount') || '请输入有效的充值金额')
       return
     }
@@ -104,14 +215,14 @@ export function useRecharge() {
     try {
       console.log('[Recharge] 创建充值订单:', {
         amount: depositAmount,
-        coin: 'TRX',
+        coin: selectedCoin.value,
         userId
       })
       
       // 创建充值订单
       const response = await orderApi.createDepositOrder({
         amount: depositAmount,
-        coin: 'TRX',
+        coin: selectedCoin.value,
         user_id: userId
       })
       
@@ -145,7 +256,7 @@ export function useRecharge() {
       // 保存订单数据
       rechargeAddress.value = receive_address
       actualAmount.value = amount || selectedAmount.value.toString()
-      actualCoin.value = coin || 'TRX'
+      actualCoin.value = (coin || selectedCoin.value).toUpperCase()
       
       // 计算截止时间（当前时间 + 5分钟）
       deadline.value = formatDeadline(5)
@@ -163,11 +274,11 @@ export function useRecharge() {
       // 刷新用户信息
       await fetchUserInfo()
       
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('[Recharge] 创建订单异常:', error)
       
       // 如果是未登录错误，关闭弹窗
-      if (error.message === 'NOT_LOGGED_IN') {
+      if (error instanceof Error && error.message === 'NOT_LOGGED_IN') {
         ElMessage.warning(t('common.pleaseLogin') || '请先登录')
         close()
       } else {
@@ -202,8 +313,8 @@ export function useRecharge() {
    * 复制充值金额（使用接口返回的实际金额）
    */
   const copyActualAmount = () => {
-    if (actualAmount.value) {
-      copyText(actualAmount.value, t('recharge.copyAmountSuccess'))
+    if (actualAmount.value || selectedAmount.value > 0) {
+      copyText(displayActualAmount.value, t('recharge.copyAmountSuccess'))
     }
   }
 
@@ -232,6 +343,7 @@ export function useRecharge() {
   const open = async () => {
     visible.value = true
     currentStep.value = 1
+    selectedCoin.value = 'TRX'
     selectedAmount.value = 0
     customAmountInput.value = '1'
     isCustomAmount.value = false
@@ -272,6 +384,7 @@ export function useRecharge() {
     
     visible.value = false
     currentStep.value = 1
+    selectedCoin.value = 'TRX'
     selectedAmount.value = 0
     customAmountInput.value = '1'
     isCustomAmount.value = false
@@ -284,21 +397,29 @@ export function useRecharge() {
     isCopying,
     isLoadingAddress,
     currentStep,
+    selectedCoin,
     
     // 用户输入
     selectedAmount,
     customAmountInput,
     isCustomAmount,
     presetAmounts,
+    amountInputmode,
+    amountPattern,
     
     // 订单数据
     rechargeAddress,
     actualAmount,
+    displayActualAmount,
     actualCoin,
     deadline,
+    isLoadingExchangeRate,
+    usdtExchangeRateText,
+    estimatedTrxAmount,
     
     // 方法
     selectPresetAmount,
+    handleCoinChange,
     handleCustomAmountFocus,
     handleCustomAmountInput,
     confirmAmount,

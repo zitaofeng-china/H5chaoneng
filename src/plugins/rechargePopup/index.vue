@@ -20,6 +20,15 @@
       
       <!-- 第一步：选择充值金额 -->
       <div v-if="currentStep === 1" class="recharge-content step-one">
+        <el-tabs
+          v-model="selectedCoin"
+          class="coin-tabs"
+          @tab-change="handleCoinChange"
+        >
+          <el-tab-pane :label="t('common.trx')" name="TRX" />
+          <el-tab-pane :label="t('common.usdt')" name="USDT" />
+        </el-tabs>
+
         <div class="amount-selection">
           <div class="preset-amounts">
             <div
@@ -29,34 +38,53 @@
               :class="{ active: selectedAmount === amount && !isCustomAmount }"
               @click="selectPresetAmount(amount)"
             >
-              {{ amount }} TRX
+              {{ formatCryptoAmount(amount) }} {{ selectedCoin }}
             </div>
           </div>
           
           <div class="custom-amount-section">
             <div class="custom-amount-label">
               <el-icon :size="20"><Money /></el-icon>
-              {{ t('recharge.customAmount') }}
+              {{ t('recharge.customAmount', { coin: selectedCoin }) }}
             </div>
             <el-input
               v-model="customAmountInput"
               type="text"
-              inputmode="numeric"
-              pattern="[0-9]*"
-              :placeholder="t('recharge.enterCustomAmount')"
+              :inputmode="amountInputmode"
+              :pattern="amountPattern"
+              :placeholder="t('recharge.enterCustomAmount', { coin: selectedCoin })"
               class="custom-amount-input"
               @focus="handleCustomAmountFocus"
               @input="handleCustomAmountInput"
             >
-              <template #suffix>TRX</template>
+              <template #suffix>{{ selectedCoin }}</template>
             </el-input>
+          </div>
+
+          <div v-if="selectedCoin === 'USDT'" class="usdt-rate-panel">
+            <div class="rate-row">
+              <span>{{ t('recharge.exchangeRate') }}</span>
+              <span v-if="isLoadingExchangeRate" class="rate-muted">
+                {{ t('recharge.rateLoading') }}
+              </span>
+              <span v-else-if="usdtExchangeRateText" class="rate-value">
+                1 USDT ≈ {{ usdtExchangeRateText }} TRX
+              </span>
+              <span v-else class="rate-muted">-</span>
+            </div>
+            <div v-if="estimatedTrxAmount" class="rate-row estimated-row">
+              <span>{{ t('recharge.estimatedTrx') }}</span>
+              <span class="rate-value">{{ estimatedTrxAmount }} TRX</span>
+            </div>
           </div>
 
           <el-button
             type="primary"
             size="large"
             class="confirm-amount-btn"
-            :disabled="!selectedAmount || selectedAmount < 1"
+            :disabled="
+              !selectedAmount || (selectedCoin === 'TRX' && selectedAmount < 1)
+            "
             @click="confirmAmount"
           >
             {{ t('recharge.confirmAmount') }}
@@ -68,7 +96,7 @@
       <div v-else class="recharge-content step-two">
         <div class="selected-amount-display">
           <div class="amount-value">
-            {{ actualAmount || selectedAmount }} {{ actualCoin }}
+            {{ displayActualAmount }} {{ actualCoin }}
             <el-button
               link
               type="primary"
@@ -80,6 +108,12 @@
             </el-button>
           </div>
           <div class="amount-note">{{ t('recharge.finalAmountNote') }}</div>
+          <div
+            v-if="actualCoin === 'USDT' && estimatedTrxAmount"
+            class="estimated-trx-note"
+          >
+            {{ t('recharge.estimatedTrx') }}: {{ estimatedTrxAmount }} TRX
+          </div>
           <div v-if="deadline" class="deadline-note">
             {{ t('recharge.transferDeadline', { time: deadline }) }}
           </div>
@@ -113,6 +147,7 @@ import { useRecharge } from '@/hooks/useRecharge'
 import { useI18n } from 'vue-i18n'
 import { Money } from '@element-plus/icons-vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { formatCryptoAmount } from '@/utils/number'
 
 defineOptions({
   name: 'RechargePopup',
@@ -127,15 +162,22 @@ const {
   isCopying,
   isLoadingAddress,
   currentStep,
+  selectedCoin,
   selectedAmount,
   customAmountInput,
   isCustomAmount,
   presetAmounts,
+  amountInputmode,
+  amountPattern,
   rechargeAddress,
-  actualAmount,
+  displayActualAmount,
   actualCoin,
   deadline,
+  isLoadingExchangeRate,
+  usdtExchangeRateText,
+  estimatedTrxAmount,
   selectPresetAmount,
+  handleCoinChange,
   handleCustomAmountFocus,
   handleCustomAmountInput,
   confirmAmount,

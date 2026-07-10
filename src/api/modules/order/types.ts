@@ -19,6 +19,8 @@ export enum OrderKind {
   KindBotFee = 11,           // 机器人付费
 }
 
+export type RechargeCoin = 'TRX' | 'USDT'
+
 /**
  * 创建订单请求参数
  */
@@ -36,7 +38,7 @@ export interface CreateOrderParams {
  */
 export interface CreateDepositOrderParams {
   amount: number              // 充值金额
-  coin: string                // 币种（例如："TRX"）
+  coin: RechargeCoin          // 币种
   user_id: number             // 用户ID
 }
 
