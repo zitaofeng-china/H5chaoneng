@@ -11,13 +11,13 @@ function getBaseUrl(): string {
   if (import.meta.env.DEV) {
     return import.meta.env.VITE_API_BASE_URL || ''
   }
-  
+
   // 生产环境：优先使用运行时配置
   const runtimeConfig = typeof window !== 'undefined' ? (window as any).__APP_CONFIG__?.API_BASE_URL : undefined
   if (runtimeConfig !== undefined && runtimeConfig !== null) {
     return runtimeConfig
   }
-  
+
   // 兜底：使用环境变量
   return import.meta.env.VITE_API_BASE_URL || ''
 }
@@ -35,7 +35,7 @@ export const ENABLE_RESPONSE_LOG = import.meta.env.DEV
 
 // 不需要 Token 的接口列表
 export const NO_TOKEN_URLS: (string | RegExp)[] = [
-  '/v3/login',
+  '/v3/login', // 账号密码登录；Telegram Mini App 也走此接口，InitData 放在请求头
   '/v3/register',
   '/v3/reset_password',
   '/v3/change_password', // 修改密码不需要 Token，只需要 Site
@@ -44,7 +44,7 @@ export const NO_TOKEN_URLS: (string | RegExp)[] = [
   '/v3/address', // 获取付款地址（二维码）- 包括福利订单 kind=6
   '/v3/exchange/rate', // 获取汇率信息
   '/v3/captcha/email', // 获取邮箱验证码
-  '/v3/tg_login', // Telegram Mini App 登录
+  '/v3/tg_login', // 兼容预留：历史约定路径；当前前端实际使用 /v3/login + Header InitData
   '/v1/ticker/price', // 获取 TRX/USDT 实时行情
 ]
 

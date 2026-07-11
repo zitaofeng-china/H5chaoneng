@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import WelfareOrder from '@/pages/home/components/WelfareOrder.vue'
+import WelfareOrder from '@/components/business/WelfareOrder.vue'
 
 defineOptions({
   name: 'WelfarePage',
