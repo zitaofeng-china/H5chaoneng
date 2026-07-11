@@ -51,7 +51,7 @@ export function useOrderCreation() {
         // 订单创建成功后，刷新用户信息以更新余额
         if (userStore.isLogin) {
           logger.debug('刷新用户信息以更新余额')
-          await userStore.fetchUserInfo()
+          await userStore.fetchUserInfo({ force: true })
         }
       }
 

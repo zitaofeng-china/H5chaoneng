@@ -258,13 +258,9 @@ const handleUnactivatedAddresses = (addresses: string[]) => {
     })
 }
 
-// 初始化时获取价格和用户信息
+// 初始化时刷新价格（store 内已有缓存则短路）；用户信息由 App 统一拉取
 onMounted(() => {
   priceStore.fetchPrice()
-  // 如果用户已登录，获取用户信息
-  if (userStore.isLogin) {
-    userStore.fetchUserInfo()
-  }
 })
 </script>
 

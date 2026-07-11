@@ -132,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, onUnmounted, onMounted } from 'vue'
+import { ref, reactive, watch, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
@@ -288,11 +288,8 @@ const handleSaveAddress = async () => {
     })
 
     if (success) {
-      // 重新获取用户信息
-      const userResponse = await authApi.getUserInfo()
-      if (userResponse.data) {
-        userStore.updateUserInfo(userResponse.data)
-      }
+      // 重新获取用户信息（强制刷新 bind_address）
+      await userStore.fetchUserInfo({ force: true })
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
@@ -329,12 +326,8 @@ const handleDeleteAddress = async (address: string) => {
       if (formData.selectedAddress === address) {
         formData.selectedAddress = ''
       }
-      
-      // 重新获取用户信息
-      const userResponse = await authApi.getUserInfo()
-      if (userResponse.data) {
-        userStore.updateUserInfo(userResponse.data)
-      }
+
+      await userStore.fetchUserInfo({ force: true })
     }
   } catch (error) {
     // 用户取消删除
@@ -370,20 +363,6 @@ const handleRentNow = async () => {
     console.error('【ERROR INFO】:', error)
   }
 }
-
-onMounted(async () => {
-  // 获取用户信息
-  if (userStore.isLogin) {
-    try {
-      const response = await authApi.getUserInfo()
-      if (response.data) {
-        userStore.updateUserInfo(response.data)
-      }
-    } catch (error) {
-      console.error('获取用户信息失败:', error)
-    }
-  }
-})
 
 onUnmounted(() => {
   formRef.value?.resetFields()

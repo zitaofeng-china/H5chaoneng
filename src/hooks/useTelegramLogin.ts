@@ -9,6 +9,7 @@ import { useUserStore } from '@/stores/useUserStore'
 import { isTelegramMiniApp, getTelegramInitData, getTelegramUser, telegramReady, telegramExpand } from '@/utils/telegram'
 import { getSite } from '@/utils/site'
 import { setToken, setTokenExpiredAt } from '@/utils/token'
+import { post } from '@/api/request'
 
 const TG_LOGIN_ERROR_MESSAGE = '账号异常，请联系客服'
 const TG_LOGIN_DISABLED_MESSAGE = '功能不全禁止登录-“已禁用客服”'
@@ -30,18 +31,17 @@ function formatExpireTime(time: number): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 }
 
-// 使用后端 /v3/login 接口，InitData 放在 Header 中
-async function tgLoginApi(initData: string, site: string) {
-  const response = await fetch('/v3/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Site': site,
-      'InitData': initData,
+/** 走统一 request：自动带 Site；InitData 放自定义 Header */
+async function tgLoginApi(initData: string) {
+  return post(
+    '/v3/login',
+    {},
+    {
+      headers: {
+        InitData: initData,
+      },
     },
-    body: JSON.stringify({}),
-  })
-  return response.json()
+  )
 }
 
 export function useTelegramLogin() {
@@ -108,8 +108,8 @@ export function useTelegramLogin() {
     tgLoginError.value = ''
 
     try {
-      const response = await tgLoginApi(initData, site)
-      const data = response?.data
+      const response = await tgLoginApi(initData)
+      const data = response?.data as Record<string, unknown> | null | undefined
 
       if (String(response?.code) === '200013') {
         console.error('[Telegram] 用户已禁用:', response)
@@ -125,8 +125,10 @@ export function useTelegramLogin() {
         return false
       }
 
-      if (response.code === '000000') {
-        const { token, user_info, site: responseSite } = data
+      if (response.code === '000000' && data) {
+        const token = data.token as string | undefined
+        const user_info = data.user_info as Parameters<typeof userStore.updateUserInfo>[0]
+        const responseSite = data.site as string | undefined
 
         // 保存 token
         if (token) {
@@ -135,7 +137,7 @@ export function useTelegramLogin() {
         }
 
         // 保存过期时间（后端返回秒级时间戳，需要转为毫秒）
-        const expiredAt = data.expired_at || data.expirated_at
+        const expiredAt = (data.expired_at ?? data.expirated_at) as number | undefined
         const expiredAtMs = Number(expiredAt) * 1000
         if (Number.isFinite(expiredAtMs) && expiredAtMs > 0) {
           setTokenExpiredAt(expiredAtMs)
@@ -156,6 +158,8 @@ export function useTelegramLogin() {
         if (responseSite && responseSite !== getSite()) {
           console.log('[Telegram] 动态跳转到站点:', responseSite)
           router.replace(`/${responseSite}/`)
+        } else if (site && site !== getSite()) {
+          // site 参数兼容
         }
 
         return true

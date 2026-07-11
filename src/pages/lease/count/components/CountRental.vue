@@ -407,10 +407,7 @@ const handleSaveAddress = async () => {
     })
 
     if (success) {
-      const userResponse = await authApi.getUserInfo()
-      if (userResponse.data) {
-        userStore.updateUserInfo(userResponse.data)
-      }
+      await userStore.fetchUserInfo({ force: true })
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
@@ -443,10 +440,7 @@ const handleDeleteAddress = async (address: string) => {
         selectedAddress.value = ''
       }
 
-      const userResponse = await authApi.getUserInfo()
-      if (userResponse.data) {
-        userStore.updateUserInfo(userResponse.data)
-      }
+      await userStore.fetchUserInfo({ force: true })
     }
   } catch (error) {
     if (error === 'cancel') {

@@ -5,7 +5,7 @@
 import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
-import { authApi, binanceApi, orderApi } from '@/api'
+import { binanceApi, orderApi } from '@/api'
 import type { RechargeCoin } from '@/api/modules/order/types'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useCopyToClipboard } from './useCopyToClipboard'
@@ -287,7 +287,7 @@ export function useRecharge() {
       currentStep.value = 2
       
       // 刷新用户信息
-      await fetchUserInfo()
+      await userStore.fetchUserInfo({ force: true })
       
     } catch (error: unknown) {
       console.error('[Recharge] 创建订单异常:', error)
@@ -336,17 +336,13 @@ export function useRecharge() {
   /**
    * 获取最新用户信息
    */
-  const fetchUserInfo = async () => {
+  const fetchUserInfo = async (force = false) => {
     if (!userStore.isLogin || !userStore.token) {
       return
     }
-    
+
     try {
-      const response = await authApi.getUserInfo()
-      if (response.code === '000000' && response.data) {
-        userStore.updateUserInfo(response.data)
-        console.log('[Recharge] 用户信息已更新')
-      }
+      await userStore.fetchUserInfo({ force })
     } catch (error) {
       console.error('[Recharge] 获取用户信息失败:', error)
     }
@@ -363,9 +359,9 @@ export function useRecharge() {
     customAmountInput.value = ''
     isCustomAmount.value = false
     resetOrderData()
-    
-    // 获取最新用户信息
-    await fetchUserInfo()
+
+    // 打开充值时强制刷新余额
+    await fetchUserInfo(true)
   }
 
   /**
@@ -374,12 +370,12 @@ export function useRecharge() {
    */
   const fetchUserInfoWithDelay = () => {
     const delays = [5000, 10000, 15000] // 5秒、10秒、15秒
-    
+
     delays.forEach((delay, index) => {
       setTimeout(async () => {
         try {
           console.log(`[Recharge] 第${index + 1}次延迟获取用户信息（延迟${delay / 1000}秒）`)
-          await fetchUserInfo()
+          await fetchUserInfo(true)
         } catch (error) {
           console.error(`[Recharge] 第${index + 1}次延迟获取用户信息失败:`, error)
         }

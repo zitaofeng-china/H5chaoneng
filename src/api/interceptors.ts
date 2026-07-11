@@ -9,60 +9,20 @@ import { getToken, isTokenExpired } from '@/utils/token'
 import { clearAuthSession } from '@/utils/session'
 import { ElMessage } from 'element-plus'
 import { getPopup } from '@/plugins/popupRegistry'
+import i18n from '@/lang'
 
 // 防止重复弹出登录框的标志
 let isShowingLoginPopup = false
 
-/**
- * 获取当前语言的翻译文本
- */
-function getTranslation(key: string, fallback: string): string {
-  // 直接使用手动翻译映射
-  const locale = localStorage.getItem('locale') || 'zh-CN'
-  
-  const translations: Record<string, Record<string, string>> = {
-    'zh-CN': {
-      'common.pleaseLogin': '请先登录',
-      'auth.tokenExpired': '登录已过期，请重新登录'
-    },
-    'zh-TW': {
-      'common.pleaseLogin': '請先登錄',
-      'auth.tokenExpired': '登入已過期，請重新登入'
-    },
-    'en': {
-      'common.pleaseLogin': 'Please login first',
-      'auth.tokenExpired': 'Login expired, please login again'
-    },
-    'ja': {
-      'common.pleaseLogin': 'まずログインしてください',
-      'auth.tokenExpired': 'ログインが期限切れです、再度ログインしてください'
-    },
-    'ko': {
-      'common.pleaseLogin': '먼저 로그인해주세요',
-      'auth.tokenExpired': '로그인이 만료되었습니다, 다시 로그인해주세요'
-    },
-    'ru': {
-      'common.pleaseLogin': 'Пожалуйста, сначала войдите в систему',
-      'auth.tokenExpired': 'Срок действия входа истек, войдите снова'
-    },
-    'ar': {
-      'common.pleaseLogin': 'الرجاء تسجيل الدخول أولاً',
-      'auth.tokenExpired': 'انتهت صلاحية تسجيل الدخول، يرجى تسجيل الدخول مرة أخرى'
-    },
-    'es': {
-      'common.pleaseLogin': 'Por favor inicie sesión primero',
-      'auth.tokenExpired': 'Sesión expirada, inicie sesión nuevamente'
-    },
-    'tr': {
-      'common.pleaseLogin': 'Lütfen önce giriş yapın',
-      'auth.tokenExpired': 'Oturum süresi doldu, lütfen tekrar giriş yapın'
+function t(key: string, fallback: string): string {
+  try {
+    const translated = i18n.global.t(key)
+    if (typeof translated === 'string' && translated && translated !== key) {
+      return translated
     }
+  } catch {
+    // i18n 尚未就绪时回退
   }
-  
-  if (translations[locale] && translations[locale][key]) {
-    return translations[locale][key]
-  }
-  
   return fallback
 }
 
@@ -71,16 +31,17 @@ function getTranslation(key: string, fallback: string): string {
  */
 function showLoginPopup(message?: string) {
   if (isShowingLoginPopup) return
-  
+
   isShowingLoginPopup = true
-  
+
   // 显示提示消息
   if (message) {
     ElMessage.warning(message)
   }
-  
-  getPopup('loginPopup')?.open()
-  
+
+  // 登录弹窗可能尚未懒加载完成
+  void Promise.resolve(getPopup('loginPopup')?.open()).catch(() => {})
+
   // 3秒后重置标志，允许再次弹出
   setTimeout(() => {
     isShowingLoginPopup = false
@@ -105,38 +66,38 @@ function needsToken(url: string): boolean {
 export function requestInterceptor(url: string, config: RequestInit): RequestInit {
   // 检查是否需要认证
   const requiresAuth = needsToken(url)
-  
+
   if (requiresAuth) {
     const token = getToken()
-    
+
     // 情况1：未登录（没有 token）
     if (!token) {
       console.warn('[Request] 未登录，阻止请求:', url)
-      
+
       // 显示未登录提示
-      const message = getTranslation('common.pleaseLogin', '请先登录')
+      const message = t('common.pleaseLogin', '请先登录')
       ElMessage.warning(message)
-      
+
       // 抛出错误让业务代码处理
       throw new Error('NOT_LOGGED_IN')
     }
-    
+
     // 情况2：Token 已过期
     if (isTokenExpired()) {
       console.warn('[Request] Token 已过期，清除认证信息')
-      
+
       // 清除认证数据（包括 store 状态）
       void clearAuthSession()
-      
+
       // Token 过期时显示登录弹窗
-      const message = getTranslation('auth.tokenExpired', '登录已过期，请重新登录')
+      const message = t('auth.tokenExpired', '登录已过期，请重新登录')
       showLoginPopup(message)
-      
+
       // 抛出错误，阻止请求继续
       throw new Error('TOKEN_EXPIRED')
     }
-  } else {
-    // 不需要认证的接口，记录日志
+  } else if (import.meta.env.DEV) {
+    // 不需要认证的接口，仅开发环境记录日志
     console.log('[Request] 无需认证的接口:', url)
   }
 
@@ -160,7 +121,7 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
     }
   }
 
-  // 合并用户自定义的请求头
+  // 合并用户自定义的请求头（如 TG InitData）
   const configHeaders = (config.headers as Record<string, string>) || {}
   Object.assign(headers, configHeaders)
 
@@ -183,10 +144,10 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
 /**
  * 响应拦截器
  */
-export function responseInterceptor<T = any>(
+export function responseInterceptor<T = unknown>(
   response: ApiResponse<T>,
   url: string,
-  method: string
+  method: string,
 ): ApiResponse<T> {
   // 打印响应日志
   if (ENABLE_RESPONSE_LOG) {
@@ -210,9 +171,9 @@ export function responseInterceptor<T = any>(
   if (TOKEN_EXPIRED_CODES.includes(code)) {
     // 清除认证数据（包括 store 状态）
     void clearAuthSession()
-    
+
     // 显示登录弹窗
-    const message = getTranslation('auth.tokenExpired', '登录已过期，请重新登录')
+    const message = t('auth.tokenExpired', '登录已过期，请重新登录')
     showLoginPopup(message)
   }
 

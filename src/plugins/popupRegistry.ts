@@ -1,9 +1,9 @@
 export interface PopupControl {
-  open: () => void
+  open: () => void | Promise<void>
   close: () => void
 }
 
-type PopupName =
+export type PopupName =
   | 'loginPopup'
   | 'registerPopup'
   | 'resetPopup'

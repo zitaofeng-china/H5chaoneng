@@ -21,7 +21,7 @@ async function bootstrap() {
   app.use(createPinia())
   app.use(router)
   app.use(i18n)
-  await app.use(allPlugins)
+  app.use(allPlugins)
 
   app.component('SvgIcon', SvgIcon)
 
