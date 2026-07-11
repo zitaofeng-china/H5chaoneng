@@ -6,24 +6,25 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { siteApi, priceApi } from '@/api'
-import { getSite, clearSite, DEFAULT_SITE } from '@/utils/site'
+import { getSite, DEFAULT_SITE } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
+import { usePriceStore } from '@/stores/usePriceStore'
 import { ElMessage } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 
 export function useSiteVerification() {
   const router = useRouter()
   const siteStore = useSiteStore()
+  const priceStore = usePriceStore()
   const { t } = useI18n()
-  
+
   const isVerifying = ref(false)
   const isValid = ref(false)
   const siteInfo = ref<any>(null)
-  const priceInfo = ref<any>(null)
 
   async function verifySite(): Promise<boolean> {
     let site = getSite()
-    
+
     // 如果没有 Site，使用默认 Site 并重定向
     if (!site) {
       site = DEFAULT_SITE
@@ -40,11 +41,13 @@ export function useSiteVerification() {
 
       if (siteResponse.code === '000000' && priceResponse.code === '000000') {
         siteInfo.value = siteResponse.data
-        priceInfo.value = priceResponse.data
-        
-        // 同时更新到 Site Store，供其他组件使用
+
+        // 同时更新到 Site / Price Store，供其他组件使用（避免 App 再次拉价格）
         siteStore.updateSiteInfo(siteResponse.data)
-        
+        if (priceResponse.data) {
+          priceStore.setPrice(priceResponse.data)
+        }
+
         isValid.value = true
         return true
       } else {
@@ -53,7 +56,7 @@ export function useSiteVerification() {
           // 显示国际化的错误消息
           ElMessage.error(t('error.siteNotExist'))
         }
-        
+
         // 验证失败，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
         if (site !== DEFAULT_SITE) {
           console.log('[Site验证] 当前 Site 验证失败，重定向到默认 Site:', DEFAULT_SITE)
@@ -62,7 +65,7 @@ export function useSiteVerification() {
           // 重定向后重新验证，确保定制化数据正确加载
           return verifySite()
         }
-        
+
         // 如果是默认 Site 验证失败，也继续使用默认 Site（不跳转 404）
         console.warn('[Site验证] 默认 Site 验证失败，但继续使用默认 Site')
         isValid.value = true // 标记为有效，允许继续
@@ -70,7 +73,7 @@ export function useSiteVerification() {
       }
     } catch (error) {
       console.error('[Site验证] 验证出错:', error)
-      
+
       // 验证出错，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
       const currentSite = getSite()
       if (currentSite !== DEFAULT_SITE) {
@@ -80,7 +83,7 @@ export function useSiteVerification() {
         // 重定向后重新验证
         return verifySite()
       }
-      
+
       // 如果是默认 Site 出错，也继续使用默认 Site（不跳转 404）
       console.warn('[Site验证] 默认 Site 验证出错，但继续使用默认 Site')
       isValid.value = true // 标记为有效，允许继续
@@ -94,7 +97,6 @@ export function useSiteVerification() {
     isVerifying,
     isValid,
     siteInfo,
-    priceInfo,
     verifySite,
   }
 }

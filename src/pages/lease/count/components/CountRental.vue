@@ -277,7 +277,7 @@ const selectedAddress = ref('')
 const bindAddressKind = AddressKind.COUNT_RENTAL
 
 const getBindAddressMap = (): BindAddressMap => {
-  return { ...(userInfo.value?.bind_address || {}) }
+  return { ...userInfo.value?.bind_address }
 }
 
 const getSavedAddressesByKind = (kind: number): string[] => {

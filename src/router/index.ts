@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { DEFAULT_SITE } from '@/utils/site'
 
 // 路由名称到页面标题的映射
 const routeTitleMap: Record<string, string> = {
@@ -21,7 +20,7 @@ const router = createRouter({
       beforeEnter() {
         window.location.href = 'https://t.me/g711bot'
       },
-      component: () => import('@/pages/home/index.vue'), // 占位，不会实际渲染
+      component: { render: () => null },
     },
     // 独立的 404 路由（不带 site 前缀）
     {

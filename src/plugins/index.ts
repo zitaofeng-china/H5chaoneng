@@ -1,22 +1,23 @@
 import { type App, type Plugin } from 'vue'
 
-const modules = import.meta.glob<Record<string, Plugin | ((app: App) => void)>>('./**/index.ts', {
-  eager: true,
-})
+const modules = import.meta.glob<Record<string, Plugin | ((app: App) => void)>>('./**/index.ts')
 
 const instancePlugins: Plugin = {
-  install(app: App) {
-    Object.keys(modules).forEach((path) => {
-      const module = modules[path]
-      const plugin = module?.default
+  async install(app: App) {
+    const entries = Object.entries(modules).filter(([path]) => !path.includes('plugins/index.ts'))
 
-      if (path.includes('plugins/index.ts')) return
-
-      if (plugin) {
-        app.use(plugin)
-        console.log(`[Plugin System] Loaded: ${path}`)
-      }
-    })
+    await Promise.all(
+      entries.map(async ([path, loader]) => {
+        const module = await loader()
+        const plugin = module?.default
+        if (plugin) {
+          app.use(plugin)
+          if (import.meta.env.DEV) {
+            console.log(`[Plugin System] Loaded: ${path}`)
+          }
+        }
+      }),
+    )
   },
 }
 

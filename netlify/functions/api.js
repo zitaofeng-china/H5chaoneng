@@ -2,7 +2,7 @@
 // Node 18+ 内置 fetch，不需要 node-fetch
 // 使用 ESM 导出（根 package.json 为 "type": "module"）
 
-export async function handler(event, context) {
+export async function handler(event, _context) {
   // 允许 CORS
   const headers = {
     'Access-Control-Allow-Origin': '*',

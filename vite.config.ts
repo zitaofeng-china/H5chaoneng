@@ -22,25 +22,30 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production'
   const shouldAnalyze = process.env.ANALYZE === 'true'
 
+  const elementPlusResolver = ElementPlusResolver({
+    importStyle: 'css',
+  })
+
   return {
   plugins: [
     vue(),
     vueJsx(),
-    vueDevTools(),
-    codeInspectorPlugin({
-      bundler: 'vite',
-      hotKeys: ['altKey', 'shiftKey'],
-      showSwitch: true,
-      autoToggle: true,
-      editor: 'code',
-    }),
+    !isProduction && vueDevTools(),
+    !isProduction &&
+      codeInspectorPlugin({
+        bundler: 'vite',
+        hotKeys: ['altKey', 'shiftKey'],
+        showSwitch: true,
+        autoToggle: true,
+        editor: 'code',
+      }),
     AutoImport({
-      resolvers: [ElementPlusResolver(), IconsResolver({ prefix: 'Icon' })],
+      resolvers: [elementPlusResolver, IconsResolver({ prefix: 'Icon' })],
       dts: 'auto-imports.d.ts',
     }),
     Components({
       resolvers: [
-        ElementPlusResolver(),
+        elementPlusResolver,
         // 关键：自动注册图标组件，使用 'ep' 集合 (代表 element-plus)
         IconsResolver({ enabledCollections: ['ep'] }),
       ],
@@ -77,14 +82,14 @@ export default defineConfig(({ mode }) => {
       jpg: { quality: 75 },
       webp: { lossless: true, quality: 75 },
     }),
-    visualizer({ 
-      open: false, 
-      filename: 'stats.html', 
-      gzipSize: true, 
-      brotliSize: true,
-      // 只在需要分析时生成，加快构建速度
-      template: 'treemap', // 使用更快的模板
-    }),
+    (shouldAnalyze || isProduction) &&
+      visualizer({
+        open: false,
+        filename: 'stats.html',
+        gzipSize: true,
+        brotliSize: true,
+        template: 'treemap',
+      }),
     // Gzip 压缩（生产环境启用）
     // viteCompression({
     //   verbose: true, // 是否在控制台输出压缩结果
@@ -94,7 +99,7 @@ export default defineConfig(({ mode }) => {
     //   ext: '.gz', // 生成的压缩包后缀
     //   deleteOriginFile: false, // 不删除源文件
     // }),
-  ],
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -128,15 +133,14 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000, // 增加超时时间到 60 秒
-        // 配置代理请求头
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.error('[Proxy Error]', err.message)
           })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[Proxy]', req.method, req.url)
           })
-          proxy.on('proxyRes', (proxyRes, req, res) => {
+          proxy.on('proxyRes', (proxyRes, req) => {
             console.log('[Proxy Response]', proxyRes.statusCode, req.url)
           })
         },
@@ -146,11 +150,11 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.error('[Proxy Error v2]', err.message)
           })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[Proxy v2]', req.method, req.url)
           })
         },
@@ -160,11 +164,11 @@ export default defineConfig(({ mode }) => {
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.error('[Proxy Error v1]', err.message)
           })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[Proxy v1]', req.method, req.url)
           })
         },
@@ -175,7 +179,7 @@ export default defineConfig(({ mode }) => {
   esbuild: isProduction ? { drop: ['console', 'debugger'] } : {},
   build: {
     target: 'es2015', // 目标浏览器
-    assetsInlineLimit: 0, // 调到 4kb
+    assetsInlineLimit: 4096, // 小资源内联，减少请求数
     chunkSizeWarningLimit: 1000, // 1. 提高警告阈值到 1000k（如果有些库压缩后确实很大，500k 的默认警告太严格了）
     sourcemap: false, // 生产环境不生成 sourcemap
     cssCodeSplit: true, // CSS 代码分割
@@ -183,25 +187,25 @@ export default defineConfig(({ mode }) => {
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // 将 node_modules 中的模块打包到 vendor 文件夹
-          // 将所有来自 assets 目录的 svg 提取到一个独立的 chunk 中
-          // 插件内部生成的虚拟模块通常包含 'virtual:svg-icons'
           if (id.includes('virtual:svg-icons-register')) {
             return 'svg-icons-placeholder'
           }
 
           if (id.includes('node_modules')) {
-            // return id.toString().split('node_modules/')[1].split('/')[0].toString()
-
-            // 将超大库独立拆包
             if (id.includes('element-plus')) return 'element'
-            if (id.includes('lodash')) return 'lodash'
-
-            // pnpm 路径通常包含 .pnpm，这里统一提取包名
-            const name = id.toString().split('node_modules/')[1].split('/')[0].toString()
-            if (name.includes('.pnpm')) {
-              return name.split('+')[1] || 'vendor' // 提取 pnpm 具体的包名
+            if (
+              id.includes('/vue/') ||
+              id.includes('/vue-router/') ||
+              id.includes('/pinia/') ||
+              id.includes('/vue-i18n/') ||
+              id.includes('\\vue\\') ||
+              id.includes('\\vue-router\\') ||
+              id.includes('\\pinia\\') ||
+              id.includes('\\vue-i18n\\')
+            ) {
+              return 'vue-vendor'
             }
+            return 'vendor'
           }
         },
         // 1. 用于从入口点创建的 chunk (如 index.js)

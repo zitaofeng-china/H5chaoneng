@@ -192,7 +192,7 @@ const formData = reactive({
 const bindAddressKind = AddressKind.FLASH_ENERGY_BALANCE
 
 const getBindAddressMap = (): BindAddressMap => {
-  return { ...(userInfo.value?.bind_address || {}) }
+  return { ...userInfo.value?.bind_address }
 }
 
 const getSavedAddressesByKind = (kind: number): string[] => {

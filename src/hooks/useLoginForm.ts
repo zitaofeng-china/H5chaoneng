@@ -6,7 +6,7 @@ import { ref, reactive, computed, onMounted } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/useUserStore'
-import { loginSimple } from '@/api/modules/auth'
+import { login } from '@/api/modules/auth'
 import { authApi } from '@/api'
 import { useFormValidation } from './useFormValidation'
 import type { LoginForm } from '@/plugins/loginPopup/types'
@@ -52,7 +52,7 @@ export function useLoginForm() {
 
       loading.value = true
 
-      const response = await loginSimple({
+      const response = await login({
         code_id: '',
         password: loginForm.password,
         username: loginForm.username,

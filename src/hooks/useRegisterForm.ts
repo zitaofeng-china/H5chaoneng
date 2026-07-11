@@ -5,7 +5,7 @@
 import { ref, reactive, computed } from 'vue'
 import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
-import { register, getUserInfo, loginSimple } from '@/api/modules/auth'
+import { register, getUserInfo, login } from '@/api/modules/auth'
 import { useFormValidation } from './useFormValidation'
 import { handleResponse } from '@/utils/response'
 import { useUserStore } from '@/stores/useUserStore'
@@ -14,7 +14,7 @@ import type { RegisterForm } from '@/plugins/registerPopup/types'
 export function useRegisterForm() {
   const { t } = useI18n()
   const userStore = useUserStore()
-  const { usernameRules, emailRules, passwordRules, confirmPasswordRules, telegramRules } = useFormValidation()
+  const { usernameRules, emailRules, passwordRules, confirmPasswordRules } = useFormValidation()
 
   const visible = ref(false)
   const loading = ref(false)
@@ -74,7 +74,7 @@ export function useRegisterForm() {
 
       // 2. 注册成功后自动登录
       try {
-        const loginResponse = await loginSimple({
+        const loginResponse = await login({
           code_id: '',
           password: registerForm.password,
           username: registerForm.username,
