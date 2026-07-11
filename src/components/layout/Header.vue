@@ -310,197 +310,42 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, getCurrentInstance, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-plus'
+import vClickOutside from 'element-plus/es/directives/click-outside/index.mjs'
 import Avatar from '@/assets/icons/header/avatar.svg'
-import { useCommonStore } from '@/stores/useCommonStore'
-import { useUserStore } from '@/stores/useUserStore'
-import { useLangStore } from '@/stores/useLangStore'
-import { useSiteStore } from '@/stores/useSiteStore'
-import { storeToRefs } from 'pinia'
-import { handleOpenToTelegram } from '@/utils'
-import { setLocale } from '@/lang'
-import type { Locale } from '@/lang/types'
-import { getSite, isLiteSite, LITE_SITE, DEFAULT_SITE } from '@/utils/site'
-import { formatBalance } from '@/utils/number'
-import { isTelegramMiniApp } from '@/utils/telegram'
-import { clearAuthSession } from '@/utils/session'
+import { useHeaderNav } from './useHeaderNav'
 
 defineOptions({
   name: 'LayoutHeader',
 })
 
-const instance = getCurrentInstance()
-const proxy = instance?.proxy as any // 使用 any 避免类型检查问题
-
-const commonStore = useCommonStore()
-const siteStore = useSiteStore()
-const { isMobile: isMobileView } = storeToRefs(commonStore)
-const { tgAdmin, botName } = storeToRefs(siteStore)
-
-const localLang = ref(useLangStore().currentLocale)
-const activeNames = ref<string[]>([])
-const isMenu = ref(false)
-const menuBtn = ref(null)
-
-// 精简模式：依赖响应式的路由参数判断，确保路由切换后能正确更新
-const isLite = computed(() => {
-  const site = (route.params.site as string) || getSite()
-  return site === DEFAULT_SITE
-})
-
-// TG Mini App 环境判断
-const isTgEnv = isTelegramMiniApp()
-
-const lang = reactive({
-  en: 'English',
-  'zh-CN': '中文',
-  ja: '日本語',
-  ko: '한국어',
-  ru: 'Русский',
-  ar: 'العربية',
-  es: 'Español',
-  tr: 'Türkçe',
-  'zh-TW': '繁體中文',
-})
-
-// 判断是否在能量租赁相关页面（首页闪租、按时间租用、按笔数租用）
-const isActiveHome = computed(() => {
-  const site = getSite()
-  // 只有这些页面且没有 hash 时才激活能量租赁下拉菜单
-  // 如果有 hash，说明用户在查看 FAQ 部分，不应该激活能量租赁
-  if (route.hash) return false
-  const energyRentalPaths = [`/${site}/lease-time`, `/${site}/lease-count`]
-  // 首页（带或不带尾斜杠）也算闪租命中
-  return route.path === `/${site}` || route.path === `/${site}/` || energyRentalPaths.includes(route.path as string)
-})
-
-// 判断是否应该激活常见问题下拉菜单
-const isActiveFaq = computed(() => {
-  const site = getSite()
-  // 只有在首页且有 hash 时才激活常见问题下拉菜单
-  return (route.path === `/${site}` || route.path === `/${site}/`) && !!route.hash
-})
-
-const userStore = useUserStore()
-const isLogin = computed(() => userStore.isLogin)
-
-// 获取用户 TRX 余额
-const trxBalance = computed(() => {
-  if (!userStore.userInfo) return '0.00'
-  return formatBalance(userStore.userInfo.trx_balance)
-})
-
-const route = useRoute()
-const router = useRouter()
-const { logout } = userStore
-
-const isActive = (path: string) => {
-  const site = getSite()
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  const fullPath = `/${site}${normalizedPath}`
-  
-  // 特殊处理首页：/:site 和 /:site/ 都应该匹配
-  if (normalizedPath === '/') {
-    return route.path === `/${site}` || route.path === `/${site}/`
-  }
-  
-  return route.path === fullPath
-}
-
-const isHashActive = (hash: string) => {
-  return route.hash === hash
-}
-
-const handleToRouter = (path: string, hash?: string) => {
-  const site = getSite()
-  
-  // 构建完整路径：/:site/path
-  // 确保 path 以 / 开头
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  const fullPath = `/${site}${normalizedPath}`
-  
-  console.log('[Header] 跳转路由:', { site, path, normalizedPath, fullPath, hash })
-  
-  router.push({ path: fullPath, hash })
-
-  if (isMobileView.value) {
-    handleMenu('router')
-  }
-}
-
-const handleLanguageChange = (local: Locale) => {
-  localLang.value = local
-  console.log(local)
-  setLocale(local)
-}
-
-const handleLogin = () => {
-  proxy?.$loginPopup?.open()
-}
-
-const handleRegister = () => {
-  proxy?.$registerPopup?.open()
-}
-
-const handleRechange = () => {
-  proxy?.$rechargePopup?.open()
-}
-
-const handleModifyPassword = () => {
-  proxy?.$revisePasswordPopup?.open()
-}
-
-const handleUserInfo = () => {
-  proxy?.$userInfoPopup?.open()
-}
-
-// TG 环境重新登录：刷新页面触发自动登录
-const handleTgRelogin = () => {
-  window.location.reload()
-}
-
-const handleLogout = async () => {
-  try {
-    await logout()
-    await clearAuthSession()
-    
-    // 保留当前URL的站点信息并重定向到首页
-    const currentPath = window.location.pathname
-    const segments = currentPath.split('/').filter(Boolean)
-    const site = segments[0] || ''
-    
-    // 跳转到首页，保留站点信息
-    window.location.href = site ? `/${site}/` : '/'
-  } catch (error) {
-    console.error('退出登录失败:', error)
-    // 即使失败也要刷新页面
-    const currentPath = window.location.pathname
-    const segments = currentPath.split('/').filter(Boolean)
-    const site = segments[0] || ''
-    window.location.href = site ? `/${site}/` : '/'
-  }
-}
-
-const handleChange = (val: CollapseModelValue) => {
-  console.log(val)
-}
-
-const handleCollapseDestroy = () => {
-  isMenu.value = false
-  activeNames.value = []
-}
-
-const handleMenu = (type: 'menu' | 'router' = 'menu') => {
-  isMenu.value = type !== 'menu' ? false : !isMenu.value
-}
-
-watch(isMobileView, (mobile) => {
-  if (!mobile && isMenu.value) {
-    handleCollapseDestroy()
-  }
-})
+const {
+  isMobileView,
+  tgAdmin,
+  localLang,
+  activeNames,
+  isMenu,
+  menuBtn,
+  isLite,
+  isTgEnv,
+  lang,
+  isActiveHome,
+  isActiveFaq,
+  isLogin,
+  trxBalance,
+  isActive,
+  isHashActive,
+  handleToRouter,
+  handleLanguageChange,
+  handleLogin,
+  handleRechange,
+  handleModifyPassword,
+  handleUserInfo,
+  handleLogout,
+  handleChange,
+  handleCollapseDestroy,
+  handleMenu,
+  handleOpenToTelegram,
+} = useHeaderNav()
 </script>
 
 <style lang="scss" scoped>

@@ -9,7 +9,7 @@ import { siteApi, priceApi } from '@/api'
 import { getSite, DEFAULT_SITE } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
 import { usePriceStore } from '@/stores/usePriceStore'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useI18n } from 'vue-i18n'
 
 export function useSiteVerification() {

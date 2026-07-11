@@ -5,7 +5,7 @@
  */
 
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useI18n } from 'vue-i18n'
 
 export function useCopyToClipboard() {

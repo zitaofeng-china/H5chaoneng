@@ -40,7 +40,9 @@ export default defineConfig(({ mode }) => {
         editor: 'code',
       }),
     AutoImport({
-      resolvers: [elementPlusResolver, IconsResolver({ prefix: 'Icon' })],
+      // 不在 AutoImport 中解析 Element Plus，避免从桶入口引入 ElMessage 等
+      // Message/MessageBox 统一走 @/utils/element 子路径
+      resolvers: [IconsResolver({ prefix: 'Icon' })],
       dts: 'auto-imports.d.ts',
     }),
     Components({
@@ -192,7 +194,7 @@ export default defineConfig(({ mode }) => {
           }
 
           if (id.includes('node_modules')) {
-            if (id.includes('element-plus')) return 'element'
+            // Vue 生态
             if (
               id.includes('/vue/') ||
               id.includes('/vue-router/') ||
@@ -201,10 +203,40 @@ export default defineConfig(({ mode }) => {
               id.includes('\\vue\\') ||
               id.includes('\\vue-router\\') ||
               id.includes('\\pinia\\') ||
-              id.includes('\\vue-i18n\\')
+              id.includes('\\vue-i18n\\') ||
+              id.includes('@vue/')
             ) {
               return 'vue-vendor'
             }
+
+            // Element Plus 及其常见 peer：按模块自然拆分，避免 500KB 单包
+            // 仅把共享工具/locale 归到 ep-shared，组件各自 chunk
+            if (id.includes('element-plus')) {
+              if (
+                id.includes('/es/components/') ||
+                id.includes('\\es\\components\\')
+              ) {
+                // 组件级：不强制合并，由 Rollup 按引用拆分
+                return undefined
+              }
+              return 'ep-shared'
+            }
+
+            if (
+              id.includes('@element-plus') ||
+              id.includes('@popperjs') ||
+              id.includes('@floating-ui') ||
+              id.includes('lodash-es') ||
+              id.includes('/dayjs/') ||
+              id.includes('\\dayjs\\') ||
+              id.includes('async-validator') ||
+              id.includes('@ctrl/tinycolor') ||
+              id.includes('normalize-wheel-es') ||
+              id.includes('memoize-one')
+            ) {
+              return 'ep-shared'
+            }
+
             return 'vendor'
           }
         },

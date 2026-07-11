@@ -2,7 +2,7 @@
  * 错误处理器
  */
 
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import i18n from '@/lang'
 import type { ApiResponse } from './types'
 import { clearAuthSession } from '@/utils/session'

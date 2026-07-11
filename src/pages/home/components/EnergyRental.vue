@@ -134,7 +134,8 @@
 <script setup lang="ts">
 import { ref, reactive, watch, computed, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
+import { type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'

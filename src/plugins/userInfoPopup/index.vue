@@ -72,7 +72,7 @@ import { formatBalance } from '@/utils/number'
 import { authApi } from '@/api'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { Loading, RefreshRight } from '@element-plus/icons-vue'
 import type { UserInfoRow } from './types'
 

@@ -35,7 +35,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import { ElMessageBox, ElMessage } from '@/utils/element'
 import ActivationCard from './AddressCard.vue'
 import { addressApi } from '@/api'
 import { useUserStore } from '@/stores/useUserStore'

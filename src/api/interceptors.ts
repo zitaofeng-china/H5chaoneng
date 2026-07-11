@@ -7,7 +7,7 @@ import type { ApiResponse } from './types'
 import { getSite } from '@/utils/site'
 import { getToken, isTokenExpired } from '@/utils/token'
 import { clearAuthSession } from '@/utils/session'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { getPopup } from '@/plugins/popupRegistry'
 import i18n from '@/lang'
 

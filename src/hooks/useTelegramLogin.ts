@@ -4,7 +4,7 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useUserStore } from '@/stores/useUserStore'
 import { isTelegramMiniApp, getTelegramInitData, getTelegramUser, telegramReady, telegramExpand } from '@/utils/telegram'
 import { getSite } from '@/utils/site'

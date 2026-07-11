@@ -62,7 +62,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useUserStore } from '@/stores/useUserStore'
 import { useSiteStore } from '@/stores/useSiteStore'
 import { addressApi } from '@/api'

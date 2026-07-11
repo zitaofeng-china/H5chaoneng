@@ -3,7 +3,7 @@
  */
 
 import { computed, ref } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useUserStore } from '@/stores/useUserStore'
 import { binanceApi, orderApi } from '@/api'
 import type { RechargeCoin } from '@/api/modules/order/types'

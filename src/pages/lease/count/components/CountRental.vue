@@ -172,7 +172,8 @@
 <script setup lang="ts">
 import { reactive, ref, computed, watch, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, ElMessageBox, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage, ElMessageBox } from '@/utils/element'
+import { type FormInstance, type FormRules } from 'element-plus'
 import { storeToRefs } from 'pinia'
 import KindTips from '@/components/kindTips/index.vue'
 import { useCommonStore } from '@/stores/useCommonStore'

@@ -2,7 +2,7 @@
  * 统一响应处理工具
  */
 
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import type { ApiResponse } from '@/api/types'
 import { getErrorMessage, getSuccessMessage } from './errorCode'
 import i18n from '@/lang'
