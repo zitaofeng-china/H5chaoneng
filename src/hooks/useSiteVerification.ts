@@ -1,102 +1,29 @@
 /**
  * Site 验证 Hook
- * 用于验证代理标识是否有效
+ * 状态来自模块级门禁 siteBootstrap（main 挂载前已完成校验）。
  */
 
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { siteApi, priceApi } from '@/api'
-import { getSite, DEFAULT_SITE } from '@/utils/site'
-import { useSiteStore } from '@/stores/useSiteStore'
-import { usePriceStore } from '@/stores/usePriceStore'
-import { ElMessage } from '@/utils/element'
-import { useI18n } from 'vue-i18n'
+import { computed, ref } from 'vue'
+import { siteBootstrap } from '@/utils/siteBootstrap'
 
 export function useSiteVerification() {
-  const router = useRouter()
-  const siteStore = useSiteStore()
-  const priceStore = usePriceStore()
-  const { t } = useI18n()
+  // 挂载前已校验完毕时，初始即为最终态，避免首屏再走一遍等待
+  const isVerifying = ref(!siteBootstrap.finished)
+  const isFinished = ref(siteBootstrap.finished)
+  const isValid = ref(siteBootstrap.valid)
 
-  const isVerifying = ref(false)
-  const isValid = ref(false)
-  const siteInfo = ref<any>(null)
-
-  async function verifySite(): Promise<boolean> {
-    let site = getSite()
-
-    // 如果没有 Site，使用默认 Site 并重定向
-    if (!site) {
-      site = DEFAULT_SITE
-      await router.replace(`/${DEFAULT_SITE}${router.currentRoute.value.path}`)
-    }
-
-    isVerifying.value = true
-
-    try {
-      const [siteResponse, priceResponse] = await Promise.all([
-        siteApi.getSiteInfo(),
-        priceApi.getPrice(),
-      ])
-
-      if (siteResponse.code === '000000' && priceResponse.code === '000000') {
-        siteInfo.value = siteResponse.data
-
-        // 同时更新到 Site / Price Store，供其他组件使用（避免 App 再次拉价格）
-        siteStore.updateSiteInfo(siteResponse.data)
-        if (priceResponse.data) {
-          priceStore.setPrice(priceResponse.data)
-        }
-
-        isValid.value = true
-        return true
-      } else {
-        // 检查是否是"网站不存在"错误
-        if (siteResponse.code === '000007' && siteResponse.msg === '网站不存在') {
-          // 显示国际化的错误消息
-          ElMessage.error(t('error.siteNotExist'))
-        }
-
-        // 验证失败，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
-        if (site !== DEFAULT_SITE) {
-          console.log('[Site验证] 当前 Site 验证失败，重定向到默认 Site:', DEFAULT_SITE)
-          const subPath = router.currentRoute.value.path.replace(`/${site}`, '') || ''
-          await router.replace(`/${DEFAULT_SITE}${subPath}`)
-          // 重定向后重新验证，确保定制化数据正确加载
-          return verifySite()
-        }
-
-        // 如果是默认 Site 验证失败，也继续使用默认 Site（不跳转 404）
-        console.warn('[Site验证] 默认 Site 验证失败，但继续使用默认 Site')
-        isValid.value = true // 标记为有效，允许继续
-        return true
-      }
-    } catch (error) {
-      console.error('[Site验证] 验证出错:', error)
-
-      // 验证出错，如果当前不是默认 Site，则重定向到默认 Site 并重新验证
-      const currentSite = getSite()
-      if (currentSite !== DEFAULT_SITE) {
-        console.log('[Site验证] 验证出错，重定向到默认 Site:', DEFAULT_SITE)
-        const subPath = router.currentRoute.value.path.replace(`/${currentSite}`, '') || ''
-        await router.replace(`/${DEFAULT_SITE}${subPath}`)
-        // 重定向后重新验证
-        return verifySite()
-      }
-
-      // 如果是默认 Site 出错，也继续使用默认 Site（不跳转 404）
-      console.warn('[Site验证] 默认 Site 验证出错，但继续使用默认 Site')
-      isValid.value = true // 标记为有效，允许继续
-      return true
-    } finally {
-      isVerifying.value = false
-    }
+  /** 同步模块态到响应式（main 完成后调用一次即可） */
+  function syncFromBootstrap() {
+    isVerifying.value = !siteBootstrap.finished
+    isFinished.value = siteBootstrap.finished
+    isValid.value = siteBootstrap.valid
   }
 
   return {
     isVerifying,
-    isValid,
-    siteInfo,
-    verifySite,
+    isFinished,
+    isValid: computed(() => isValid.value),
+    isValidRef: isValid,
+    syncFromBootstrap,
   }
 }

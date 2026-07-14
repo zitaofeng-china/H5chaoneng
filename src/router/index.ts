@@ -14,15 +14,12 @@ const routeTitleMap: Record<string, string> = {
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    // 根路径跳转到 Telegram 机器人
+    // 根路径占位：不在路由层立刻跳 404，由站点校验结束后再决定展示/跳转
     {
       path: '/',
-      beforeEnter() {
-        window.location.href = 'https://telegram.me/g711bot'
-      },
+      name: 'RootPending',
       component: { render: () => null },
     },
-    // 独立的 404 路由（不带 site 前缀）
     {
       path: '/404',
       name: 'NotFoundStandalone',
@@ -66,7 +63,7 @@ const router = createRouter({
           name: 'Activation',
           component: () => import('@/pages/activation/index.vue'),
         },
-        // 在 site 路由组内的 404
+        // 未知业务路径
         {
           path: ':pathMatch(.*)*',
           name: 'NotFound',
