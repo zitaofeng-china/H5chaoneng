@@ -18,7 +18,7 @@ const router = createRouter({
     {
       path: '/',
       beforeEnter() {
-        window.location.href = 'https://t.me/g711bot'
+        window.location.href = 'https://telegram.me/g711bot'
       },
       component: { render: () => null },
     },

@@ -209,32 +209,24 @@ export default defineConfig(({ mode }) => {
               return 'vue-vendor'
             }
 
-            // Element Plus 及其常见 peer：按模块自然拆分，避免 500KB 单包
-            // 仅把共享工具/locale 归到 ep-shared，组件各自 chunk
+            // Element Plus：组件自然拆分；仅把 EP 内部工具层合并，避免把 lodash/dayjs 全塞进 ep-shared
             if (id.includes('element-plus')) {
               if (
                 id.includes('/es/components/') ||
                 id.includes('\\es\\components\\')
               ) {
-                // 组件级：不强制合并，由 Rollup 按引用拆分
                 return undefined
+              }
+              // locale 按需：不要和 utils 绑死成超大 shared
+              if (id.includes('/locale/') || id.includes('\\locale\\')) {
+                return 'ep-locale'
               }
               return 'ep-shared'
             }
 
-            if (
-              id.includes('@element-plus') ||
-              id.includes('@popperjs') ||
-              id.includes('@floating-ui') ||
-              id.includes('lodash-es') ||
-              id.includes('/dayjs/') ||
-              id.includes('\\dayjs\\') ||
-              id.includes('async-validator') ||
-              id.includes('@ctrl/tinycolor') ||
-              id.includes('normalize-wheel-es') ||
-              id.includes('memoize-one')
-            ) {
-              return 'ep-shared'
+            // 常用 peer 各自/并入 vendor，避免放大 ep-shared
+            if (id.includes('@element-plus/icons')) {
+              return 'ep-icons'
             }
 
             return 'vendor'

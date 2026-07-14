@@ -52,7 +52,7 @@ pnpm test:unit    # 单元测试
 | `/:site/contract` | 合约闪兑（USDT ⇄ TRX） |
 | `/:site/hosting` | 智能托管 |
 | `/:site/activation` | 批量激活 |
-| `/` | 外跳 `https://t.me/g711bot` |
+| `/` | 外跳 `https://telegram.me/g711bot` |
 | `/404` | 独立 404 |
 
 `:site` 为站点/代理标识。
