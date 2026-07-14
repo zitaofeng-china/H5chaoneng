@@ -47,7 +47,7 @@ import { useUserStore } from '@/stores/useUserStore'
 import { addressApi } from '@/api'
 import { HostingKind } from '@/api/modules/address/types'
 import { formatCryptoAmount } from '@/utils/number'
-import { getSite } from '@/utils/site'
+import { withSitePrefix } from '@/utils/site'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -241,8 +241,7 @@ const handleUnactivatedAddresses = (addresses: string[]) => {
       sessionStorage.setItem('pendingActivationAddresses', addresses.join('\n'))
       
       // 跳转到激活页面
-      const site = getSite()
-      const targetPath = `/${site}/activation`
+      const targetPath = withSitePrefix('/activation')
       console.log('[跳转激活] 目标路径:', targetPath)
       
       router.push(targetPath)

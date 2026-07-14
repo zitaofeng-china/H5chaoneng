@@ -25,7 +25,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { handleOpenToTelegram } from '@/utils'
-import { getSite } from '@/utils/site'
+import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
 import { storeToRefs } from 'pinia'
 
@@ -42,8 +42,7 @@ const handleContactService = () => {
 }
 
 const handleViewProblems = () => {
-  const site = getSite()
-  router.push({ path: `/${site}/`, hash: '#question' })
+  router.push({ path: withSitePrefix('/'), hash: '#question' })
 }
 </script>
 

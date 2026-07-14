@@ -73,7 +73,7 @@
 import { handleOpenToTelegram } from '@/utils'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { getSite } from '@/utils/site'
+import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
 import { storeToRefs } from 'pinia'
 
@@ -96,10 +96,7 @@ const currentYear = computed(() => new Date().getFullYear())
 const router = useRouter()
 
 const handleToRouter = (path: string, hash?: string) => {
-  const site = getSite()
-  // 构建完整路径：/:site/path
-  const fullPath = `/${site}${path}`
-  router.push({ path: fullPath, hash })
+  router.push({ path: withSitePrefix(path), hash })
 }
 </script>
 

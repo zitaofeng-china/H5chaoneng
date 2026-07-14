@@ -12,7 +12,7 @@ import { storeToRefs } from 'pinia'
 import { handleOpenToTelegram } from '@/utils'
 import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
-import { getSite, DEFAULT_SITE } from '@/utils/site'
+import { getSite, DEFAULT_SITE, withSitePrefix } from '@/utils/site'
 import { formatBalance } from '@/utils/number'
 import { isTelegramMiniApp } from '@/utils/telegram'
 import { clearAuthSession } from '@/utils/session'
@@ -63,19 +63,15 @@ export function useHeaderNav() {
   })
 
   const isActiveHome = computed(() => {
-    const site = getSite()
     if (route.hash) return false
-    const energyRentalPaths = [`/${site}/lease-time`, `/${site}/lease-count`]
-    return (
-      route.path === `/${site}` ||
-      route.path === `/${site}/` ||
-      energyRentalPaths.includes(route.path as string)
-    )
+    const homePaths = [withSitePrefix('/'), withSitePrefix('/').replace(/\/$/, '')]
+    const energyRentalPaths = [withSitePrefix('/lease-time'), withSitePrefix('/lease-count')]
+    return homePaths.includes(route.path) || energyRentalPaths.includes(route.path as string)
   })
 
   const isActiveFaq = computed(() => {
-    const site = getSite()
-    return (route.path === `/${site}` || route.path === `/${site}/`) && !!route.hash
+    const homePaths = [withSitePrefix('/'), withSitePrefix('/').replace(/\/$/, '')]
+    return homePaths.includes(route.path) && !!route.hash
   })
 
   const isLogin = computed(() => userStore.isLogin)
@@ -86,12 +82,11 @@ export function useHeaderNav() {
   })
 
   const isActive = (path: string) => {
-    const site = getSite()
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
-    const fullPath = `/${site}${normalizedPath}`
+    const fullPath = withSitePrefix(normalizedPath)
 
     if (normalizedPath === '/') {
-      return route.path === `/${site}` || route.path === `/${site}/`
+      return route.path === fullPath || route.path === fullPath.replace(/\/$/, '') || route.path === '/'
     }
 
     return route.path === fullPath
@@ -100,10 +95,8 @@ export function useHeaderNav() {
   const isHashActive = (hash: string) => route.hash === hash
 
   const handleToRouter = (path: string, hash?: string) => {
-    const site = getSite()
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
-    const fullPath = `/${site}${normalizedPath}`
-    router.push({ path: fullPath, hash })
+    router.push({ path: withSitePrefix(normalizedPath), hash })
 
     if (isMobileView.value) {
       handleMenu('router')

@@ -69,7 +69,7 @@ import { addressApi } from '@/api'
 import { AddressKind } from '@/api/modules/address/types'
 import WelfarePurchaseDialog from '@/components/WelfarePurchaseDialog.vue'
 import { formatCryptoAmount } from '@/utils/number'
-import { getSite } from '@/utils/site'
+import { withSitePrefix } from '@/utils/site'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -207,8 +207,7 @@ const handleBuyNow = async () => {
 }
 
 const goToFlashRent = () => {
-  const site = getSite()
-  router.push(`/${site}/`)
+  router.push(withSitePrefix('/'))
 }
 
 // 组件挂载时获取价格

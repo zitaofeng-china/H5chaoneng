@@ -68,7 +68,7 @@ import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 import { formatCryptoAmount } from '@/utils/number'
-import { getSite } from '@/utils/site'
+import { withSitePrefix } from '@/utils/site'
 
 interface Props {
   paymentAddress?: string
@@ -122,8 +122,7 @@ const tips = computed(() => [
 const router = useRouter()
 
 const goToWelfare = () => {
-  const site = getSite()
-  router.push(`/${site}/welfare`)
+  router.push(withSitePrefix('/welfare'))
 }
 </script>
 
