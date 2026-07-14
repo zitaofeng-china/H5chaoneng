@@ -14,8 +14,9 @@ window.__APP_CONFIG__ = {
   // API_BASE_URL: ''                              // 直连后端（需要后端支持 CORS）
   API_BASE_URL: '',
 
-  // 默认站点标识
-  // 当用户访问根路径 / 或输入无效站点时，会重定向到此站点
+  // 可选：精简模式（Lite）站点标识
+  // 仅当 URL 中的 site 等于该值时隐藏部分功能；留空表示不启用 Lite
+  // 站点是否存在由接口判断：存在展示页面，不存在跳 /404
   // 留空则使用构建时的 VITE_DEFAULT_SITE 环境变量
   DEFAULT_SITE: ''
 }

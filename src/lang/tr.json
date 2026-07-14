@@ -428,6 +428,7 @@
     "maintenance": "Sistem bakımda, lütfen daha sonra tekrar deneyin",
     "paramsError": "Parametre hatası",
     "notFound": "İstenen kaynak bulunamadı",
+    "siteVerifying": "Site doğrulanıyor...",
     "pageNotFound": "Sayfa bulunamadı",
     "pageNotFoundDesc": "Üzgünüz, aradığınız sayfa mevcut değil veya bir acente bağlantısı üzerinden erişim gerektirir",
     "siteNotExist": "Site mevcut değil"

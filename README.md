@@ -24,7 +24,8 @@ pnpm dev
 http://localhost:8080/1ExAgznu
 ```
 
-根路径 `/` 会跳转到 Telegram 机器人，不能直接作为业务首页。
+站点校验只有两种结果：**存在** → 展示业务页；**不存在**（含无站点码、接口失败）→ `/404`。  
+**校验在 `app.mount` 之前完成**；完成前仅显示等待页（`index.html` 静态 + `SiteWaiting`），通过后才挂载业务页。失败时直接渲染 404 组件，不用 `router-view` 匹配业务路由，避免闪屏。
 
 ### 常用命令
 
@@ -52,18 +53,14 @@ pnpm test:unit    # 单元测试
 | `/:site/contract` | 合约闪兑（USDT ⇄ TRX） |
 | `/:site/hosting` | 智能托管 |
 | `/:site/activation` | 批量激活 |
-| `/` | 外跳 `https://telegram.me/g711bot` |
-| `/404` | 独立 404 |
+| `/` | 占位；校验后无站点码则进 `/404` |
+| `/404` | 站点不存在或未知路径 |
 
-`:site` 为站点/代理标识。
+`:site` 为站点/代理标识。校验：存在 → 展示页面；不存在 → 404。校验未完成前整站空白门禁。
 
 ### 精简模式（Lite）
 
-当 URL 中的 `site` **等于默认站点**时进入精简模式（见 `src/utils/site.ts`）：
-
-- 开发默认站点：`.env.development` → `1ExAgznu`
-- 生产默认站点：`.env.production` → `1ih5zt8q`
-- 也可由 `public/config.js` 的 `DEFAULT_SITE` 运行时覆盖
+当配置了 `DEFAULT_SITE` 且 URL 中的 `site` 与之相等时进入精简模式（见 `src/utils/site.ts`）。未配置则不启用 Lite。
 
 Lite 下隐藏：按时间/按笔数租用、智能托管、批量激活、登录入口等（Header 中 `isLite`）。
 
