@@ -4,31 +4,54 @@ import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
 import TelegramFloat from '@/components/TelegramFloat.vue'
+import SiteWaiting from '@/components/SiteWaiting.vue'
+import NotFoundPage from '@/pages/404/index.vue'
 import { useSiteVerification } from '@/hooks/useSiteVerification'
 import { useUserStore } from '@/stores/useUserStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useBury } from '@/hooks/useBury'
 import { useTelegramLogin } from '@/hooks/useTelegramLogin'
 import { getSite } from '@/utils/site'
+import { siteBootstrap } from '@/utils/siteBootstrap'
 
 const route = useRoute()
-const { verifySite } = useSiteVerification()
+const { isFinished, isValidRef, syncFromBootstrap } = useSiteVerification()
 const userStore = useUserStore()
 const priceStore = usePriceStore()
 const { track } = useBury()
 const { isInTelegram, initTelegram } = useTelegramLogin()
 
-const is404Page = computed(() => route.name === 'NotFound')
+// 与模块门禁对齐（防止 setup 时序差异）
+syncFromBootstrap()
+
+/** 未知业务路径（站点已通过时才可能命中） */
+const isUnknownPath = computed(
+  () => route.name === 'NotFound' || route.name === 'NotFoundStandalone',
+)
+
+/**
+ * 是否展示 404：
+ * - 站点不存在（!valid）→ 固定 404 组件（绝不走 router-view，避免仍匹配业务路由而闪屏）
+ * - 站点存在但路径未知 → 404
+ */
+const show404 = computed(
+  () => isFinished.value && (!isValidRef.value || isUnknownPath.value),
+)
+
+/** 仅站点校验成功且路径合法时展示完整业务页 */
+const showApp = computed(
+  () => isFinished.value && isValidRef.value && !isUnknownPath.value,
+)
+
+/** 校验未完成：等待页 */
+const showWaiting = computed(() => !isFinished.value || !siteBootstrap.finished)
 
 /** 页面重新可见时刷新用户信息的最小间隔（毫秒） */
 const USER_INFO_REFRESH_THROTTLE = 30_000
 let lastUserInfoFetchAt = 0
 
-/**
- * 监听页面可见性变化，自动刷新用户信息（节流）
- */
 function handleVisibilityChange() {
-  if (document.hidden || !userStore.isLogin) return
+  if (document.hidden || !userStore.isLogin || !isValidRef.value) return
   const now = Date.now()
   if (now - lastUserInfoFetchAt < USER_INFO_REFRESH_THROTTLE) return
   lastUserInfoFetchAt = now
@@ -36,59 +59,56 @@ function handleVisibilityChange() {
 }
 
 onMounted(async () => {
-  // 埋点：统计设备数（只触发一次）
+  syncFromBootstrap()
+
   track('运行过项目设备数', true)
 
-  if (!is404Page.value) {
-    const isValid = await verifySite()
-    if (isValid) {
-      // 价格已在 verifySite 中写入 priceStore；仅在缺失时兜底拉取
-      if (!priceStore.priceData) {
-        await priceStore.fetchPrice()
-      }
+  // 业务初始化仅在站点已通过时执行（校验已在 mount 前完成）
+  if (isValidRef.value) {
+    if (!priceStore.priceData) {
+      await priceStore.fetchPrice()
+    }
 
-      // Telegram Mini App 自动登录（在 init 之前，确保 token 先存好）
-      await initTelegram(getSite())
+    await initTelegram(getSite())
+    userStore.init()
 
-      // 初始化 userStore（此时 TG 登录的 token 已存好）
-      userStore.init()
-
-      // 如果用户已登录（包括 Telegram 自动登录），获取最新用户信息
-      if (userStore.isLogin) {
-        lastUserInfoFetchAt = Date.now()
-        await userStore.fetchUserInfo()
-      }
+    if (userStore.isLogin) {
+      lastUserInfoFetchAt = Date.now()
+      await userStore.fetchUserInfo()
     }
   }
 
-  // 监听页面可见性变化
   document.addEventListener('visibilitychange', handleVisibilityChange)
 })
 
 onUnmounted(() => {
-  // 移除事件监听
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>
 
 <template>
-  <div id="app" :class="{ 'is-404': is404Page }">
-    <Layout v-if="!is404Page" />
-    <router-view v-else />
+  <!-- 站点校验中：等待页 -->
+  <SiteWaiting v-if="showWaiting" />
 
-    <!-- 首次访问欢迎弹窗 -->
-    <WelcomeDialog v-if="!is404Page" />
+  <!-- 站点不存在 / 未知路径：直接挂 404 组件，禁止 router-view 匹配业务页 -->
+  <div v-else-if="show404" class="app-shell is-404">
+    <NotFoundPage />
+  </div>
 
-    <!-- Telegram 浮窗按钮（非 Telegram 环境才显示） -->
-    <TelegramFloat v-if="!is404Page && !isInTelegram" />
+  <!-- 站点存在：完整业务页 -->
+  <div v-else-if="showApp" class="app-shell">
+    <Layout />
+    <WelcomeDialog />
+    <TelegramFloat v-if="!isInTelegram" />
   </div>
 </template>
 
 <style lang="scss" scoped>
-#app {
+.app-shell {
   padding-top: 66px;
   overflow: hidden;
   overflow-y: auto;
+  min-height: 100vh;
 
   &.is-404 {
     padding-top: 0;
@@ -96,7 +116,7 @@ onUnmounted(() => {
 }
 
 @media (max-width: 890px) {
-  #app {
+  .app-shell:not(.is-404) {
     padding-top: 54px;
   }
 }
