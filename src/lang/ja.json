@@ -427,7 +427,8 @@
     "maintenance": "システムメンテナンス中、後ほどお試しください",
     "paramsError": "パラメータエラー",
     "notFound": "リクエストされたリソースが見つかりません",
-    "siteVerifying": "サイトを確認中...",
+    "siteVerifying": "サイトを確認中",
+    "loggingIn": "ログイン中",
     "pageNotFound": "ページが見つかりません",
     "pageNotFoundDesc": "申し訳ございません、お探しのページは存在しないか、代理リンクを通じてアクセスする必要があります",
     "siteNotExist": "サイトが存在しません"

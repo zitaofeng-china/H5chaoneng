@@ -428,7 +428,8 @@
     "maintenance": "Sistema en mantenimiento, inténtelo más tarde",
     "paramsError": "Error de parámetros",
     "notFound": "Recurso solicitado no encontrado",
-    "siteVerifying": "Verificando sitio...",
+    "siteVerifying": "Verificando sitio",
+    "loggingIn": "Iniciando sesión",
     "pageNotFound": "Página no encontrada",
     "pageNotFoundDesc": "Lo sentimos, la página que busca no existe o requiere acceso a través de un enlace de agente",
     "siteNotExist": "El sitio no existe"

@@ -444,7 +444,8 @@
     "maintenance": "System under maintenance, please try again later",
     "paramsError": "Parameter error",
     "notFound": "Requested resource not found",
-    "siteVerifying": "Verifying site...",
+    "siteVerifying": "Verifying site",
+    "loggingIn": "Logging in",
     "pageNotFound": "Page Not Found",
     "pageNotFoundDesc": "Sorry, the page you are looking for does not exist or requires access through an agent link",
     "siteNotExist": "Site does not exist"

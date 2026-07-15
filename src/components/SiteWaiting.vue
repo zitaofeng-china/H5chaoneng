@@ -2,16 +2,36 @@
   <div class="site-waiting" aria-busy="true" aria-live="polite">
     <div class="site-waiting__inner">
       <div class="site-waiting__spinner" aria-hidden="true" />
-      <p class="site-waiting__title">{{ $t('error.siteVerifying') }}</p>
-      <p class="site-waiting__hint">{{ $t('common.loading') }}</p>
+      <p class="site-waiting__title">
+        <span>{{ titleText }}</span>
+        <span class="site-waiting__dots" aria-hidden="true">
+          <span class="site-waiting__dot">.</span>
+          <span class="site-waiting__dot">.</span>
+          <span class="site-waiting__dot">.</span>
+        </span>
+      </p>
+      <p v-if="!isMiniApp" class="site-waiting__hint">{{ $t('common.loading') }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { isTelegramMiniApp } from '@/utils/telegram'
+
 defineOptions({
   name: 'SiteWaiting',
 })
+
+const { t } = useI18n()
+/** setup 时 Telegram 可能尚未注入，用 computed 便于后续重绘 */
+const isMiniApp = computed(() => isTelegramMiniApp())
+
+/** Mini App：展示登录中；普通 H5：展示站点校验 */
+const titleText = computed(() =>
+  isMiniApp.value ? t('error.loggingIn') : t('error.siteVerifying'),
+)
 </script>
 
 <style scoped lang="scss">
@@ -54,6 +74,33 @@ defineOptions({
   font-weight: 500;
   line-height: 1.5;
   color: var(--theme-text-white, #fff);
+  display: inline-flex;
+  align-items: baseline;
+}
+
+.site-waiting__dots {
+  display: inline-flex;
+  align-items: baseline;
+  margin-left: 1px;
+  min-width: 1.2em;
+}
+
+.site-waiting__dot {
+  display: inline-block;
+  animation: site-waiting-dot-bounce 1.2s ease-in-out infinite;
+  will-change: transform, opacity;
+
+  &:nth-child(1) {
+    animation-delay: 0s;
+  }
+
+  &:nth-child(2) {
+    animation-delay: 0.15s;
+  }
+
+  &:nth-child(3) {
+    animation-delay: 0.3s;
+  }
 }
 
 .site-waiting__hint {
@@ -69,6 +116,21 @@ defineOptions({
   }
 }
 
+/* 三点依次上跳 */
+@keyframes site-waiting-dot-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.45;
+  }
+
+  30% {
+    transform: translateY(-5px);
+    opacity: 1;
+  }
+}
+
 @media (max-width: 768px) {
   .site-waiting__spinner {
     width: 40px;
@@ -81,6 +143,13 @@ defineOptions({
 
   .site-waiting__hint {
     font-size: 12px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-waiting__dot {
+    animation: none;
+    opacity: 1;
   }
 }
 </style>

@@ -479,7 +479,8 @@
     "maintenance": "系统维护中，请稍后再试",
     "paramsError": "参数错误",
     "notFound": "请求的资源不存在",
-    "siteVerifying": "正在校验站点...",
+    "siteVerifying": "正在校验站点",
+    "loggingIn": "正在登录中",
     "pageNotFound": "页面未找到",
     "pageNotFoundDesc": "抱歉，您访问的页面不存在或需要通过代理链接访问",
     "siteNotExist": "网站不存在"
