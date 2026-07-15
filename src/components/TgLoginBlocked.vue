@@ -31,7 +31,7 @@ const props = withDefaults(
   }>(),
   {
     message: '',
-    seconds: 5,
+    seconds: 3,
   },
 )
 

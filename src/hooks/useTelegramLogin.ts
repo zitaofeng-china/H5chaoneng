@@ -23,7 +23,7 @@ const TG_LOGIN_SUCCESS_MESSAGE = '登录成功'
 const TG_LOGIN_EXPIRE_TIME_PREFIX = '登录有效期至'
 const TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE = '登录过期时间异常，请联系客服'
 /** 关闭倒计时秒数 */
-export const TG_LOGIN_BLOCKED_COUNTDOWN = 5
+export const TG_LOGIN_BLOCKED_COUNTDOWN = 3
 
 function isEmptyData(data: unknown): boolean {
   if (data == null) return true
