@@ -75,14 +75,5 @@ body {
   }
 }
 
-/* 全局 Message 提示框位置调整 - 向下移动避免遮挡标题 */
-.el-message {
-  top: 80px !important;
-}
-
-/* 移动端 Message 提示框位置调整 */
-@media (max-width: 890px) {
-  .el-message {
-    top: 70px !important;
-  }
-}
+/* Message 纵向位置由 utils/element.ts 的 offset 控制
+ * 禁止再用 top: xx !important，否则多条 ElMessage 会叠在同一高度 */

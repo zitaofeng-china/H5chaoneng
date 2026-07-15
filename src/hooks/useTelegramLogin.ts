@@ -139,11 +139,10 @@ export function useTelegramLogin() {
         // 保存过期时间（后端返回秒级时间戳，需要转为毫秒）
         const expiredAt = (data.expired_at ?? data.expirated_at) as number | undefined
         const expiredAtMs = Number(expiredAt) * 1000
+        let expireTip = ''
         if (Number.isFinite(expiredAtMs) && expiredAtMs > 0) {
           setTokenExpiredAt(expiredAtMs)
-          ElMessage.info(`${TG_LOGIN_EXPIRE_TIME_PREFIX}：${formatExpireTime(expiredAtMs)}`)
-        } else {
-          ElMessage.warning(TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE)
+          expireTip = `${TG_LOGIN_EXPIRE_TIME_PREFIX}：${formatExpireTime(expiredAtMs)}`
         }
 
         // 保存用户信息
@@ -152,7 +151,13 @@ export function useTelegramLogin() {
         }
 
         console.log('[Telegram] 自动登录成功')
-        ElMessage.success(TG_LOGIN_SUCCESS_MESSAGE)
+        // 合并为一条提示，避免 success/info 同时弹出叠在一起
+        if (expireTip) {
+          ElMessage.success(`${TG_LOGIN_SUCCESS_MESSAGE}，${expireTip}`)
+        } else {
+          ElMessage.success(TG_LOGIN_SUCCESS_MESSAGE)
+          ElMessage.warning(TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE)
+        }
 
         // 动态站点跳转：后端返回站点标识时，跳转到对应站点
         if (responseSite && responseSite !== getSite()) {
