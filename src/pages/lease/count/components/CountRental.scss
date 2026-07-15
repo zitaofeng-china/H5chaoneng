@@ -1,3 +1,6 @@
+// 经 Vue 的 @use 引入时是独立模块，拿不到 vite additionalData 注入的 mixin
+@use '@/assets/styles/_mixins.scss' as *;
+
 .time-rental-page {
   padding: 18px;
   display: flex;
