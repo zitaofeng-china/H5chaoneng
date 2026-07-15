@@ -10,25 +10,54 @@
           <span class="site-waiting__dot">.</span>
         </span>
       </p>
+      <!-- Mini App 不展示「加载中」副文案 -->
       <p v-if="!isMiniApp" class="site-waiting__hint">{{ $t('common.loading') }}</p>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { isTelegramMiniApp } from '@/utils/telegram'
+import { isTelegramEnvironment, isTelegramMiniApp } from '@/utils/telegram'
 
 defineOptions({
   name: 'SiteWaiting',
 })
 
 const { t } = useI18n()
-/** setup 时 Telegram 可能尚未注入，用 computed 便于后续重绘 */
-const isMiniApp = computed(() => isTelegramMiniApp())
 
-/** Mini App：展示登录中；普通 H5：展示站点校验 */
+/** 宽松 + 严格任一命中；setup 后短轮询，避免 TG SDK 稍晚注入时仍显示「校验站点」 */
+const isMiniApp = ref(isTelegramEnvironment() || isTelegramMiniApp())
+
+let pollTimer: ReturnType<typeof setInterval> | null = null
+
+onMounted(() => {
+  if (isMiniApp.value) return
+  let n = 0
+  pollTimer = setInterval(() => {
+    n += 1
+    if (isTelegramEnvironment() || isTelegramMiniApp()) {
+      isMiniApp.value = true
+      if (pollTimer) clearInterval(pollTimer)
+      pollTimer = null
+      return
+    }
+    if (n > 40 && pollTimer) {
+      clearInterval(pollTimer)
+      pollTimer = null
+    }
+  }, 50)
+})
+
+onUnmounted(() => {
+  if (pollTimer) {
+    clearInterval(pollTimer)
+    pollTimer = null
+  }
+})
+
+/** Mini App：正在登录中；普通 H5：正在校验站点 */
 const titleText = computed(() =>
   isMiniApp.value ? t('error.loggingIn') : t('error.siteVerifying'),
 )
@@ -116,7 +145,6 @@ const titleText = computed(() =>
   }
 }
 
-/* 三点依次上跳 */
 @keyframes site-waiting-dot-bounce {
   0%,
   60%,

@@ -10,7 +10,29 @@ export function getTelegramWebApp() {
 }
 
 /**
- * 判断当前是否在 Telegram Mini App 环境中
+ * 宽松检测：是否处于 Telegram 客户端 / Mini App 容器（用于 UI 文案，不要求 initData 已就绪）
+ */
+export function isTelegramEnvironment(): boolean {
+  if (typeof window === 'undefined') return false
+
+  try {
+    const tg = getTelegramWebApp()
+    // initData / platform / version 任一存在即可认为在 TG 内
+    if (tg && (tg.initData || tg.platform || tg.version)) return true
+
+    const loc = `${window.location.search || ''}${window.location.hash || ''}`
+    if (/tgWebApp/i.test(loc)) return true
+
+    if (/Telegram/i.test(navigator.userAgent || '')) return true
+  } catch {
+    // ignore
+  }
+
+  return false
+}
+
+/**
+ * 严格检测：是否在 Telegram Mini App 且可取到 initData（可走自动登录）
  */
 export function isTelegramMiniApp(): boolean {
   const tg = getTelegramWebApp()
