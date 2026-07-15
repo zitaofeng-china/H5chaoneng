@@ -14,6 +14,7 @@ import { useBury } from '@/hooks/useBury'
 import { useTelegramLogin, TG_LOGIN_BLOCKED_COUNTDOWN } from '@/hooks/useTelegramLogin'
 import { getSite } from '@/utils/site'
 import { siteBootstrap } from '@/utils/siteBootstrap'
+import { isTelegramEnvironment, isTelegramMiniApp } from '@/utils/telegram'
 
 const route = useRoute()
 const { isFinished, isValidRef, syncFromBootstrap } = useSiteVerification()
@@ -25,18 +26,35 @@ const { isInTelegram, tgLoginBlocked, initTelegram } = useTelegramLogin()
 // 与模块门禁对齐（防止 setup 时序差异）
 syncFromBootstrap()
 
+/** Mini App 容器（站点失败时 isInTelegram 可能仍为 false，不能只依赖登录 hook） */
+const isTgEnv = computed(
+  () => isInTelegram.value || isTelegramEnvironment() || isTelegramMiniApp(),
+)
+
 /** 未知业务路径（站点已通过时才可能命中） */
 const isUnknownPath = computed(
   () => route.name === 'NotFound' || route.name === 'NotFoundStandalone',
 )
 
 /**
- * 是否展示 404：
- * - 站点不存在（!valid）→ 固定 404 组件（绝不走 router-view，避免仍匹配业务路由而闪屏）
- * - 站点存在但路径未知 → 404
+ * Mini App 拦截页（倒计时关闭）：
+ * - 自动登录失败
+ * - 站点不存在 / 校验失败
+ */
+const showMiniAppBlocked = computed(
+  () => tgLoginBlocked.value || (isFinished.value && !isValidRef.value && isTgEnv.value),
+)
+
+/**
+ * 是否展示 404（仅非 Mini App 拦截场景）：
+ * - 普通 H5 站点不存在
+ * - 站点存在但路径未知
  */
 const show404 = computed(
-  () => isFinished.value && (!isValidRef.value || isUnknownPath.value),
+  () =>
+    isFinished.value &&
+    !showMiniAppBlocked.value &&
+    (!isValidRef.value || isUnknownPath.value),
 )
 
 /** 仅站点校验成功且路径合法时展示完整业务页 */
@@ -88,9 +106,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <!-- Mini App 登录失败：全屏拦截 + 倒计时关闭（最高优先级） -->
+  <!-- Mini App：登录失败 / 站点不存在 → 全屏拦截 + 倒计时关闭 -->
   <TgLoginBlocked
-    v-if="tgLoginBlocked"
+    v-if="showMiniAppBlocked"
     :message="$t('error.miniAppNotOpen')"
     :seconds="TG_LOGIN_BLOCKED_COUNTDOWN"
   />
@@ -98,7 +116,7 @@ onUnmounted(() => {
   <!-- 站点校验中：等待页 -->
   <SiteWaiting v-else-if="showWaiting" />
 
-  <!-- 站点不存在 / 未知路径：直接挂 404 组件，禁止 router-view 匹配业务页 -->
+  <!-- 普通 H5：站点不存在 / 未知路径 → 404 -->
   <div v-else-if="show404" class="app-shell is-404">
     <NotFoundPage />
   </div>
