@@ -481,6 +481,9 @@
     "notFound": "请求的资源不存在",
     "siteVerifying": "正在校验站点",
     "loggingIn": "正在登录中",
+    "miniAppNotOpen": "您的账号未开放MiniAPP，请联系代理开启！！！",
+    "miniAppClosingIn": "{seconds} 秒后关闭 Mini App",
+    "miniAppCloseNow": "立即关闭",
     "pageNotFound": "页面未找到",
     "pageNotFoundDesc": "抱歉，您访问的页面不存在或需要通过代理链接访问",
     "siteNotExist": "网站不存在"

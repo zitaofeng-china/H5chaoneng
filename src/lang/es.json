@@ -430,6 +430,9 @@
     "notFound": "Recurso solicitado no encontrado",
     "siteVerifying": "Verificando sitio",
     "loggingIn": "Iniciando sesión",
+    "miniAppNotOpen": "Su cuenta no tiene Mini App habilitado. ¡Contacte a su agente para activarlo!!!",
+    "miniAppClosingIn": "Cerrando Mini App en {seconds}s",
+    "miniAppCloseNow": "Cerrar ahora",
     "pageNotFound": "Página no encontrada",
     "pageNotFoundDesc": "Lo sentimos, la página que busca no existe o requiere acceso a través de un enlace de agente",
     "siteNotExist": "El sitio no existe"

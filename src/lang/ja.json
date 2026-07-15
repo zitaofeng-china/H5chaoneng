@@ -429,6 +429,9 @@
     "notFound": "リクエストされたリソースが見つかりません",
     "siteVerifying": "サイトを確認中",
     "loggingIn": "ログイン中",
+    "miniAppNotOpen": "このアカウントは Mini App が未開放です。代理店に連絡して有効化してください！！！",
+    "miniAppClosingIn": "{seconds} 秒後に Mini App を閉じます",
+    "miniAppCloseNow": "今すぐ閉じる",
     "pageNotFound": "ページが見つかりません",
     "pageNotFoundDesc": "申し訳ございません、お探しのページは存在しないか、代理リンクを通じてアクセスする必要があります",
     "siteNotExist": "サイトが存在しません"

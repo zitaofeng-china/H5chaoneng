@@ -429,6 +429,9 @@
     "notFound": "요청한 리소스를 찾을 수 없습니다",
     "siteVerifying": "사이트 확인 중",
     "loggingIn": "로그인 중",
+    "miniAppNotOpen": "계정에 Mini App이 개방되지 않았습니다. 대리점에 문의하여 활성화하세요!!!",
+    "miniAppClosingIn": "{seconds}초 후 Mini App이 닫힙니다",
+    "miniAppCloseNow": "지금 닫기",
     "pageNotFound": "페이지를 찾을 수 없습니다",
     "pageNotFoundDesc": "죄송합니다, 찾으시는 페이지가 존재하지 않거나 대리 링크를 통해 액세스해야 합니다",
     "siteNotExist": "사이트가 존재하지 않습니다"

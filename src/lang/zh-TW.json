@@ -428,6 +428,9 @@
     "notFound": "請求的資源不存在",
     "siteVerifying": "正在校驗站點",
     "loggingIn": "正在登入中",
+    "miniAppNotOpen": "您的帳號未開放 MiniAPP，請聯繫代理開啟！！！",
+    "miniAppClosingIn": "{seconds} 秒後關閉 Mini App",
+    "miniAppCloseNow": "立即關閉",
     "pageNotFound": "頁面未找到",
     "pageNotFoundDesc": "抱歉，您訪問的頁面不存在或需要通過代理鏈接訪問",
     "siteNotExist": "網站不存在"

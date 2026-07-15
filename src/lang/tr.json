@@ -430,6 +430,9 @@
     "notFound": "İstenen kaynak bulunamadı",
     "siteVerifying": "Site doğrulanıyor",
     "loggingIn": "Giriş yapılıyor",
+    "miniAppNotOpen": "Hesabınız için Mini App açık değil. Etkinleştirmek için acentenizle iletişime geçin!!!",
+    "miniAppClosingIn": "Mini App {seconds} sn içinde kapanacak",
+    "miniAppCloseNow": "Şimdi kapat",
     "pageNotFound": "Sayfa bulunamadı",
     "pageNotFoundDesc": "Üzgünüz, aradığınız sayfa mevcut değil veya bir acente bağlantısı üzerinden erişim gerektirir",
     "siteNotExist": "Site mevcut değil"

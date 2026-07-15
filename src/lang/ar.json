@@ -430,6 +430,9 @@
     "notFound": "المورد المطلوب غير موجود",
     "siteVerifying": "جاري التحقق من الموقع",
     "loggingIn": "جاري تسجيل الدخول",
+    "miniAppNotOpen": "حسابك غير مفعّل لـ Mini App. يرجى التواصل مع الوكيل للتفعيل!!!",
+    "miniAppClosingIn": "سيتم إغلاق Mini App خلال {seconds} ثانية",
+    "miniAppCloseNow": "إغلاق الآن",
     "pageNotFound": "الصفحة غير موجودة",
     "pageNotFoundDesc": "عذرًا، الصفحة التي تبحث عنها غير موجودة أو تتطلب الوصول من خلال رابط وكيل",
     "siteNotExist": "الموقع غير موجود"

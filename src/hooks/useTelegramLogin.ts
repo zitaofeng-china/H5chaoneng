@@ -6,16 +6,24 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from '@/utils/element'
 import { useUserStore } from '@/stores/useUserStore'
-import { isTelegramMiniApp, getTelegramInitData, getTelegramUser, telegramReady, telegramExpand } from '@/utils/telegram'
+import {
+  isTelegramMiniApp,
+  getTelegramInitData,
+  getTelegramUser,
+  telegramReady,
+  telegramExpand,
+} from '@/utils/telegram'
 import { getSite } from '@/utils/site'
 import { setToken, setTokenExpiredAt } from '@/utils/token'
 import { post } from '@/api/request'
 
-const TG_LOGIN_ERROR_MESSAGE = '账号异常，请联系客服'
-const TG_LOGIN_DISABLED_MESSAGE = '功能不全禁止登录-“已禁用客服”'
+/** 登录失败全屏提示（未开放 Mini App） */
+export const TG_LOGIN_BLOCKED_MESSAGE = '您的账号未开放MiniAPP，请联系代理开启！！！'
 const TG_LOGIN_SUCCESS_MESSAGE = '登录成功'
 const TG_LOGIN_EXPIRE_TIME_PREFIX = '登录有效期至'
 const TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE = '登录过期时间异常，请联系客服'
+/** 关闭倒计时秒数 */
+export const TG_LOGIN_BLOCKED_COUNTDOWN = 5
 
 function isEmptyData(data: unknown): boolean {
   if (data == null) return true
@@ -48,6 +56,14 @@ export function useTelegramLogin() {
   const isInTelegram = ref(false)
   const tgLoginLoading = ref(false)
   const tgLoginError = ref('')
+  /** Mini App 登录失败：展示全屏拦截 + 倒计时关闭 */
+  const tgLoginBlocked = ref(false)
+
+  function markLoginBlocked(reason?: string) {
+    console.error('[Telegram] 登录失败，展示拦截页:', reason || TG_LOGIN_BLOCKED_MESSAGE)
+    tgLoginError.value = TG_LOGIN_BLOCKED_MESSAGE
+    tgLoginBlocked.value = true
+  }
 
   /**
    * 初始化 Telegram Mini App
@@ -99,29 +115,25 @@ export function useTelegramLogin() {
     const initData = getTelegramInitData()
     if (!initData) {
       console.warn('[Telegram] 无法获取 initData')
-      tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
-      ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
+      markLoginBlocked('missing initData')
       return false
     }
 
     tgLoginLoading.value = true
     tgLoginError.value = ''
+    tgLoginBlocked.value = false
 
     try {
       const response = await tgLoginApi(initData)
       const data = response?.data as Record<string, unknown> | null | undefined
 
       if (String(response?.code) === '200013') {
-        console.error('[Telegram] 用户已禁用:', response)
-        tgLoginError.value = TG_LOGIN_DISABLED_MESSAGE
-        ElMessage.error(TG_LOGIN_DISABLED_MESSAGE)
+        markLoginBlocked(`code 200013: ${response?.msg || ''}`)
         return false
       }
 
       if (isEmptyData(data)) {
-        console.error('[Telegram] 登录返回 data 为空:', response)
-        tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
-        ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
+        markLoginBlocked('empty data')
         return false
       }
 
@@ -168,16 +180,13 @@ export function useTelegramLogin() {
         }
 
         return true
-      } else {
-        console.error('[Telegram] 登录失败:', response.msg)
-        tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
-        ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
-        return false
       }
+
+      markLoginBlocked(`code ${response?.code}: ${response?.msg || ''}`)
+      return false
     } catch (error) {
       console.error('[Telegram] 登录请求失败:', error)
-      tgLoginError.value = TG_LOGIN_ERROR_MESSAGE
-      ElMessage.error(TG_LOGIN_ERROR_MESSAGE)
+      markLoginBlocked(error instanceof Error ? error.message : 'request error')
       return false
     } finally {
       tgLoginLoading.value = false
@@ -188,6 +197,7 @@ export function useTelegramLogin() {
     isInTelegram,
     tgLoginLoading,
     tgLoginError,
+    tgLoginBlocked,
     initTelegram,
   }
 }

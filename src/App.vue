@@ -5,12 +5,13 @@ import Layout from '@/components/layout/index.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
 import TelegramFloat from '@/components/TelegramFloat.vue'
 import SiteWaiting from '@/components/SiteWaiting.vue'
+import TgLoginBlocked from '@/components/TgLoginBlocked.vue'
 import NotFoundPage from '@/pages/404/index.vue'
 import { useSiteVerification } from '@/hooks/useSiteVerification'
 import { useUserStore } from '@/stores/useUserStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useBury } from '@/hooks/useBury'
-import { useTelegramLogin } from '@/hooks/useTelegramLogin'
+import { useTelegramLogin, TG_LOGIN_BLOCKED_COUNTDOWN } from '@/hooks/useTelegramLogin'
 import { getSite } from '@/utils/site'
 import { siteBootstrap } from '@/utils/siteBootstrap'
 
@@ -19,7 +20,7 @@ const { isFinished, isValidRef, syncFromBootstrap } = useSiteVerification()
 const userStore = useUserStore()
 const priceStore = usePriceStore()
 const { track } = useBury()
-const { isInTelegram, initTelegram } = useTelegramLogin()
+const { isInTelegram, tgLoginBlocked, initTelegram } = useTelegramLogin()
 
 // 与模块门禁对齐（防止 setup 时序差异）
 syncFromBootstrap()
@@ -87,8 +88,15 @@ onUnmounted(() => {
 </script>
 
 <template>
+  <!-- Mini App 登录失败：全屏拦截 + 倒计时关闭（最高优先级） -->
+  <TgLoginBlocked
+    v-if="tgLoginBlocked"
+    :message="$t('error.miniAppNotOpen')"
+    :seconds="TG_LOGIN_BLOCKED_COUNTDOWN"
+  />
+
   <!-- 站点校验中：等待页 -->
-  <SiteWaiting v-if="showWaiting" />
+  <SiteWaiting v-else-if="showWaiting" />
 
   <!-- 站点不存在 / 未知路径：直接挂 404 组件，禁止 router-view 匹配业务页 -->
   <div v-else-if="show404" class="app-shell is-404">
