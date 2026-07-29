@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from 'node:url'
 import path from 'node:path'
 
 import { defineConfig, loadEnv } from 'vite'
+import type { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import vueDevTools from 'vite-plugin-vue-devtools'
@@ -16,6 +17,74 @@ import IconsResolver from 'unplugin-icons/resolver'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { codeInspectorPlugin } from 'code-inspector-plugin'
 // import viteCompression from 'vite-plugin-compression'
+
+const DEV_BASE_COOKIE = 'energy_h5_public_base'
+
+function normalizeBase(base: string): string {
+  const normalized = base.replace(/^\/+|\/+$/g, '')
+  return normalized ? `/${normalized}/` : '/'
+}
+
+function getCookieValue(cookieHeader: string | undefined, name: string): string | undefined {
+  const cookie = cookieHeader
+    ?.split(';')
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${name}=`))
+
+  if (!cookie) return undefined
+
+  try {
+    return decodeURIComponent(cookie.slice(name.length + 1))
+  } catch {
+    return undefined
+  }
+}
+
+function isPathUnderBase(pathname: string, base: string): boolean {
+  return base === '/' || pathname === base.slice(0, -1) || pathname.startsWith(base)
+}
+
+function devBaseMigrationPlugin(base: string): Plugin {
+  return {
+    name: 'dev-base-migration',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.method !== 'GET' || !req.headers.accept?.includes('text/html')) {
+          next()
+          return
+        }
+
+        const previousBase = getCookieValue(req.headers.cookie as string | undefined, DEV_BASE_COOKIE)
+        if (!previousBase) {
+          next()
+          return
+        }
+
+        const normalizedPreviousBase = normalizeBase(previousBase)
+        if (normalizedPreviousBase === base) {
+          next()
+          return
+        }
+
+        const requestUrl = new URL(req.url || '/', 'http://localhost')
+        if (!isPathUnderBase(requestUrl.pathname, normalizedPreviousBase)) {
+          next()
+          return
+        }
+
+        const pathAfterPreviousBase =
+          normalizedPreviousBase === '/'
+            ? requestUrl.pathname
+            : requestUrl.pathname.slice(normalizedPreviousBase.length - 1)
+        const targetPath = `${base === '/' ? '' : base.slice(0, -1)}${pathAfterPreviousBase}`
+
+        res.statusCode = 302
+        res.setHeader('Location', `${targetPath}${requestUrl.search}${requestUrl.hash}`)
+        res.end()
+      })
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -35,6 +104,7 @@ export default defineConfig(({ mode }) => {
   return {
   base,
   plugins: [
+    !isProduction && devBaseMigrationPlugin(base),
     vue(),
     vueJsx(),
     !isProduction && vueDevTools(),

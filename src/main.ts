@@ -16,6 +16,10 @@ import allPlugins from '@/plugins/index.ts'
 import i18n, { initLocale } from '@/lang'
 import { ensureSiteVerified } from '@/utils/siteBootstrap'
 
+if (import.meta.env.DEV) {
+  document.cookie = `energy_h5_public_base=${encodeURIComponent(import.meta.env.BASE_URL)}; Path=/; SameSite=Lax`
+}
+
 async function bootstrap() {
   const app = createApp(App)
   const pinia = createPinia()
