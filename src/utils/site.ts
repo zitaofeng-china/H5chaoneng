@@ -1,6 +1,6 @@
 /**
  * Site 管理工具
- * 站点码以 URL 第一段为准；存在与否由接口校验，不存在则 404。
+ * 优先使用 Vite 部署基路径的最后一段；根路径部署时再从 URL 第一段解析。
  */
 
 // 可选：精简模式（Lite）站点标识
@@ -22,7 +22,21 @@ export const LITE_SITE = DEFAULT_SITE
 /** 非站点路径段，避免被识别为 site */
 const RESERVED_PATH_SEGMENTS = new Set(['404'])
 
+/**
+ * 从 Vite 部署基路径提取 Site。
+ * @example getSiteFromBase('/h5/') -> 'h5'
+ */
+export function getSiteFromBase(base = import.meta.env.BASE_URL): string {
+  const segments = base.split('/').filter(Boolean)
+  return segments[segments.length - 1] || ''
+}
+
 export function getSite(): string {
+  const siteFromBase = getSiteFromBase()
+  if (siteFromBase) {
+    return siteFromBase
+  }
+
   const path = window.location.pathname
   const segments = path.split('/').filter(Boolean)
   const siteFromUrl = segments[0] || ''
