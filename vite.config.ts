@@ -67,7 +67,8 @@ function devBaseMigrationPlugin(base: string): Plugin {
         }
 
         const requestUrl = new URL(req.url || '/', 'http://localhost')
-        if (isPathUnderBase(requestUrl.pathname, base)) {
+        // 根路径会匹配所有 URL，切换到根部署时仍需移除旧的非根 base。
+        if (base !== '/' && isPathUnderBase(requestUrl.pathname, base)) {
           next()
           return
         }
