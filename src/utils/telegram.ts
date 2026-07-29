@@ -10,20 +10,20 @@ export function getTelegramWebApp() {
 }
 
 /**
- * 宽松检测：是否处于 Telegram 客户端 / Mini App 容器（用于 UI 文案，不要求 initData 已就绪）
+ * 检测是否由 Telegram Mini App 启动。
+ *
+ * Telegram SDK 在普通浏览器中也可能暴露 platform/version，因此它们不能作为容器依据。
+ * 只有 SDK initData 或 Telegram 注入的 tgWebAppData 启动参数存在时才认为是 Mini App。
  */
 export function isTelegramEnvironment(): boolean {
   if (typeof window === 'undefined') return false
 
   try {
     const tg = getTelegramWebApp()
-    // initData / platform / version 任一存在即可认为在 TG 内
-    if (tg && (tg.initData || tg.platform || tg.version)) return true
+    if (typeof tg?.initData === 'string' && tg.initData.trim()) return true
 
     const loc = `${window.location.search || ''}${window.location.hash || ''}`
-    if (/tgWebApp/i.test(loc)) return true
-
-    if (/Telegram/i.test(navigator.userAgent || '')) return true
+    if (/(?:[?&#])tgWebAppData=[^&#]+/i.test(loc)) return true
   } catch {
     // ignore
   }
@@ -36,7 +36,7 @@ export function isTelegramEnvironment(): boolean {
  */
 export function isTelegramMiniApp(): boolean {
   const tg = getTelegramWebApp()
-  return !!(tg && tg.initData && tg.initData.length > 0)
+  return typeof tg?.initData === 'string' && tg.initData.trim().length > 0
 }
 
 /**

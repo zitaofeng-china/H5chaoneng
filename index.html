@@ -107,15 +107,15 @@
         }
       </style>
       <script>
-        // 尽早识别 Mini App：静态启动页改「正在登录中」，并隐藏「加载中」
+        // 仅在真实 Mini App 启动上下文中改为「正在登录中」。
+        // Telegram SDK 在普通浏览器也可能有 platform/version，不能据此判断。
         ;(function () {
           function isTelegramEnv() {
             try {
               var tg = window.Telegram && window.Telegram.WebApp
-              if (tg && (tg.initData || tg.platform || tg.version)) return true
+              if (tg && typeof tg.initData === 'string' && tg.initData.trim()) return true
               var loc = String(location.search || '') + String(location.hash || '')
-              if (/tgWebApp/i.test(loc)) return true
-              if (/Telegram/i.test(navigator.userAgent || '')) return true
+              if (/(?:[?&#])tgWebAppData=[^&#]+/i.test(loc)) return true
             } catch (e) {}
             return false
           }
