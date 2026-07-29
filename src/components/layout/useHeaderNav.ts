@@ -137,16 +137,10 @@ export function useHeaderNav() {
       await logout()
       await clearAuthSession()
 
-      const currentPath = window.location.pathname
-      const segments = currentPath.split('/').filter(Boolean)
-      const site = segments[0] || ''
-      window.location.href = site ? `/${site}/` : '/'
+      await router.replace(withSitePrefix('/'))
     } catch (error) {
       console.error('退出登录失败:', error)
-      const currentPath = window.location.pathname
-      const segments = currentPath.split('/').filter(Boolean)
-      const site = segments[0] || ''
-      window.location.href = site ? `/${site}/` : '/'
+      await router.replace(withSitePrefix('/'))
     }
   }
 
