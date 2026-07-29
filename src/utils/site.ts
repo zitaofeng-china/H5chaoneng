@@ -1,6 +1,6 @@
 /**
  * Site 管理工具
- * 优先使用 Vite 部署基路径的最后一段；根路径部署时再从 URL 第一段解析。
+ * URL 位于 Vite 部署基路径下时，取基路径后的第一段作为站点；根路径部署时取 URL 第一段。
  */
 
 // 可选：精简模式（Lite）站点标识
@@ -23,29 +23,27 @@ export const LITE_SITE = DEFAULT_SITE
 const RESERVED_PATH_SEGMENTS = new Set(['404'])
 
 /**
- * 从 Vite 部署基路径提取 Site。
- * @example getSiteFromBase('/h5/') -> 'h5'
+ * 从当前路径中提取 Site，忽略 Vite 部署基路径。
+ * @example getSiteFromPath('/h5/tenant/hosting', '/h5/') -> 'tenant'
  */
-export function getSiteFromBase(base = import.meta.env.BASE_URL): string {
-  const segments = base.split('/').filter(Boolean)
-  return segments[segments.length - 1] || ''
-}
-
-export function getSite(): string {
-  const siteFromBase = getSiteFromBase()
-  if (siteFromBase) {
-    return siteFromBase
-  }
-
-  const path = window.location.pathname
-  const segments = path.split('/').filter(Boolean)
-  const siteFromUrl = segments[0] || ''
+export function getSiteFromPath(
+  path = window.location.pathname,
+  base = import.meta.env.BASE_URL,
+): string {
+  const pathSegments = path.split('/').filter(Boolean)
+  const baseSegments = base.split('/').filter(Boolean)
+  const isPathUnderBase = baseSegments.every((segment, index) => pathSegments[index] === segment)
+  const siteFromUrl = pathSegments[isPathUnderBase ? baseSegments.length : 0] || ''
 
   if (!siteFromUrl || RESERVED_PATH_SEGMENTS.has(siteFromUrl)) {
     return ''
   }
 
   return siteFromUrl
+}
+
+export function getSite(): string {
+  return getSiteFromPath()
 }
 
 /**
