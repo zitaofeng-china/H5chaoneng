@@ -67,6 +67,11 @@ function devBaseMigrationPlugin(base: string): Plugin {
         }
 
         const requestUrl = new URL(req.url || '/', 'http://localhost')
+        if (isPathUnderBase(requestUrl.pathname, base)) {
+          next()
+          return
+        }
+
         if (!isPathUnderBase(requestUrl.pathname, normalizedPreviousBase)) {
           next()
           return
@@ -80,6 +85,7 @@ function devBaseMigrationPlugin(base: string): Plugin {
 
         res.statusCode = 302
         res.setHeader('Location', `${targetPath}${requestUrl.search}${requestUrl.hash}`)
+        res.setHeader('Set-Cookie', `${DEV_BASE_COOKIE}=${encodeURIComponent(base)}; Path=/; SameSite=Lax`)
         res.end()
       })
     },
