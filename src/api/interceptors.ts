@@ -138,6 +138,8 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
   return {
     ...config,
     headers,
+    // 站点和价格等公开接口无需携带浏览器 Cookie，避免代理将旧登录态转发给后端。
+    credentials: requiresAuth ? config.credentials : 'omit',
   }
 }
 
