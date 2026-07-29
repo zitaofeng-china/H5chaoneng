@@ -44,3 +44,6 @@ __screenshots__/
 stats.html
 auto-imports.d.ts
 components.d.ts
+
+# Playwright CLI session artifacts
+.playwright-cli/
