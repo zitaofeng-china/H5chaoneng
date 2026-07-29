@@ -3,8 +3,8 @@ import { getSiteFromPath } from '@/utils/site'
 
 describe('site helpers', () => {
   it('uses the first segment after the deployment base as Site', () => {
-    expect(getSiteFromPath('/h5/tenant/hosting', '/h5/')).toBe('tenant')
-    expect(getSiteFromPath('/platform/h5/tenant/hosting', '/platform/h5/')).toBe('tenant')
+    expect(getSiteFromPath('/h5/3tQxQEH/hosting', '/h5/')).toBe('3tQxQEH')
+    expect(getSiteFromPath('/platform/h5/3tQxQEH/hosting', '/platform/h5/')).toBe('3tQxQEH')
   })
 
   it('returns an empty Site when the URL has no segment after the deployment base', () => {
@@ -16,6 +16,6 @@ describe('site helpers', () => {
   })
 
   it('uses the first URL segment for root deployment', () => {
-    expect(getSiteFromPath('/demo/hosting', '/')).toBe('demo')
+    expect(getSiteFromPath('/3tQxQEH/hosting', '/')).toBe('3tQxQEH')
   })
 })
