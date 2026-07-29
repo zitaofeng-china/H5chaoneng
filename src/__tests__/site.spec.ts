@@ -5,6 +5,11 @@ describe('site helpers', () => {
   it('uses the first segment after the deployment base as Site', () => {
     expect(getSiteFromPath('/h5/3tQxQEH/hosting', '/h5/')).toBe('3tQxQEH')
     expect(getSiteFromPath('/platform/h5/3tQxQEH/hosting', '/platform/h5/')).toBe('3tQxQEH')
+    expect(getSiteFromPath('/hwdawda/awdawd/3tQxQEH/hosting', '/hwdawda/awdawd/')).toBe('3tQxQEH')
+  })
+
+  it('does not treat an outdated deployment path as Site', () => {
+    expect(getSiteFromPath('/h5/3tQxQEH/hosting', '/hwdawda/awdawd/')).toBe('')
   })
 
   it('returns an empty Site when the URL has no segment after the deployment base', () => {

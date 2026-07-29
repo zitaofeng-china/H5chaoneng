@@ -33,7 +33,13 @@ export function getSiteFromPath(
   const pathSegments = path.split('/').filter(Boolean)
   const baseSegments = base.split('/').filter(Boolean)
   const isPathUnderBase = baseSegments.every((segment, index) => pathSegments[index] === segment)
-  const siteFromUrl = pathSegments[isPathUnderBase ? baseSegments.length : 0] || ''
+
+  // 非根路径部署时，旧 base 下的地址不能将其首段误识别为 Site。
+  if (baseSegments.length > 0 && !isPathUnderBase) {
+    return ''
+  }
+
+  const siteFromUrl = pathSegments[baseSegments.length] || ''
 
   if (!siteFromUrl || RESERVED_PATH_SEGMENTS.has(siteFromUrl)) {
     return ''
