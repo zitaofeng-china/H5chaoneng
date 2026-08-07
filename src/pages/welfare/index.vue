@@ -14,6 +14,6 @@ defineOptions({
 
 <style lang="scss" scoped>
 .welfare-page {
-  padding-bottom: 40px;
+  padding-bottom: 24px;
 }
 </style>
