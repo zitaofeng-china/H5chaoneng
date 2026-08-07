@@ -265,11 +265,11 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .contract-flash {
-  padding: 0 0 80px;
+  padding: 0 0 40px;
 
   .header {
     text-align: center;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
   }
 
   .title {
@@ -394,7 +394,7 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .contract-flash {
-    padding: 0 0 60px;
+    padding: 0 0 32px;
 
     .rental-card {
       border-radius: 6px;
