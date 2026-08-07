@@ -3,6 +3,7 @@
     <div class="header">
       <div class="title">{{ t('home.title') }}</div>
     </div>
+    <AdBanner />
     <el-card class="rental-card">
       <el-tabs v-model="activeTab" class="rental-tabs">
         <el-tab-pane :label="$t('home.transferRental')" name="transfer">
@@ -137,6 +138,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from '@/utils/element'
 import { type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
+import AdBanner from '@/components/business/AdBanner.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -375,11 +377,11 @@ onUnmounted(() => {
 
 .energy-rental {
   background: var(--theme-bg-light);
-  padding: 40px 0 80px;
+  padding: 20px 0 40px;
 
   .header {
     text-align: center;
-    padding-bottom: 40px;
+    padding-bottom: 20px;
   }
 
   .title {
@@ -645,7 +647,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .energy-rental {
-    padding: 0 6px 40px;
+    padding: 0 6px 24px;
 
     .header {
       padding-bottom: 10px;
