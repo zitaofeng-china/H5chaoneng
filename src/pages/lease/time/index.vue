@@ -27,11 +27,11 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .time-page {
-  margin: 50px 0;
+  margin: 24px 0;
 
   .time-head {
     .time-title {
-      margin-bottom: 30px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: center;
       color: var(--theme-text-black);
