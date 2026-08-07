@@ -228,7 +228,7 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .welfare-order {
   background: var(--theme-bg-light);
-  padding: 40px 20px 40px;
+  padding: 20px 20px 24px;
 
   .welfare-card {
     max-width: 960px;
