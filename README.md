@@ -21,7 +21,7 @@ pnpm dev
 访问时必须带**站点码**（代理标识）：
 
 ```text
-http://localhost:8080/1ExAgznu
+https://test-chaoneng.gaod2o.shop/1ExAgznu
 ```
 
 站点校验只有两种结果：**存在** → 展示业务页；**不存在**（含无站点码、接口失败）→ `/404`。  

@@ -22,13 +22,14 @@ export async function handler(event, _context) {
   try {
     // 提取 API 路径
     const path = event.path.replace('/.netlify/functions/api', '')
+    const normalizedPath = path.startsWith('/') ? path : `/${path}`
     
     // 构建查询参数
     const queryString = event.queryStringParameters 
       ? '?' + new URLSearchParams(event.queryStringParameters).toString()
       : ''
     
-    const backendUrl = `http://47.84.135.181:8888${path}${queryString}`
+    const backendUrl = `https://test-chaoneng.gaod2o.shop${normalizedPath}${queryString}`
     
     console.log('Proxying to:', backendUrl)
     console.log('Query params:', event.queryStringParameters)

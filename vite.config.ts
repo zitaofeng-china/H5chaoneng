@@ -215,7 +215,7 @@ export default defineConfig(({ mode }) => {
     },
     proxy: {
       '/v3': {
-        target: 'http://47.84.135.181:8888',
+        target: 'https://test-chaoneng.gaod2o.shop/',
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000, // 增加超时时间到 60 秒
@@ -232,7 +232,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       '/v2': {
-        target: 'http://47.84.135.181:8888',
+        target: 'https://test-chaoneng.gaod2o.shop/',
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000,
@@ -246,7 +246,7 @@ export default defineConfig(({ mode }) => {
         },
       },
       '/v1': {
-        target: 'http://47.84.135.181:8888',
+        target: 'https://test-chaoneng.gaod2o.shop/',
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000,
