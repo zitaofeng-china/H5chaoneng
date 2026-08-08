@@ -45,7 +45,7 @@ export const NO_TOKEN_URLS: (string | RegExp)[] = [
   '/v3/exchange/rate', // 获取汇率信息
   '/v3/captcha/email', // 获取邮箱验证码
   '/v3/tg_login', // 兼容预留：历史约定路径；当前前端实际使用 /v3/login + Header InitData
-  '/v1/ticker/price', // 获取 TRX/USDT 实时行情
+  '/v3/ticker/price', // 获取 TRX/USDT 实时行情
   '/v3/ad', // 获取 H5 用户广告列表
 ]
 
