@@ -15,7 +15,7 @@ import type { RegisterForm } from '@/plugins/registerPopup/types'
 export function useRegisterForm() {
   const { t } = useI18n()
   const userStore = useUserStore()
-  const { usernameRules, emailRules, passwordRules, confirmPasswordRules } = useFormValidation()
+  const { usernameRules, emailRules, registerPasswordRules, confirmPasswordRules } = useFormValidation()
 
   const visible = ref(false)
   const loading = ref(false)
@@ -36,7 +36,7 @@ export function useRegisterForm() {
   const rules = computed<FormRules<RegisterForm>>(() => ({
     username: usernameRules.value,
     email: emailRules.value,
-    password: passwordRules.value,
+    password: registerPasswordRules.value,
     passwords: confirmPasswordRules(() => registerForm.password).value,
   }))
 
