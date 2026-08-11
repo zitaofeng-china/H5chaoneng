@@ -74,6 +74,7 @@ export function useCountRental() {
           return `${count}${t('common.purchase')}(${total}${t('common.trx')})`
         }),
         counts,
+        prices: counts.map((count) => formatCryptoAmount(count * strokePrice.value)),
       },
     ]
   })
@@ -81,8 +82,8 @@ export function useCountRental() {
   const tips = computed(() => [
     t('countRental.tips1'),
     t('countRental.tips2'),
-    t('countRental.tips3'),
     t('countRental.tips4'),
+    t('countRental.tips3'),
   ])
 
   const paymentTips = computed(() => [

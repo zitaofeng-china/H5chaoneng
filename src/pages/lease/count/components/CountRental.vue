@@ -3,17 +3,29 @@
     <div class="rental-wrapper">
       <div class="selection-grid">
         <div class="grid-row" v-for="(row, rIdx) in rows" :key="rIdx">
+          <div class="row-label">
+            <span class="label-marker" aria-hidden="true"></span>
+            {{ t('countRental.selectTier') }}
+          </div>
           <div class="row-options">
             <button
-              v-for="(opt, idx) in row.options"
-              :key="idx"
-              :class="['pill', !isCustom && selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
-              @click="onSelect(rIdx, idx)"
+              v-for="option in countOptions"
+              :key="`${option.rowIndex}-${option.index}`"
+              type="button"
+              :class="[
+                'pill',
+                !isCustom && selecteIndex[0] === option.rowIndex && selecteIndex[1] === option.index
+                  ? 'active'
+                  : '',
+              ]"
+              @click="onSelect(option.rowIndex, option.index)"
             >
-              {{ opt }}
+              <span class="option-price">{{ option.price }} {{ t('common.trx') }}</span>
+              <span class="option-count">{{ option.count }}{{ t('common.purchase') }}</span>
             </button>
             <button
-              :class="['pill', isCustom ? 'active' : '']"
+              type="button"
+              :class="['pill', 'custom-pill', isCustom ? 'active' : '']"
               @click="onCustomClick"
             >
               {{ t('lease.custom') }}
@@ -48,8 +60,8 @@
           ref="formRef"
           :model="form"
           :rules="rules"
-          label-width="115px"
-          label-suffix=":"
+          label-position="top"
+          label-suffix=""
           class="details-form"
           :class="{ 'derail-form-m': isMobile }"
         >
@@ -63,6 +75,15 @@
             <el-input v-model="wallet" :placeholder="t('lease.enterAddress')" />
           </el-form-item>
           <el-form-item :label="$t('home.savedAddress')" prop="selectedAddress">
+            <template #label>
+              <span class="saved-address-label">
+                <span>{{ $t('home.savedAddress') }}</span>
+                <span class="tip-row">
+                  <SvgIcon name="fee-info" width="12" height="12" />
+                  <span class="tip-text">{{ $t('home.saveTip') }}</span>
+                </span>
+              </span>
+            </template>
             <el-select
               v-model="selectedAddress"
               :placeholder="$t('home.selectSavedAddress')"
@@ -105,12 +126,6 @@
               </el-option>
             </el-select>
           </el-form-item>
-          <div class="tip-row">
-            <SvgIcon name="fee-info" width="12" height="12" />
-            <span class="tip-text">
-              {{ $t('home.saveTip') }}
-            </span>
-          </div>
 
           <el-form-item>
             <div class="btn-wrap">
@@ -172,6 +187,7 @@
 <script setup lang="ts">
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+import { computed } from 'vue'
 import { useCountRental } from './useCountRental'
 
 defineOptions({ name: 'CountRental' })
@@ -203,6 +219,19 @@ const {
   handleRent,
   handleBuy,
 } = useCountRental()
+
+const countOptions = computed(() => {
+  return rows.value.flatMap((row, rowIndex) =>
+    row.counts
+      .map((count, index) => ({
+        rowIndex,
+        index,
+        count,
+        price: row.prices[index],
+      }))
+      .filter((option) => option.count !== 7),
+  )
+})
 </script>
 
 <style scoped lang="scss">

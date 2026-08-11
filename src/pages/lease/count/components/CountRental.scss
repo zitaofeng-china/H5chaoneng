@@ -1,28 +1,256 @@
-// 经 Vue 的 @use 引入时是独立模块，拿不到 vite additionalData 注入的 mixin
 @use '@/assets/styles/_mixins.scss' as *;
 
 .time-rental-page {
-  padding: 18px;
   display: flex;
   justify-content: center;
+  padding: 2px 18px 32px;
 }
 
 .rental-wrapper {
   @include rental-card;
+
+  box-sizing: border-box;
+  width: min(680px, 100%);
+  max-width: 100%;
+  padding: 24px;
 }
 
-.title {
-  font-size: 16px;
+.selection-grid {
+  margin-bottom: 10px;
+}
+
+.grid-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row-label {
+  display: flex;
+  align-items: center;
+  min-height: 14px;
+  color: var(--theme-text-black);
+  font-size: 12px;
   font-weight: 700;
-  color: #1f2937;
-  margin: 6px 0 12px;
+  line-height: 1.2;
+}
+
+.label-marker {
+  width: 2px;
+  height: 12px;
+  margin-right: 5px;
+  border-radius: 1px;
+  background: var(--theme-bg-blue);
+}
+
+.row-options {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  width: 100%;
+}
+
+.pill {
+  box-sizing: border-box;
+  min-width: 0;
+  height: 60px;
+  padding: 7px 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid rgba(22, 93, 255, 0.12);
+  border-radius: 4px;
+  background: #eef4ff;
+  color: var(--theme-text-blue);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease,
+    box-shadow 0.18s ease;
+
+  &:hover {
+    border-color: rgba(22, 93, 255, 0.3);
+    background: #e5efff;
+  }
+
+  &.active {
+    border-color: var(--theme-bg-blue);
+    background: var(--theme-bg-blue);
+    color: var(--theme-text-white);
+    box-shadow: 0 2px 5px rgba(22, 93, 255, 0.12);
+
+    .option-count {
+      color: rgba(255, 255, 255, 0.86);
+    }
+  }
+
+  &.custom-pill {
+    color: var(--theme-text-blue);
+
+    &.active {
+      color: var(--theme-text-white);
+    }
+  }
+}
+
+.option-price {
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.option-count {
+  color: rgba(30, 41, 59, 0.55);
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.custom-input-wrapper {
+  margin-top: 12px;
+  padding: 7px;
+  border-radius: 4px;
+  background: var(--theme-time-bg-light);
+
+  .custom-form-item {
+    margin-bottom: 0;
+
+    :deep(.el-form-item__label) {
+      color: var(--theme-text-black);
+      font-weight: 600;
+    }
+
+    :deep(.el-input__suffix) {
+      color: var(--theme-text-muted);
+    }
+  }
+
+  .max-count-hint {
+    margin-top: 4px;
+    color: var(--theme-text-muted);
+    font-size: 11px;
+  }
+}
+
+.details-card {
+  margin-top: 2px;
+
+  .card-title {
+    margin: 0 0 16px;
+    color: var(--theme-text-dark);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+  }
+}
+
+.details-form {
+  :deep(.el-form-item) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 7px;
+  }
+
+  :deep(.el-form-item__label) {
+    box-sizing: border-box;
+    width: 100% !important;
+    height: auto;
+    min-height: 14px;
+    padding: 0 0 4px;
+    display: flex;
+    align-items: center;
+    color: var(--theme-text-black);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  :deep(.el-form-item__label::before) {
+    content: '';
+    width: 2px;
+    height: 12px;
+    margin-right: 5px;
+    border-radius: 1px;
+    background: var(--theme-bg-blue);
+  }
+
+  :deep(.el-form-item__content) {
+    min-height: 0;
+    margin-left: 0 !important;
+    line-height: 1;
+  }
+
+  :deep(.el-input),
+  :deep(.el-select) {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper) {
+    min-height: 36px;
+    padding: 1px 10px;
+    border-radius: 3px;
+    background: #fbfcfe;
+    box-shadow: 0 0 0 1px #e7ecf3 inset;
+  }
+
+  :deep(.el-input__inner) {
+    height: 34px;
+    color: var(--theme-text-muted);
+    font-size: 13px;
+    font-weight: 600;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input__suffix),
+  :deep(.el-select__placeholder),
+  :deep(.el-select__caret) {
+    color: var(--theme-text-muted);
+    font-size: 12px;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper) {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
+}
+
+.saved-address-label {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tip-row {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  color: rgba(30, 41, 59, 0.48);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.2;
+  white-space: nowrap;
+
+  .tip-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 }
 
 .custom-empty {
   padding: 10px 0;
-  text-align: center;
   color: var(--theme-text-light-gray);
-  font-size: 14px;
+  font-size: 13px;
+  text-align: center;
 }
 
 .address-option {
@@ -44,268 +272,58 @@
   cursor: pointer;
 }
 
-.tip-row {
-  margin: -4px 0 18px 115px;
+.btn-wrap {
+  width: 100%;
   display: flex;
   align-items: center;
-  color: var(--theme-text-black);
-  opacity: 0.6;
-  font-size: 12px;
-
-  .tip-text {
-    padding-left: 4px;
-  }
+  gap: 10px;
 }
 
-.selection-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-
-.grid-row {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
-  padding: 6px 0;
-}
-
-.row-options {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+.rent-btn {
+  flex: 1;
   width: 100%;
-}
+  height: 38px;
+  margin: 0;
+  padding: 0 12px;
+  border: none;
+  border-radius: 3px;
+  background: var(--theme-bg-orange);
+  color: var(--theme-text-white);
+  font-size: 13px;
+  font-weight: 700;
 
-.pill {
-  @include pill-button;
-}
-
-.custom-input-wrapper {
-  margin-top: 12px;
-  padding: 16px;
-  background: var(--theme-time-bg-light);
-  border-radius: 8px;
-
-  .custom-form-item {
-    margin-bottom: 0;
-
-    :deep(.el-form-item__label) {
-      font-weight: 600;
-      color: var(--theme-text-black);
-    }
-
-    :deep(.el-input__suffix) {
-      color: var(--theme-text-muted);
-    }
-  }
-  
-  .max-count-hint {
-    margin-top: 8px;
-    font-size: 12px;
-    color: var(--theme-text-muted);
-  }
-}
-
-@media (max-width: 768px) {
-  .time-rental-page {
-    padding: 6px;
+  &:hover,
+  &:focus {
+    border-color: transparent;
+    background: #f45d0f;
+    color: var(--theme-text-white);
   }
 
-  .rental-wrapper {
-    width: 100%;
-    padding: 10px;
-  }
+  &.buy-btn {
+    background: var(--theme-bg-blue);
 
-  .selection-grid {
-    gap: 10px;
-    margin-bottom: 20px;
-  }
-
-  .grid-row {
-    gap: 6px;
-    padding: 4px 0;
-  }
-
-  .row-options {
-    gap: 8px;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .pill {
-    height: 38px;
-    font-size: 13px;
-    padding: 0 8px;
-    min-width: 0;
-  }
-
-  .custom-input-wrapper {
-    margin-top: 10px;
-    padding: 12px;
-
-    .custom-form-item {
-      :deep(.el-form-item__label) {
-        font-size: 13px;
-      }
-
-      :deep(.el-input__inner) {
-        height: 40px;
-        font-size: 14px;
-      }
-    }
-  }
-
-  .details-card {
-    .card-title {
-      font-size: 15px;
-      margin-bottom: 16px;
-    }
-  }
-
-  .tip-row {
-    margin-left: 0;
-  }
-
-  :deep(.el-form-item) {
-    margin-bottom: 16px;
-  }
-
-  :deep(.el-form-item__label) {
-    font-size: 13px;
-    padding-bottom: 6px;
-  }
-
-  :deep(.el-input__inner) {
-    font-size: 14px;
-    height: 40px;
-  }
-
-  .btn-wrap {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    width: 100%;
-
-    :deep(.el-button) {
-      width: 100%;
-      height: 44px !important;
-      font-size: 15px;
-      margin: 0 !important;
-      padding: 0 16px;
-      line-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-  }
-
-  :deep(.el-dialog) {
-    width: 90% !important;
-    max-width: 400px;
-    border-radius: 12px;
-    margin: auto;
-    position: relative;
-    top: 50%;
-    transform: translateY(-50%);
-  }
-
-  :deep(.el-dialog__header) {
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--theme-border-light);
-    margin: 0;
-  }
-
-  :deep(.el-dialog__title) {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--theme-text-black);
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 14px 16px 14px;
-    margin: 0;
-  }
-
-  .payment-dialog {
-    .payment-tips {
-      margin-bottom: 16px;
-      padding: 12px;
-      background: var(--theme-choose-orange-bg);
-      border-radius: 8px;
-      border: 1px solid var(--theme-choose-orange);
-
-      .tip-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 6px;
-        font-size: 12px;
-        font-weight: 500;
-        color: var(--theme-text-black);
-        margin-bottom: 8px;
-        line-height: 1.4;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        svg {
-          flex-shrink: 0;
-          margin-top: 1px;
-          width: 13px;
-          height: 13px;
-          color: var(--theme-choose-orange);
-        }
-
-        span {
-          flex: 1;
-        }
-      }
-    }
-
-    :deep(.qr-section) {
-      padding: 0 !important;
-      margin: 0 !important;
-
-      .section-title {
-        font-size: 15px;
-        font-weight: 600;
-        margin-bottom: 10px;
-      }
-
-      .qr-code {
-        margin: 0 auto 8px;
-      }
-
-      .wallet-address {
-        margin-top: 8px;
-        font-size: 12px;
-      }
-
-      .tips-info {
-        margin-top: 6px;
-        margin-bottom: 0;
-      }
+    &:hover,
+    &:focus {
+      background: #0f55e6;
     }
   }
 }
 
 .payment-dialog {
   .payment-tips {
-    padding: 12px;
-    background: var(--theme-choose-orange-bg);
-    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 14px 16px;
     border: 1px solid rgba(249, 115, 22, 0.3);
+    border-radius: 8px;
+    background: var(--theme-choose-orange-bg);
 
     .tip-item {
       display: flex;
       align-items: flex-start;
       gap: 6px;
-      font-size: 12px;
-      color: var(--theme-text-black);
       margin-bottom: 8px;
+      color: var(--theme-text-black);
+      font-size: 12px;
       line-height: 1.5;
 
       &:last-child {
@@ -325,14 +343,14 @@
   }
 
   .qr-section {
+    padding: 12px 0 16px;
     text-align: center;
-    padding: 16px 0;
 
     .section-title {
+      margin-bottom: 10px;
+      color: var(--theme-text-black);
       font-size: 16px;
       font-weight: 700;
-      color: var(--theme-text-black);
-      margin-bottom: 12px;
     }
 
     .wallet-address {
@@ -341,196 +359,212 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      font-size: 14px;
       color: var(--theme-text-black);
-
-      .address-text {
-        font-family: 'Courier New', monospace;
-        word-break: break-all;
-      }
+      font-size: 13px;
     }
   }
 }
 
-// PC端样式优化 - 使用主题颜色
 @media (min-width: 769px) {
   .payment-dialog {
     .payment-tips {
-      padding: 20px;
-      margin-bottom: 24px;
-      background: var(--theme-choose-orange-bg);
-      border: 2px solid var(--theme-choose-orange);
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+      padding: 18px;
 
       .tip-item {
-        font-size: 15px;
+        font-size: 14px;
         font-weight: 600;
-        margin-bottom: 12px;
-        line-height: 1.6;
-        color: var(--theme-text-black);
-
-        &:last-child {
-          margin-bottom: 0;
-        }
+        line-height: 1.5;
 
         svg {
-          width: 16px;
-          height: 16px;
-          margin-top: 3px;
-          color: var(--theme-choose-orange);
-        }
-
-        span {
-          flex: 1;
+          width: 15px;
+          height: 15px;
         }
       }
     }
   }
 }
 
-/* 适配 300px 超小屏幕 */
-@media (max-width: 360px) {
+@media (max-width: 890px) {
   .time-rental-page {
-    padding: 4px;
+    padding: 0 6px 24px;
   }
 
   .rental-wrapper {
-    padding: 8px;
+    width: 100%;
+    padding: 16px 14px 14px;
   }
 
   .selection-grid {
-    gap: 8px;
     margin-bottom: 16px;
   }
 
-  .grid-row {
-    gap: 5px;
-    padding: 3px 0;
-  }
-
   .row-options {
-    gap: 6px;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
   }
 
   .pill {
-    height: 34px;
-    font-size: 11px;
-    padding: 0 6px;
-    border-radius: 5px;
+    height: 54px;
+    padding: 6px 4px;
   }
 
-  .custom-input-wrapper {
-    margin-top: 8px;
-    padding: 10px;
+  .option-price {
+    font-size: 12px;
+  }
 
-    .custom-form-item {
-      :deep(.el-form-item__label) {
-        font-size: 12px;
-      }
-
-      :deep(.el-input__inner) {
-        height: 36px;
-        font-size: 13px;
-      }
-
-      :deep(.el-input__suffix) {
-        font-size: 12px;
-      }
-    }
-
-    .max-count-hint {
-      margin-top: 6px;
-      font-size: 11px;
-    }
+  .option-count {
+    font-size: 10px;
   }
 
   .details-card {
-    padding: 12px;
-
     .card-title {
-      font-size: 14px;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
+      font-size: 15px;
     }
+  }
+
+  .tip-row {
+    display: none;
   }
 
   :deep(.el-form-item) {
     margin-bottom: 12px;
   }
 
-  :deep(.el-form-item__label) {
-    font-size: 12px;
-    padding-bottom: 4px;
-  }
+  .details-form {
+    :deep(.el-form-item__label) {
+      display: none !important;
+    }
 
-  :deep(.el-input__inner) {
-    font-size: 13px;
-    height: 36px;
+    :deep(.el-form-item__content) {
+      margin-left: 0 !important;
+    }
   }
 
   .btn-wrap {
+    flex-direction: column;
     gap: 10px;
 
     :deep(.el-button) {
-      height: 40px !important;
-      font-size: 14px;
-      padding: 0 12px;
-      line-height: 40px;
+      flex: none;
+      width: 100%;
+      height: 42px;
+      margin: 0 !important;
     }
   }
 
   :deep(.el-dialog) {
-    width: 94% !important;
+    width: 90% !important;
+    max-width: 400px;
+    margin: auto;
     border-radius: 10px;
   }
 
   :deep(.el-dialog__header) {
-    padding: 10px 12px;
-  }
-
-  :deep(.el-dialog__title) {
-    font-size: 15px;
+    margin: 0;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--theme-border-light);
   }
 
   :deep(.el-dialog__body) {
-    padding: 12px;
+    margin: 0;
+    padding: 14px 16px;
   }
 
   .payment-dialog {
     .payment-tips {
-      margin-bottom: 12px;
-      padding: 10px;
-      border-radius: 6px;
+      margin-bottom: 14px;
+      padding: 11px;
 
       .tip-item {
         font-size: 11px;
-        gap: 5px;
-        margin-bottom: 6px;
-        line-height: 1.3;
-
-        svg {
-          width: 12px;
-          height: 12px;
-        }
       }
     }
 
     :deep(.qr-section) {
+      padding: 0 !important;
+
       .section-title {
         font-size: 14px;
-        margin-bottom: 8px;
       }
 
       .qr-code {
-        width: 160px !important;
-        height: 160px !important;
+        width: 172px !important;
+        height: 172px !important;
       }
 
       .wallet-address {
-        margin-top: 6px;
+        margin-top: 8px;
         font-size: 11px;
       }
     }
+  }
+
+  :deep(.tips-section) {
+    margin-top: 12px;
+    padding: 14px 12px;
+
+    .tips-title {
+      margin-bottom: 10px;
+      font-size: 13px;
+    }
+
+    .tips-list {
+      gap: 7px;
+    }
+
+    .tip-text {
+      font-size: 12px;
+    }
+  }
+}
+
+@media (min-width: 891px) {
+  :deep(.tips-section) {
+    margin-top: 12px;
+    padding: 12px;
+    border-radius: 3px;
+    background: #f8fafc;
+
+    .tips-title {
+      margin-bottom: 8px;
+      font-size: 12px;
+    }
+
+    .tips-list {
+      gap: 5px;
+    }
+
+    .tip-text {
+      font-size: 11px;
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .time-rental-page {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .rental-wrapper {
+    padding: 12px 10px;
+  }
+
+  .row-options {
+    gap: 6px;
+  }
+
+  .pill {
+    height: 48px;
+    border-radius: 3px;
+  }
+
+  .option-price {
+    font-size: 11px;
+  }
+
+  .option-count {
+    font-size: 9px;
   }
 }
