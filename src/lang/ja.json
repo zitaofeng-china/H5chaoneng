@@ -57,6 +57,14 @@
   },
   "home": {
     "title": "即時エネルギーレンタル",
+    "ecosystemTitle": "私たちのエネルギーデジタルエコシステム",
+    "ecosystemSubtitle": "エネルギーレンタルとコントラクト交換を一体化したプラットフォーム。スマートコントラクトによる自動決済、秒単位の資産交換、柔軟なレンタル期間で取引を簡素化します。",
+    "rentalSubtitle": "TRONエネルギー即時レンタル — 5秒で着金、送金手数料を削減",
+    "selectPlan": "プランを選択",
+    "enterAddressStep": "アドレスを確認",
+    "completePayment": "支払いを完了",
+    "chooseMode": "支払い方法",
+    "energyAmount": "エネルギー数量",
     "welfareOrder": "福利注文",
     "welfareOrderSubtitle": "期間限定エネルギーレンタル",
     "welfareInfo1": "下記のアドレスに{price} TRXを送金すると、TRXを差し引かずにUSDTを送金できます！",
@@ -236,6 +244,7 @@
   },
   "countRental": {
     "title": "件数レンタル",
+    "selectTier": "プランを選択",
     "rentalDetails": "レンタル詳細",
     "totalPrice": "合計価格",
     "walletAddress": "レンタルウォレット住所",
@@ -248,7 +257,8 @@
     "usdtTip3": "金額にご注意ください、誤った金額は1時間エネルギー配送として処理されます",
     "tips1": "1件エネルギー購入 = 130000",
     "tips2": "時間制限なし、送金ごとに1件控除",
-    "tips3": "毎日送金使用おすすめ"
+    "tips3": "毎日送金使用おすすめ",
+    "tips4": "24時間以内は1件分を差し引きません"
   },
   "hosting": {
     "title": "スマートホスティング",

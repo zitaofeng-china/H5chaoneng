@@ -57,6 +57,14 @@
   },
   "home": {
     "title": "Flash Rent Energy",
+    "ecosystemTitle": "Our Energy Digital Ecosystem",
+    "ecosystemSubtitle": "An all-in-one energy rental and contract exchange platform with automated smart-contract settlement, second-level asset exchange, flexible rental periods, and simpler digital asset workflows.",
+    "rentalSubtitle": "Instant TRON energy rental — arrive in 5 seconds, lower transfer fees",
+    "selectPlan": "Select Plan",
+    "enterAddressStep": "Confirm Address",
+    "completePayment": "Complete Payment",
+    "chooseMode": "Payment Mode",
+    "energyAmount": "Energy Amount",
     "welfareOrder": "Welfare Order",
     "welfareOrderSubtitle": "Limited Time Offer Energy Rental",
     "welfareInfo1": "Transfer {price} TRX to the address below, transfer USDT without deducting TRX!",
@@ -239,6 +247,7 @@
   },
   "countRental": {
     "title": "Rent by Count",
+    "selectTier": "Select Tier",
     "rentalDetails": "Rental Details",
     "totalPrice": "Total Price",
     "walletAddress": "Rental Wallet Address",
@@ -251,7 +260,8 @@
     "usdtTip3": "Please note the amount, incorrect amount will be treated as 1-hour energy delivery",
     "tips1": "Purchasing 1 count of energy is 130000",
     "tips2": "No time limit, deduct one count per transfer",
-    "tips3": "Recommended to transfer daily for use"
+    "tips3": "Recommended to transfer daily for use",
+    "tips4": "No count is deducted within 24 hours"
   },
   "hosting": {
     "title": "Smart Hosting",

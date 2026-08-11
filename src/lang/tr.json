@@ -57,6 +57,14 @@
   },
   "home": {
     "title": "Hızlı Enerji Kiralama",
+    "ecosystemTitle": "Enerji Dijital Ekosistemimiz",
+    "ecosystemSubtitle": "Akıllı sözleşme ile otomatik ödeme, saniyeler içinde varlık değişimi, esnek kiralama süresi ve daha kolay dijital işlemler sunan enerji kiralama ve sözleşme değişim platformu.",
+    "rentalSubtitle": "Anında TRON enerji kiralama — 5 saniyede teslim, daha düşük transfer ücretleri",
+    "selectPlan": "Plan seçin",
+    "enterAddressStep": "Adresi onayla",
+    "completePayment": "Ödemeyi tamamlayın",
+    "chooseMode": "Ödeme yöntemi",
+    "energyAmount": "Enerji miktarı",
     "welfareOrder": "Refah Siparişi",
     "welfareOrderSubtitle": "Sınırlı Süreli Enerji Kiralama Teklifi",
     "welfareInfo1": "Aşağıdaki adrese {price} TRX transfer edin, TRX düşmeden USDT transfer edin!",
@@ -237,6 +245,7 @@
   },
   "countRental": {
     "title": "Adete Göre Kiralama",
+    "selectTier": "Kademe seçin",
     "rentalDetails": "Kiralama Detayları",
     "totalPrice": "Toplam Fiyat",
     "walletAddress": "Kiralama Cüzdanı Adresi",
@@ -249,7 +258,8 @@
     "usdtTip3": "Lütfen miktara dikkat edin, yanlış miktar 1 saatlik enerji teslimatı olarak işlenecektir",
     "tips1": "1 adet enerji satın almak = 130000",
     "tips2": "Zaman sınırı yok, her transferde bir adet düşülür",
-    "tips3": "Günlük kullanım için transfer yapmanız önerilir"
+    "tips3": "Günlük kullanım için transfer yapmanız önerilir",
+    "tips4": "24 saat içinde bir adet düşülmez"
   },
   "hosting": {
     "title": "Akıllı Barındırma",

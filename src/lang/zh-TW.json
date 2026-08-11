@@ -56,6 +56,14 @@
   },
   "home": {
     "title": "閃租能量",
+    "ecosystemTitle": "我們的能量數字生態",
+    "ecosystemSubtitle": "一站式能量租賃 + 合約閃兌平台，全程智能合約自動兌付，資產秒級兌換，租期靈活可調，用數字化工具降低能源資產流轉成本，簡化交易流程。",
+    "rentalSubtitle": "TRON 網絡能量即時租賃，5 秒到賬，降低轉賬手續費",
+    "selectPlan": "選擇方案",
+    "enterAddressStep": "確認地址",
+    "completePayment": "完成支付",
+    "chooseMode": "選擇模式",
+    "energyAmount": "能量數量",
     "welfareOrder": "福利訂單",
     "welfareOrderSubtitle": "限時優惠能量租賃",
     "welfareInfo1": "向下方地址轉帳{price} TRX，轉帳USDT不扣TRX！",
@@ -235,6 +243,7 @@
   },
   "countRental": {
     "title": "按筆數租用",
+    "selectTier": "選擇檔位",
     "rentalDetails": "租用詳情",
     "totalPrice": "總價",
     "walletAddress": "租用錢包地址",
@@ -247,7 +256,8 @@
     "usdtTip3": "請注意金額，錯誤金額將當成1小時能量發貨",
     "tips1": "購買1筆能量數為130000",
     "tips2": "不限制使用時間，每轉帳一次扣一筆",
-    "tips3": "建議每天轉帳使用"
+    "tips3": "建議每天轉帳使用",
+    "tips4": "24小時不用扣一筆"
   },
   "hosting": {
     "title": "智能託管",

@@ -57,6 +57,14 @@
   },
   "home": {
     "title": "즉시 에너지 대여",
+    "ecosystemTitle": "우리의 에너지 디지털 생태계",
+    "ecosystemSubtitle": "에너지 대여와 계약 교환을 한곳에서 제공하며, 스마트 계약 자동 정산과 빠른 자산 교환, 유연한 대여 기간으로 거래 과정을 간소화합니다.",
+    "rentalSubtitle": "즉시 TRON 에너지 대여 — 5초 내 도착, 전송 수수료 절감",
+    "selectPlan": "요금제 선택",
+    "enterAddressStep": "주소 확인",
+    "completePayment": "결제 완료",
+    "chooseMode": "결제 방식",
+    "energyAmount": "에너지 수량",
     "welfareOrder": "복지 주문",
     "welfareOrderSubtitle": "기간 한정 에너지 대여",
     "welfareInfo1": "아래 주소로 {price} TRX를 송금하면 TRX를 차감하지 않고 USDT를 송금할 수 있습니다!",
@@ -236,6 +244,7 @@
   },
   "countRental": {
     "title": "건수당 대여",
+    "selectTier": "등급 선택",
     "rentalDetails": "대여 상세정보",
     "totalPrice": "총 가격",
     "walletAddress": "대여 지갑 주소",
@@ -248,7 +257,8 @@
     "usdtTip3": "금액에 주의하세요, 잘못된 금액은 1시간 에너지 배송으로 처리됩니다",
     "tips1": "1건 에너지 구매 = 130000",
     "tips2": "시간 제한 없음, 이체 시 1건 차감",
-    "tips3": "매일 이체 사용 권장"
+    "tips3": "매일 이체 사용 권장",
+    "tips4": "24시간 동안 1건이 차감되지 않습니다"
   },
   "hosting": {
     "title": "스마트 호스팅",
