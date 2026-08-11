@@ -1,13 +1,10 @@
 <template>
   <nav class="navbar">
+    <span class="navbar-grid" aria-hidden="true"></span>
     <div class="navbar-container">
       <div class="logo-section" @click.stop="handleToRouter('/')">
-        <div class="logo-icon">
-          <img src="@/assets/images/logo.png" alt="Logo" />
-        </div>
-        <div class="m-logo-icon">
-          <img src="@/assets/images/m-logo.png" alt="Logo" />
-        </div>
+        <img :src="gasLogoMark" alt="GAS711" class="logo-mark" />
+        <span class="logo-wordmark">GAS711</span>
       </div>
 
       <div class="nav-links">
@@ -16,7 +13,7 @@
           <el-dropdown 
             trigger="click"
             :hide-on-click="true"
-            placement="bottom-start"
+            placement="bottom"
             popper-class="energy-rental-popper-unique"
           >
             <span class="nav-link">
@@ -90,7 +87,7 @@
           <el-dropdown 
             trigger="click"
             :hide-on-click="true"
-            placement="bottom-start"
+            placement="bottom"
             popper-class="faq-popper-unique"
           >
             <span class="nav-link">
@@ -135,6 +132,15 @@
         </div>
       </div>
       <div class="right-section">
+        <button
+          v-if="tgAdmin"
+          type="button"
+          class="header-action"
+          :aria-label="$t('nav.contactUs')"
+          @click="handleOpenToTelegram(tgAdmin)"
+        >
+          <SvgIcon name="header-tg" width="18" height="18" />
+        </button>
         <div class="dropdown-popper-box lang-dropdown">
           <el-dropdown trigger="click" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
@@ -155,12 +161,16 @@
           </el-dropdown>
         </div>
 
-        <div class="balance-display" v-if="isLogin">
-          <div class="balance-info">
-            <SvgIcon name="trx" width="24" height="24" />
-            <div class="balance-amount">{{ trxBalance }}</div>
-          </div>
-        </div>
+        <button
+          v-if="isLogin"
+          type="button"
+          class="balance-recharge"
+          @click="handleRechange"
+        >
+          <SvgIcon name="header-USDT" width="16" height="16" class="balance-token-icon" />
+          <span class="balance-amount">{{ trxBalance }}</span>
+          <span class="recharge-text">{{ $t('common.recharge') }}</span>
+        </button>
 
         <div class="dropdown-popper-box user-dropdown" v-if="isLogin">
           <el-dropdown trigger="hover" :teleported="true" popper-class="user-popper">
@@ -186,9 +196,9 @@
           </el-dropdown>
         </div>
         <div class="no-login" v-else>
-          <div v-if="!isLite" class="login-btn btn" @click="handleLogin">
+          <button v-if="!isLite" type="button" class="login-btn btn" @click="handleLogin">
             {{ $t('login.title') }}
-          </div>
+          </button>
         </div>
         <div class="info-wrap" ref="menuBtn" v-if="isMobileView" @click="handleMenu('menu')">
           <div class="dropdown-popper-box">
@@ -311,7 +321,8 @@
 
 <script setup lang="ts">
 import vClickOutside from 'element-plus/es/directives/click-outside/index.mjs'
-import Avatar from '@/assets/icons/header/avatar.svg'
+import Avatar from '@/assets/icons/header/avatar-01.svg'
+import gasLogoMark from '@/assets/images/gas-logo-mark.png'
 import { useHeaderNav } from './useHeaderNav'
 
 defineOptions({
@@ -350,9 +361,10 @@ const {
 
 <style lang="scss" scoped>
 .navbar {
-  background: var(--theme-bg);
-  padding: 0 20px;
-  height: 66px;
+  background: #fff;
+  padding: 0 24px;
+  height: var(--layout-header-height, 50px);
+  min-height: var(--layout-header-height, 50px);
   display: flex;
   align-items: center;
   position: fixed;
@@ -360,120 +372,174 @@ const {
   right: 0;
   top: 0;
   z-index: 1000;
+  border-bottom: 0;
+  box-shadow: none;
+  box-sizing: border-box;
+}
+
+.navbar-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: #fff;
+  background-image:
+    var(--theme-home-band-1-color),
+    var(--theme-home-grid-vertical);
+  background-size:
+    100% var(--theme-home-band-height, 50px),
+    auto 300px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
+  -webkit-mask-image: var(--theme-home-grid-mask);
+  mask-image: var(--theme-home-grid-mask);
+  -webkit-mask-size: 100% calc(6 * var(--theme-home-band-height, 50px));
+  mask-size: 100% calc(6 * var(--theme-home-band-height, 50px));
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 .navbar-container {
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex: 0 0 auto;
+  gap: 8px;
+  min-width: 140px;
   cursor: pointer;
 }
 
-.logo-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
-.m-logo-icon {
-  display: none;
-}
-
-.logo-text {
-  color: #ffd700;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 1px;
+.logo-wordmark {
+  color: #334155;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 30px;
+  justify-content: center;
+  flex: 1;
+  gap: 28px;
+  height: 100%;
 
   .nav-link {
-    color: #fff;
+    color: #475467;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: color 0.3s ease;
-    padding: 5px 0;
+    gap: 4px;
+    height: 100%;
+    padding: 0;
     cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.2s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: #2f6df6;
+      opacity: 0;
+      transform: scaleX(0.35);
+      transform-origin: center;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
 
     &:active,
     &:focus {
       outline: none;
     }
 
-    &.is-active {
-      position: relative;
-      color: var(--theme-text-green);
+    &:hover {
+      color: #1766f5;
+    }
 
-      .el-icon--right {
-        color: var(--theme-text-green);
-      }
+    &.is-active {
+      color: #1766f5;
 
       &::after {
-        display: inline;
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        height: 2px;
-        width: 100%;
-        background-color: var(--theme-text-green);
-        transition: width 0.3s ease;
+        opacity: 1;
+        transform: scaleX(1);
       }
-      color: var(--theme-text-green);
+
+      .el-icon--right {
+        color: #1766f5;
+      }
     }
   }
 
   .dropdown-popper-box {
     position: relative;
+    height: 100%;
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      overflow: hidden;
-      border-radius: 50%;
+    :deep(.el-dropdown) {
+      height: 100%;
+      display: flex;
+      align-items: center;
     }
 
     &:hover,
     &.is-active {
-      color: var(--theme-text-green);
+      color: #1766f5;
 
       .el-icon--right {
-        color: var(--theme-text-green);
+        color: #1766f5;
       }
 
-      .nav-link-text {
-        position: relative;
+      .nav-link {
+        color: #1766f5;
 
         &::after {
-          display: inline;
-          content: '';
-          position: absolute;
-          bottom: -8px;
-          left: 0;
-          height: 2px;
-          width: 100%;
-          background-color: var(--theme-text-green);
-          transition: width 0.3s ease;
+          opacity: 1;
+          transform: scaleX(1);
         }
-        color: var(--theme-text-green);
       }
+    }
+  }
+}
+
+.energy-rental-dropdown {
+  .nav-link::after {
+    right: auto;
+    left: 50%;
+    width: 56px;
+    transform: translateX(-50%) scaleX(0.35);
+  }
+
+  &:hover,
+  &.is-active {
+    .nav-link::after {
+      transform: translateX(-50%) scaleX(1) !important;
     }
   }
 }
@@ -486,120 +552,125 @@ const {
   }
 }
 
-/* 能量租赁下拉菜单样式 */
-.energy-rental-popper-unique {
-  z-index: 2000 !important;
-}
-
-/* 常见问题下拉菜单样式 */
-.faq-popper-unique {
-  z-index: 2001 !important;
-}
-
-:deep(.el-dropdown-menu) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-}
-
-:deep(.el-dropdown-menu__item) {
-  transition: all 0.3s ease !important;
-  justify-content: center;
-
-  &:hover,
-  &.is-active {
-    background: var(--theme-bg-dark) !important;
-    color: var(--theme-text-gray) !important;
-    border-radius: 2px;
-  }
-}
-
-:deep(.el-dropdown-menu__item--divided) {
-  border-top-color: #444 !important;
-}
-
-:deep(.el-popper.is-dark .el-popper__arrow::before) {
-  background-color: #2a2a3e !important;
-  border: 1px solid #444 !important;
-}
-
 :deep(.el-tooltip__trigger:focus),
 :deep(.el-tooltip__trigger:focus-visible),
 :deep(.el-dropdown-link:focus) {
   outline: none !important;
 }
 
-@media (max-width: 890px) {
-  :deep(.el-dropdown-menu) {
-    min-width: auto !important;
-    max-width: none !important;
-    padding: 0 !important;
-    max-height: none !important;
-    overflow: visible !important;
-  }
-
-  :deep(.el-dropdown-menu__item) {
-    font-size: 13px !important;
-    padding: 8px 16px !important;
-    min-height: auto !important;
-    line-height: 1.4 !important;
-  }
-}
-
 .right-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex: 0 0 auto;
+  gap: 10px;
 
-  .info-wrap {
-    min-width: 40px;
-    height: 40px;
+  .header-action {
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--theme-bg-gray);
-    border-radius: 4px;
+    border: 1px solid rgba(23, 102, 245, 0.65);
+    border-radius: 8px;
+    background: #fff;
+    color: #1766f5;
+    font: inherit;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
 
     &:hover {
-      opacity: 0.8;
+      background: #eef4ff;
+      border-color: #1766f5;
+    }
+
+    .svg-icon {
+      filter: brightness(0) saturate(100%) invert(28%) sepia(99%) saturate(3464%) hue-rotate(216deg)
+        brightness(96%) contrast(104%);
+    }
+  }
+
+  .info-wrap {
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1px solid rgba(23, 102, 245, 0.65);
+    border-radius: 8px;
+    color: #1766f5;
+    font: inherit;
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+
+    &:hover {
+      background: #eef4ff;
+      border-color: #1766f5;
+    }
+
+    .svg-icon {
+      filter: brightness(0) saturate(100%) invert(28%) sepia(99%) saturate(3464%) hue-rotate(216deg)
+        brightness(96%) contrast(104%);
     }
   }
 }
 
-.balance-display {
-  padding: 0 5px;
-  min-width: 40px;
-  height: 40px;
-  display: flex;
+/* 图 2：蓝底余额区 + 独立白色充值按钮 */
+.balance-recharge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  background: var(--theme-bg-gray);
+  gap: 7px;
+  height: 28px;
+  padding: 2px 4px 2px 7px;
+  border: 1px solid #1766f5;
   border-radius: 4px;
-  color: var(--theme-text-white);
-  font-size: 14px;
-
-  .balance-info {
-    padding: 0 20px 0 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.recharge-btn {
-  padding: 0 5px;
-  min-width: 70px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--theme-bg-blue);
-  border-radius: 4px;
+  background: #1766f5;
+  color: #fff;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    opacity: 0.8;
+    background: #0f5de7;
+    box-shadow: 0 2px 8px rgba(23, 102, 245, 0.12);
+
+    .recharge-text {
+      background: #f5f8ff;
+    }
+  }
+
+  .balance-token-icon {
+    width: 14px;
+    height: 14px;
+    flex: 0 0 14px;
+  }
+
+  .balance-amount {
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .recharge-text {
+    min-width: 48px;
+    height: 22px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 3px;
+    background: #fff;
+    color: #1766f5;
+    font-size: 11px;
+    font-weight: 600;
   }
 }
 
@@ -608,15 +679,26 @@ const {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    opacity: 0.7;
+    opacity: 0.88;
   }
 
   &:active,
   &:focus {
     outline: none;
+  }
+
+  .user-avatar {
+    width: 36px;
+    height: 36px;
+    box-sizing: border-box;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid #ff8a3d;
+    box-shadow: 0 0 0 1px rgba(23, 102, 245, 0.2);
+    background: #e8f1ff;
   }
 }
 
@@ -624,21 +706,27 @@ const {
   display: flex;
   align-items: center;
   gap: 10px;
-  color: var(--theme-text-white);
+  color: #344054;
 
   .btn {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font-family: inherit;
+    font-size: 12px;
     cursor: pointer;
 
     &:hover {
-      color: var(--theme-text-green);
+      color: #165dff;
     }
   }
 }
 
 .collapse-container {
-  max-height: calc(100vh - 44px);
+  max-height: calc(100vh - var(--layout-header-height, 50px));
   position: fixed;
-  top: 44px;
+  top: var(--layout-header-height, 50px);
   left: 0;
   right: 0;
   z-index: 99;
@@ -714,11 +802,11 @@ const {
     // 我们自定义的路由激活状态（显示绿色）
     &.route-active {
       .el-collapse-item__header {
-        background: rgba(54, 211, 153, 0.08);
+        background: rgba(22, 93, 255, 0.08);
       }
 
       .el-collapse-item__title {
-        color: var(--theme-text-green);
+        color: #165dff;
       }
     }
 
@@ -772,7 +860,7 @@ const {
         transform: translateY(-50%);
         width: 3px;
         height: 3px;
-        background: var(--theme-text-green);
+        background: #165dff;
         border-radius: 50%;
         opacity: 0;
         transition: all 0.3s ease;
@@ -787,8 +875,8 @@ const {
       }
 
       &.is-active {
-        color: var(--theme-text-green);
-        background: rgba(54, 211, 153, 0.08);
+        color: #165dff;
+        background: rgba(22, 93, 255, 0.08);
         font-weight: 600;
 
         &::before {
@@ -801,7 +889,8 @@ const {
 
 @media (max-width: 890px) {
   .navbar {
-    height: 54px;
+    height: var(--layout-header-height, 50px);
+    min-height: var(--layout-header-height, 50px);
     padding: 0 10px;
   }
 
@@ -814,17 +903,18 @@ const {
     font-size: 12px;
   }
   
-  .logo-icon {
-    display: none;
+  .logo-section {
+    min-width: 108px;
+    gap: 6px;
   }
 
-  .m-logo-icon {
-    display: flex;
-    
-    img {
-      height: 30px;
-      width: auto;
-    }
+  .logo-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .logo-wordmark {
+    font-size: 14px;
   }
   
   .nav-links {
@@ -837,130 +927,45 @@ const {
     justify-content: flex-end;
 
     .info-wrap {
-      min-width: 34px;
-      height: 34px;
+      min-width: 30px;
+      width: 30px;
+      height: 30px;
+      box-sizing: border-box;
       
       svg {
         width: 19px;
         height: 19px;
       }
     }
-  }
 
-  .balance-display {
-    min-width: auto;
-    height: 34px;
-    padding: 0 3px;
-    font-size: 12px;
-
-    .balance-info {
-      padding: 0 6px 0 5px;
-      gap: 4px;
-      
-      svg {
-        width: 18px;
-        height: 18px;
-      }
-    }
-    
-    .balance-amount {
-      font-size: 12px;
-      max-width: 55px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-  }
-
-  .recharge-btn {
-    min-width: 56px;
-    height: 26px;
-    padding: 0 6px;
-    
-    .text {
-      font-size: 11px;
-      white-space: nowrap;
-    }
-  }
-
-  .user-icon {
-    .user-avatar {
-      width: 34px;
-      height: 34px;
-    }
-  }
-
-  .no-login {
-    .btn {
-      font-size: 12px;
-      white-space: nowrap;
-    }
-  }
-  
-  .collapse-container {
-    top: 54px;
-    max-height: calc(100vh - 54px);
-  }
-}
-
-/* 适配 300px 超小屏幕 */
-@media (max-width: 360px) {
-  .navbar {
-    height: 50px;
-    padding: 0 6px;
-  }
-
-  .navbar-container {
-    gap: 4px;
-  }
-
-  .m-logo-icon {
-    img {
-      height: 26px;
-    }
-  }
-
-  .right-section {
-    gap: 3px;
-
-    .info-wrap {
-      min-width: 30px;
+    .header-action {
+      width: 30px;
       height: 30px;
-      
-      svg {
-        width: 17px;
-        height: 17px;
-      }
     }
   }
 
-  .balance-display {
+  .balance-recharge {
     height: 30px;
-    padding: 0 2px;
+    padding: 2px 4px 2px 6px;
+    gap: 4px;
     font-size: 11px;
 
-    .balance-info {
-      padding: 0 4px 0 3px;
-      gap: 3px;
-      
-      svg {
-        width: 16px;
-        height: 16px;
-      }
+    .balance-token-icon {
+      width: 14px;
+      height: 14px;
+      flex-basis: 14px;
     }
-    
-    .balance-amount {
-      font-size: 11px;
-      max-width: 45px;
-    }
-  }
 
-  .recharge-btn {
-    min-width: 48px;
-    height: 24px;
-    padding: 0 4px;
-    
-    .text {
+    .balance-amount {
+      max-width: 64px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .recharge-text {
+      min-width: 38px;
+      height: 24px;
+      padding: 0 6px;
       font-size: 10px;
     }
   }
@@ -973,6 +978,96 @@ const {
   }
 
   .no-login {
+    .btn {
+      font-size: 12px;
+      white-space: nowrap;
+    }
+  }
+  
+  .collapse-container {
+    top: var(--layout-header-height, 50px);
+    max-height: calc(100vh - var(--layout-header-height, 50px));
+  }
+}
+
+/* 适配 300px 超小屏幕 */
+@media (max-width: 360px) {
+  .navbar {
+    height: var(--layout-header-height, 50px);
+    min-height: var(--layout-header-height, 50px);
+    padding: 0 6px;
+  }
+
+  .navbar-container {
+    gap: 4px;
+  }
+
+  .logo-section {
+    min-width: 92px;
+    gap: 5px;
+  }
+
+  .logo-mark {
+    width: 22px;
+    height: 22px;
+  }
+
+  .logo-wordmark {
+    font-size: 13px;
+  }
+
+  .right-section {
+    gap: 3px;
+
+    .info-wrap {
+      min-width: 30px;
+      width: 30px;
+      height: 30px;
+      
+      svg {
+        width: 17px;
+        height: 17px;
+      }
+    }
+
+    .header-action {
+      width: 30px;
+      height: 30px;
+    }
+  }
+
+  .balance-recharge {
+    height: 28px;
+    padding: 2px 3px 2px 5px;
+    gap: 3px;
+    font-size: 10px;
+
+    .balance-token-icon {
+      width: 13px;
+      height: 13px;
+      flex-basis: 13px;
+    }
+
+    .balance-amount {
+      max-width: 48px;
+    }
+
+    .recharge-text {
+      min-width: 34px;
+      height: 22px;
+      padding: 0 5px;
+      font-size: 9px;
+    }
+  }
+
+  .user-icon {
+    .user-avatar {
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  .no-login {
     gap: 3px;
     font-size: 11px;
 
@@ -982,8 +1077,8 @@ const {
   }
   
   .collapse-container {
-    top: 50px;
-    max-height: calc(100vh - 50px);
+    top: var(--layout-header-height, 50px);
+    max-height: calc(100vh - var(--layout-header-height, 50px));
 
     :deep(.el-collapse) {
       padding: 8px 10px 10px;
@@ -1027,6 +1122,76 @@ const {
           height: 2.5px;
         }
       }
+    }
+  }
+}
+</style>
+
+<!-- teleported 下拉挂载到 body，需全局样式 -->
+<style lang="scss">
+.energy-rental-popper-unique,
+.faq-popper-unique {
+  z-index: 2001 !important;
+
+  .el-dropdown-menu {
+    min-width: 104px !important;
+    padding: 6px !important;
+    border: 1px solid #e8edf5 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 28px rgba(24, 45, 78, 0.12) !important;
+  }
+
+  .el-dropdown-menu__item {
+    min-height: 32px;
+    margin: 0;
+    padding: 0 12px !important;
+    border-radius: 6px !important;
+    color: #475467 !important;
+    font-size: 13px !important;
+    line-height: 32px !important;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: #f0f5ff !important;
+      color: #1766f5 !important;
+    }
+
+    &.is-active {
+      color: #fff !important;
+      background: #1766f5 !important;
+      font-weight: 600;
+    }
+  }
+}
+
+/* 能量租赁菜单的当前路由只保留文字状态，避免整项蓝底抢占导航下划线 */
+.energy-rental-popper-unique .el-dropdown-menu__item.is-active {
+  color: #475467 !important;
+  background: transparent !important;
+  font-weight: 400 !important;
+
+  &:hover {
+    color: #1766f5 !important;
+    background: #f0f5ff !important;
+  }
+}
+
+.lang-popper,
+.user-popper {
+  .el-dropdown-menu {
+    border: 1px solid #e8edf5 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 28px rgba(24, 45, 78, 0.12) !important;
+  }
+
+  .el-dropdown-menu__item {
+    color: #475467 !important;
+
+    &:hover,
+    &.is-active {
+      background: #f0f5ff !important;
+      color: #1766f5 !important;
     }
   }
 }

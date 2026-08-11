@@ -131,7 +131,8 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .app-shell {
-  padding-top: 66px;
+  --layout-header-height: var(--theme-home-band-height, 50px);
+  padding-top: var(--layout-header-height);
   overflow: hidden;
   overflow-y: auto;
   min-height: 100vh;
@@ -143,7 +144,15 @@ onUnmounted(() => {
 
 @media (max-width: 890px) {
   .app-shell:not(.is-404) {
-    padding-top: 54px;
+    --layout-header-height: var(--theme-home-band-height, 50px);
+    padding-top: var(--layout-header-height);
+  }
+}
+
+@media (max-width: 360px) {
+  .app-shell:not(.is-404) {
+    --layout-header-height: var(--theme-home-band-height, 50px);
+    padding-top: var(--layout-header-height);
   }
 }
 </style>
