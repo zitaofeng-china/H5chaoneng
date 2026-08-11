@@ -78,7 +78,9 @@
               <template #prefix>{{ t('lease.unitPrice') }}</template>
               <template #suffix> {{ t('common.trx') }} </template>
             </el-input>
-            <el-input :model-value="unitPriceDisplay + ' ' + t('common.trx')" disabled v-else />
+            <el-input :model-value="unitPriceDisplay" disabled v-else>
+              <template #suffix>{{ t('common.trx') }}</template>
+            </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.count')" prop="count">
@@ -86,7 +88,9 @@
               <template #prefix>{{ t('lease.count') }}</template>
               <template #suffix> {{ t('common.purchase') }} </template>
             </el-input>
-            <el-input :model-value="count + ' ' + t('common.purchase')" disabled v-else />
+            <el-input :model-value="count" disabled v-else>
+              <template #suffix>{{ t('common.purchase') }}</template>
+            </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.totalPrice')" prop="total">
@@ -101,7 +105,9 @@
               <template #prefix>{{ t('lease.validity') }}</template>
               <template #suffix> {{ validityUnit }} </template>
             </el-input>
-            <el-input :model-value="validity + ' ' + validityUnit" disabled v-else />
+            <el-input :model-value="validity" disabled v-else>
+              <template #suffix>{{ validityUnit }}</template>
+            </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.singleEnergy')" prop="energy">
@@ -109,7 +115,9 @@
               <template #prefix v-if="isMobile">{{ t('lease.singleEnergy') }}</template>
               <template #suffix> {{ t('common.w') }} </template>
             </el-input>
-            <el-input :model-value="energy + ' ' + t('common.w')" disabled v-else />
+            <el-input :model-value="energy" disabled v-else>
+              <template #suffix>{{ t('common.w') }}</template>
+            </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.totalEnergy')" prop="totalEnergy">
@@ -117,7 +125,9 @@
               <template #prefix v-if="isMobile">{{ t('lease.totalEnergy') }}</template>
               <template #suffix> {{ t('common.w') }} </template>
             </el-input>
-            <el-input :model-value="totalEnergy + ' ' + t('common.w')" disabled v-else />
+            <el-input :model-value="totalEnergy" disabled v-else>
+              <template #suffix>{{ t('common.w') }}</template>
+            </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.walletAddress')" prop="wallet">
@@ -126,7 +136,7 @@
 
           <el-form-item>
             <el-button type="primary" class="rent-btn" @click="rentNow">
-              {{ t('lease.rentNowButton') }}({{ totalDisplay }}TRX)
+              {{ t('lease.rentNowButton') }} ({{ totalDisplay }} {{ t('common.trx') }})
             </el-button>
           </el-form-item>
         </el-form>
@@ -140,8 +150,9 @@
       width="400px"
       :close-on-click-modal="false"
       align-center
+      class="custom-count-dialog"
     >
-      <el-form :model="customForm" :rules="customRules" ref="customFormRef" label-width="80px">
+      <el-form :model="customForm" :rules="customRules" ref="customFormRef" label-width="36px">
         <el-form-item :label="t('lease.count')" prop="count">
           <el-input
             v-model.number="customForm.count"
@@ -565,62 +576,306 @@ const rentNow = async () => {
 @use '@/assets/styles/detail-form.scss';
 
 .time-rental-page {
-  padding: 18px;
   display: flex;
   justify-content: center;
+  padding: 2px 0 32px;
 }
 
 .rental-wrapper {
   @include rental-card;
-}
 
-.title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 6px 0 12px;
+  box-sizing: border-box;
+  width: min(680px, 100%);
+  max-width: 100%;
+  padding: 18px;
 }
 
 .selection-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  margin-bottom: 18px;
 }
 
 .grid-row {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  padding: 6px 0;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid #eef1f5;
+  border-radius: 4px;
+  background: #fbfcfe;
 }
 
 .row-label {
+  display: flex;
+  align-items: center;
+  min-height: 14px;
   width: 100%;
-  color: #6b7280;
-  font-size: 13px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  :deep(svg) {
+    flex: 0 0 auto;
+    margin-right: 4px;
+  }
 }
 
 .row-options {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
   width: 100%;
 }
 
 .pill {
-  @include pill-button;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 3px;
+  border: none;
+  border-radius: 3px;
+  background: #f0f2f4;
+  color: #98a2b3;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+
+  &:hover {
+    background: #e8ebef;
+    color: #667085;
+  }
+
+  &.active {
+    background: var(--theme-bg-blue);
+    color: var(--theme-text-white);
+    box-shadow: 0 2px 5px rgba(22, 93, 255, 0.12);
+  }
+}
+
+.details-card {
+  margin-top: 0;
+
+  .card-title {
+    margin: 0 0 14px;
+    color: var(--theme-text-dark);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+  }
+}
+
+.details-form {
+  :deep(.el-form-item) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 8px;
+  }
+
+  :deep(.el-form-item__label) {
+    box-sizing: border-box;
+    width: 100% !important;
+    height: auto;
+    min-height: 14px;
+    padding: 0 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: #344054;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: left;
+  }
+
+  :deep(.el-form-item__content) {
+    min-height: 0;
+    margin-left: 0 !important;
+    line-height: 1;
+  }
+
+  :deep(.el-input) {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper) {
+    min-height: 34px;
+    padding: 1px 10px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 0 1px #e1e6ee inset;
+  }
+
+  :deep(.el-input.is-disabled .el-input__wrapper) {
+    background: #f1f3f5;
+    box-shadow: none;
+  }
+
+  :deep(.el-input__inner) {
+    height: 32px;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 600;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input.is-disabled .el-input__inner) {
+    color: #344054;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input__suffix),
+  :deep(.el-input__prefix) {
+    color: #667085;
+    font-size: 11px;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper) {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
+}
+
+:deep(.rent-btn) {
+  width: 100%;
+  height: 38px;
+  margin-top: 4px;
+  border: none;
+  border-radius: 3px;
+  background: var(--theme-bg-orange);
+  color: var(--theme-text-white);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+:deep(.custom-count-dialog) {
+  align-self: center;
+  height: auto !important;
+  min-height: 0;
+  max-height: calc(100vh - 80px);
+  overflow: visible;
+  width: 320px !important;
+  margin: 0 auto;
+  padding: 0;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.18);
+
+  .el-dialog__header {
+    margin: 0;
+    padding: 9px 12px 7px;
+  }
+
+  .el-dialog__title {
+    color: #1f2937;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .el-dialog__headerbtn {
+    top: 8px;
+    right: 8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 4px;
+    background: #eef0f3;
+
+    .el-dialog__close {
+      color: #667085;
+      font-size: 13px;
+    }
+  }
+
+  .el-dialog__body {
+    margin: 0;
+    padding: 3px 12px 8px;
+  }
+
+  .el-form-item {
+    margin-bottom: 0;
+  }
+
+  .el-form-item__label {
+    width: 36px !important;
+    height: 28px;
+    padding: 0 6px 0 0;
+    overflow: visible;
+    white-space: nowrap;
+    color: #475467;
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 28px;
+  }
+
+  .el-form-item__content {
+    min-width: 0;
+    margin-left: 0 !important;
+    line-height: 1;
+  }
+
+  .el-input__wrapper {
+    min-height: 28px;
+    padding: 0 8px;
+    border-radius: 2px;
+    box-shadow: 0 0 0 1px #dfe4eb inset;
+  }
+
+  .el-input__inner {
+    height: 26px;
+    color: #344054;
+    font-size: 11px;
+  }
+
+  .el-input__suffix {
+    color: #98a2b3;
+    font-size: 10px;
+  }
+
+  .el-form-item.is-error .el-input__wrapper {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
+
+  .el-dialog__footer {
+    padding: 5px 12px 10px;
+    display: flex;
+    gap: 6px;
+  }
+
+  .el-button {
+    flex: 1;
+    min-width: 0;
+    height: 28px;
+    margin: 0 !important;
+    padding: 0 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 500;
+  }
+
+  .el-button--primary {
+    border-color: var(--theme-bg-blue);
+    background: var(--theme-bg-blue);
+  }
 }
 
 @media (max-width: 768px) {
   .time-rental-page {
-    padding: 6px;
+    padding: 2px 6px 24px;
   }
 
   .rental-wrapper {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
   }
 
   .selection-grid {
@@ -637,80 +892,58 @@ const rentNow = async () => {
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
 
-      .selection-label {
+    .selection-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #344054;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    :deep(.el-select) {
+      width: 100%;
+
+      .el-input__wrapper {
+        min-height: 38px;
+        padding: 0 10px;
+        border: 1px solid #e1e6ee;
+        border-radius: 3px;
+        background: #fff;
+        box-shadow: none;
+      }
+
+      .el-input__inner {
+        height: 38px;
+        color: #344054;
         font-size: 13px;
-        font-weight: 600;
-        color: #374151;
-        display: flex;
-        align-items: center;
-        gap: 4px;
       }
+    }
 
-      :deep(.el-select) {
-        width: 100%;
+    .row-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
 
-        .el-input__wrapper {
-          background: rgba(2, 15, 45, 0.03);
-          border-radius: 4px;
-          box-shadow: none;
-          border: 1px solid rgba(2, 15, 45, 0.08);
-          padding: 0 12px;
-          min-height: 42px;
-        }
+    .pill {
+      height: 36px;
+      padding: 0 8px;
+      font-size: 12px;
 
-        .el-input__inner {
-          height: 42px;
-          font-size: 14px;
-          color: var(--theme-text-black);
-        }
-      }
-
-      .row-options {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-        width: 100%;
-      }
-
-      .pill {
-        height: 36px;
-        font-size: 13px;
-        padding: 0 8px;
-        min-width: 0;
-        flex: 1 1 calc(50% - 3px);
-        font-weight: 500;
-        background: rgba(2, 15, 45, 0.03);
-        border: 1px solid rgba(2, 15, 45, 0.08);
-        border-radius: 4px;
-        color: #374151;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        &:hover {
-          background: rgba(2, 15, 45, 0.05);
-        }
-
-        &.active {
-          background: var(--theme-bg-blue);
-          color: white;
-          border-color: var(--theme-bg-blue);
-        }
-
-        &:last-child {
-          flex: 1 1 100%;
-        }
+      &:last-child {
+        grid-column: 1 / -1;
       }
     }
   }
 
   .details-card {
     .card-title {
-      font-size: 15px;
       margin-bottom: 14px;
+      font-size: 15px;
     }
   }
 
@@ -718,20 +951,13 @@ const rentNow = async () => {
     margin-bottom: 8px;
   }
 
-  :deep(.el-form-item__label) {
-    font-size: 13px;
-    padding-bottom: 0;
-  }
-
   :deep(.el-input__inner) {
-    font-size: 15px;
-    height: 36px;
-    font-weight: 500;
+    font-size: 13px;
   }
 
   :deep(.el-input__prefix),
   :deep(.el-input__suffix) {
-    font-size: 14px;
+    font-size: 12px;
   }
 
   :deep(.el-input__wrapper) {
@@ -739,31 +965,78 @@ const rentNow = async () => {
   }
 
   :deep(.rent-btn) {
-    width: 100%;
     height: 42px;
-    font-size: 14px;
     margin-top: 6px;
+    font-size: 13px;
   }
 
-  :deep(.el-dialog) {
-    width: 90% !important;
-    max-width: 400px;
-  }
+  :deep(.custom-count-dialog) {
+    width: 230px !important;
 
-  :deep(.el-dialog__body) {
-    padding: 16px;
-  }
+    .el-dialog__header {
+      padding: 10px 10px 8px;
+    }
 
-  :deep(.el-dialog__header) {
-    padding: 14px 16px;
-  }
+    .el-dialog__title {
+      font-size: 10px;
+      line-height: 12px;
+    }
 
-  :deep(.el-dialog__title) {
-    font-size: 15px;
-  }
+    .el-dialog__headerbtn {
+      top: 7px;
+      right: 8px;
+      width: 18px;
+      height: 18px;
 
-  :deep(.el-dialog__footer) {
-    padding: 12px 16px;
+      .el-dialog__close {
+        font-size: 11px;
+      }
+    }
+
+    .el-dialog__body {
+      padding: 4px 9px 7px;
+    }
+
+    .el-form-item {
+      height: 18px;
+    }
+
+    .el-form-item__label {
+      width: 28px !important;
+      height: 18px;
+      padding-right: 4px;
+      overflow: visible;
+      white-space: nowrap;
+      font-size: 9px;
+      line-height: 18px;
+    }
+
+    .el-input__wrapper {
+      height: 18px;
+      min-height: 18px;
+      padding: 0 5px;
+    }
+
+    .el-input__inner {
+      height: 16px;
+      font-size: 10px;
+    }
+
+    .el-input__suffix {
+      font-size: 9px;
+    }
+
+    .el-dialog__footer {
+      padding: 7px 9px 7px;
+      gap: 5px;
+    }
+
+    .el-button {
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 2px;
+      font-size: 9px;
+    }
   }
 }
 </style>
