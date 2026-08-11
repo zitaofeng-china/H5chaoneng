@@ -10,8 +10,8 @@
       @close="handleClose"
     >
       <div class="register-container">
-        <div class="register-left">
-          <LoginBackground />
+        <div class="register-background" aria-hidden="true">
+          <img :src="RegisterBg" alt="" class="register-bg" />
         </div>
 
         <div class="register-right">
@@ -129,10 +129,8 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
-import { useCommonStore } from '@/stores/useCommonStore'
 import { useRegisterForm } from '@/hooks/useRegisterForm'
-import LoginBackground from '@/components/logo/LoginBackground.vue'
+import RegisterBg from '@/assets/images/register-bg.png'
 import { getPopup } from '@/plugins/popupRegistry'
 import type { RegisterEmits } from './types'
 
@@ -141,8 +139,6 @@ defineOptions({
 })
 
 const emit = defineEmits<RegisterEmits>()
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
 
 const {
   visible,

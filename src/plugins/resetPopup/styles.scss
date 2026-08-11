@@ -50,27 +50,45 @@
 }
 
 .reset-container {
+  position: relative;
+  min-height: 485px;
   display: flex;
+  justify-content: flex-end;
 }
 
-.reset-left {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
+.reset-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+
+  .reset-bg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 .reset-right {
-  flex: 1;
+  position: relative;
+  z-index: 1;
+  flex: 0 0 50%;
+  width: 50%;
+  box-sizing: border-box;
+  margin-left: auto;
   padding: 50px 24px 0;
   display: flex;
   flex-direction: column;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .reset-header {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 50px;
+  margin-bottom: 40px;
 
   .reset-title {
     font-size: 34px;
@@ -85,7 +103,7 @@
   flex-direction: column;
 
   .el-form-item {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 
     .input-wrapper {
       flex: 1;
@@ -133,7 +151,7 @@
 }
 
 .reset-btn {
-  margin-top: 30px;
+  margin-top: 10px;
   width: 100%;
   height: 50px;
   font-size: 18px;
@@ -164,6 +182,26 @@
   }
 }
 
+.login-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: -8px;
+  color: var(--theme-text-gray);
+  font-size: 14px;
+
+  :deep(.el-link) {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-bg-blue);
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
 // 移动端适配
 @media (max-width: 768px) {
   .reset-dialog {
@@ -175,9 +213,28 @@
     flex-direction: column;
   }
 
+  .reset-background {
+    position: relative;
+    inset: auto;
+    display: block;
+    flex: 0 0 240px;
+    width: 100%;
+    height: 240px;
+
+    :deep(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+  }
+
   .reset-right {
-    flex: 1;
-    padding: 20px 24px;
+    flex: none;
+    width: 100%;
+    margin-left: 0;
+    padding: 24px 20px 32px;
+    background: var(--theme-bg-white);
   }
 
   .reset-header {
@@ -190,7 +247,21 @@
 
   .reset-form {
     .el-form-item {
-      margin-bottom: 20px;
+      margin-bottom: 14px;
+
+      .input-wrapper {
+        .custom-input {
+          height: 44px;
+
+          :deep(.el-input__wrapper) {
+            padding: 10px 12px;
+          }
+
+          :deep(.el-input__inner) {
+            font-size: 14px;
+          }
+        }
+      }
     }
   }
 
@@ -198,5 +269,14 @@
     height: 44px;
     margin-top: 0;
     font-size: 14px;
+  }
+
+  .login-link {
+    margin-top: 0;
+    font-size: 13px;
+
+    :deep(.el-link) {
+      font-size: 13px;
+    }
   }
 }

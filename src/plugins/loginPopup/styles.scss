@@ -50,20 +50,38 @@
 }
 
 .login-container {
+  position: relative;
+  min-height: 485px;
   display: flex;
+  justify-content: flex-end;
 }
 
-.login-left {
-  flex: 1;
-  display: flex;
-  align-items: flex-start;
+.login-background {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+
+  .login-bg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
 }
 
 .login-right {
-  flex: 1;
-  padding: 50px 24px;
+  position: relative;
+  z-index: 1;
+  flex: 0 0 50%;
+  width: 50%;
+  box-sizing: border-box;
+  margin-left: auto;
+  padding: 50px 24px 0;
   display: flex;
   flex-direction: column;
+  background: rgba(255, 255, 255, 0.72);
 }
 
 .login-header {
@@ -85,10 +103,10 @@
   flex-direction: column;
 
   .el-form-item {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 
     &:last-of-type {
-      margin-bottom: 28px;
+      margin-bottom: 16px;
     }
 
     .input-wrapper {
@@ -152,7 +170,7 @@
 }
 
 .form-actions {
-  margin-bottom: 50px;
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -264,14 +282,27 @@
 .register-link {
   display: flex;
   justify-content: center;
+  margin-top: 0;
 
-  :deep(.el-link) {
+  .register-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 50px;
+    margin: 0;
+    border-radius: 8px;
+    border-color: var(--theme-bg-blue) !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    color: var(--theme-bg-blue) !important;
     font-size: 16px;
     font-weight: 600;
-    color: var(--theme-bg-blue);
 
-    &::after {
-      display: none;
+    &:hover {
+      border-color: var(--theme-bg-blue) !important;
+      background: rgba(255, 255, 255, 0.3) !important;
+      color: var(--theme-bg-blue) !important;
+      transform: translateY(-1px);
     }
   }
 }
@@ -305,20 +336,28 @@
     flex-direction: column;
   }
 
-  .login-left {
+  .login-background {
+    position: relative;
+    inset: auto;
     display: block;
-    flex: none;
+    flex: 0 0 240px;
+    width: 100%;
     height: 240px;
-    
+
     :deep(img) {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: center;
     }
   }
 
   .login-right {
+    flex: none;
+    width: 100%;
+    margin-left: 0;
     padding: 24px 20px 32px;
+    background: var(--theme-bg-white);
   }
 
   .login-header {
@@ -333,10 +372,10 @@
 
   .login-form {
     .el-form-item {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
 
       &:last-of-type {
-        margin-bottom: 20px;
+        margin-bottom: 14px;
       }
     }
 
@@ -387,9 +426,10 @@
   }
 
   .register-link {
-    margin-top: 16px;
+    margin-top: 8px;
 
-    :deep(.el-link) {
+    .register-btn {
+      height: 44px;
       font-size: 14px;
       font-weight: 600;
     }

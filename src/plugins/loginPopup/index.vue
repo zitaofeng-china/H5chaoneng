@@ -10,8 +10,8 @@
       @close="handleClose"
     >
       <div class="login-container">
-        <div class="login-left">
-          <LoginBackground />
+        <div class="login-background" aria-hidden="true">
+          <img :src="RegisterBg" alt="" class="login-bg" />
         </div>
 
         <div class="login-right">
@@ -88,7 +88,14 @@
             </el-form-item>
 
             <div class="register-link">
-              <el-link type="primary" @click="switchToRegister">{{ $t('login.register') }}</el-link>
+              <el-button
+                type="primary"
+                plain
+                class="register-btn"
+                @click="switchToRegister"
+              >
+                {{ $t('login.register') }}
+              </el-button>
             </div>
           </el-form>
         </div>
@@ -99,10 +106,8 @@
 
 <script setup lang="ts">
 import { getCurrentInstance } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useCommonStore } from '@/stores/useCommonStore'
 import { useLoginForm } from '@/hooks/useLoginForm'
-import LoginBackground from '@/components/logo/LoginBackground.vue'
+import RegisterBg from '@/assets/images/register-bg.png'
 import type { LoginEmits } from './types'
 
 defineOptions({
@@ -111,8 +116,6 @@ defineOptions({
 
 const emit = defineEmits<LoginEmits>()
 const { proxy } = getCurrentInstance()!
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
 
 const {
   visible,

@@ -10,8 +10,8 @@
       @close="handleClose"
     >
       <div class="reset-container">
-        <div class="reset-left">
-          <LoginBackground />
+        <div class="reset-background" aria-hidden="true">
+          <img :src="RegisterBg" alt="" class="reset-bg" />
         </div>
 
         <div class="reset-right">
@@ -108,6 +108,11 @@
                 {{ t('reset.resetButton') }}
               </el-button>
             </el-form-item>
+
+            <div class="login-link">
+              <span>{{ t('register.hasAccount') }}</span>
+              <el-link type="primary" @click="switchToLogin">{{ t('register.login') }}</el-link>
+            </div>
           </el-form>
         </div>
       </div>
@@ -116,11 +121,10 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
-import { useCommonStore } from '@/stores/useCommonStore'
 import { useResetForm } from '@/hooks/useResetForm'
-import LoginBackground from '@/components/logo/LoginBackground.vue'
+import RegisterBg from '@/assets/images/register-bg.png'
+import { getPopup } from '@/plugins/popupRegistry'
 import type { ResetEmits } from './types'
 
 defineOptions({
@@ -129,8 +133,6 @@ defineOptions({
 
 const { t } = useI18n()
 const emit = defineEmits<ResetEmits>()
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
 
 const {
   visible,
@@ -156,6 +158,14 @@ const onReset = async () => {
   if (success) {
     await handleClose()
   }
+}
+
+const switchToLogin = () => {
+  getPopup('loginPopup')?.open()
+  setTimeout(() => {
+    handleClose()
+  }, 50)
+  emit('switchToLogin')
 }
 
 defineExpose({

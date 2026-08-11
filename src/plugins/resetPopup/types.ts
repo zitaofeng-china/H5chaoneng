@@ -13,4 +13,5 @@ export interface ResetEmits {
   close: []
   switchToReset: []
   switchToRegister: []
+  switchToLogin: []
 }
