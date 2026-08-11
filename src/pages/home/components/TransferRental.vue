@@ -1,16 +1,7 @@
 <template>
   <div class="transfer-rental">
-    <div class="top-banner">
-      <div class="banner-item" v-for="banner in priceBanners" :key="banner.count">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">
-          {{ t('transferRental.transferTemplate', { price: banner.price, count: banner.count }) }}
-        </div>
-      </div>
-    </div>
-
     <div class="instruction-note">
-      <span>*</span>
+      <SvgIcon name="transfer-info" width="12" height="12" />
       {{ t('transferRental.note') }}
     </div>
 
@@ -19,7 +10,6 @@
       <QrCodeWithAddress
         :address="props.paymentAddress"
         :title="t('transferRental.walletQrcode')"
-        :tip="t('common.checkWalletAddress')"
       />
     </div>
     <div v-else-if="loadingTimeout" class="error-section">
@@ -49,26 +39,16 @@
     <KindTips :tips="tips" />
     
     <!-- 跳转到福利订单 -->
-    <div class="page-link-section">
-      <el-button type="warning" plain size="large" class="page-link-btn" @click="goToWelfare">
-        {{ t('home.goToWelfareOrder') }} →
-      </el-button>
-    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
-import { usePriceStore } from '@/stores/usePriceStore'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
-import { formatCryptoAmount } from '@/utils/number'
-import { withSitePrefix } from '@/utils/site'
 
 interface Props {
   paymentAddress?: string
@@ -79,8 +59,6 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
-const priceStore = usePriceStore()
-const { priceData } = storeToRefs(priceStore)
 
 const { loadingTimeout, resetTimer } = useAddressLoading({
   address: () => props.paymentAddress,
@@ -95,22 +73,6 @@ const handleRetry = () => {
   emit('retry')
 }
 
-// 动态计算按1小时价格购买的价格
-const hourlyPrice = computed(() => {
-  return Number.parseFloat(priceData.value?.time_1h || '5')
-})
-
-// 动态生成价格横幅（基于1小时价格）
-const priceBanners = computed(() => {
-  const price = hourlyPrice.value
-  return [
-    { count: 1, price: formatCryptoAmount(price) },
-    { count: 2, price: formatCryptoAmount(price * 2) },
-    { count: 4, price: formatCryptoAmount(price * 4) },
-    { count: 20, price: formatCryptoAmount(price * 20) },
-  ]
-})
-
 const tips = computed(() => [
   t('transferRental.walletTips'),
   t('transferRental.noUsdtTip'),
@@ -119,60 +81,75 @@ const tips = computed(() => [
   t('transferRental.addressTip'),
 ])
 
-const router = useRouter()
-
-const goToWelfare = () => {
-  router.push(withSitePrefix('/welfare'))
-}
 </script>
 
 <style lang="scss" scoped>
 .transfer-rental {
   padding: 0;
 
-  .page-link-section {
-    margin-top: 20px;
-    text-align: center;
-
-    .page-link-btn {
-      width: 100%;
-      max-width: 400px;
-      height: 48px;
-      font-size: 16px;
-      font-weight: 600;
-      border-radius: 8px;
-    }
-  }
-
   .instruction-note {
-    margin: 24px 0 16px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--theme-text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 30px;
+    margin: 16px 0 14px;
+    padding: 0 12px;
+    box-sizing: border-box;
+    border: 1px solid #ffd3d9;
+    border-radius: 4px;
+    background: #fff1f2;
+    color: #c13555;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
 
-    span {
-      color: rgba(193, 53, 53, 1);
+    :deep(svg) {
+      flex-shrink: 0;
+      color: #d94d70;
     }
   }
 
-  .top-banner {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 4px;
-    background: rgba(22, 93, 255, 0.08);
-    color: var(--theme-bg-blue);
-    font-size: 14px;
-    font-weight: 700;
+  .qr-section-wrapper :deep(.qr-section) {
+    padding: 8px 0 14px;
   }
 
-  .banner-item {
-    display: flex;
-    align-items: center;
+  .qr-section-wrapper :deep(.section-title) {
+    margin-bottom: 10px;
+    font-size: 14px;
+  }
+
+  .qr-section-wrapper :deep(.qr-code),
+  .qr-section-wrapper :deep(.status-container) {
+    width: 192px;
+    height: 192px;
+  }
+
+  .qr-section-wrapper :deep(.wallet-address) {
+    margin-top: 10px;
+    font-size: 12px;
+  }
+
+  .qr-section-wrapper :deep(.tips-info) {
+    display: none;
+  }
+
+  :deep(.tips-section) {
+    margin: 8px 0 20px;
+    padding: 14px 16px;
+  }
+
+  :deep(.tips-section .tips-title) {
+    margin-bottom: 10px;
+    font-size: 12px;
+  }
+
+  :deep(.tips-section .tips-list) {
     gap: 6px;
+  }
+
+  :deep(.tips-section .tip-text) {
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .loading-section {
@@ -262,45 +239,30 @@ const goToWelfare = () => {
 
 @media (max-width: 768px) {
   .transfer-rental {
-    .page-link-section {
-      margin-top: 16px;
-
-      .page-link-btn {
-        height: 44px;
-        font-size: 14px;
-      }
-    }
-
-    .top-banner {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 12px;
-      font-size: 13px;
-    }
-
-    .banner-item {
-      gap: 6px;
-      width: 100%;
-
-      svg {
-        flex-shrink: 0;
-      }
-
-      .text {
-        flex: 1;
-        line-height: 1.4;
-      }
-    }
-
     .instruction-note {
-      margin: 16px 0 12px;
-      font-size: 13px;
+      min-height: 32px;
+      margin: 12px 0 10px;
+      padding: 4px 10px;
+      font-size: 11px;
       line-height: 1.5;
     }
 
     .qr-section-wrapper {
-      margin: 12px 0;
+      margin: 0;
+
+      :deep(.qr-section) {
+        padding: 8px 0 12px;
+      }
+
+      :deep(.section-title) {
+        font-size: 14px;
+      }
+
+      :deep(.qr-code),
+      :deep(.status-container) {
+        width: 120px;
+        height: 120px;
+      }
     }
 
     .loading-section {
