@@ -16,6 +16,8 @@ import { getSite, DEFAULT_SITE, withSitePrefix } from '@/utils/site'
 import { formatBalance } from '@/utils/number'
 import { isTelegramMiniApp } from '@/utils/telegram'
 import { clearAuthSession } from '@/utils/session'
+import { ElMessage } from '@/utils/element'
+import { useI18n } from 'vue-i18n'
 
 export function useHeaderNav() {
   const instance = getCurrentInstance()
@@ -27,6 +29,7 @@ export function useHeaderNav() {
     $userInfoPopup?: { open: () => void | Promise<void> }
   } | null
 
+  const { t } = useI18n()
   const commonStore = useCommonStore()
   const siteStore = useSiteStore()
   const { isMobile: isMobileView } = storeToRefs(commonStore)
@@ -109,6 +112,14 @@ export function useHeaderNav() {
   }
 
   const handleLogin = () => {
+    if (isTgEnv) {
+      ElMessage.warning({
+        message: t('common.pleaseLogin'),
+        duration: 2000,
+        showClose: true,
+      })
+      return
+    }
     void proxy?.$loginPopup?.open()
   }
 

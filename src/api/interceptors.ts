@@ -10,6 +10,7 @@ import { clearAuthSession } from '@/utils/session'
 import { ElMessage } from '@/utils/element'
 import { getPopup } from '@/plugins/popupRegistry'
 import i18n from '@/lang'
+import { isMiniAppRuntime } from '@/utils/telegram'
 
 // 防止重复弹出登录框的标志
 let isShowingLoginPopup = false
@@ -26,6 +27,14 @@ function t(key: string, fallback: string): string {
   return fallback
 }
 
+function showLoginTip(message: string) {
+  ElMessage.warning({
+    message,
+    duration: 2000,
+    showClose: true,
+  })
+}
+
 /**
  * 显示登录弹窗
  */
@@ -33,6 +42,15 @@ function showLoginPopup(message?: string) {
   if (isShowingLoginPopup) return
 
   isShowingLoginPopup = true
+
+  // Mini App 不打开账号密码登录框，仅展示可点击/2 秒自动关闭的提示
+  if (isMiniAppRuntime()) {
+    if (message) showLoginTip(message)
+    setTimeout(() => {
+      isShowingLoginPopup = false
+    }, 2000)
+    return
+  }
 
   // 显示提示消息
   if (message) {
@@ -76,7 +94,17 @@ export function requestInterceptor(url: string, config: RequestInit): RequestIni
 
       // 显示未登录提示
       const message = t('common.pleaseLogin', '请先登录')
-      ElMessage.warning(message)
+      if (isMiniAppRuntime()) {
+        if (!isShowingLoginPopup) {
+          isShowingLoginPopup = true
+          showLoginTip(message)
+          setTimeout(() => {
+            isShowingLoginPopup = false
+          }, 2000)
+        }
+      } else {
+        ElMessage.warning(message)
+      }
 
       // 抛出错误让业务代码处理
       throw new Error('NOT_LOGGED_IN')
