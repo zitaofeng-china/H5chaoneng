@@ -2,12 +2,28 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html,
+body,
+#app {
+  width: 100%;
+  max-width: 100%;
+}
+
 body {
   min-width: 320px;
   font-size: 14px;
   background: var(--theme-bg-light);
   overflow-x: hidden;
   font-family: 'Inter, v-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol';
+}
+
+html.is-miniapp,
+html.is-miniapp body,
+html.is-miniapp #app {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .common-page {

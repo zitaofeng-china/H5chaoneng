@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import Layout from '@/components/layout/index.vue'
 import WelcomeDialog from '@/components/WelcomeDialog.vue'
@@ -14,7 +14,12 @@ import { useBury } from '@/hooks/useBury'
 import { useTelegramLogin, TG_LOGIN_BLOCKED_COUNTDOWN } from '@/hooks/useTelegramLogin'
 import { getSite } from '@/utils/site'
 import { siteBootstrap } from '@/utils/siteBootstrap'
-import { isTelegramEnvironment, isTelegramMiniApp } from '@/utils/telegram'
+import {
+  applyTelegramFullWidth,
+  isTelegramEnvironment,
+  isTelegramMiniApp,
+  telegramExpand,
+} from '@/utils/telegram'
 
 const route = useRoute()
 const { isFinished, isValidRef, syncFromBootstrap } = useSiteVerification()
@@ -29,6 +34,23 @@ syncFromBootstrap()
 /** Mini App 容器（站点失败时 isInTelegram 可能仍为 false，不能只依赖登录 hook） */
 const isTgEnv = computed(
   () => isInTelegram.value || isTelegramEnvironment() || isTelegramMiniApp(),
+)
+
+function syncMiniAppClass(active: boolean) {
+  document.documentElement.classList.toggle('is-miniapp', active)
+  document.body.classList.toggle('is-miniapp', active)
+}
+
+watch(
+  isTgEnv,
+  (active) => {
+    syncMiniAppClass(active)
+    if (active) {
+      telegramExpand()
+      applyTelegramFullWidth()
+    }
+  },
+  { immediate: true },
 )
 
 /** 未知业务路径（站点已通过时才可能命中） */
@@ -102,6 +124,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   document.removeEventListener('visibilitychange', handleVisibilityChange)
+  syncMiniAppClass(false)
 })
 </script>
 
@@ -122,7 +145,7 @@ onUnmounted(() => {
   </div>
 
   <!-- 站点存在：完整业务页 -->
-  <div v-else-if="showApp" class="app-shell">
+  <div v-else-if="showApp" class="app-shell" :class="{ 'is-miniapp': isTgEnv }">
     <Layout />
     <WelcomeDialog />
     <TelegramFloat v-if="!isInTelegram" />
@@ -136,6 +159,14 @@ onUnmounted(() => {
   overflow: hidden;
   overflow-y: auto;
   min-height: 100vh;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  &.is-miniapp {
+    width: 100%;
+    max-width: 100%;
+  }
 
   &.is-404 {
     padding-top: 0;
