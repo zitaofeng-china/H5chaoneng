@@ -1,17 +1,18 @@
 <template>
   <div class="contract-flash">
     <el-card class="rental-card">
+      <div class="section-label">{{ t('contract.title') }}</div>
       <el-tabs v-model="activeTab" class="rental-tabs">
         <el-tab-pane :label="t('contract.usdtToTrx')" name="USDT" />
         <el-tab-pane :label="t('contract.trxToUsdt')" name="TRX" />
         <el-form
           ref="formRef"
           :model="formData"
-          label-position="right"
-          label-suffix=":"
+          label-position="top"
           class="rental-form"
         >
           <div class="form-wrap">
+            <div class="field-label">{{ t('contract.enterAmount') }}</div>
             <el-form-item prop="unitPrice">
               <el-input
                 v-model="formData.unitPrice"
@@ -23,20 +24,19 @@
                 @input="handleAmountInput"
                 @blur="handleBlur"
               >
-                <template #prefix>{{ t('contract.enterAmount') }}</template>
                 <template #suffix>{{
                   activeTab === 'USDT' ? t('common.usdt') : t('common.trx')
                 }}</template>
               </el-input>
             </el-form-item>
 
+            <div class="field-label">{{ t('contract.estimatedGet') }}</div>
             <el-form-item>
               <el-input
                 v-model="formData.coinAmount"
                 :placeholder="t('contract.estimatedPlaceholder')"
                 disabled
               >
-                <template #prefix>{{ t('contract.estimatedGet') }}</template>
                 <template #suffix>{{
                   activeTab === 'USDT' ? t('common.trx') : t('common.usdt')
                 }}</template>
@@ -267,32 +267,39 @@ onMounted(() => {
 .contract-flash {
   padding: 0 0 40px;
 
-  .header {
-    text-align: center;
-    padding-bottom: 20px;
+  .section-label,
+  .field-label {
+    display: flex;
+    align-items: center;
+    min-height: 17px;
+    border-left: 3px solid var(--theme-bg-blue);
+    padding-left: 8px;
+    color: var(--theme-text-black);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
-  .title {
-    font-size: 40px;
-    font-weight: 700;
-    color: var(--theme-text-black);
+  .section-label {
+    margin-bottom: 12px;
   }
 
   .rental-card {
-    max-width: 896px;
+    width: min(760px, calc(100% - 48px));
+    max-width: 760px;
     margin: 0 auto;
-    border-radius: 8px;
+    border-radius: 5px;
     border: none;
-    box-shadow: 0px 14px 30px 0px rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
 
     :deep(.el-card__body) {
-      padding: 24px;
+      padding: 24px 28px 28px;
     }
   }
 
   .rental-tabs {
     :deep(.el-tabs__header) {
-      margin: 0 0 22px;
+      margin: 0 0 16px;
     }
 
     :deep(.el-tabs__content) {
@@ -312,18 +319,18 @@ onMounted(() => {
       display: flex;
       background: rgba(2, 15, 45, 0.03);
       border-radius: 4px;
-      padding: 3px;
+      padding: 0;
       box-sizing: border-box;
     }
 
     :deep(.el-tabs__item) {
       flex: 1;
-      height: 44px;
-      line-height: 44px;
+      height: 38px;
+      line-height: 38px;
       padding: 0;
       text-align: center;
-      font-weight: 700;
-      font-size: 14px;
+      font-weight: 600;
+      font-size: 13px;
       color: rgba(30, 41, 59, 0.6);
       border-radius: 4px;
       transition:
@@ -333,7 +340,7 @@ onMounted(() => {
       &.is-active {
         color: var(--theme-text-white);
         background: var(--theme-bg-blue);
-        box-shadow: 0px 4px 10px 0px rgba(22, 93, 255, 0.25);
+        box-shadow: 0 1px 4px rgba(22, 93, 255, 0.2);
       }
     }
 
@@ -343,34 +350,43 @@ onMounted(() => {
   }
 
   .form-wrap {
+    .field-label {
+      margin-bottom: 10px;
+    }
+
     :deep(.el-form-item) {
-      margin-bottom: 18px;
+      margin-bottom: 12px;
 
       .el-form-item__content {
         justify-content: center;
       }
 
       .el-input {
-        font-size: 14px;
+        width: 100%;
+        font-size: 13px;
+
         .el-input__wrapper {
-          background: rgba(2, 15, 45, 0.03);
+          min-height: 40px;
+          height: 40px;
+          background: #f1f2f4;
           border-radius: 4px;
           box-shadow: none;
-          border: 1px solid rgba(2, 15, 45, 0.08);
-          padding: 0 12px;
+          border: none;
+          padding: 0 14px;
         }
 
         .el-input__inner {
-          text-align: right;
-          height: 44px;
-          line-height: 44px;
+          text-align: left;
+          height: 38px;
+          line-height: 38px;
+          font-size: 13px;
           color: var(--theme-text-black);
         }
 
-        .el-input__prefix,
         .el-input__suffix-inner {
-          font-weight: 600;
-          color: var(--theme-text-black);
+          color: #98a2b3;
+          font-size: 12px;
+          font-weight: 500;
         }
 
         .el-input__inner {
@@ -383,10 +399,158 @@ onMounted(() => {
         }
 
         &.is-disabled {
+          .el-input__wrapper {
+            background: #f1f2f4;
+          }
+
           .el-input__inner {
-            padding-right: 15px;
+            color: #667085;
+            -webkit-text-fill-color: initial;
           }
         }
+      }
+    }
+  }
+
+  :deep(.rate-card) {
+    margin: 0;
+    padding: 12px 16px;
+    border-radius: 4px;
+    gap: 6px;
+    font-size: 11px;
+
+    .rate-section {
+      .rate-main {
+        gap: 6px;
+
+        .rate-label-inline,
+        .rate-text {
+          font-size: 11px;
+        }
+
+        .rate-text {
+          gap: 3px;
+        }
+
+        .rate-symbol {
+          margin: 0 3px;
+        }
+      }
+    }
+
+    .note-section {
+      gap: 4px;
+
+      .note-text,
+      .limits-row .limit-item {
+        font-size: 11px;
+        line-height: 1.45;
+      }
+
+      .limits-row {
+        gap: 16px;
+      }
+    }
+
+    .stock-section {
+      gap: 6px;
+      font-size: 11px;
+    }
+  }
+
+  :deep(.qr-section) {
+    padding: 32px 0 0;
+
+    .section-title {
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .qr-code,
+    .status-container {
+      width: 168px;
+      height: 168px;
+    }
+
+    .wallet-address {
+      max-width: 100%;
+      margin-top: 16px;
+      gap: 6px;
+      font-size: 11px;
+
+      .address-text {
+        max-width: 560px;
+        font-size: 11px;
+      }
+
+      .copy-button {
+        width: 18px !important;
+        min-width: 18px !important;
+        height: 18px !important;
+      }
+    }
+
+    .tips-info {
+      display: none;
+    }
+  }
+
+  :deep(.tips-section) {
+    margin: 14px 0 0;
+    padding: 14px 16px;
+    border-radius: 4px;
+    background: #f7faff;
+
+    .tips-title {
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .tips-list {
+      gap: 6px;
+    }
+
+    .tip-item {
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .tip-text {
+      font-size: 11px;
+      line-height: 1.4;
+    }
+  }
+
+  :deep(.loading-section),
+  :deep(.error-section) {
+    margin: 0;
+    padding: 24px 0;
+    border-radius: 4px;
+
+    .loading-title,
+    .error-title {
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .loading-placeholder,
+    .error-placeholder {
+      gap: 10px;
+      padding: 24px 0;
+
+      .loading-text,
+      .error-text {
+        font-size: 13px;
+      }
+
+      .error-hint {
+        font-size: 12px;
+      }
+
+      .retry-button {
+        padding: 8px 18px;
+        font-size: 13px;
       }
     }
   }
@@ -394,20 +558,28 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .contract-flash {
-    padding: 0 0 32px;
+    padding: 0 0 24px;
 
     .rental-card {
-      border-radius: 6px;
-      box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      max-width: none;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px rgba(15, 23, 42, 0.08);
 
       :deep(.el-card__body) {
-        padding: 10px;
+        padding: 12px;
       }
+    }
+
+    .section-label,
+    .field-label {
+      min-height: 14px;
+      font-size: 11px;
     }
 
     .rental-tabs {
       :deep(.el-tabs__header) {
-        margin: 0 0 18px;
+        margin: 0 0 12px;
       }
 
       :deep(.el-tabs__nav) {
@@ -415,30 +587,35 @@ onMounted(() => {
       }
 
       :deep(.el-tabs__item) {
-        height: 40px;
-        line-height: 40px;
-        font-size: 13px;
+        height: 36px;
+        line-height: 36px;
+        font-size: 12px;
       }
     }
 
     .form-wrap {
+      .field-label {
+        margin-bottom: 5px;
+      }
+
       :deep(.el-form-item) {
-        margin-bottom: 14px;
+        margin-bottom: 11px;
 
         .el-input {
           font-size: 13px;
 
           .el-input__wrapper {
             padding: 0 10px;
+            min-height: 38px;
+            height: 38px;
           }
 
           .el-input__inner {
-            height: 40px;
-            line-height: 40px;
+            height: 36px;
+            line-height: 36px;
             font-size: 13px;
           }
 
-          .el-input__prefix,
           .el-input__suffix-inner {
             font-size: 13px;
             font-weight: 600;
@@ -454,6 +631,122 @@ onMounted(() => {
               color: var(--theme-text-gray);
             }
           }
+        }
+      }
+    }
+
+    :deep(.rate-card) {
+      padding: 12px;
+      gap: 8px;
+
+      .rate-section {
+        .rate-main {
+          gap: 5px;
+
+          .rate-label-inline,
+          .rate-text {
+            font-size: 11px;
+          }
+        }
+      }
+
+      .note-section {
+        gap: 4px;
+
+        .note-text,
+        .limits-row .limit-item {
+          font-size: 11px;
+        }
+
+        .limits-row {
+          gap: 14px;
+        }
+      }
+
+      .stock-section {
+        font-size: 11px;
+      }
+    }
+
+    :deep(.qr-section) {
+      padding: 16px 0 10px;
+
+      .section-title {
+        font-size: 14px;
+      }
+
+      .qr-code,
+      .status-container {
+        width: 150px;
+        height: 150px;
+      }
+
+      .wallet-address {
+        font-size: 11px;
+
+        .address-text {
+          max-width: 270px;
+          font-size: 10px;
+        }
+
+        .copy-button {
+          width: 18px !important;
+          min-width: 18px !important;
+          height: 18px !important;
+        }
+      }
+
+      .tips-info {
+        font-size: 10px;
+      }
+    }
+
+    :deep(.tips-section) {
+      margin-top: 10px;
+      padding: 12px;
+
+      .tips-title {
+        margin-bottom: 8px;
+        font-size: 12px;
+      }
+
+      .tips-list {
+        gap: 6px;
+      }
+
+      .tip-text {
+        font-size: 11px;
+      }
+    }
+
+    :deep(.loading-section),
+    :deep(.error-section) {
+      padding: 24px 12px;
+      border-radius: 4px;
+
+      .loading-title,
+      .error-title {
+        margin-bottom: 16px;
+        font-size: 14px;
+      }
+
+      .loading-placeholder,
+      .error-placeholder {
+        padding: 24px 0;
+        gap: 10px;
+
+        .loading-text,
+        .error-text {
+          font-size: 13px;
+        }
+
+        .error-hint {
+          font-size: 12px;
+        }
+
+        .retry-button {
+          padding: 8px 18px;
+          font-size: 13px;
         }
       }
     }

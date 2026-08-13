@@ -1,40 +1,37 @@
 <template>
   <div id="welfare" class="welfare-order">
+    <div class="page-title">{{ t('home.welfareOrder') }}</div>
     <el-card class="welfare-card">
-      <!-- 标题 -->
-      <div class="welfare-header">
-        {{ t('home.welfareOrder') }}
-      </div>
+      <div class="section-label">{{ t('home.welfareOrder') }}说明</div>
 
-      <!-- 提示信息 -->
       <div class="welfare-info">
         <div class="info-item">
-          <span class="icon">🔥</span>
+          <img class="icon" :src="welfareFlameImage" alt="" />
           <span class="text">{{ t('home.welfareInfo1', { price: welfarePrice }) }}</span>
         </div>
         <div class="info-item">
-          <span class="icon">💎</span>
+          <img class="icon" :src="welfareTelegramImage" alt="" />
           <span class="text">{{ t('home.welfareInfo2', { price: welfarePrice }) }}</span>
         </div>
         <div class="info-item">
-          <span class="icon">⚡</span>
+          <img class="icon" :src="welfareBoltImage" alt="" />
           <span class="text">{{ t('home.welfareInfo3') }}</span>
         </div>
       </div>
 
-      <!-- 温馨提示 -->
       <div class="welfare-tips">
-        <div class="tips-title">
-          <span class="icon">⚠️</span>
-          <span>{{ t('home.welfareTipsTitle') }}</span>
+        <div class="tips-copy">
+          <div class="tips-title">
+            <span>{{ t('home.welfareTipsTitle') }}</span>
+          </div>
+          <div class="tips-content">
+            <div class="tip-item">{{ t('home.welfareTip1') }}</div>
+            <div class="tip-item">{{ t('home.welfareTip2') }}</div>
+          </div>
         </div>
-        <div class="tips-content">
-          <div class="tip-item">{{ t('home.welfareTip1') }}</div>
-          <div class="tip-item">{{ t('home.welfareTip2') }}</div>
-        </div>
+        <img class="tips-gift" :src="welfareGiftImage" alt="" />
       </div>
 
-      <!-- 立即购买按钮 -->
       <el-button 
         class="buy-button" 
         type="primary" 
@@ -45,10 +42,10 @@
         {{ t('home.buyWelfareNow') }}
       </el-button>
 
-      <!-- 跳转到闪租能量 -->
       <div class="page-link-section">
         <el-button type="primary" plain size="large" class="page-link-btn" @click="goToFlashRent">
-          {{ t('home.goToNormalEnergy') }} →
+          {{ t('home.goToNormalEnergy') }}
+          <img class="link-arrow" :src="welfareArrowImage" alt="" />
         </el-button>
       </div>
     </el-card>
@@ -70,6 +67,11 @@ import { AddressKind } from '@/api/modules/address/types'
 import WelfarePurchaseDialog from '@/components/WelfarePurchaseDialog.vue'
 import { formatCryptoAmount } from '@/utils/number'
 import { withSitePrefix } from '@/utils/site'
+import welfareArrowImage from '@/assets/images/welfare/welfare-arrow.png'
+import welfareBoltImage from '@/assets/images/welfare/welfare-bolt.png'
+import welfareFlameImage from '@/assets/images/welfare/welfare-flame.png'
+import welfareGiftImage from '@/assets/images/welfare/welfare-gift.png'
+import welfareTelegramImage from '@/assets/images/welfare/welfare-telegram.png'
 
 const { t } = useI18n()
 const router = useRouter()
@@ -227,118 +229,144 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .welfare-order {
-  background: var(--theme-bg-light);
-  padding: 20px 20px 24px;
+  padding: 44px 20px 16px;
+
+  .page-title {
+    margin-bottom: 16px;
+    color: var(--theme-text-black);
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+  }
 
   .welfare-card {
-    max-width: 960px;
+    max-width: 980px;
     margin: 0 auto;
     border-radius: 8px;
     border: none;
     box-shadow: 0px 14px 30px 0px rgba(0, 0, 0, 0.08);
 
     :deep(.el-card__body) {
-      padding: 0;
+      padding: 26px 28px 28px;
     }
   }
 
-  .welfare-header {
-    background: linear-gradient(135deg, #f6a623 0%, #f77737 100%);
-    color: white;
-    text-align: center;
-    font-size: 24px;
-    font-weight: 700;
-    padding: 20px;
-    border-radius: 8px 8px 0 0;
+  .section-label {
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+    padding-left: 10px;
+    border-left: 3px solid var(--theme-bg-blue);
+    color: var(--theme-text-black);
+    font-size: 14px;
+    font-weight: 600;
   }
 
   .welfare-info {
-    padding: 30px 40px;
-    background: white;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 18px;
+    padding: 16px 18px;
+    background: linear-gradient(90deg, #eef6ff 0%, #fff8f3 52%, #fbf2ff 100%);
+    border-radius: 4px;
 
     .info-item {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      font-size: 16px;
+      gap: 10px;
+      min-width: 0;
+      padding: 0 18px;
+      font-size: 14px;
       color: var(--theme-text-black);
+      border-right: 1px solid rgba(15, 23, 42, 0.12);
 
       &:last-child {
-        margin-bottom: 0;
+        border-right: 0;
       }
 
       .icon {
-        font-size: 24px;
+        width: 37px;
+        height: 37px;
         flex-shrink: 0;
       }
 
       .text {
         flex: 1;
-        line-height: 1.6;
+        line-height: 1.4;
       }
     }
   }
 
   .welfare-tips {
-    padding: 24px 40px;
-    background: #fff9e6;
-    border-top: 1px solid rgba(0, 0, 0, 0.06);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 124px;
+    margin-top: 16px;
+    padding: 16px 20px;
+    background: #f7faff;
+    border-radius: 4px;
+
+    .tips-copy {
+      min-width: 0;
+      padding-right: 20px;
+    }
 
     .tips-title {
       display: flex;
       align-items: center;
-      gap: 8px;
       font-size: 16px;
       font-weight: 700;
-      color: #f6a623;
-      margin-bottom: 16px;
-
-      .icon {
-        font-size: 20px;
-      }
+      color: var(--theme-text-black);
+      margin-bottom: 10px;
     }
 
     .tips-content {
-      padding-left: 28px;
-
       .tip-item {
         position: relative;
-        font-size: 14px;
-        color: rgba(0, 0, 0, 0.75);
-        line-height: 1.8;
-        margin-bottom: 8px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
+        padding-left: 18px;
+        font-size: 13px;
+        color: var(--theme-text-muted);
+        line-height: 1.7;
 
         &::before {
-          content: '-';
+          content: '';
           position: absolute;
-          left: -12px;
-          color: #f6a623;
+          top: 0.52em;
+          left: 0;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #46d39a;
         }
       }
+    }
+
+    .tips-gift {
+      width: 200px;
+      height: 100px;
+      flex: 0 0 auto;
+      object-fit: contain;
     }
   }
 
   .buy-button {
-    width: calc(100% - 80px);
-    margin: 30px 40px;
-    height: 56px;
-    font-size: 18px;
-    font-weight: 700;
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    width: 100%;
+    height: 48px;
+    margin: 16px 0 12px;
+    font-size: 16px;
+    font-weight: 600;
+    background: #ff5a1f;
     border: none;
-    border-radius: 8px;
-    box-shadow: 0px 8px 20px 0px rgba(79, 172, 254, 0.4);
+    border-radius: 3px;
+    box-shadow: none;
     transition: all 0.3s ease;
 
     &:hover {
       transform: translateY(-2px);
-      box-shadow: 0px 12px 24px 0px rgba(79, 172, 254, 0.5);
+      background: #f04f17;
+      box-shadow: 0 5px 12px rgba(255, 90, 31, 0.25);
     }
 
     &:active {
@@ -347,77 +375,100 @@ onUnmounted(() => {
   }
 
   .page-link-section {
-    padding: 0 40px 30px;
+    padding: 0;
     text-align: center;
 
     .page-link-btn {
       width: 100%;
-      height: 48px;
-      font-size: 16px;
+      height: 42px;
+      font-size: 14px;
       font-weight: 600;
-      border-radius: 8px;
+      border-radius: 3px;
+      background: #f0f6ff;
+      border-color: #c7dcff;
+
+      .link-arrow {
+        width: 20px;
+        height: 20px;
+        margin-left: 8px;
+      }
     }
   }
 }
 
 @media (max-width: 768px) {
   .welfare-order {
-    padding: 20px 10px 20px;
+    padding: 32px 12px 36px;
 
-    .welfare-header {
-      font-size: 18px;
-      padding: 16px;
+    .page-title {
+      margin-bottom: 14px;
+      font-size: 24px;
+    }
+
+    .welfare-card {
+      :deep(.el-card__body) {
+        padding: 14px 12px;
+      }
     }
 
     .welfare-info {
-      padding: 20px 16px;
+      display: flex;
+      align-items: stretch;
+      padding: 8px 4px;
 
       .info-item {
-        font-size: 14px;
-        margin-bottom: 12px;
+        flex: 1;
+        gap: 5px;
+        padding: 0 6px;
+        font-size: 10px;
 
         .icon {
-          font-size: 20px;
+          width: 23px;
+          height: 23px;
         }
       }
     }
 
     .welfare-tips {
-      padding: 16px;
+      min-height: 84px;
+      padding: 10px;
 
       .tips-title {
-        font-size: 14px;
-        margin-bottom: 12px;
-
-        .icon {
-          font-size: 18px;
-        }
+        font-size: 12px;
+        margin-bottom: 5px;
       }
 
       .tips-content {
-        padding-left: 20px;
-
         .tip-item {
-          font-size: 13px;
-          line-height: 1.6;
-          margin-bottom: 6px;
+          padding-left: 12px;
+          font-size: 10px;
+          line-height: 1.55;
+
+          &::before {
+            width: 7px;
+            height: 7px;
+          }
         }
+      }
+
+      .tips-gift {
+        width: 105px;
+        height: 53px;
       }
     }
 
     .buy-button {
-      width: calc(100% - 32px);
-      margin: 20px 16px;
-      height: 48px;
-      font-size: 16px;
+      height: 38px;
+      margin: 10px 0 8px;
+      font-size: 12px;
     }
 
     .page-link-section {
-      padding: 0 16px 20px;
+      padding: 0;
 
       .page-link-btn {
-        height: 44px;
-        font-size: 14px;
+        height: 32px;
+        font-size: 11px;
       }
     }
   }
