@@ -51,7 +51,7 @@ export interface HostingAddressItem {
   address: string // 托管地址
   agent_id: number // 代理ID
   bot_id: number // 机器人ID
-  count: number // 数量
+  count: number // 历史已用笔数
   created_at: string | number // 创建时间
   id: number // 托管记录ID
   kind: number // 类型
@@ -61,10 +61,10 @@ export interface HostingAddressItem {
   origin: number // 来源
   status: number // 状态
   threshold: number // 阈值
-  total: number // 总使用次数
+  total: number // 总量/额度
   updated_at: string | number // 更新时间
   user_id: number // 用户ID
-  today_total?: number // 今日使用次数（可选）
+  today_count?: number // 今天已用笔数
 }
 
 /**
