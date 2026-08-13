@@ -2,12 +2,12 @@
   <div id="energy" class="energy-rental">
     <section
       class="ecosystem-hero"
-      :class="{ 'has-ad': hasAd }"
+      :class="{ 'has-ad': hasAd !== false, 'is-miniapp': isMiniApp }"
       aria-labelledby="ecosystem-title"
     >
-      <div v-if="!hasAd" class="ecosystem-grid" aria-hidden="true"></div>
+      <div v-if="hasAd === false" class="ecosystem-grid" aria-hidden="true"></div>
       <AdBanner @update:hasAd="hasAd = $event" />
-      <template v-if="!hasAd">
+      <template v-if="hasAd === false">
         <h1 id="ecosystem-title" class="ecosystem-title">{{ t('home.ecosystemTitle') }}</h1>
         <p class="ecosystem-subtitle">{{ t('home.ecosystemSubtitle') }}</p>
       </template>
@@ -205,7 +205,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, computed, onUnmounted } from 'vue'
+import { ref, reactive, watch, computed, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from '@/utils/element'
@@ -226,9 +226,11 @@ import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { storeToRefs } from 'pinia'
 import { formatCryptoAmount } from '@/utils/number'
 import { withSitePrefix } from '@/utils/site'
+import { isMiniAppRuntime } from '@/utils/telegram'
 
 const { t } = useI18n()
-const hasAd = ref(false)
+const hasAd = ref<boolean | null>(null)
+const isMiniApp = ref(isMiniAppRuntime())
 const router = useRouter()
 const langStore = useLangStore()
 const commonStore = useCommonStore()
@@ -445,6 +447,10 @@ const handleRentNow = async () => {
 const goToWelfare = () => {
   router.push(withSitePrefix('/welfare'))
 }
+
+onMounted(() => {
+  isMiniApp.value = isMiniAppRuntime()
+})
 
 onUnmounted(() => {
   formRef.value?.resetFields()
@@ -822,6 +828,24 @@ onUnmounted(() => {
 
   :deep(.ad-image) {
     object-fit: cover;
+  }
+
+  &.has-ad.is-miniapp {
+    width: 100%;
+    padding: 0;
+
+    :deep(.ad-banner) {
+      width: 100%;
+      max-width: none;
+      height: auto;
+      margin: 0;
+    }
+
+    :deep(.ad-carousel),
+    :deep(.ad-skeleton) {
+      width: 100%;
+      border-radius: 0;
+    }
   }
 }
 
@@ -1425,6 +1449,10 @@ onUnmounted(() => {
       height: auto;
       min-height: 0;
       padding: 14px 12px 4px;
+    }
+
+    &.has-ad.is-miniapp {
+      padding: 0;
     }
 
     :deep(.ad-carousel),
