@@ -300,7 +300,8 @@
     "tips7": "After each USDT transfer, one hosting fee will be automatically charged until insufficient balance",
     "insufficientBalance": "Insufficient account balance, please recharge first",
     "65000EnergyFee": "Using 65000 energy: 3TRX/count",
-    "131000EnergyFee": "Using 131000 energy: 5TRX/count"
+    "131000EnergyFee": "Using 131000 energy: 5TRX/count",
+    "hostNow": "Host Now"
   },
   "contract": {
     "title": "Contract Flash Exchange",

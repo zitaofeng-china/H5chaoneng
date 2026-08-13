@@ -298,7 +298,8 @@
     "tips7": "Her USDT transferinden sonra, bakiye yetersiz olana kadar otomatik olarak bir barındırma ücreti tahsil edilecektir",
     "insufficientBalance": "Hesap bakiyesi yetersiz, lütfen önce yükleyin",
     "65000EnergyFee": "65000 enerji kullanımı: 3TRX/adet",
-    "131000EnergyFee": "131000 enerji kullanımı: 5TRX/adet"
+    "131000EnergyFee": "131000 enerji kullanımı: 5TRX/adet",
+    "hostNow": "Hemen barındır"
   },
   "contract": {
     "title": "Sözleşme Hızlı Değişimi",

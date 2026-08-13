@@ -300,7 +300,7 @@
     "goToActivate": "前往激活",
     "addingAddresses": "正在添加第 {current}/{total} 个地址",
     "address": "需要托管的地址",
-    "enterAddresses": "请输入地址，多个地址，请使用英文逗号分隔，或一行一个地址，",
+    "enterAddresses": "请输入地址，多个地址，请使用英文逗号分隔，或一行一个地址。",
     "confirm": "确定",
     "use65000Energy": "使用65000能量",
     "use131000Energy": "使用131000能量",
@@ -313,7 +313,8 @@
     "tips7": "每USDT转账后将会自动托管一笔，直到余额不足",
     "insufficientBalance": "账户余额不足，请先充值",
     "65000EnergyFee": "使用65000能量：3TRX/笔",
-    "131000EnergyFee": "使用131000能量：5TRX/笔"
+    "131000EnergyFee": "使用131000能量：5TRX/笔",
+    "hostNow": "立即托管"
   },
   "contract": {
     "title": "合约闪兑",

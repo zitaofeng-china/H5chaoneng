@@ -283,7 +283,7 @@
     "goToActivate": "前往激活",
     "addingAddresses": "正在添加第 {current}/{total} 個地址",
     "address": "需要託管的地址",
-    "enterAddresses": "請輸入地址，多個地址，請使用英文逗號分隔，或一行一個地址，",
+    "enterAddresses": "請輸入地址，多個地址，請使用英文逗號分隔，或一行一個地址。",
     "confirm": "確定",
     "use65000Energy": "使用65000能量",
     "use131000Energy": "使用131000能量",
@@ -296,7 +296,8 @@
     "tips7": "每USDT轉帳後將會自動託管一筆，直到餘額不足",
     "insufficientBalance": "賬戶餘額不足，請先充值",
     "65000EnergyFee": "使用65000能量：3TRX/筆",
-    "131000EnergyFee": "使用131000能量：5TRX/筆"
+    "131000EnergyFee": "使用131000能量：5TRX/筆",
+    "hostNow": "立即託管"
   },
   "contract": {
     "title": "合約閃兌",

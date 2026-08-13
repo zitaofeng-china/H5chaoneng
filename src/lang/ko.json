@@ -297,7 +297,8 @@
     "tips7": "USDT 이체 후 자동으로 1회 호스팅 비용 청구, 잔액 부족 시까지",
     "insufficientBalance": "계정 잔액 부족, 먼저 충전해주세요",
     "65000EnergyFee": "65000 에너지 사용: 3TRX/건",
-    "131000EnergyFee": "131000 에너지 사용: 5TRX/건"
+    "131000EnergyFee": "131000 에너지 사용: 5TRX/건",
+    "hostNow": "지금 호스팅"
   },
   "contract": {
     "title": "계약 즉시 교환",
