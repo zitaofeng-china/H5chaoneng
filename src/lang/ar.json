@@ -346,7 +346,15 @@
     "allFailed": "فشل التنشيط",
     "activationFailed": "فشل التنشيط",
     "tips1": "الحد الأقصى 1000 عنوان للتنشيط الدفعي",
-    "tips2": "العناوين المنشطة لا تتحمل رسوم تنشيط"
+    "tips2": "العناوين المنشطة لا تتحمل رسوم تنشيط",
+    "inputAddress": "أدخل العناوين",
+    "enteredLabel": "تم إدخال",
+    "addressCountUnit": "عناوين",
+    "estimatedFee": "الرسوم المتوقعة",
+    "noticeCount": "المجموع {count}",
+    "successActivatedCount": "تم التفعيل بنجاح",
+    "pricePerAddress": "TRX/عنوان",
+    "countUnit": ""
   },
   "feeCard": {
     "title": "شرح الرسوم",

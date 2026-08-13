@@ -348,7 +348,15 @@
     "allFailed": "Activation failed, please check if addresses are valid",
     "activationFailed": "Activation failed",
     "tips1": "Maximum 1000 addresses for batch activation",
-    "tips2": "Activated addresses do not charge activation fee"
+    "tips2": "Activated addresses do not charge activation fee",
+    "inputAddress": "Enter addresses",
+    "enteredLabel": "Entered",
+    "addressCountUnit": "addresses",
+    "estimatedFee": "Estimated fee",
+    "noticeCount": "{count} in total",
+    "successActivatedCount": "Successfully activated",
+    "pricePerAddress": "TRX/address",
+    "countUnit": ""
   },
   "feeCard": {
     "title": "Fee Description",

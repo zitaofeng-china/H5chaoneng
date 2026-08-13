@@ -345,7 +345,15 @@
     "allFailed": "활성화 실패",
     "activationFailed": "활성화 실패",
     "tips1": "일괄 활성화는 최대 1000개 주소까지",
-    "tips2": "활성화된 주소는 활성화 비용 청구 안함"
+    "tips2": "활성화된 주소는 활성화 비용 청구 안함",
+    "inputAddress": "주소 입력",
+    "enteredLabel": "입력됨",
+    "addressCountUnit": "개 주소",
+    "estimatedFee": "예상 비용",
+    "noticeCount": "총 {count}건",
+    "successActivatedCount": "활성화 성공 수",
+    "pricePerAddress": "TRX/주소",
+    "countUnit": "개"
   },
   "feeCard": {
     "title": "비용 안내",

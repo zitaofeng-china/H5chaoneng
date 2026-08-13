@@ -344,7 +344,15 @@
     "allFailed": "激活失敗",
     "activationFailed": "激活失敗",
     "tips1": "批量激活地址數量最多為1000個",
-    "tips2": "已激活的地址不收取激活費用"
+    "tips2": "已激活的地址不收取激活費用",
+    "inputAddress": "請輸入地址",
+    "enteredLabel": "已輸入",
+    "addressCountUnit": "個地址",
+    "estimatedFee": "預計費用",
+    "noticeCount": "共{count}條",
+    "successActivatedCount": "激活成功地址數",
+    "pricePerAddress": "TRX/地址",
+    "countUnit": "個"
   },
   "feeCard": {
     "title": "費用說明",

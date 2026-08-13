@@ -346,7 +346,15 @@
     "allFailed": "Error al activar",
     "activationFailed": "Error al activar",
     "tips1": "Máximo 1000 direcciones para activación masiva",
-    "tips2": "Las direcciones activadas no cobran tarifa de activación"
+    "tips2": "Las direcciones activadas no cobran tarifa de activación",
+    "inputAddress": "Introducir direcciones",
+    "enteredLabel": "Introducidas",
+    "addressCountUnit": "direcciones",
+    "estimatedFee": "Tarifa estimada",
+    "noticeCount": "{count} en total",
+    "successActivatedCount": "Activadas con éxito",
+    "pricePerAddress": "TRX/dirección",
+    "countUnit": ""
   },
   "feeCard": {
     "title": "Descripción de Comisiones",

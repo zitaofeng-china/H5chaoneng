@@ -345,7 +345,15 @@
     "allFailed": "活性化に失敗しました",
     "activationFailed": "活性化に失敗しました",
     "tips1": "一括活性化は最大1000住所まで",
-    "tips2": "活性化済み住所は活性化料金を徴収しません"
+    "tips2": "活性化済み住所は活性化料金を徴収しません",
+    "inputAddress": "アドレスを入力",
+    "enteredLabel": "入力済み",
+    "addressCountUnit": "件",
+    "estimatedFee": "予定費用",
+    "noticeCount": "全{count}件",
+    "successActivatedCount": "活性化成功数",
+    "pricePerAddress": "TRX/アドレス",
+    "countUnit": "件"
   },
   "feeCard": {
     "title": "料金説明",

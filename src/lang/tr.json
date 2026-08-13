@@ -346,7 +346,15 @@
     "allFailed": "Aktivasyon başarısız",
     "activationFailed": "Aktivasyon başarısız",
     "tips1": "Toplu aktivasyon için maksimum 1000 adres",
-    "tips2": "Aktive edilen adresler için aktivasyon ücreti alınmaz"
+    "tips2": "Aktive edilen adresler için aktivasyon ücreti alınmaz",
+    "inputAddress": "Adresleri girin",
+    "enteredLabel": "Girilen",
+    "addressCountUnit": "adres",
+    "estimatedFee": "Tahmini ücret",
+    "noticeCount": "Toplam {count}",
+    "successActivatedCount": "Başarıyla etkinleştirilen",
+    "pricePerAddress": "TRX/adres",
+    "countUnit": "adet"
   },
   "feeCard": {
     "title": "Ücret Açıklaması",

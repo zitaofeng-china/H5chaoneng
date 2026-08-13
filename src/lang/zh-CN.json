@@ -370,7 +370,15 @@
     "allFailed": "激活失败，请检查地址是否有效",
     "activationFailed": "激活失败",
     "tips1": "批量激活地址数量最多为1000个",
-    "tips2": "已激活的地址不收取激活费用"
+    "tips2": "已激活的地址不收取激活费用",
+    "inputAddress": "请输入地址",
+    "enteredLabel": "已输入",
+    "addressCountUnit": "个地址",
+    "estimatedFee": "预计费用",
+    "noticeCount": "共{count}条",
+    "successActivatedCount": "激活成功地址数",
+    "pricePerAddress": "TRX/地址",
+    "countUnit": "个"
   },
   "feeCard": {
     "title": "费用说明",
