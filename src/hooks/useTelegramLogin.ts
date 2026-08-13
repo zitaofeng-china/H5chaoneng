@@ -12,6 +12,7 @@ import {
   getTelegramUser,
   telegramReady,
   telegramExpand,
+  applyTelegramFullWidth,
 } from '@/utils/telegram'
 import { getSite } from '@/utils/site'
 import { setToken, setTokenExpiredAt } from '@/utils/token'
@@ -23,7 +24,7 @@ const TG_LOGIN_SUCCESS_MESSAGE = '登录成功'
 const TG_LOGIN_EXPIRE_TIME_PREFIX = '登录有效期至'
 const TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE = '登录过期时间异常，请联系客服'
 /** 关闭倒计时秒数 */
-export const TG_LOGIN_BLOCKED_COUNTDOWN = 3
+export const TG_LOGIN_BLOCKED_COUNTDOWN = 2
 
 function isEmptyData(data: unknown): boolean {
   if (data == null) return true
@@ -87,8 +88,9 @@ export function useTelegramLogin() {
     // 通知 Telegram 页面已准备好
     telegramReady()
 
-    // 展开到全屏
+    // 展开到全屏，并贴合手机宽度
     telegramExpand()
+    applyTelegramFullWidth()
 
     // 获取用户信息（调试用）
     const tgUser = getTelegramUser()
@@ -165,10 +167,22 @@ export function useTelegramLogin() {
         console.log('[Telegram] 自动登录成功')
         // 合并为一条提示，避免 success/info 同时弹出叠在一起
         if (expireTip) {
-          ElMessage.success(`${TG_LOGIN_SUCCESS_MESSAGE}，${expireTip}`)
+          ElMessage.success({
+            message: `${TG_LOGIN_SUCCESS_MESSAGE}，${expireTip}`,
+            duration: 2000,
+            showClose: true,
+          })
         } else {
-          ElMessage.success(TG_LOGIN_SUCCESS_MESSAGE)
-          ElMessage.warning(TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE)
+          ElMessage.success({
+            message: TG_LOGIN_SUCCESS_MESSAGE,
+            duration: 2000,
+            showClose: true,
+          })
+          ElMessage.warning({
+            message: TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE,
+            duration: 2000,
+            showClose: true,
+          })
         }
 
         // 动态站点跳转：后端返回站点标识时，跳转到对应站点

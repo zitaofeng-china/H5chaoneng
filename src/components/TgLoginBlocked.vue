@@ -1,5 +1,11 @@
 <template>
-  <div class="tg-login-blocked" role="alertdialog" aria-modal="true" aria-live="assertive">
+  <div
+    class="tg-login-blocked"
+    role="alertdialog"
+    aria-modal="true"
+    aria-live="assertive"
+    @click="closeNow"
+  >
     <div class="tg-login-blocked__card">
       <div class="tg-login-blocked__icon" aria-hidden="true">!</div>
       <p class="tg-login-blocked__message">{{ displayMessage }}</p>
@@ -31,7 +37,7 @@ const props = withDefaults(
   }>(),
   {
     message: '',
-    seconds: 3,
+    seconds: 2,
   },
 )
 
@@ -84,6 +90,7 @@ onUnmounted(() => {
   padding: 24px;
   background: var(--theme-bg, #293445);
   box-sizing: border-box;
+  cursor: pointer;
 }
 
 .tg-login-blocked__card {
