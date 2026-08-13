@@ -1,9 +1,16 @@
 <template>
   <div id="energy" class="energy-rental">
-    <section class="ecosystem-hero" aria-labelledby="ecosystem-title">
-      <div class="ecosystem-grid" aria-hidden="true"></div>
-      <h1 id="ecosystem-title" class="ecosystem-title">{{ t('home.ecosystemTitle') }}</h1>
-      <p class="ecosystem-subtitle">{{ t('home.ecosystemSubtitle') }}</p>
+    <section
+      class="ecosystem-hero"
+      :class="{ 'has-ad': hasAd }"
+      aria-labelledby="ecosystem-title"
+    >
+      <div v-if="!hasAd" class="ecosystem-grid" aria-hidden="true"></div>
+      <AdBanner @update:hasAd="hasAd = $event" />
+      <template v-if="!hasAd">
+        <h1 id="ecosystem-title" class="ecosystem-title">{{ t('home.ecosystemTitle') }}</h1>
+        <p class="ecosystem-subtitle">{{ t('home.ecosystemSubtitle') }}</p>
+      </template>
     </section>
 
     <section class="rental-section" aria-labelledby="rental-title">
@@ -204,6 +211,7 @@ import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from '@/utils/element'
 import { type FormInstance, type FormRules } from 'element-plus'
 import TransferRental from './TransferRental.vue'
+import AdBanner from '@/components/business/AdBanner.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -220,6 +228,7 @@ import { formatCryptoAmount } from '@/utils/number'
 import { withSitePrefix } from '@/utils/site'
 
 const { t } = useI18n()
+const hasAd = ref(false)
 const router = useRouter()
 const langStore = useLangStore()
 const commonStore = useCommonStore()
@@ -788,6 +797,32 @@ onUnmounted(() => {
   text-align: center;
   position: relative;
   background: #fff;
+
+  &.has-ad {
+    height: auto;
+    min-height: 0;
+    padding: 20px 24px 8px;
+  }
+
+  :deep(.ad-banner) {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 920px);
+    height: 100%;
+    margin: 0 auto;
+  }
+
+  :deep(.ad-carousel),
+  :deep(.ad-skeleton) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 4.5;
+    border-radius: 8px;
+  }
+
+  :deep(.ad-image) {
+    object-fit: cover;
+  }
 }
 
 .ecosystem-grid {
@@ -1385,6 +1420,17 @@ onUnmounted(() => {
     height: calc(5 * var(--theme-home-band-height, 30px));
     min-height: calc(5 * var(--theme-home-band-height, 30px));
     padding: 32px 16px 28px;
+
+    &.has-ad {
+      height: auto;
+      min-height: 0;
+      padding: 14px 12px 4px;
+    }
+
+    :deep(.ad-carousel),
+    :deep(.ad-skeleton) {
+      aspect-ratio: 16 / 5;
+    }
   }
 
   .ecosystem-title {
