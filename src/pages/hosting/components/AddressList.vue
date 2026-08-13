@@ -33,7 +33,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { ElMessageBox, ElMessage } from '@/utils/element'
 import ActivationCard from './AddressCard.vue'
@@ -43,6 +44,7 @@ import type { HostingAddressItem } from '@/api/modules/address/types'
 
 const { t } = useI18n()
 const userStore = useUserStore()
+const { isLogin } = storeToRefs(userStore)
 const loading = ref(false)
 const loadingMore = ref(false)
 const error = ref('')
@@ -199,10 +201,24 @@ function handleRefresh() {
   fetchHostingList(true)
 }
 
-// 组件挂载时获取列表
+// App 在子组件 mounted 之后才 init token，刷新时需等登录态就绪再请求
+watch(
+  isLogin,
+  (loggedIn) => {
+    if (loggedIn) {
+      fetchHostingList(true)
+      return
+    }
+
+    hostingList.value = []
+    error.value = ''
+    hasMore.value = false
+    loading.value = false
+  },
+  { immediate: true },
+)
+
 onMounted(() => {
-  fetchHostingList()
-  // 监听刷新事件
   window.addEventListener('refresh-hosting-list', handleRefresh)
 })
 
@@ -216,11 +232,11 @@ onUnmounted(() => {
 .activation-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  max-height: 305px;
+  gap: 16px;
+  max-height: 280px;
   overflow-y: auto;
   overscroll-behavior: contain;
-  padding-right: 4px;
+  padding-right: 2px;
 }
 
 .activation-list::-webkit-scrollbar {
@@ -262,9 +278,9 @@ onUnmounted(() => {
 
 @media (max-width: 890px) {
   .activation-list {
-    gap: 10px;
-    max-height: 360px;
-    padding-right: 2px;
+    gap: 14px;
+    max-height: 320px;
+    padding-right: 0;
   }
 
   .loading-state,
