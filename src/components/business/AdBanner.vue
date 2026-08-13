@@ -1,35 +1,43 @@
 <template>
-  <section v-if="hasAdImage" class="ad-banner" aria-label="广告">
+  <section
+    v-if="showBanner"
+    class="ad-banner"
+    :class="{ 'is-miniapp': instantSwitch }"
+    aria-label="广告"
+  >
     <div
       ref="carouselRef"
       class="ad-carousel"
-      :class="{ 'is-dragging': isDragging }"
+      :class="{ 'is-dragging': isDragging, 'is-instant': instantSwitch }"
       @pointerdown="handlePointerDown"
       @pointermove="handlePointerMove"
       @pointerup="handlePointerUp"
       @pointercancel="handlePointerCancel"
     >
-      <Transition name="ad-smooth" mode="out-in">
+      <div class="ad-slides">
         <component
-          :is="currentAd?.link_url ? 'a' : 'div'"
-          :key="`${String(currentAd?.id)}-${activeIndex}`"
+          :is="ad.link_url ? 'a' : 'div'"
+          v-for="(ad, index) in displayAds"
+          :key="getAdKey(ad, index)"
           class="ad-slide"
-          :href="currentAd?.link_url ? resolveUrl(currentAd.link_url) : undefined"
-          :target="currentAd?.link_url ? '_blank' : undefined"
-          :rel="currentAd?.link_url ? 'noopener noreferrer' : undefined"
+          :class="{ 'is-active': index === activeIndex }"
+          :href="ad.link_url ? resolveUrl(ad.link_url) : undefined"
+          :target="ad.link_url ? '_blank' : undefined"
+          :rel="ad.link_url ? 'noopener noreferrer' : undefined"
+          :aria-hidden="index !== activeIndex"
           @click="handleSlideClick"
         >
           <img
             class="ad-image"
-            :src="resolveUrl(currentAd!.image_url)"
-            :alt="currentAd?.title || $t('home.adBannerTitle')"
+            :src="resolveUrl(ad.image_url)"
+            alt=""
             draggable="false"
-            @error="handleImageError"
+            @error="handleImageError(ad)"
           />
         </component>
-      </Transition>
+      </div>
 
-      <template v-if="ads.length > 1">
+      <template v-if="displayAds.length > 1">
         <button
           class="ad-arrow ad-arrow--prev"
           type="button"
@@ -48,9 +56,9 @@
         </button>
       </template>
 
-      <div v-if="ads.length > 1" class="ad-dots" role="tablist" aria-label="广告切换">
+      <div v-if="displayAds.length > 1" class="ad-dots" role="tablist" aria-label="广告切换">
         <button
-          v-for="(ad, index) in ads"
+          v-for="(ad, index) in displayAds"
           :key="getAdKey(ad, index)"
           class="ad-dot"
           :class="{ 'is-active': index === activeIndex }"
@@ -69,6 +77,9 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { adApi } from '@/api'
 import type { AdItem } from '@/api/modules/ad/types'
+import { isMiniAppRuntime } from '@/utils/telegram'
+
+let cachedAds: AdItem[] | null = null
 
 defineOptions({
   name: 'AdBanner',
@@ -78,34 +89,38 @@ const emit = defineEmits<{
   'update:hasAd': [value: boolean]
 }>()
 
-const ads = ref<AdItem[]>([])
+const ads = ref<AdItem[]>(cachedAds ?? [])
 const activeIndex = ref(0)
-const loading = ref(false)
+const loaded = ref(Boolean(cachedAds))
 const failedImages = ref(new Set<string>())
 const carouselRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
 const suppressClick = ref(false)
+const instantSwitch = computed(() => isMiniAppRuntime())
 let pointerStartX = 0
 let pointerStartY = 0
 let pointerId: number | null = null
 let rotationTimer: ReturnType<typeof setInterval> | undefined
 
-const currentAd = computed(() => ads.value[activeIndex.value] ?? null)
-const currentImageFailed = computed(() => {
-  const id = currentAd.value?.id
-  return id !== undefined && failedImages.value.has(String(id))
-})
-const hasAdImage = computed(
-  () => Boolean(currentAd.value?.image_url) && !currentImageFailed.value,
+const displayAds = computed(() =>
+  ads.value.filter((ad) => Boolean(ad.image_url) && !failedImages.value.has(String(ad.id))),
 )
+const showBanner = computed(() => displayAds.value.length > 0)
 
-watch(
-  [hasAdImage, loading],
-  ([visible, isLoading]) => {
-    if (!isLoading) emit('update:hasAd', visible)
-  },
-  { immediate: true },
-)
+function emitHasAd() {
+  if (!loaded.value) return
+  emit('update:hasAd', showBanner.value)
+}
+
+watch(displayAds, (list) => {
+  if (activeIndex.value >= list.length) {
+    activeIndex.value = 0
+  }
+  emitHasAd()
+  if (list.length < 2) stopRotation()
+})
+
+if (loaded.value) emitHasAd()
 
 function isEnabled(ad: AdItem): boolean {
   const status = ad.status
@@ -149,17 +164,23 @@ function stopRotation() {
 
 function startRotation() {
   stopRotation()
-  if (ads.value.length < 2) return
+  if (displayAds.value.length < 2) return
 
   rotationTimer = setInterval(() => {
-    activeIndex.value = (activeIndex.value + 1) % ads.value.length
+    const total = displayAds.value.length
+    if (total < 2) {
+      stopRotation()
+      return
+    }
+    activeIndex.value = (activeIndex.value + 1) % total
   }, 6500)
 }
 
 function goToAd(index: number) {
-  if (ads.value.length < 2) return
+  const total = displayAds.value.length
+  if (total < 2) return
 
-  activeIndex.value = (index + ads.value.length) % ads.value.length
+  activeIndex.value = (index + total) % total
   startRotation()
 }
 
@@ -180,7 +201,7 @@ function isButtonTarget(target: EventTarget | null): boolean {
 }
 
 function handlePointerDown(event: PointerEvent) {
-  if (ads.value.length < 2 || isButtonTarget(event.target)) return
+  if (displayAds.value.length < 2 || isButtonTarget(event.target)) return
 
   pointerId = event.pointerId
   pointerStartX = event.clientX
@@ -239,20 +260,23 @@ function handleSlideClick(event: MouseEvent) {
   suppressClick.value = false
 }
 
-function handleImageError() {
-  const id = currentAd.value?.id
-  if (id === undefined) return
-
-  failedImages.value = new Set(failedImages.value).add(String(id))
+function handleImageError(ad: AdItem) {
+  failedImages.value = new Set(failedImages.value).add(String(ad.id))
 }
 
 async function loadAds() {
-  loading.value = true
+  if (cachedAds?.length) {
+    ads.value = cachedAds
+    loaded.value = true
+    emitHasAd()
+    startRotation()
+  }
 
   try {
     const response = await adApi.getAds()
     if (String(response.code) === '000000') {
       ads.value = normalizeAds(response.data)
+      cachedAds = ads.value
       activeIndex.value = 0
       startRotation()
     } else if (import.meta.env.DEV) {
@@ -263,7 +287,8 @@ async function loadAds() {
       console.warn('[AdBanner] 获取广告异常:', error)
     }
   } finally {
-    loading.value = false
+    loaded.value = true
+    emitHasAd()
   }
 }
 
@@ -280,6 +305,18 @@ onUnmounted(() => {
 .ad-banner {
   width: min(100%, 896px);
   margin: 0 auto 16px;
+
+  &.is-miniapp {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+
+    .ad-carousel,
+    .ad-skeleton {
+      width: 100%;
+      border-radius: 0;
+    }
+  }
 }
 
 .ad-carousel,
@@ -300,12 +337,35 @@ onUnmounted(() => {
   }
 }
 
+.ad-slides {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
 .ad-slide {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   display: block;
   width: 100%;
   height: 100%;
   color: inherit;
   text-decoration: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s ease;
+
+  &.is-active {
+    position: relative;
+    z-index: 1;
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+
+.ad-carousel.is-instant .ad-slide {
+  transition: none;
 }
 
 .ad-image {
@@ -392,20 +452,6 @@ onUnmounted(() => {
 
 .ad-arrow--next {
   right: 12px;
-}
-
-.ad-smooth-enter-active,
-.ad-smooth-leave-active {
-  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.ad-smooth-enter-from {
-  transform: translateX(18px);
-}
-
-.ad-smooth-leave-to {
-  transform: translateX(-18px);
 }
 
 .ad-dots {
