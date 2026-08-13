@@ -124,7 +124,9 @@
     "smartContractFlash": "Proceso de Intercambio Rápido de Contratos Inteligentes Explicado",
     "smartContractFlashDesc": "Este intercambio rápido de contratos inteligentes es un intercambio instantáneo descentralizado USDT-TRX en la cadena TRON, usando tecnología de contratos inteligentes, activación automática del contrato, devolución automática de tokens de intercambio",
     "usdtToTrx": "Cuando la billetera de pago transfiere USDT a la billetera de intercambio rápido, esto activa el contrato. Después del intercambio automático, TRX se devuelve con la comisión deducida, luego se transfiere a la billetera de pago.",
-    "trxToUsdt": "Cuando la billetera de pago transfiere TRX a la billetera de intercambio rápido, se deduce la comisión, luego se activa el contrato. Después del intercambio automático, USDT se devuelve y se transfiere a la billetera de pago."
+    "trxToUsdt": "Cuando la billetera de pago transfiere TRX a la billetera de intercambio rápido, se deduce la comisión, luego se activa el contrato. Después del intercambio automático, USDT se devuelve y se transfiere a la billetera de pago.",
+    "adBannerEyebrow": "Promoción de la plataforma",
+    "adBannerTitle": "Alquiler instantáneo de energía, oferta limitada"
   },
   "fee": {
     "title": "Descripción de Comisiones",

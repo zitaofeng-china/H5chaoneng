@@ -127,7 +127,9 @@
     "smartContractFlash": "Smart Contract Flash Exchange Process Explained",
     "smartContractFlashDesc": "This smart contract flash exchange is a decentralized USDT-TRX instant exchange on TRON chain, using smart contract technology, automatically trigger contract exchange, automatically return exchange tokens",
     "usdtToTrx": "When the payment wallet transfers USDT to the flash exchange wallet, it triggers the contract. After automatic exchange, TRX is returned with fee deducted, then transferred to the payment wallet.",
-    "trxToUsdt": "When the payment wallet transfers TRX to the flash exchange wallet, the fee is deducted, then the contract is triggered. After automatic exchange, USDT is returned and transferred to the payment wallet."
+    "trxToUsdt": "When the payment wallet transfers TRX to the flash exchange wallet, the fee is deducted, then the contract is triggered. After automatic exchange, USDT is returned and transferred to the payment wallet.",
+    "adBannerEyebrow": "Platform Offer",
+    "adBannerTitle": "Flash energy rental, limited-time deal"
   },
   "fee": {
     "title": "Fee Description",

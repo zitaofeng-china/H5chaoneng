@@ -1,12 +1,6 @@
 <template>
-  <section v-if="loading || currentAd" class="ad-banner" aria-label="广告">
-    <div v-if="loading" class="ad-skeleton" aria-hidden="true">
-      <span class="ad-skeleton__line ad-skeleton__line--title"></span>
-      <span class="ad-skeleton__line ad-skeleton__line--text"></span>
-    </div>
-
+  <section v-if="hasAdImage" class="ad-banner" aria-label="广告">
     <div
-      v-else
       ref="carouselRef"
       class="ad-carousel"
       :class="{ 'is-dragging': isDragging }"
@@ -26,17 +20,12 @@
           @click="handleSlideClick"
         >
           <img
-            v-if="currentAd?.image_url && !currentImageFailed"
             class="ad-image"
-            :src="resolveUrl(currentAd.image_url)"
-            :alt="currentAd.title || '广告'"
+            :src="resolveUrl(currentAd!.image_url)"
+            :alt="currentAd?.title || $t('home.adBannerTitle')"
             draggable="false"
             @error="handleImageError"
           />
-          <div v-else class="ad-fallback">
-            <span class="ad-fallback__eyebrow">{{ currentAd?.title || '平台活动' }}</span>
-            <span class="ad-fallback__title">闪租能量，限时优惠</span>
-          </div>
         </component>
       </Transition>
 
@@ -77,13 +66,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { adApi } from '@/api'
 import type { AdItem } from '@/api/modules/ad/types'
 
 defineOptions({
   name: 'AdBanner',
 })
+
+const emit = defineEmits<{
+  'update:hasAd': [value: boolean]
+}>()
 
 const ads = ref<AdItem[]>([])
 const activeIndex = ref(0)
@@ -102,6 +95,17 @@ const currentImageFailed = computed(() => {
   const id = currentAd.value?.id
   return id !== undefined && failedImages.value.has(String(id))
 })
+const hasAdImage = computed(
+  () => Boolean(currentAd.value?.image_url) && !currentImageFailed.value,
+)
+
+watch(
+  [hasAdImage, loading],
+  ([visible, isLoading]) => {
+    if (!isLoading) emit('update:hasAd', visible)
+  },
+  { immediate: true },
+)
 
 function isEnabled(ad: AdItem): boolean {
   const status = ad.status
@@ -149,7 +153,7 @@ function startRotation() {
 
   rotationTimer = setInterval(() => {
     activeIndex.value = (activeIndex.value + 1) % ads.value.length
-  }, 5000)
+  }, 6500)
 }
 
 function goToAd(index: number) {

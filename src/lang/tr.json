@@ -124,7 +124,9 @@
     "smartContractFlash": "Akıllı Sözleşme Hızlı Değişim Süreci Açıklaması",
     "smartContractFlashDesc": "Bu akıllı sözleşme hızlı değişimi, TRON zincirinde merkezi olmayan USDT-TRX anlık değişimidir, akıllı sözleşme teknolojisi kullanarak, sözleşme değişimini otomatik tetikler, değişim tokenlarını otomatik olarak iade eder",
     "usdtToTrx": "Ödeme cüzdanı hızlı değişim cüzdanına USDT transfer ettiğinde, sözleşme tetiklenir. Otomatik değişimden sonra, TRX ücret düşülerek iade edilir, ardından ödeme cüzdanına transfer edilir.",
-    "trxToUsdt": "Ödeme cüzdanı hızlı değişim cüzdanına TRX transfer ettiğinde, ücret düşülür, ardından sözleşme tetiklenir. Otomatik değişimden sonra, USDT iade edilir ve ödeme cüzdanına transfer edilir."
+    "trxToUsdt": "Ödeme cüzdanı hızlı değişim cüzdanına TRX transfer ettiğinde, ücret düşülür, ardından sözleşme tetiklenir. Otomatik değişimden sonra, USDT iade edilir ve ödeme cüzdanına transfer edilir.",
+    "adBannerEyebrow": "Platform kampanyası",
+    "adBannerTitle": "Anında enerji kiralama, sınırlı teklif"
   },
   "fee": {
     "title": "Ücret Açıklaması",

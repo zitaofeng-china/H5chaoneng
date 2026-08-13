@@ -123,7 +123,9 @@
     "smartContractFlash": "智能合約閃兌流程詳解",
     "smartContractFlashDesc": "本智能合約閃兌是波場鏈去中心化USDT-TRX交易即時兌換，利用智能合約技術，自動觸發合約兌換，自動原路返回兌換代幣",
     "usdtToTrx": "當付款錢包往閃兌錢包轉入USDT就觸發合約，通過自動兌換，返回TRX後扣除手續費，再轉入付款錢包。",
-    "trxToUsdt": "當付款錢包往閃兌錢包轉入TRX後扣除手續費，再觸發合約，通過自動兌換，返回USDT再轉入付款錢包。"
+    "trxToUsdt": "當付款錢包往閃兌錢包轉入TRX後扣除手續費，再觸發合約，通過自動兌換，返回USDT再轉入付款錢包。",
+    "adBannerEyebrow": "平台活動",
+    "adBannerTitle": "閃租能量，限時優惠"
   },
   "fee": {
     "title": "手續費說明",

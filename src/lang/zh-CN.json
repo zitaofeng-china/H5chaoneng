@@ -130,7 +130,9 @@
     "smartContractFlash": "智能合约闪兑流程详解",
     "smartContractFlashDesc": "本智能合约闪兑是波场链去中心化USDT-TRX交易即时兑换，利用智能合约技术，自动触发合约兑换，自动原路返回兑换代币",
     "usdtToTrx": "当付款钱包往闪兑钱包转入USDT就触发合约，通过自动兑换，返回TRX后扣除手续费，再转入付款钱包。",
-    "trxToUsdt": "当付款钱包往闪兑钱包转入TRX后扣除手续费，再触发合约，通过自动兑换，返回USDT再转入付款钱包。"
+    "trxToUsdt": "当付款钱包往闪兑钱包转入TRX后扣除手续费，再触发合约，通过自动兑换，返回USDT再转入付款钱包。",
+    "adBannerEyebrow": "平台活动",
+    "adBannerTitle": "闪租能量，限时优惠"
   },
   "fee": {
     "title": "手续费说明",
