@@ -39,6 +39,11 @@ export function isTelegramMiniApp(): boolean {
   return typeof tg?.initData === 'string' && tg.initData.trim().length > 0
 }
 
+/** Mini App 容器（含仅能识别到启动参数、尚未取到 initData 的情况） */
+export function isMiniAppRuntime(): boolean {
+  return isTelegramMiniApp() || isTelegramEnvironment()
+}
+
 /**
  * 获取 Telegram initData（用于后端验证）
  */
@@ -69,6 +74,24 @@ export function telegramReady() {
 export function telegramExpand() {
   const tg = getTelegramWebApp()
   tg?.expand()
+}
+
+/** 让 Mini App 页面宽度始终贴合手机可视宽度 */
+export function applyTelegramFullWidth() {
+  const tg = getTelegramWebApp()
+  const root = document.documentElement
+  const apply = () => {
+    const width = Number(tg?.viewportWidth) || window.innerWidth
+    if (width > 0) {
+      root.style.setProperty('--tg-viewport-width', `${width}px`)
+    }
+    root.style.width = '100%'
+    document.body.style.width = '100%'
+  }
+
+  apply()
+  if (!tg?.onEvent) return
+  tg.onEvent('viewportChanged', apply)
 }
 
 /**
