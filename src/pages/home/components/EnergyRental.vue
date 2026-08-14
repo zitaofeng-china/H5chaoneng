@@ -1537,54 +1537,50 @@ onUnmounted(() => {
   }
 
   .rental-card :deep(.el-card__body) {
-    padding: 0 0 20px;
+    padding: 0 10px 20px;
   }
 
   .mode-section.is-balance {
     min-height: 0;
   }
 
+  .rental-card.is-balance .mode-label,
+  .rental-card.is-balance .rental-tabs,
+  .rental-card.is-balance .field-label,
+  .rental-card.is-balance .rental-form,
+  .rental-card.is-balance .rental-form .info-text,
+  .rental-card.is-balance .rental-form :deep(.el-form-item),
+  .rental-card.is-balance .rental-form :deep(.balance-form-item),
+  .rental-card.is-balance .rental-form .action-form-item {
+    width: 100%;
+    max-width: none;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
   .rental-card.is-balance .rental-tabs {
-    width: calc(100% - 20px);
-    margin: 16px 10px 0;
+    margin-top: 16px;
   }
 
   .rental-card.is-transfer .rental-tabs {
-    width: calc(100% - 20px);
-    margin: 0 10px;
+    width: 100%;
+    margin: 0;
   }
 
   .rental-card.is-transfer .mode-label {
-    width: calc(100% - 20px);
-    margin: 20px 10px 0;
+    width: 100%;
+    margin: 20px 0 0;
   }
 
   .balance-mode-label {
     margin-top: 20px !important;
   }
 
-  .rental-card.is-balance .field-label,
-  .rental-card.is-balance .rental-form,
-  .rental-card.is-balance .rental-form .info-text {
-    width: calc(100% - 20px);
-  }
-
   .rental-card.is-balance .field-label {
-    margin-left: 10px;
     font-size: 13px;
   }
 
-  .rental-card.is-balance .rental-form {
-    margin: 0;
-  }
-
-  .rental-card.is-balance .rental-form :deep(.balance-form-item) {
-    width: calc(100% - 20px);
-    margin-left: 10px;
-  }
-
   .rental-card.is-balance .rental-form .info-text {
-    margin-left: 10px;
     font-size: 12px;
   }
 
@@ -1601,9 +1597,7 @@ onUnmounted(() => {
   }
 
   .rental-card.is-balance .rental-form .action-form-item {
-    width: calc(100% - 20px);
-    max-width: none;
-    margin: 16px 10px 0;
+    margin-top: 16px;
   }
 
   .rental-card.is-balance .rental-form .action-buttons {
