@@ -1,99 +1,98 @@
 <template>
   <footer class="footer">
+    <div class="footer-glow" aria-hidden="true"></div>
+
     <div class="footer-container">
       <div class="footer-content">
-        <div class="footer-section left-section">
-          <div class="logo-section">
-            <img src="@/assets/images/logo.png" alt="Logo" />
-          </div>
-          <div class="description">{{ $t('footer.description') }}</div>
+        <section class="footer-section brand-section">
+          <img src="@/assets/images/logo.png" alt="GAS711" class="footer-logo" />
+          <p class="description">{{ $t('footer.description') }}</p>
           <div class="social-icons">
-            <div class="social-icon" @click="handleOpenToTelegram(tgAdmin)">
-              <SvgIcon name="footer-telegram" width="24" height="24" />
-            </div>
+            <button
+              type="button"
+              class="social-icon"
+              :aria-label="$t('nav.contactUs')"
+              @click="handleOpenToTelegram(tgAdmin)"
+            >
+              <SvgIcon name="footer-telegram" width="18" height="18" />
+            </button>
           </div>
-        </div>
+        </section>
 
-        <div class="footer-section middle-section">
-          <div class="section-title">{{ $t('footer.quickLinks') }}</div>
+        <nav class="footer-section quick-links" :aria-label="$t('footer.quickLinks')">
+          <h2 class="section-title">{{ $t('footer.quickLinks') }}</h2>
           <ul class="link-list">
             <li>
-              <div class="footer-link" @click="handleToRouter('/contract')">
+              <button type="button" class="footer-link" @click="handleToRouter('/contract')">
                 {{ $t('nav.contractFlash') }}
-              </div>
+              </button>
             </li>
             <li>
-              <div class="footer-link" @click="handleToRouter('/hosting')">
+              <button type="button" class="footer-link" @click="handleToRouter('/hosting')">
                 {{ $t('nav.smartHosting') }}
-              </div>
+              </button>
             </li>
             <li>
-              <div class="footer-link" @click="handleToRouter('/activation')">
+              <button type="button" class="footer-link" @click="handleToRouter('/activation')">
                 {{ $t('nav.batchActivation') }}
-              </div>
+              </button>
             </li>
             <li>
-              <div class="footer-link" @click.stop="handleToRouter('/', '#feature')">
+              <button type="button" class="footer-link" @click="handleToRouter('/', '#feature')">
                 {{ $t('nav.features') }}
-              </div>
+              </button>
             </li>
             <li>
-              <div class="footer-link" @click.stop="handleToRouter('/', '#howItWorks')">
+              <button type="button" class="footer-link" @click="handleToRouter('/', '#howItWorks')">
                 {{ $t('nav.howItWorks') }}
-              </div>
+              </button>
             </li>
             <li>
-              <div class="footer-link" @click.stop="handleToRouter('/', '#question')">
+              <button type="button" class="footer-link" @click="handleToRouter('/', '#question')">
                 {{ $t('nav.faq') }}
-              </div>
+              </button>
             </li>
           </ul>
-        </div>
+        </nav>
 
-        <div class="footer-section right-section">
-          <div class="section-title">{{ $t('footer.contactUs') }}</div>
-          <div class="contact-info">
-            <div class="contact-item" @click="handleOpenToTelegram(tgAdmin)">
-              <SvgIcon name="footer-telegram" width="20" height="20" />
-              <span>{{ displayTgAdmin }}</span>
-            </div>
-          </div>
-        </div>
+        <section class="footer-section contact-section">
+          <h2 class="section-title">{{ $t('footer.contactUs') }}</h2>
+          <button type="button" class="contact-item" @click="handleOpenToTelegram(tgAdmin)">
+            <SvgIcon name="footer-telegram" width="16" height="16" />
+            <span>{{ displayTgAdmin }}</span>
+          </button>
+        </section>
       </div>
 
-      <!-- 版权信息独立一行 -->
       <div class="footer-bottom">
-        <div class="copyright">© {{ currentYear }} GAS711. {{ $t('footer.rightsReserved') }}</div>
+        <span>© {{ currentYear }} GAS711. {{ $t('footer.rightsReserved') }}</span>
       </div>
     </div>
   </footer>
 </template>
 
 <script setup lang="ts">
-import { handleOpenToTelegram } from '@/utils'
 import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
+import { handleOpenToTelegram } from '@/utils'
 import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
-import { storeToRefs } from 'pinia'
 
 defineOptions({
   name: 'LayoutFooter',
 })
 
+const router = useRouter()
 const siteStore = useSiteStore()
 const { tgAdmin } = storeToRefs(siteStore)
 
-// 显示用的 Telegram 账号（确保有 @ 前缀）
 const displayTgAdmin = computed(() => {
   if (!tgAdmin.value) return ''
   return tgAdmin.value.startsWith('@') ? tgAdmin.value : `@${tgAdmin.value}`
 })
 
-// 动态获取当前年份
 const currentYear = computed(() => new Date().getFullYear())
-
-const router = useRouter()
 
 const handleToRouter = (path: string, hash?: string) => {
   router.push({ path: withSitePrefix(path), hash })
@@ -102,307 +101,214 @@ const handleToRouter = (path: string, hash?: string) => {
 
 <style lang="scss" scoped>
 .footer {
-  min-height: 320px;
-  background: var(--theme-bg);
-  padding: 60px 0 0;
-  margin-top: auto;
+  position: relative;
+  overflow: hidden;
+  min-height: 248px;
+  padding: 50px 0 0;
+  background: linear-gradient(180deg, #061743 0%, #020f2d 62%, #061b4c 100%);
+  color: #fff;
+  isolation: isolate;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -22px;
+  height: 128px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(24, 77, 205, 0.2) 22%,
+    rgba(20, 127, 255, 0.35) 53%,
+    rgba(32, 208, 236, 0.24) 72%,
+    transparent 100%
+  );
+  filter: blur(22px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.footer::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(119, 187, 255, 0.48), transparent);
+  pointer-events: none;
 }
 
 .footer-container {
-  max-width: 1600px;
+  width: min(100%, 1180px);
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 32px;
+  box-sizing: border-box;
 }
 
 .footer-content {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(150px, 0.75fr) minmax(150px, 0.8fr);
+  gap: 56px;
+}
+
+.footer-section {
+  min-width: 0;
+}
+
+.footer-logo {
+  display: block;
+  width: 106px;
+  height: auto;
+}
+
+.description {
+  max-width: 320px;
+  margin: 16px 0 17px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+.social-icons {
   display: flex;
-  gap: 80px;
-  padding-bottom: 40px;
+  gap: 8px;
+}
 
-  .footer-section {
-    flex: 1;
+.social-icon,
+.contact-item,
+.footer-link {
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+}
 
-    .section-title {
-      color: var(--theme-text-white);
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 20px;
-    }
-  }
+.social-icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 
-  .left-section {
-    flex: 1.2;
-
-    .logo-section {
-      margin-bottom: 20px;
-
-      img {
-        height: 40px;
-        width: auto;
-      }
-    }
-
-    .description {
-      color: var(--theme-text-white);
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 24px;
-      opacity: 0.7;
-      white-space: 310px;
-    }
-
-    .social-icons {
-      display: flex;
-      gap: 16px;
-    }
-
-    .social-icon {
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      color: var(--theme-text-white);
-
-      &:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: translateY(-2px);
-      }
-    }
-  }
-
-  .middle-section {
-    flex: 0.8;
-
-    .link-list {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-
-      li {
-        margin-bottom: 14px;
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        .footer-link {
-          color: var(--theme-text-white);
-          text-decoration: none;
-          font-size: 14px;
-          transition: all 0.3s ease;
-          opacity: 0.7;
-          cursor: pointer;
-          display: inline-block;
-          position: relative;
-
-          &::before {
-            content: '';
-            position: absolute;
-            left: -12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 4px;
-            background: var(--theme-text-green);
-            border-radius: 50%;
-            opacity: 0;
-            transition: all 0.3s ease;
-          }
-
-          &:hover {
-            opacity: 1;
-            color: var(--theme-text-green);
-            transform: translateX(4px);
-
-            &::before {
-              opacity: 1;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .right-section {
-    flex: 1;
+  &:hover {
+    background: rgba(31, 117, 255, 0.45);
+    transform: translateY(-1px);
   }
 }
 
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.section-title {
+  margin: 2px 0 16px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.link-list {
+  display: grid;
+  gap: 9px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.footer-link {
+  padding: 0;
+  color: rgba(255, 255, 255, 0.58);
+  background: transparent;
+  font-size: 13px;
+  line-height: 1.4;
+  text-align: left;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    color: #fff;
+    transform: translateX(2px);
+  }
 }
 
 .contact-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  padding: 10px;
-  margin: -10px;
-  border-radius: 8px;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.05);
-
-    span {
-      opacity: 1;
-      color: var(--theme-text-green);
-    }
-
-    svg {
-      transform: scale(1.1);
-    }
-  }
-
-  span {
-    color: var(--theme-text-white);
-    font-size: 14px;
-    opacity: 0.7;
-    transition: all 0.3s ease;
-    word-break: break-all;
-  }
+  gap: 9px;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.62);
+  background: transparent;
+  font-size: 13px;
+  line-height: 1.4;
+  transition: color 0.2s ease;
 
   svg {
-    color: var(--theme-bg-blue);
-    flex-shrink: 0;
-    transition: transform 0.3s ease;
+    color: #35a7ff;
+  }
+
+  &:hover {
+    color: #fff;
   }
 }
 
 .footer-bottom {
+  margin-top: 38px;
+  padding: 16px 0 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 24px 0;
+  color: rgba(255, 255, 255, 0.42);
+  font-size: 12px;
+  line-height: 1.4;
   text-align: center;
-
-  .copyright {
-    color: var(--theme-text-white);
-    font-size: 14px;
-    opacity: 0.5;
-  }
 }
 
-@media (max-width: 890px) {
+@media (max-width: 768px) {
   .footer {
     min-height: auto;
-    padding: 24px 0 0;
+    padding-top: 34px;
   }
 
   .footer-container {
-    padding: 0 10px;
+    padding: 0 16px;
   }
 
   .footer-content {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 20px;
-    padding-bottom: 20px;
+    grid-template-columns: 1fr 1fr;
+    gap: 26px 28px;
+  }
 
-    .footer-section {
-      flex: none;
-    }
+  .brand-section {
+    grid-column: 1 / -1;
+  }
 
-    // Logo 和社交图标放在一行
-    .left-section {
-      display: grid;
-      grid-template-columns: auto 1fr;
-      gap: 16px;
-      align-items: start;
+  .footer-logo {
+    width: 94px;
+  }
 
-      .logo-section {
-        margin-bottom: 0;
+  .description {
+    margin: 12px 0 13px;
+    font-size: 10px;
+  }
 
-        img {
-          height: 28px;
-        }
-      }
+  .section-title {
+    margin-bottom: 12px;
+    font-size: 11px;
+  }
 
-      .description {
-        display: none; // 移动端隐藏描述文字
-      }
-
-      .social-icons {
-        display: flex;
-        gap: 10px;
-        justify-content: flex-end;
-      }
-
-      .social-icon {
-        width: 34px;
-        height: 34px;
-        
-        svg {
-          width: 18px;
-          height: 18px;
-        }
-      }
-    }
-
-    // 快速链接改为两列布局
-    .middle-section {
-      .section-title {
-        font-size: 13px;
-        margin-bottom: 10px;
-        font-weight: 600;
-      }
-
-      .link-list {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px 12px;
-
-        li {
-          margin-bottom: 0;
-
-          .footer-link {
-            font-size: 12px;
-            opacity: 0.8;
-          }
-        }
-      }
-    }
-
-    // 联系方式简化
-    .right-section {
-      .section-title {
-        font-size: 13px;
-        margin-bottom: 10px;
-        font-weight: 600;
-      }
-
-      .contact-item {
-        padding: 6px 4px;
-        margin: -6px -4px;
-
-        svg {
-          width: 16px;
-          height: 16px;
-        }
-
-        span {
-          font-size: 12px;
-          opacity: 0.8;
-        }
-      }
-    }
+  .footer-link,
+  .contact-item {
+    font-size: 10px;
   }
 
   .footer-bottom {
-    padding: 14px 0 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-
-    .copyright {
-      font-size: 10px;
-      opacity: 0.6;
-      line-height: 1.3;
-    }
+    margin-top: 28px;
+    padding: 12px 0 16px;
+    font-size: 9px;
   }
 }
 </style>
