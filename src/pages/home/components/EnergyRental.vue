@@ -1469,6 +1469,24 @@ onUnmounted(() => {
     }
   }
 
+  @media (max-width: 400px) {
+    .ecosystem-hero.has-ad:not(.is-miniapp) {
+      padding-right: 0;
+      padding-left: 0;
+
+      :deep(.ad-banner) {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+      }
+
+      :deep(.ad-carousel),
+      :deep(.ad-skeleton) {
+        border-radius: 0;
+      }
+    }
+  }
+
   .ecosystem-title {
     font-size: 26px;
   }

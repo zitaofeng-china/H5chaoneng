@@ -517,6 +517,20 @@ onUnmounted(() => {
     margin-bottom: 12px;
   }
 
+  @media (max-width: 400px) {
+    .ad-banner:not(.is-miniapp) {
+      width: 100%;
+      max-width: none;
+      margin-right: 0;
+      margin-left: 0;
+
+      .ad-carousel,
+      .ad-skeleton {
+        border-radius: 0;
+      }
+    }
+  }
+
   .ad-carousel,
   .ad-skeleton {
     aspect-ratio: 16 / 4;
