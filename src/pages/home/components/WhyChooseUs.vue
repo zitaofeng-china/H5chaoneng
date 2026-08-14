@@ -1,21 +1,26 @@
 <template>
   <section id="feature" class="why-choose-us">
-    <div class="container">
-      <div class="header">
+    <div class="feature-container">
+      <header class="feature-header">
         <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
-        <p class="subtitle">
-          {{ t('home.subtitle') }}
-        </p>
-      </div>
+        <p class="subtitle">{{ t('home.subtitle') }}</p>
+      </header>
 
-      <div class="grid">
-        <div v-for="item in items" :key="item.key" class="card">
-          <div class="icon">
-            <SvgIcon :name="`choose-${item.icon}`" width="56" height="56" />
-          </div>
+      <div class="feature-showcase">
+        <div class="token-art" aria-hidden="true">
+          <span class="feature-visual feature-visual-base"></span>
+          <span class="feature-visual feature-visual-inner"></span>
+          <span class="feature-visual feature-visual-token"></span>
+        </div>
 
-          <div class="card-title">{{ t(item.titleKey) }}</div>
-          <div class="card-desc">{{ t(item.descKey) }}</div>
+        <div class="feature-list">
+          <article v-for="(item, index) in items" :key="item.key" class="feature-item">
+            <span class="feature-dot" :class="`tone-${index + 1}`"></span>
+            <div class="feature-copy">
+              <h3>{{ t(item.titleKey) }}</h3>
+              <p>{{ t(item.descKey) }}</p>
+            </div>
+          </article>
         </div>
       </div>
     </div>
@@ -35,7 +40,6 @@ type Item = {
   key: string
   titleKey: string
   descKey: string
-  icon: 'shield' | 'bolt' | 'coins' | 'code' | 'eye' | 'headset'
 }
 
 const items: Item[] = [
@@ -43,208 +47,275 @@ const items: Item[] = [
     key: 'safe',
     titleKey: 'home.safeAndReliable',
     descKey: 'home.safeAndReliableDesc',
-    icon: 'shield',
   },
   {
     key: 'fast',
     titleKey: 'home.fastExchange',
     descKey: 'home.fastExchangeDesc',
-    icon: 'bolt',
   },
   {
     key: 'low',
     titleKey: 'home.lowCost',
     descKey: 'home.lowCostDesc',
-    icon: 'coins',
   },
   {
     key: 'contract',
     titleKey: 'home.smartContract',
     descKey: 'home.smartContractDesc',
-    icon: 'code',
   },
   {
     key: 'transparent',
     titleKey: 'home.transparent',
     descKey: 'home.transparentDesc',
-    icon: 'eye',
   },
   {
     key: 'support',
     titleKey: 'home.support247',
     descKey: 'home.support247Desc',
-    icon: 'headset',
   },
 ]
 </script>
 
 <style lang="scss" scoped>
 .why-choose-us {
-  background: var(--theme-bg-light);
-  padding: 20px 0 100px;
+  overflow: hidden;
+  background: #fff;
+  padding: 72px 0 8px;
 }
 
-.container {
-  max-width: 1200px;
+.feature-container {
+  width: min(100%, 1360px);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 24px;
+  box-sizing: border-box;
 }
 
-.header {
+.feature-header {
   text-align: center;
+  margin-bottom: 28px;
 }
 
 .title {
-  font-size: 40px;
-  font-weight: 700;
-  color: var(--theme-text-black);
   margin: 0;
+  color: #182230;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .subtitle {
-  margin: 14px auto 0;
-  max-width: 820px;
-  font-size: 14px;
-  color: var(--theme-text-muted);
-}
-
-.grid {
-  margin-top: 56px;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
-}
-
-.card {
-  background: var(--theme-text-white);
-  border-radius: 14px;
-  padding: 26px;
-  box-shadow: 0px 13px 22px 0px var(--theme-shadow-strong);
-  border: 1px solid var(--theme-border-light);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0px 18px 28px 0px var(--theme-shadow-strong-hover);
-  }
-}
-
-.icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.card-title {
-  margin-top: 18px;
-  font-size: 18px;
-  font-weight: 700;
-  color: var(--theme-text-black);
-}
-
-.card-desc {
-  margin-top: 10px;
+  max-width: 720px;
+  margin: 12px auto 0;
+  color: rgba(71, 84, 103, 0.72);
   font-size: 13px;
   line-height: 1.7;
-  color: var(--theme-text-muted);
 }
 
-.icon-blue {
-  background: var(--theme-choose-blue-bg);
-  color: var(--theme-choose-blue);
+.feature-showcase {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 560px);
+  align-items: center;
+  gap: 8px 12px;
 }
 
-.icon-green {
-  background: var(--theme-choose-green-bg);
-  color: var(--theme-choose-green);
+.token-art {
+  position: relative;
+  width: 100%;
+  max-width: 720px;
+  aspect-ratio: 896 / 780;
+  margin-left: -6%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
 }
 
-.icon-orange {
-  background: var(--theme-choose-orange-bg);
-  color: var(--theme-choose-orange);
+.feature-visual {
+  position: absolute;
+  display: block;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  pointer-events: none;
 }
 
-.icon-purple {
-  background: var(--theme-choose-purple-bg);
-  color: var(--theme-choose-purple);
+.feature-visual-base {
+  top: -6%;
+  left: -4%;
+  width: 118%;
+  height: 128%;
+  background-image: url('@/assets/images/home/lanhu/feature-bg.png');
 }
 
-.icon-red {
-  background: var(--theme-choose-red-bg);
-  color: var(--theme-choose-red);
+.feature-visual-inner {
+  top: 4%;
+  left: 42%;
+  width: 46%;
+  height: 52%;
+  background-image: url('@/assets/images/home/lanhu/feature-inner-bg.png');
 }
 
-.icon-yellow {
-  background: var(--theme-choose-yellow-bg);
-  color: var(--theme-choose-yellow);
+.feature-visual-token {
+  top: 32%;
+  left: 16%;
+  width: 30%;
+  height: 34%;
+  background-image: url('@/assets/images/home/lanhu/feature-coin.png');
 }
 
-@media (max-width: 992px) {
-  .container {
-    padding: 0 20px;
+.feature-list {
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 36px;
+  background: #fff;
+  border: 1px solid rgba(22, 93, 255, 0.42);
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.feature-item {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr);
+  gap: 12px;
+  padding: 16px 0;
+
+  & + .feature-item {
+    border-top: 1px solid rgba(224, 229, 236, 0.62);
+  }
+}
+
+.feature-dot {
+  width: 8px;
+  height: 8px;
+  margin-top: 5px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 4px color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.tone-1 {
+  color: #2588ff;
+  background: #2588ff;
+}
+
+.tone-2 {
+  color: #ffb547;
+  background: #ffb547;
+}
+
+.tone-3 {
+  color: #ff7b6b;
+  background: #ff7b6b;
+}
+
+.tone-4 {
+  color: #a27cff;
+  background: #a27cff;
+}
+
+.tone-5 {
+  color: #f06a9a;
+  background: #f06a9a;
+}
+
+.tone-6 {
+  color: #f0b735;
+  background: #f0b735;
+}
+
+.feature-copy h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.feature-copy p {
+  margin: 5px 0 0;
+  color: rgba(71, 84, 103, 0.68);
+  font-size: 12px;
+  line-height: 1.65;
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .feature-container {
+    padding: 0 32px;
   }
 
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+  .feature-showcase {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 48%);
+  }
+
+  .token-art {
+    margin-left: -4%;
+  }
+
+  .feature-list {
+    padding: 22px 24px;
+  }
+
+  .feature-item {
+    gap: 11px;
+    padding: 13px 0;
+  }
+
+  .feature-copy h3 {
+    font-size: 14px;
+  }
+
+  .feature-copy p {
+    font-size: 11px;
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .why-choose-us {
-    padding: 32px 0 40px;
+    padding: 48px 0 8px;
   }
 
-  .container {
+  .feature-container {
     padding: 0 16px;
   }
 
   .title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 24px;
   }
 
   .subtitle {
-    font-size: 13px;
     margin-top: 10px;
-    line-height: 1.5;
-  }
-
-  .grid {
-    margin-top: 20px;
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .card {
-    padding: 18px;
-    border-radius: 12px;
-  }
-
-  .icon {
-    width: 40px;
-    height: 40px;
-
-    svg {
-      width: 48px;
-      height: 48px;
-    }
-  }
-
-  .card-title {
-    margin-top: 14px;
-    font-size: 16px;
-    font-weight: 600;
-  }
-
-  .card-desc {
-    margin-top: 8px;
     font-size: 12px;
     line-height: 1.6;
+  }
+
+  .feature-showcase {
+    display: block;
+    margin-top: 12px;
+  }
+
+  .token-art {
+    width: min(100%, 340px);
+    margin: 0 auto;
+  }
+
+  .feature-list {
+    margin-top: 8px;
+    padding: 16px 18px;
+    border: 1px solid rgba(2, 15, 45, 0.06);
+  }
+
+  .feature-item {
+    grid-template-columns: 10px minmax(0, 1fr);
+    gap: 10px;
+    padding: 11px 0;
+  }
+
+  .feature-copy h3 {
+    font-size: 14px;
+  }
+
+  .feature-copy p {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.55;
   }
 }
 </style>
