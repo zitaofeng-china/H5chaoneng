@@ -1222,11 +1222,19 @@ onUnmounted(() => {
 
 .energy-rental .rental-form .energy-radio-group {
   width: 100%;
+  padding: 4px;
+  gap: 10px;
 }
 
 .energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner) {
   height: 44px;
   line-height: 42px;
+  border: 1px solid #d0d5dd;
+  box-shadow: none;
+}
+
+.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+  border-color: #165dff;
 }
 
 .rental-form :deep(.el-input__wrapper),
