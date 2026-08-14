@@ -1,33 +1,30 @@
 <template>
-  <div class="help-section">
-    <div class="help-container">
-      <div class="help-content">
-        <div class="help-info">
-          <div class="help-title">{{ $t('help.title') }}</div>
-          <div class="help-subtitle">{{ $t('help.subtitle') }}</div>
-        </div>
+  <section id="contact" class="help-section">
+    <span class="help-shape help-shape-left" aria-hidden="true"></span>
+    <span class="help-shape help-shape-right" aria-hidden="true"></span>
 
-        <div class="help-info">
-          <div class="help-buttons">
-            <div class="help-button primary" @click="handleContactService">
-              <span>{{ $t('help.contactService') }}</span>
-            </div>
-            <div class="help-button secondary" @click="handleViewProblems">
-              <span>{{ $t('help.viewFaq') }}</span>
-            </div>
-          </div>
-        </div>
+    <div class="help-container">
+      <h2 class="help-title">{{ $t('help.title') }}</h2>
+      <p class="help-subtitle">{{ $t('help.subtitle') }}</p>
+
+      <div class="help-buttons">
+        <button type="button" class="help-button primary" @click="handleContactService">
+          {{ $t('help.contactService') }}
+        </button>
+        <button type="button" class="help-button secondary" @click="handleViewProblems">
+          {{ $t('help.viewFaq') }}
+        </button>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { handleOpenToTelegram } from '@/utils'
 import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
-import { storeToRefs } from 'pinia'
 
 defineOptions({
   name: 'HelpSection',
@@ -48,194 +45,130 @@ const handleViewProblems = () => {
 
 <style lang="scss" scoped>
 .help-section {
-  background: var(--theme-bg-blue);
-  padding: 100px 0;
+  position: relative;
+  overflow: hidden;
+  padding: 56px 24px 60px;
+  background:
+    linear-gradient(180deg, rgba(232, 244, 255, 0.35), rgba(232, 244, 255, 0.35)),
+    linear-gradient(135deg, #eef6ff 0%, #e4f1ff 48%, #dcecff 100%);
+  isolation: isolate;
+}
+
+.help-shape {
+  position: absolute;
+  width: 220px;
+  height: 168px;
+  border: 1px solid rgba(71, 155, 235, 0.28);
+  background: rgba(255, 255, 255, 0.28);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.help-shape-left {
+  left: -36px;
+  bottom: -56px;
+  clip-path: polygon(0 45%, 44% 0, 100% 18%, 74% 100%, 12% 82%);
+  transform: rotate(12deg);
+}
+
+.help-shape-right {
+  right: -32px;
+  top: -62px;
+  clip-path: polygon(15% 0, 100% 22%, 74% 100%, 20% 80%, 0 34%);
+  transform: rotate(-12deg);
 }
 
 .help-container {
-  max-width: 1200px;
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
   margin: 0 auto;
-  padding: 0 40px;
-  color: var(--theme-text-white);
-}
-
-.help-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-
-  .help-info {
-    &:not(:last-child) {
-      margin-bottom: 80px;
-    }
-  }
-}
-
-.help-title {
-  font-size: 40px;
-  font-weight: 700;
-  margin-bottom: 20px;
   text-align: center;
 }
 
+.help-title {
+  margin: 0;
+  color: #165dff;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
 .help-subtitle {
-  font-size: 18px;
+  margin: 10px auto 0;
+  color: rgba(71, 84, 103, 0.72);
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .help-buttons {
   display: flex;
-  gap: 32px;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 22px;
 }
 
 .help-button {
-  width: 150px;
-  height: 50px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  padding: 0 8px;
+  min-width: 112px;
+  height: 36px;
+  padding: 0 18px;
   border-radius: 4px;
-  font-size: 16px;
-  font-weight: 400;
+  font: inherit;
+  font-size: 13px;
+  line-height: 34px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  text-align: center;
-  box-sizing: border-box;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 
-  &.primary {
-    background: var(--theme-text-white);
-    color: var(--theme-bg-blue);
-
-    &:hover {
-      transform: translateY(-2px);
-
-      .button-icon {
-        background: rgba(255, 255, 255, 0.25);
-      }
-    }
+  &:hover {
+    transform: translateY(-1px);
   }
+}
 
-  &.secondary {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--theme-text-white);
-    border: 2px solid rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
+.help-button.primary {
+  border: 1px solid #fff;
+  color: #165dff;
+  background: #fff;
+  box-shadow: 0 6px 14px rgba(34, 105, 183, 0.08);
+}
 
-    &:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.25);
-      transform: translateY(-2px);
-
-      .button-icon {
-        background: rgba(255, 255, 255, 0.2);
-      }
-    }
-  }
+.help-button.secondary {
+  border: 1px solid #165dff;
+  color: #fff;
+  background: #165dff;
+  box-shadow: 0 6px 14px rgba(22, 93, 255, 0.22);
 }
 
 @media (max-width: 768px) {
-  .help-container {
-    max-width: initial;
-    padding: 0 6px;
-  }
-
-  .help-content {
-    .help-info {
-      &:not(:last-child) {
-        margin-bottom: 20px;
-      }
-    }
-  }
-
   .help-section {
-    padding: 32px 0;
+    padding: 36px 16px 40px;
   }
 
   .help-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 10px;
+    font-size: 22px;
   }
 
   .help-subtitle {
-    font-size: 13px;
-    line-height: 1.5;
-    opacity: 0.9;
+    font-size: 12px;
   }
 
   .help-buttons {
-    gap: 12px;
-    width: 100%;
-    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
   }
 
   .help-button {
-    flex: 1;
-    max-width: 160px;
-    min-width: 140px;
-    height: 44px;
-    font-size: 14px;
-    border-radius: 6px;
-  }
-}
-
-/* 适配 300px 超小屏幕 */
-@media (max-width: 360px) {
-  .help-container {
-    padding: 0 8px;
+    min-width: 96px;
+    height: 34px;
+    padding: 0 12px;
+    font-size: 12px;
   }
 
-  .help-section {
-    padding: 20px 0;
-  }
-
-  .help-content {
-    .help-info {
-      &:not(:last-child) {
-        margin-bottom: 14px;
-      }
-    }
-  }
-
-  .help-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-
-  .help-subtitle {
-    font-size: 11px;
-    line-height: 1.4;
-    padding: 0 2px;
-  }
-
-  .help-buttons {
-    gap: 6px;
-    width: 100%;
-    padding: 0 10px;
-    justify-content: center;
-  }
-
-  .help-button {
-    flex: 0 1 auto;
-    max-width: 130px;
-    min-width: 110px;
-    height: 36px;
-    font-size: 11px;
-    border-radius: 4px;
-    padding: 0 8px;
-
-    span {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    &.secondary {
-      border-width: 1.5px;
-    }
+  .help-shape {
+    width: 140px;
+    height: 110px;
   }
 }
 </style>
