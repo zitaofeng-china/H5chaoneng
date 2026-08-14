@@ -1,54 +1,59 @@
 <template>
   <section id="howItWorks" class="how-it-works">
-    <div class="container">
-      <div class="header">
-        <div class="title">{{ t('home.howItWorks') }}</div>
-        <p class="subtitle">
-          {{ t('home.howItWorksDesc') }}
-        </p>
-      </div>
+    <div class="how-container">
+      <header class="how-header">
+        <h2 class="title">{{ t('home.howItWorks') }}</h2>
+        <p class="subtitle">{{ t('home.howItWorksDesc') }}</p>
+      </header>
 
-      <div class="cards">
-        <div class="card">
-          <div class="card-title">{{ t('home.energyQuickRental') }}</div>
-          <p class="card-description">
-            {{ t('home.energyQuickRentalDesc') }}
-          </p>
-          <ul class="list">
-            <li class="list-item">
-              <SvgIcon name="how-right" width="20" height="20" />
-              <span class="text">{{ t('home.chooseTransactionCount') }}</span>
+      <div class="workflow-stage">
+        <img
+          class="workflow-bolt"
+          src="@/assets/images/home/lanhu/workflow-bolt.png"
+          alt=""
+          aria-hidden="true"
+        />
+
+        <div class="workflow-top">
+          <article class="workflow-primary">
+            <h3>{{ t('home.energyQuickRental') }}</h3>
+            <p>{{ t('home.energyQuickRentalDesc') }}</p>
+          </article>
+
+          <ul class="workflow-points">
+            <li>
+              <SvgIcon name="how-right" width="18" height="18" />
+              <span>{{ t('home.chooseTransactionCount') }}</span>
             </li>
-            <li class="list-item">
-              <SvgIcon name="how-right" width="20" height="20" />
-              <span class="text">{{ t('home.transferToAddress') }}</span>
+            <li>
+              <SvgIcon name="how-right" width="18" height="18" />
+              <span>{{ t('home.transferToAddress') }}</span>
             </li>
-            <li class="list-item">
-              <SvgIcon name="how-right" width="20" height="20" />
-              <span class="text">{{ t('home.systemAutoInject') }}</span>
+            <li>
+              <SvgIcon name="how-right" width="18" height="18" />
+              <span>{{ t('home.systemAutoInject') }}</span>
             </li>
           </ul>
         </div>
 
-        <div class="card">
-          <div class="card-title">{{ t('home.smartContractFlash') }}</div>
-          <p class="card-description">
-            {{ t('home.smartContractFlashDesc') }}
-          </p>
-          <ul class="list">
-            <li class="list-item">
-              <SvgIcon name="how-right" width="20" height="20" />
-              <span class="text">
-                {{ t('home.usdtToTrx') }}
-              </span>
-            </li>
-            <li class="list-item">
-              <SvgIcon name="how-right" width="20" height="20" />
-              <span class="text">
-                {{ t('home.trxToUsdt') }}
-              </span>
-            </li>
-          </ul>
+        <div class="workflow-bottom">
+          <div class="workflow-copy">
+            <p>
+              <SvgIcon name="how-right" width="16" height="16" />
+              <span>{{ t('home.usdtToTrx') }}</span>
+            </p>
+            <p>
+              <SvgIcon name="how-right" width="16" height="16" />
+              <span>{{ t('home.trxToUsdt') }}</span>
+            </p>
+          </div>
+
+          <div class="workflow-secondary-stack">
+            <article class="workflow-secondary">
+              <h3>{{ t('home.smartContractFlash') }}</h3>
+            </article>
+            <p class="workflow-secondary-detail">{{ t('home.smartContractFlashDesc') }}</p>
+          </div>
         </div>
       </div>
     </div>
@@ -67,180 +72,342 @@ defineOptions({
 
 <style lang="scss" scoped>
 .how-it-works {
-  padding: 100px 0;
-  background: var(--theme-text-white);
+  position: relative;
+  overflow: hidden;
+  padding: 96px 0 120px;
+  background:
+    radial-gradient(ellipse 64% 54% at 92% 0%, rgba(210, 228, 255, 0.5) 0%, transparent 72%),
+    #fff;
 }
 
-.container {
-  max-width: 1200px;
+.how-container {
+  width: min(100%, 1200px);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 48px;
+  box-sizing: border-box;
 }
 
-.header {
+.how-header {
   text-align: center;
 }
 
 .title {
   margin: 0;
-  font-size: 40px;
+  color: #182230;
+  font-size: 36px;
   font-weight: 700;
-  color: var(--theme-text-black);
+  line-height: 1.3;
+  letter-spacing: 0.04em;
 }
 
 .subtitle {
-  margin: 14px auto 0;
+  max-width: 780px;
+  margin: 12px auto 0;
+  color: #182230;
   font-size: 14px;
-  color: var(--theme-text-black);
-  opacity: 0.8;
-}
-
-.cards {
-  margin-top: 56px;
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-}
-
-.card {
-  background: var(--theme-card-bg-light);
-  border-radius: 8px;
-  padding: 32px;
-
-  &:first-child {
-    svg {
-      color: var(--theme-text-green);
-    }
-  }
-
-  &:last-child {
-    svg {
-      color: var(--theme-bg-blue);
-    }
-  }
-}
-
-.card-title {
-  line-height: 1.7;
-  font-size: 20px;
   font-weight: 700;
-  color: var(--theme-text-black);
+  line-height: 1.7;
 }
 
-.card-description {
-  margin: 10px 0 0;
-  font-size: 14px;
-  color: var(--theme-text-muted);
-}
-
-.list {
-  list-style: none;
-  padding: 0;
-  margin: 14px 0 0;
+.workflow-stage {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 32px;
+  margin-top: 56px;
 }
 
-.list-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.workflow-bolt {
+  position: absolute;
+  z-index: 0;
+  left: 30%;
+  top: -48px;
+  width: 410px;
+  height: auto;
+  aspect-ratio: 3 / 4;
+  display: block;
+  pointer-events: none;
+  object-fit: contain;
+  opacity: 0.86;
 }
 
-.bullet {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  display: flex;
+.workflow-top,
+.workflow-bottom {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 440px minmax(0, 1fr);
+  column-gap: 80px;
   align-items: center;
+}
+
+.workflow-bottom {
+  align-items: start;
+}
+
+.workflow-primary {
+  box-sizing: border-box;
+  border-radius: 16px;
+}
+
+.workflow-secondary {
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.workflow-primary {
+  min-height: 248px;
+  display: flex;
+  flex-direction: column;
   justify-content: center;
-  flex-shrink: 0;
-  margin-top: 2px;
-
-  &::after {
-    content: '✓';
-    font-size: 11px;
-    line-height: 1;
-    font-weight: 700;
-    color: var(--theme-text-white);
-  }
+  margin-left: 3%;
+  padding: 48px 28px 48px 56px;
+  color: #fff;
+  background: #165dff;
+  box-shadow: 0 18px 30px rgba(22, 93, 255, 0.1);
 }
 
-.bullet-green {
-  background: var(--theme-text-green);
-}
-
-.bullet-blue {
-  background: var(--theme-bg-blue);
-}
-
-.text {
+.workflow-primary h3,
+.workflow-secondary h3 {
+  margin: 0;
   font-size: 14px;
-  line-height: 1.6;
-  color: var(--theme-text-muted);
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.workflow-primary p {
+  margin: 10px 0 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.7;
+}
+
+.workflow-points {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 20px;
+  width: min(100%, 400px);
+  padding: 0;
+  margin: 0 0 0 92px;
+  list-style: none;
+  justify-self: start;
+}
+
+.workflow-points li,
+.workflow-copy p {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: #182230;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.65;
+}
+
+.workflow-points li {
+  align-items: center;
+}
+
+.workflow-points svg {
+  flex: 0 0 auto;
+  color: #36c99b;
+}
+
+.workflow-copy {
+  width: min(100%, 440px);
+  padding: 36px 4px 0 126px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.workflow-copy span {
+  max-width: 28em;
+}
+
+.workflow-copy svg {
+  flex: 0 0 auto;
+  margin-top: 3px;
+  color: #4c8eff;
+}
+
+.workflow-secondary-stack {
+  position: relative;
+  width: min(100%, 420px);
+  justify-self: end;
+  margin-left: 0;
+  margin-top: -40px;
+  padding-top: 76px;
+}
+
+.workflow-secondary {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  z-index: 2;
+  width: 256px;
+  min-height: 136px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 18% 16px 16px;
+  color: #fff;
+  text-align: center;
+  background: #0b1733;
+  box-shadow: 0 16px 28px rgba(10, 27, 69, 0.12);
+}
+
+.workflow-secondary-detail {
+  box-sizing: border-box;
+  min-height: 216px;
+  margin: 0;
+  padding: 108px 32px 28px;
+  color: #182230;
+  background: #f2f4f7;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.85;
+}
+
+@media (max-width: 1180px) and (min-width: 769px) {
+  .how-container {
+    padding: 0 32px;
+  }
+
+  .workflow-top,
+  .workflow-bottom {
+    grid-template-columns: minmax(300px, 1fr) minmax(0, 1fr);
+    column-gap: 40px;
+  }
+
+  .workflow-bolt {
+    left: 34%;
+    width: 280px;
+    height: auto;
+    aspect-ratio: 3 / 4;
+  }
+
+  .workflow-primary {
+    min-height: 220px;
+    padding: 36px 28px;
+  }
+
+  .workflow-points,
+  .workflow-secondary-stack {
+    justify-self: stretch;
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0;
+  }
+
+  .workflow-copy {
+    padding-top: 16px;
+  }
+
+  .workflow-copy span {
+    max-width: none;
+  }
+
+  .workflow-secondary {
+    width: 240px;
+    min-height: 136px;
+    right: 12px;
+  }
 }
 
 @media (max-width: 768px) {
-  .container {
-    padding: 0 6px;
+  .how-it-works {
+    padding: 48px 0 52px;
   }
 
-  .how-it-works {
-    padding: 40px 0;
+  .how-container {
+    padding: 0 16px;
   }
 
   .title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: 0;
   }
 
   .subtitle {
-    font-size: 13px;
-    margin-top: 10px;
-    line-height: 1.5;
+    margin-top: 9px;
+    font-size: 14px;
   }
 
-  .cards {
-    margin-top: 20px;
-    gap: 20px;
+  .workflow-stage {
+    gap: 18px;
+    margin-top: 28px;
   }
 
-  .card {
-    padding: 18px;
-    border-radius: 10px;
+  .workflow-bolt {
+    display: none;
   }
 
-  .card-title {
-    font-size: 16px;
-    font-weight: 600;
-    line-height: 1.5;
+  .workflow-top,
+  .workflow-bottom {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
   }
 
-  .card-description {
-    font-size: 13px;
-    margin-top: 8px;
-    line-height: 1.5;
+  .workflow-primary,
+  .workflow-secondary {
+    width: 100%;
+    min-height: 0;
+    margin-left: 0;
+    padding: 24px 20px;
   }
 
-  .list {
-    margin-top: 12px;
-    gap: 8px;
+  .workflow-primary h3,
+  .workflow-secondary h3 {
+    font-size: 14px;
   }
 
-  .list-item {
-    gap: 8px;
-
-    svg {
-      width: 18px;
-      height: 18px;
-      flex-shrink: 0;
-    }
+  .workflow-points {
+    width: 100%;
+    margin-left: 0;
+    gap: 12px;
   }
 
-  .text {
-    font-size: 13px;
-    line-height: 1.5;
+  .workflow-points li,
+  .workflow-copy p {
+    font-size: 12px;
+  }
+
+  .workflow-copy {
+    width: 100%;
+    padding: 0;
+  }
+
+  .workflow-copy span {
+    max-width: none;
+  }
+
+  .workflow-secondary-stack {
+    width: 100%;
+    margin-left: 0;
+    margin-top: 0;
+    padding-top: 0;
+  }
+
+  .workflow-secondary {
+    position: relative;
+    top: auto;
+    right: auto;
+    width: 100%;
+    min-height: 0;
+    margin-bottom: 10px;
+  }
+
+  .workflow-secondary-detail {
+    min-height: 0;
+    padding: 20px;
+    font-size: 14px;
   }
 }
 </style>
