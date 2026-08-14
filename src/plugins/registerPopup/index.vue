@@ -4,21 +4,11 @@
       v-model="visible"
       :show-close="true"
       :width="864"
-      :height="552"
       header-class="register-header"
       align-center
       @close="handleClose"
     >
-      <div class="register-container">
-        <div class="register-background" aria-hidden="true">
-          <img :src="RegisterBg" alt="" class="register-bg" />
-        </div>
-
-        <div class="register-right">
-          <div class="register-header">
-            <div class="register-title">{{ $t('register.title') }}</div>
-          </div>
-
+      <AuthDialogFrame mode="register" @switch="onAuthSwitch">
           <el-form
             :model="registerForm"
             :rules="rules"
@@ -117,20 +107,15 @@
               </el-button>
             </el-form-item>
 
-            <div class="login-link">
-              <span>{{ $t('register.hasAccount') }}</span>
-              <el-link type="primary" @click="switchToLogin">{{ $t('register.login') }}</el-link>
-            </div>
           </el-form>
-        </div>
-      </div>
+      </AuthDialogFrame>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { useRegisterForm } from '@/hooks/useRegisterForm'
-import RegisterBg from '@/assets/images/register-bg.png'
+import AuthDialogFrame from '@/components/auth/AuthDialogFrame.vue'
 import { getPopup } from '@/plugins/popupRegistry'
 import type { RegisterEmits } from './types'
 
@@ -169,6 +154,12 @@ const switchToLogin = () => {
     handleClose()
   }, 50)
   emit('switchToLogin')
+}
+
+const onAuthSwitch = (mode: 'login' | 'register') => {
+  if (mode === 'login') {
+    switchToLogin()
+  }
 }
 
 defineExpose({
