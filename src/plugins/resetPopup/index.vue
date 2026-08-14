@@ -12,6 +12,8 @@
       <div class="reset-container">
         <div class="reset-background" aria-hidden="true">
           <img :src="RegisterBg" alt="" class="reset-bg" />
+          <div class="reset-bg-blur" />
+          <div class="reset-bg-fade" />
         </div>
 
         <div class="reset-right">
