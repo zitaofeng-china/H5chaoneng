@@ -1,5 +1,11 @@
 <template>
   <div id="fee" class="fee-description">
+    <img
+      class="fee-side-art"
+      src="@/assets/images/home/lanhu/workflow-side-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
     <div class="fee-container">
       <div class="fee-header">
         <div class="fee-title">{{ $t('fee.title') }}</div>
@@ -105,23 +111,38 @@ defineOptions({
 
 <style lang="scss" scoped>
 .fee-description {
-  padding: 100px 0;
-  background: var(--theme-bg-light);
+  position: relative;
+  isolation: isolate;
+  overflow: visible;
+  padding: 96px 0 104px;
+  background: #fff;
+}
+
+.fee-side-art {
+  position: absolute;
+  z-index: -1;
+  top: 92px;
+  right: -56px;
+  width: 587px;
+  height: 663px;
+  max-width: none;
+  pointer-events: none;
+  object-fit: contain;
 }
 
 .fee-container {
-  max-width: 1000px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .fee-header {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 44px;
 }
 
 .fee-title {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 700;
   color: var(--theme-text-black);
   margin-bottom: 10px;
@@ -138,9 +159,9 @@ defineOptions({
   display: flex;
   flex-direction: column;
   background: var(--theme-text-white);
-  border-radius: 16px;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0px 13px 22px 0px rgba(0, 0, 0, 0.07);
+  box-shadow: 0 10px 24px rgba(21, 47, 92, 0.07);
 }
 
 .fee-columns {
@@ -149,7 +170,7 @@ defineOptions({
 }
 
 .fee-column {
-  padding: 30px;
+  padding: 28px 32px 24px;
 
   &:not(:last-child) {
     border-right: 1px solid rgba(245, 245, 245, 1);
@@ -163,7 +184,7 @@ defineOptions({
 .column-title {
   display: flex;
   align-items: center;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--theme-text-black);
 
@@ -183,7 +204,7 @@ defineOptions({
   justify-content: space-between;
   align-items: flex-start;
   padding: 5px 0 0 0;
-  font-size: 14px;
+  font-size: 12px;
 
   &:last-child {
     padding-top: 10px;
@@ -240,8 +261,8 @@ defineOptions({
 }
 
 .important-notice {
-  background: var(--theme-transfer-bg-light);
-  padding: 30px;
+  background: #f7f9fd;
+  padding: 24px 32px 26px;
 }
 
 .notice-header {
@@ -249,7 +270,7 @@ defineOptions({
 }
 
 .notice-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--theme-text-black);
 }
@@ -265,7 +286,7 @@ defineOptions({
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
+  font-size: 12px;
   // line-height: 1;
 }
 
@@ -275,6 +296,14 @@ defineOptions({
 }
 
 @media (max-width: 768px) {
+  .fee-side-art {
+    top: 112px;
+    right: -230px;
+    width: 440px;
+    height: auto;
+    opacity: 0.55;
+  }
+
   .fee-container {
     max-width: initial;
     padding: 0 10px;
