@@ -1,26 +1,23 @@
 <template>
-  <div id="question" class="faq-section">
+  <section id="question" class="faq-section">
     <div class="faq-container">
-      <div class="faq-header">
-        <div class="faq-title">{{ $t('faq.title') }}</div>
-        <div class="faq-subtitle">{{ $t('faq.subtitle') }}</div>
-      </div>
+      <header class="faq-header">
+        <h2 class="faq-title">{{ $t('faq.title') }}</h2>
+        <p class="faq-subtitle">{{ $t('faq.subtitle') }}</p>
+      </header>
 
       <div class="faq-list">
-        <div
+        <article
           v-for="(item, index) in faqItems"
-          :key="index"
+          :key="item.questionKey"
           class="faq-item"
           :class="{ active: activeIndex === index }"
-          @click.stop="toggleItem(index)"
         >
-          <div class="faq-question">
+          <button type="button" class="faq-question" @click.stop="toggleItem(index)">
             <span>{{ $t(item.questionKey) }}</span>
-            <div class="faq-icon">
-              <SvgIcon name="faq-arrow" width="24" height="24" />
-            </div>
-          </div>
-          <div class="faq-answer" v-show="activeIndex === index" @click.stop="() => {}">
+            <SvgIcon name="faq-arrow" width="18" height="18" />
+          </button>
+          <div v-show="activeIndex === index" class="faq-answer">
             <template v-if="item.questionKey === 'faq.problemsSupport'">
               {{ formatAnswerWithTgAdmin($t(item.answerKey)) }}
             </template>
@@ -28,10 +25,10 @@
               {{ $t(item.answerKey) }}
             </template>
           </div>
-        </div>
+        </article>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
@@ -50,7 +47,7 @@ type FaqItem = {
   answerKey: string
 }
 
-const faqItems = ref<FaqItem[]>([
+const faqItems: FaqItem[] = [
   {
     questionKey: 'faq.whatIsEnergyRental',
     answerKey: 'faq.whatIsEnergyRentalAns',
@@ -71,15 +68,12 @@ const faqItems = ref<FaqItem[]>([
     questionKey: 'faq.problemsSupport',
     answerKey: 'faq.problemsSupportAns',
   },
-])
+]
 
 const toggleItem = (index: number) => {
   activeIndex.value = activeIndex.value === index ? -1 : index
 }
 
-/**
- * 格式化答案，将 @GasVipBot 替换为实际的 tg_admin
- */
 const formatAnswerWithTgAdmin = (answer: string) => {
   const tgAdmin = siteStore.tgAdmin || '@GasVipBot'
   return answer.replace(/@GasVipBot/g, tgAdmin)
@@ -88,32 +82,34 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 
 <style lang="scss" scoped>
 .faq-section {
-  padding: 100px 0;
-  background: var(--theme-bg-white);
+  padding: 64px 0 72px;
+  background: #f7f9fd;
 }
 
 .faq-container {
-  max-width: 800px;
+  width: min(100%, 820px);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .faq-header {
+  margin-bottom: 34px;
   text-align: center;
-  margin-bottom: 60px;
 }
 
 .faq-title {
-  font-size: 40px;
+  margin: 0;
+  color: #182230;
+  font-size: 36px;
   font-weight: 700;
-  color: var(--theme-text-black);
-  margin-bottom: 10px;
+  line-height: 1.3;
 }
 
 .faq-subtitle {
-  font-size: 14px;
-  color: var(--theme-text-black);
-  opacity: 0.8;
+  margin: 11px auto 0;
+  color: rgba(71, 84, 103, 0.72);
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -124,75 +120,62 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 }
 
 .faq-item {
-  background: var(--theme-text-white);
-  border: 1px solid rgba(30, 41, 59, 0.2);
-  border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &.active {
-    .faq-icon {
-      transform: rotate(180deg);
-    }
-  }
+  border: 1px solid #dce3ed;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.03);
 }
 
 .faq-question {
+  width: 100%;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
-  font-size: 18px;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 0;
+  color: #253246;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
   font-weight: 600;
-  transition: color 0.3s ease;
-}
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
 
-.faq-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--theme-text-black);
-  transition: all 0.3s ease;
+  &:hover {
+    color: #165dff;
+  }
 
   svg {
-    transition: transform 0.3s ease;
+    flex: 0 0 auto;
+    color: #7f8da3;
+    transition: transform 0.2s ease;
   }
+}
+
+.faq-item.active .faq-question svg {
+  color: #165dff;
+  transform: rotate(180deg);
 }
 
 .faq-answer {
-  padding: 10px 32px 24px;
-  font-size: 16px;
-  opacity: 0.8;
-  line-height: 1.8;
+  padding: 0 18px 15px;
+  color: rgba(71, 84, 103, 0.74);
+  font-size: 12px;
+  line-height: 1.75;
   white-space: pre-line;
-  border-top: 1px solid rgba(30, 41, 59, 0.2);
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 0.8;
-    transform: translateY(0);
-  }
 }
 
 @media (max-width: 768px) {
-  .faq-container {
-    max-width: initial;
-    padding: 0 10px;
+  .faq-section {
+    padding: 48px 0 52px;
   }
 
-  .faq-section {
-    padding: 40px 0;
+  .faq-container {
+    padding: 0 14px;
   }
 
   .faq-header {
@@ -200,42 +183,33 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   }
 
   .faq-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 24px;
   }
 
   .faq-subtitle {
-    font-size: 13px;
-    line-height: 1.5;
+    margin-top: 8px;
+    font-size: 12px;
   }
 
   .faq-list {
-    gap: 12px;
-  }
-
-  .faq-item {
-    border-radius: 10px;
+    gap: 6px;
   }
 
   .faq-question {
-    padding: 16px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    gap: 12px;
+    min-height: 44px;
+    padding: 10px 13px;
+    font-size: 12px;
   }
 
-  .faq-icon {
-    svg {
-      width: 20px;
-      height: 20px;
-    }
+  .faq-question svg {
+    width: 16px;
+    height: 16px;
   }
 
   .faq-answer {
-    padding: 8px 18px 16px;
-    font-size: 13px;
-    line-height: 1.6;
+    padding: 0 13px 12px;
+    font-size: 11px;
+    line-height: 1.65;
   }
 }
 </style>
