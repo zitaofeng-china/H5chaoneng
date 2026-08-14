@@ -380,7 +380,7 @@
   },
   "register": {
     "title": "註冊",
-    "usernamePlaceholder": "請輸入用戶名",
+    "usernamePlaceholder": "請輸入帳號",
     "emailPlaceholder": "請輸入郵箱",
     "telegramPlaceholder": "請輸入TG用戶名選填",
     "passwordPlaceholder": "請輸入密碼",

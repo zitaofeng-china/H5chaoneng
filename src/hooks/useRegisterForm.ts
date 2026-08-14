@@ -24,7 +24,6 @@ export function useRegisterForm() {
   const registerForm = reactive<RegisterForm>({
     username: '',
     email: '',
-    telegram: '',
     password: '',
     passwords: '',
     remember: false,

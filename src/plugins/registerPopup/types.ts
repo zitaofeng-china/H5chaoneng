@@ -5,7 +5,6 @@
 export interface RegisterForm {
   username: string
   email: string
-  telegram: string
   password: string
   passwords: string
   remember: boolean

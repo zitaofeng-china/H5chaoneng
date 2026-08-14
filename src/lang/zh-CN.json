@@ -414,7 +414,7 @@
   },
   "register": {
     "title": "注册",
-    "usernamePlaceholder": "请输入用户名",
+    "usernamePlaceholder": "请输入账号",
     "emailPlaceholder": "请输入邮箱",
     "telegramPlaceholder": "请输入TG用户名选填",
     "passwordPlaceholder": "请输入密码",
