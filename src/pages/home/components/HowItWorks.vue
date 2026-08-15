@@ -71,20 +71,41 @@ defineOptions({
 </script>
 
 <style lang="scss" scoped>
+/**
+ * 以 1200px 设计稿为基准整体等比缩放。
+ * --u 表示「设计稿里的 1px」实际渲染多长：
+ *   宽度 >= 1200px 时恒为 1px（还原设计稿）
+ *   宽度 <  1200px 时随容器宽度线性缩小，版式比例与大屏完全一致
+ * 因此 769px ~ 1200px 之间不再需要单独的中间态断点，
+ * 只在 768px 及以下切换为移动端堆叠布局（与全站断点保持一致）。
+ */
+@function u($n) {
+  @return calc(#{$n} * var(--u));
+}
+
 .how-it-works {
+  container-type: inline-size;
   position: relative;
   overflow: hidden;
-  padding: 96px 0 120px;
   background:
     radial-gradient(ellipse 64% 54% at 92% 0%, rgba(210, 228, 255, 0.5) 0%, transparent 72%),
     #fff;
 }
 
 .how-container {
+  /* 兜底：不支持容器查询单位时退化为视口宽度 */
+  --u: calc(min(100vw, 1200px) / 1200);
+
   width: min(100%, 1200px);
   margin: 0 auto;
-  padding: 0 48px;
+  padding: u(96) u(48) u(120);
   box-sizing: border-box;
+}
+
+@supports (width: 1cqw) {
+  .how-container {
+    --u: calc(min(100cqw, 1200px) / 1200);
+  }
 }
 
 .how-header {
@@ -94,17 +115,17 @@ defineOptions({
 .title {
   margin: 0;
   color: #182230;
-  font-size: 36px;
+  font-size: u(36);
   font-weight: 700;
   line-height: 1.3;
   letter-spacing: 0.04em;
 }
 
 .subtitle {
-  max-width: 780px;
-  margin: 12px auto 0;
+  max-width: u(780);
+  margin: u(12) auto 0;
   color: #182230;
-  font-size: 14px;
+  font-size: u(14);
   font-weight: 700;
   line-height: 1.7;
 }
@@ -113,16 +134,16 @@ defineOptions({
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 32px;
-  margin-top: 56px;
+  gap: u(32);
+  margin-top: u(56);
 }
 
 .workflow-bolt {
   position: absolute;
   z-index: 0;
   left: 30%;
-  top: -48px;
-  width: 410px;
+  top: u(-48);
+  width: u(410);
   height: auto;
   aspect-ratio: 3 / 4;
   display: block;
@@ -136,8 +157,8 @@ defineOptions({
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 440px minmax(0, 1fr);
-  column-gap: 80px;
+  grid-template-columns: u(440) minmax(0, 1fr);
+  column-gap: u(80);
   align-items: center;
 }
 
@@ -147,38 +168,38 @@ defineOptions({
 
 .workflow-primary {
   box-sizing: border-box;
-  border-radius: 16px;
+  border-radius: u(16);
 }
 
 .workflow-secondary {
   box-sizing: border-box;
-  border-radius: 8px;
+  border-radius: u(8);
 }
 
 .workflow-primary {
-  min-height: 248px;
+  min-height: u(248);
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin-left: 3%;
-  padding: 48px 28px 48px 56px;
+  padding: u(48) u(28) u(48) u(56);
   color: #fff;
   background: #165dff;
-  box-shadow: 0 18px 30px rgba(22, 93, 255, 0.1);
+  box-shadow: 0 u(18) u(30) rgba(22, 93, 255, 0.1);
 }
 
 .workflow-primary h3,
 .workflow-secondary h3 {
   margin: 0;
-  font-size: 14px;
+  font-size: u(14);
   font-weight: 700;
   line-height: 1.45;
 }
 
 .workflow-primary p {
-  margin: 10px 0 0;
+  margin: u(10) 0 0;
   color: #fff;
-  font-size: 14px;
+  font-size: u(14);
   font-weight: 700;
   line-height: 1.7;
 }
@@ -187,10 +208,10 @@ defineOptions({
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 20px;
-  width: min(100%, 400px);
+  gap: u(20);
+  width: min(100%, u(400));
   padding: 0;
-  margin: 0 0 0 92px;
+  margin: 0 0 0 u(92);
   list-style: none;
   justify-self: start;
 }
@@ -199,10 +220,10 @@ defineOptions({
 .workflow-copy p {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: u(8);
   margin: 0;
   color: #182230;
-  font-size: 12px;
+  font-size: u(12);
   font-weight: 700;
   line-height: 1.65;
 }
@@ -213,15 +234,17 @@ defineOptions({
 
 .workflow-points svg {
   flex: 0 0 auto;
+  width: u(18);
+  height: u(18);
   color: #36c99b;
 }
 
 .workflow-copy {
-  width: min(100%, 440px);
-  padding: 36px 4px 0 126px;
+  width: min(100%, u(440));
+  padding: u(36) u(4) 0 u(126);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: u(18);
 }
 
 .workflow-copy span {
@@ -230,103 +253,58 @@ defineOptions({
 
 .workflow-copy svg {
   flex: 0 0 auto;
-  margin-top: 3px;
+  width: u(16);
+  height: u(16);
+  margin-top: u(3);
   color: #4c8eff;
 }
 
 .workflow-secondary-stack {
   position: relative;
-  width: min(100%, 420px);
+  width: min(100%, u(420));
   justify-self: end;
   margin-left: 0;
-  margin-top: -40px;
-  padding-top: 76px;
+  margin-top: u(-40);
+  padding-top: u(76);
 }
 
 .workflow-secondary {
   position: absolute;
   top: 0;
-  right: 10px;
+  right: u(10);
   z-index: 2;
-  width: 256px;
-  min-height: 136px;
+  width: u(256);
+  min-height: u(136);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 18% 16px 16px;
+  padding: 18% u(16) u(16);
   color: #fff;
   text-align: center;
   background: #0b1733;
-  box-shadow: 0 16px 28px rgba(10, 27, 69, 0.12);
+  box-shadow: 0 u(16) u(28) rgba(10, 27, 69, 0.12);
 }
 
 .workflow-secondary-detail {
   box-sizing: border-box;
-  min-height: 216px;
+  min-height: u(216);
   margin: 0;
-  padding: 108px 32px 28px;
+  padding: u(108) u(32) u(28);
   color: #182230;
   background: #f2f4f7;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: u(8);
+  font-size: u(14);
   font-weight: 700;
   line-height: 1.85;
 }
 
-@media (max-width: 1180px) and (min-width: 769px) {
-  .how-container {
-    padding: 0 32px;
-  }
-
-  .workflow-top,
-  .workflow-bottom {
-    grid-template-columns: minmax(300px, 1fr) minmax(0, 1fr);
-    column-gap: 40px;
-  }
-
-  .workflow-bolt {
-    left: 34%;
-    width: 280px;
-    height: auto;
-    aspect-ratio: 3 / 4;
-  }
-
-  .workflow-primary {
-    min-height: 220px;
-    padding: 36px 28px;
-  }
-
-  .workflow-points,
-  .workflow-secondary-stack {
-    justify-self: stretch;
-    width: 100%;
-    margin-left: 0;
-    margin-top: 0;
-  }
-
-  .workflow-copy {
-    padding-top: 16px;
-  }
-
-  .workflow-copy span {
-    max-width: none;
-  }
-
-  .workflow-secondary {
-    width: 240px;
-    min-height: 136px;
-    right: 12px;
-  }
-}
-
 @media (max-width: 768px) {
-  .how-it-works {
-    padding: 48px 0 52px;
-  }
-
   .how-container {
-    padding: 0 16px;
+    /* 移动端不再等比缩放，回到 1:1 的移动端设计值 */
+    --u: 1px;
+
+    padding: 48px 16px 52px;
   }
 
   .title {
