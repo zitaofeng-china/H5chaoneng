@@ -13,17 +13,26 @@
           class="faq-item"
           :class="{ active: activeIndex === index }"
         >
-          <button type="button" class="faq-question" @click.stop="toggleItem(index)">
+          <button
+            type="button"
+            class="faq-question"
+            :aria-expanded="activeIndex === index"
+            @click.stop="toggleItem(index)"
+          >
             <span>{{ $t(item.questionKey) }}</span>
             <SvgIcon name="faq-arrow" width="18" height="18" />
           </button>
-          <div v-show="activeIndex === index" class="faq-answer">
-            <template v-if="item.questionKey === 'faq.problemsSupport'">
-              {{ formatAnswerWithTgAdmin($t(item.answerKey)) }}
-            </template>
-            <template v-else>
-              {{ $t(item.answerKey) }}
-            </template>
+          <div class="faq-collapse" :class="{ open: activeIndex === index }">
+            <div class="faq-collapse-inner" :aria-hidden="activeIndex !== index">
+              <div class="faq-answer">
+                <template v-if="item.questionKey === 'faq.problemsSupport'">
+                  {{ formatAnswerWithTgAdmin($t(item.answerKey)) }}
+                </template>
+                <template v-else>
+                  {{ $t(item.answerKey) }}
+                </template>
+              </div>
+            </div>
           </div>
         </article>
       </div>
@@ -144,6 +153,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   line-height: 1.5;
   text-align: left;
   cursor: pointer;
+  transition: color 0.25s ease, padding 0.32s ease;
 
   &:hover {
     color: #165dff;
@@ -152,8 +162,12 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   svg {
     flex: 0 0 auto;
     color: #7f8da3;
-    transition: transform 0.2s ease;
+    transition: transform 0.32s ease, color 0.25s ease;
   }
+}
+
+.faq-item.active .faq-question {
+  padding-bottom: 16px;
 }
 
 .faq-item.active .faq-question svg {
@@ -161,12 +175,51 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   transform: rotate(180deg);
 }
 
+.faq-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.faq-collapse.open {
+  grid-template-rows: 1fr;
+}
+
+.faq-collapse-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
 .faq-answer {
-  padding: 0 18px 15px;
+  padding: 16px 20px 18px;
+  border-top: 1px solid #dce3ed;
   color: rgba(71, 84, 103, 0.74);
   font-size: 12px;
   line-height: 1.75;
   white-space: pre-line;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+}
+
+.faq-collapse.open .faq-answer {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.28s ease 0.05s,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1) 0.04s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-question,
+  .faq-question svg,
+  .faq-collapse,
+  .faq-answer,
+  .faq-collapse.open .faq-answer {
+    transition: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -207,7 +260,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   }
 
   .faq-answer {
-    padding: 0 13px 12px;
+    padding: 12px 13px 14px;
     font-size: 11px;
     line-height: 1.65;
   }
