@@ -1,5 +1,10 @@
 <template>
-  <section id="howItWorks" class="how-it-works">
+  <section
+    id="howItWorks"
+    ref="sectionRef"
+    class="how-it-works"
+    :class="{ 'is-ready': isReady }"
+  >
     <div class="how-container">
       <header class="how-header">
         <h2 class="title">{{ t('home.howItWorks') }}</h2>
@@ -21,30 +26,26 @@
           </article>
 
           <ul class="workflow-points">
-            <li>
+            <li
+              v-for="(point, index) in pointKeys"
+              :key="point"
+              :style="{ '--delay': `${180 + index * 80}ms` }"
+            >
               <SvgIcon name="how-right" width="18" height="18" />
-              <span>{{ t('home.chooseTransactionCount') }}</span>
-            </li>
-            <li>
-              <SvgIcon name="how-right" width="18" height="18" />
-              <span>{{ t('home.transferToAddress') }}</span>
-            </li>
-            <li>
-              <SvgIcon name="how-right" width="18" height="18" />
-              <span>{{ t('home.systemAutoInject') }}</span>
+              <span>{{ t(point) }}</span>
             </li>
           </ul>
         </div>
 
         <div class="workflow-bottom">
           <div class="workflow-copy">
-            <p>
+            <p
+              v-for="(line, index) in copyKeys"
+              :key="line"
+              :style="{ '--delay': `${360 + index * 80}ms` }"
+            >
               <SvgIcon name="how-right" width="16" height="16" />
-              <span>{{ t('home.usdtToTrx') }}</span>
-            </p>
-            <p>
-              <SvgIcon name="how-right" width="16" height="16" />
-              <span>{{ t('home.trxToUsdt') }}</span>
+              <span>{{ t(line) }}</span>
             </p>
           </div>
 
@@ -61,12 +62,57 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
 
 defineOptions({
   name: 'HowItWorks',
+})
+
+const sectionRef = ref<HTMLElement | null>(null)
+const isReady = ref(false)
+
+const pointKeys = [
+  'home.chooseTransactionCount',
+  'home.transferToAddress',
+  'home.systemAutoInject',
+] as const
+
+const copyKeys = ['home.usdtToTrx', 'home.trxToUsdt'] as const
+
+let io: IntersectionObserver | null = null
+let readyFallback = 0
+
+onMounted(() => {
+  const el = sectionRef.value
+  if (!el || typeof IntersectionObserver === 'undefined') {
+    isReady.value = true
+    return
+  }
+
+  readyFallback = window.setTimeout(() => {
+    isReady.value = true
+  }, 1200)
+
+  io = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        isReady.value = true
+        window.clearTimeout(readyFallback)
+        io?.disconnect()
+      }
+    },
+    { threshold: 0.08, rootMargin: '80px 0px 0px 0px' },
+  )
+  io.observe(el)
+})
+
+onUnmounted(() => {
+  window.clearTimeout(readyFallback)
+  io?.disconnect()
+  io = null
 })
 </script>
 
@@ -87,9 +133,9 @@ defineOptions({
   container-type: inline-size;
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 64% 54% at 92% 0%, rgba(210, 228, 255, 0.5) 0%, transparent 72%),
-    #fff;
+  /* 背景改由父级 .fee-workflow-ambient 统一绘制的环境光渐变提供，
+     避免与“手续费说明”区块的背景在拼接处出现断层空白。 */
+  background: transparent;
 }
 
 .how-container {
@@ -98,7 +144,7 @@ defineOptions({
 
   width: min(100%, 1200px);
   margin: 0 auto;
-  padding: u(96) u(48) u(120);
+  padding: u(56) u(48) u(32);
   box-sizing: border-box;
 }
 
@@ -297,6 +343,146 @@ defineOptions({
   font-size: u(14);
   font-weight: 700;
   line-height: 1.85;
+}
+
+.how-header {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workflow-bolt {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.workflow-primary {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease;
+}
+
+.workflow-points li,
+.workflow-copy p {
+  opacity: 0;
+  transform: translateX(16px);
+  transition:
+    opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
+}
+
+.workflow-secondary,
+.workflow-secondary-detail {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.55s ease 0.18s,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.18s,
+    box-shadow 0.28s ease;
+}
+
+.is-ready .how-header,
+.is-ready .workflow-primary,
+.is-ready .workflow-points li,
+.is-ready .workflow-copy p,
+.is-ready .workflow-secondary,
+.is-ready .workflow-secondary-detail {
+  opacity: 1;
+  transform: none;
+}
+
+.is-ready .workflow-bolt {
+  opacity: 0.86;
+  transform: none;
+  animation: workflow-bolt-float 5.6s ease-in-out 0.7s infinite;
+}
+
+.is-ready .workflow-primary {
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease;
+}
+
+.is-ready .workflow-primary:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 u(22) u(36) rgba(22, 93, 255, 0.2);
+}
+
+.is-ready .workflow-points li,
+.is-ready .workflow-copy p {
+  cursor: default;
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    color 0.25s ease;
+}
+
+.is-ready .workflow-points li:hover,
+.is-ready .workflow-copy p:hover {
+  transform: translateX(6px);
+  color: #165dff;
+}
+
+.is-ready .workflow-points li:hover svg,
+.is-ready .workflow-copy p:hover svg {
+  transform: scale(1.12);
+}
+
+.workflow-points svg,
+.workflow-copy svg {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-ready .workflow-secondary-stack {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-ready .workflow-secondary-stack:hover {
+  transform: translateY(-5px);
+}
+
+.is-ready .workflow-secondary-stack:hover .workflow-secondary {
+  box-shadow: 0 u(20) u(32) rgba(10, 27, 69, 0.2);
+}
+
+@keyframes workflow-bolt-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .how-header,
+  .workflow-bolt,
+  .workflow-primary,
+  .workflow-points li,
+  .workflow-copy p,
+  .workflow-secondary,
+  .workflow-secondary-detail,
+  .is-ready .workflow-primary,
+  .is-ready .workflow-points li,
+  .is-ready .workflow-copy p,
+  .is-ready .workflow-secondary-stack {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+
+  .workflow-bolt {
+    opacity: 0.86;
+  }
 }
 
 @media (max-width: 768px) {
