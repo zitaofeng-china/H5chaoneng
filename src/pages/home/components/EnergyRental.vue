@@ -787,7 +787,7 @@ onUnmounted(() => {
 
 /* 新版首页首屏布局 */
 .energy-rental {
-  padding: 0 0 84px;
+  padding: 0 0 32px;
   background: #fff;
 }
 
@@ -1445,7 +1445,7 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .energy-rental {
-    padding-bottom: 40px;
+    padding-bottom: 28px;
   }
 
   .ecosystem-hero {
