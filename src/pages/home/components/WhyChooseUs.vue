@@ -1,5 +1,10 @@
 <template>
-  <section id="feature" class="why-choose-us">
+  <section
+    id="feature"
+    ref="sectionRef"
+    class="why-choose-us"
+    :class="{ 'is-ready': isReady }"
+  >
     <header class="feature-header">
       <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
       <p class="subtitle">{{ t('home.subtitle') }}</p>
@@ -27,15 +32,21 @@
           </div>
         </div>
 
-        <div class="feature-list">
+        <div class="feature-list" @mouseleave="hoveredIndex = null">
           <span class="feature-frame" aria-hidden="true"></span>
           <article
             v-for="(item, index) in items"
             :key="item.key"
             class="feature-item"
-            :class="{ featured: index === 0 }"
+            :class="{ featured: featuredIndex === index }"
+            :style="{ '--delay': `${80 + index * 70}ms` }"
+            @mouseenter="hoveredIndex = index"
+            @focusin="hoveredIndex = index"
+            @click="hoveredIndex = index"
           >
-            <span class="feature-dot" :class="`tone-${index + 1}`"></span>
+            <span class="feature-dot" :class="`tone-${index + 1}`">
+              <img class="feature-dot-icon" :src="featureIcons[index]" alt="" />
+            </span>
             <div class="feature-copy">
               <h3>{{ t(item.titleKey) }}</h3>
               <p>{{ t(item.descKey) }}</p>
@@ -48,9 +59,62 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import featureContractIcon from '@/assets/images/home/lanhu/feature-icon-contract.png'
+import featureFastIcon from '@/assets/images/home/lanhu/feature-icon-fast.png'
+import featureLowCostIcon from '@/assets/images/home/lanhu/feature-icon-low-cost.png'
+import featureSafeIcon from '@/assets/images/home/lanhu/feature-icon-safe.png'
+import featureSupportIcon from '@/assets/images/home/lanhu/feature-icon-support.png'
+import featureTransparentIcon from '@/assets/images/home/lanhu/feature-icon-transparent.png'
 
 const { t } = useI18n()
+const sectionRef = ref<HTMLElement | null>(null)
+const isReady = ref(false)
+const hoveredIndex = ref<number | null>(null)
+const featuredIndex = computed(() => hoveredIndex.value ?? 0)
+
+let io: IntersectionObserver | null = null
+let readyFallback = 0
+
+onMounted(() => {
+  const el = sectionRef.value
+  if (!el || typeof IntersectionObserver === 'undefined') {
+    isReady.value = true
+    return
+  }
+
+  readyFallback = window.setTimeout(() => {
+    isReady.value = true
+  }, 1200)
+
+  io = new IntersectionObserver(
+    ([entry]) => {
+      if (entry.isIntersecting) {
+        isReady.value = true
+        window.clearTimeout(readyFallback)
+        io?.disconnect()
+      }
+    },
+    { threshold: 0.08, rootMargin: '80px 0px 0px 0px' },
+  )
+  io.observe(el)
+})
+
+onUnmounted(() => {
+  window.clearTimeout(readyFallback)
+  io?.disconnect()
+  io = null
+})
+
+const featureIcons = [
+  featureSafeIcon,
+  featureFastIcon,
+  featureLowCostIcon,
+  featureContractIcon,
+  featureTransparentIcon,
+  featureSupportIcon,
+]
 
 defineOptions({
   name: 'WhyChooseUs',
@@ -100,7 +164,7 @@ const items: Item[] = [
 .why-choose-us {
   overflow: hidden;
   background: #fff;
-  padding: 48px 0 56px;
+  padding: 16px 0 67px;
   scroll-margin-top: 80px;
 }
 
@@ -138,7 +202,7 @@ const items: Item[] = [
 .feature-showcase {
   display: grid;
   grid-template-columns: 60.5% 39.5%;
-  align-items: start;
+  align-items: end;
   min-height: 560px;
 }
 
@@ -190,6 +254,40 @@ const items: Item[] = [
   transform: translateY(-10px);
 }
 
+.feature-header {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 0.55s ease,
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.token-art {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.is-ready .feature-header,
+.is-ready .token-art {
+  opacity: 1;
+  transform: none;
+}
+
+.is-ready .token-art-glow {
+  animation: feature-glow-pulse 6s ease-in-out infinite;
+}
+
+.is-ready .token-art-usdt {
+  animation: feature-usdt-float 5.2s ease-in-out infinite;
+}
+
+.is-ready .token-art-trx {
+  animation: feature-trx-float 4.6s ease-in-out 0.35s infinite;
+}
+
 .feature-list {
   --frame: #8eb4ff;
   --rail: 8px;
@@ -199,7 +297,7 @@ const items: Item[] = [
   flex-direction: column;
   justify-content: space-between;
   min-height: 560px;
-  padding: 40px 32px 44px var(--rail);
+  padding: 0 32px 0 var(--rail);
   background: transparent;
   border: 0;
   box-sizing: border-box;
@@ -279,56 +377,69 @@ const items: Item[] = [
   display: grid;
   grid-template-columns: 0 minmax(0, 1fr);
   column-gap: 26px;
-  padding: 0;
+  padding: 30px 0;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms),
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
+}
+
+.is-ready .feature-item {
+  opacity: 1;
+  transform: none;
 }
 
 .feature-dot {
-  width: 11px;
-  height: 11px;
-  margin-top: 3px;
-  margin-left: -5.5px;
-  border: 1.5px solid currentColor;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  margin-top: -6px;
+  margin-left: -16px;
   border-radius: 50%;
-  background: #fff;
+  place-items: center;
   box-sizing: border-box;
   position: relative;
   z-index: 2;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease;
 }
 
-.feature-dot::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: currentColor;
-  transform: translate(-50%, -50%);
+.feature-item.featured .feature-dot {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(74, 125, 255, 0.18);
+}
+
+.feature-dot-icon {
+  display: block;
+  max-width: 20px;
+  max-height: 20px;
 }
 
 .tone-1 {
-  color: #5b8cff;
+  background: #dbeafe;
 }
 
 .tone-2 {
-  color: #e8b84a;
+  background: rgba(220, 252, 231, 0.5);
 }
 
 .tone-3 {
-  color: #f0a090;
+  background: rgba(255, 237, 213, 0.5);
 }
 
 .tone-4 {
-  color: #c4a8e8;
+  background: rgba(243, 232, 255, 0.5);
 }
 
 .tone-5 {
-  color: #e8a0b8;
+  background: rgba(254, 226, 226, 0.5);
 }
 
 .tone-6 {
-  color: #e8d07a;
+  background: rgba(254, 249, 195, 0.5);
 }
 
 .feature-copy {
@@ -338,9 +449,10 @@ const items: Item[] = [
 .feature-copy h3 {
   margin: 0;
   color: #1e293b;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 700;
   line-height: 1.4;
+  transition: color 0.28s ease;
 }
 
 .feature-copy p {
@@ -348,11 +460,65 @@ const items: Item[] = [
   color: rgba(71, 84, 103, 0.55);
   font-size: 12px;
   line-height: 1.65;
+  transition: color 0.28s ease;
 }
 
 .feature-item.featured .feature-copy h3,
 .feature-item.featured .feature-copy p {
   color: #4a7dff;
+}
+
+@keyframes feature-glow-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.78;
+  }
+}
+
+@keyframes feature-usdt-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1.4deg);
+  }
+}
+
+@keyframes feature-trx-float {
+  0%,
+  100% {
+    transform: translateY(-10px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(1.6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-header,
+  .token-art,
+  .feature-item,
+  .feature-dot,
+  .feature-copy h3,
+  .feature-copy p {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .is-ready .token-art-glow,
+  .is-ready .token-art-usdt,
+  .is-ready .token-art-trx {
+    animation: none;
+  }
+
+  .token-art-trx {
+    transform: translateY(-10px);
+  }
 }
 
 @media (max-width: 1200px) and (min-width: 769px) {
@@ -430,7 +596,7 @@ const items: Item[] = [
   }
 
   .feature-copy h3 {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   .feature-copy p {
