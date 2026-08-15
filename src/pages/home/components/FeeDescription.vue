@@ -1,11 +1,5 @@
 <template>
   <div id="fee" class="fee-description">
-    <img
-      class="fee-side-art"
-      src="@/assets/images/home/lanhu/workflow-side-bg.png"
-      alt=""
-      aria-hidden="true"
-    />
     <div class="fee-container">
       <div class="fee-header">
         <div class="fee-title">{{ $t('fee.title') }}</div>
@@ -112,22 +106,10 @@ defineOptions({
 <style lang="scss" scoped>
 .fee-description {
   position: relative;
-  isolation: isolate;
-  overflow: visible;
-  padding: 96px 0 104px;
-  background: #fff;
-}
-
-.fee-side-art {
-  position: absolute;
-  z-index: -1;
-  top: 92px;
-  right: -56px;
-  width: 587px;
-  height: 663px;
-  max-width: none;
-  pointer-events: none;
-  object-fit: contain;
+  padding: 64px 0 56px;
+  /* 背景改由父级 .fee-workflow-ambient 统一绘制的环境光渐变提供，
+     避免与“工作原理”区块的背景在拼接处出现断层空白。 */
+  background: transparent;
 }
 
 .fee-container {
@@ -296,14 +278,6 @@ defineOptions({
 }
 
 @media (max-width: 768px) {
-  .fee-side-art {
-    top: 112px;
-    right: -230px;
-    width: 440px;
-    height: auto;
-    opacity: 0.55;
-  }
-
   .fee-container {
     max-width: initial;
     padding: 0 10px;
