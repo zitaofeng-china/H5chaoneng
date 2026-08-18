@@ -131,7 +131,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 .faq-item {
   overflow: hidden;
   border: 1px solid #dce3ed;
-  border-radius: 4px;
+  border-radius: 8px;
   background: #fff;
   box-shadow: 0 4px 12px rgba(30, 41, 59, 0.03);
 }
