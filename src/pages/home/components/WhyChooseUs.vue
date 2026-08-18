@@ -1,11 +1,10 @@
 <template>
   <section
     id="feature"
-    ref="sectionRef"
     class="why-choose-us"
-    :class="{ 'is-ready': isReady }"
+    :class="{ 'is-ready': isReady, 'is-settled': isSettled }"
   >
-    <header class="feature-header">
+    <header ref="headerRef" class="feature-header">
       <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
       <p class="subtitle">{{ t('home.subtitle') }}</p>
     </header>
@@ -39,7 +38,7 @@
             :key="item.key"
             class="feature-item"
             :class="{ featured: featuredIndex === index }"
-            :style="{ '--delay': `${80 + index * 70}ms` }"
+            :style="{ '--delay': `${index * 220}ms` }"
             @mouseenter="hoveredIndex = index"
             @focusin="hoveredIndex = index"
             @click="hoveredIndex = index"
@@ -59,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import featureContractIcon from '@/assets/images/home/lanhu/feature-icon-contract.png'
 import featureFastIcon from '@/assets/images/home/lanhu/feature-icon-fast.png'
@@ -69,40 +68,49 @@ import featureSupportIcon from '@/assets/images/home/lanhu/feature-icon-support.
 import featureTransparentIcon from '@/assets/images/home/lanhu/feature-icon-transparent.png'
 
 const { t } = useI18n()
-const sectionRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
 const isReady = ref(false)
+const isSettled = ref(false)
 const hoveredIndex = ref<number | null>(null)
 const featuredIndex = computed(() => hoveredIndex.value ?? 0)
 
 let io: IntersectionObserver | null = null
-let readyFallback = 0
+let settleTimer = 0
+let started = false
+
+const markReady = () => {
+  if (started) return
+  started = true
+  void nextTick(() => {
+    requestAnimationFrame(() => {
+      isReady.value = true
+      settleTimer = window.setTimeout(() => {
+        isSettled.value = true
+      }, 1500)
+    })
+  })
+}
 
 onMounted(() => {
-  const el = sectionRef.value
+  const el = headerRef.value
   if (!el || typeof IntersectionObserver === 'undefined') {
-    isReady.value = true
+    markReady()
     return
   }
 
-  readyFallback = window.setTimeout(() => {
-    isReady.value = true
-  }, 1200)
-
   io = new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting) {
-        isReady.value = true
-        window.clearTimeout(readyFallback)
-        io?.disconnect()
-      }
+      if (!entry.isIntersecting) return
+      markReady()
+      io?.disconnect()
     },
-    { threshold: 0.08, rootMargin: '80px 0px 0px 0px' },
+    { threshold: 0.2, rootMargin: '0px' },
   )
   io.observe(el)
 })
 
 onUnmounted(() => {
-  window.clearTimeout(readyFallback)
+  window.clearTimeout(settleTimer)
   io?.disconnect()
   io = null
 })
@@ -164,7 +172,7 @@ const items: Item[] = [
 .why-choose-us {
   overflow: hidden;
   background: #fff;
-  padding: 16px 0 67px;
+  padding: 64px 0 67px;
   scroll-margin-top: 80px;
 }
 
@@ -256,18 +264,18 @@ const items: Item[] = [
 
 .feature-header {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(16px);
   transition:
-    opacity 0.55s ease,
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1.5s ease-in-out,
+    transform 1.5s ease-in-out;
 }
 
 .token-art {
   opacity: 0;
-  transform: translateX(-20px);
+  transform: translateX(-24px);
   transition:
-    opacity 0.7s ease,
-    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1.5s ease-in-out,
+    transform 1.5s ease-in-out;
 }
 
 .is-ready .feature-header,
@@ -380,10 +388,10 @@ const items: Item[] = [
   padding: 30px 0;
   cursor: pointer;
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(16px);
   transition:
-    opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms),
-    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
+    opacity 1.5s ease-in-out var(--delay, 0ms),
+    transform 1.5s ease-in-out var(--delay, 0ms);
 }
 
 .is-ready .feature-item {
@@ -547,7 +555,7 @@ const items: Item[] = [
 
 @media (max-width: 768px) {
   .why-choose-us {
-    padding: 40px 0 32px;
+    padding: 48px 0 32px;
   }
 
   .feature-container {
