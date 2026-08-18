@@ -77,7 +77,7 @@ const router = createRouter({
     if (hash) {
       return {
         el: hash,
-        top: ['#energy', '#feature'].includes(hash) ? 100 : 0,
+        top: ['#energy', '#feature', '#fee', '#howItWorks', '#question'].includes(hash) ? 100 : 0,
         behavior: 'smooth',
       }
     }
