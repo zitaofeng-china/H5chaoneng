@@ -1,7 +1,11 @@
 <template>
   <section id="contact" class="help-section">
-    <span class="help-shape help-shape-left" aria-hidden="true"></span>
-    <span class="help-shape help-shape-right" aria-hidden="true"></span>
+    <img
+      class="help-bg"
+      src="@/assets/images/home/lanhu/help-bg.png"
+      alt=""
+      aria-hidden="true"
+    />
 
     <div class="help-container">
       <h2 class="help-title">{{ $t('help.title') }}</h2>
@@ -47,42 +51,28 @@ const handleViewProblems = () => {
 .help-section {
   position: relative;
   overflow: hidden;
-  padding: 56px 24px 60px;
-  background:
-    linear-gradient(180deg, rgba(232, 244, 255, 0.35), rgba(232, 244, 255, 0.35)),
-    linear-gradient(135deg, #eef6ff 0%, #e4f1ff 48%, #dcecff 100%);
+  min-height: 225px;
+  background: #e8f3ff;
   isolation: isolate;
 }
 
-.help-shape {
-  position: absolute;
-  width: 220px;
-  height: 168px;
-  border: 1px solid rgba(71, 155, 235, 0.28);
-  background: rgba(255, 255, 255, 0.28);
+.help-bg {
+  display: block;
+  width: 100%;
+  max-width: 1920px;
+  min-width: 1440px;
+  height: auto;
+  margin: 0 auto;
   pointer-events: none;
-  z-index: 0;
-}
-
-.help-shape-left {
-  left: -36px;
-  bottom: -56px;
-  clip-path: polygon(0 45%, 44% 0, 100% 18%, 74% 100%, 12% 82%);
-  transform: rotate(12deg);
-}
-
-.help-shape-right {
-  right: -32px;
-  top: -62px;
-  clip-path: polygon(15% 0, 100% 22%, 74% 100%, 20% 80%, 0 34%);
-  transform: rotate(-12deg);
 }
 
 .help-container {
-  position: relative;
+  position: absolute;
   z-index: 1;
-  max-width: 780px;
-  margin: 0 auto;
+  top: 50%;
+  left: 50%;
+  width: min(780px, calc(100% - 48px));
+  transform: translate(-50%, -50%);
   text-align: center;
 }
 
@@ -143,6 +133,26 @@ const handleViewProblems = () => {
 
 @media (max-width: 768px) {
   .help-section {
+    min-height: 200px;
+  }
+
+  .help-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .help-container {
+    position: relative;
+    top: auto;
+    left: auto;
+    width: auto;
+    transform: none;
     padding: 36px 16px 40px;
   }
 
@@ -164,11 +174,6 @@ const handleViewProblems = () => {
     height: 34px;
     padding: 0 12px;
     font-size: 12px;
-  }
-
-  .help-shape {
-    width: 140px;
-    height: 110px;
   }
 }
 </style>
