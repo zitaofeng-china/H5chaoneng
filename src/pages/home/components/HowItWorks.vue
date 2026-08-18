@@ -1,35 +1,39 @@
 <template>
   <section
     id="howItWorks"
-    ref="sectionRef"
     class="how-it-works"
-    :class="{ 'is-ready': isReady }"
+    :class="{ 'is-ready': isReady, 'is-settled': isSettled }"
   >
     <div class="how-container">
-      <header class="how-header">
+      <header ref="headerRef" class="how-header">
         <h2 class="title">{{ t('home.howItWorks') }}</h2>
         <p class="subtitle">{{ t('home.howItWorksDesc') }}</p>
       </header>
 
       <div class="workflow-stage">
-        <img
-          class="workflow-bolt"
-          src="@/assets/images/home/lanhu/workflow-bolt.png"
-          alt=""
-          aria-hidden="true"
-        />
-
         <div class="workflow-top">
           <article class="workflow-primary">
             <h3>{{ t('home.energyQuickRental') }}</h3>
             <p>{{ t('home.energyQuickRentalDesc') }}</p>
+            <img
+              class="workflow-mark workflow-mark-pc"
+              src="@/assets/images/home/lanhu/workflow-bolt.png"
+              alt=""
+              aria-hidden="true"
+            />
+            <img
+              class="workflow-mark workflow-mark-mobile"
+              src="@/assets/images/home/lanhu/workflow-bolt-mobile.png"
+              alt=""
+              aria-hidden="true"
+            />
           </article>
 
           <ul class="workflow-points">
             <li
               v-for="(point, index) in pointKeys"
               :key="point"
-              :style="{ '--delay': `${180 + index * 80}ms` }"
+              :style="{ '--delay': `${index * 220}ms` }"
             >
               <SvgIcon name="how-right" width="18" height="18" />
               <span>{{ t(point) }}</span>
@@ -42,7 +46,7 @@
             <p
               v-for="(line, index) in copyKeys"
               :key="line"
-              :style="{ '--delay': `${360 + index * 80}ms` }"
+              :style="{ '--delay': `${400 + index * 220}ms` }"
             >
               <SvgIcon name="how-right" width="16" height="16" />
               <span>{{ t(line) }}</span>
@@ -62,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
@@ -71,8 +75,9 @@ defineOptions({
   name: 'HowItWorks',
 })
 
-const sectionRef = ref<HTMLElement | null>(null)
+const headerRef = ref<HTMLElement | null>(null)
 const isReady = ref(false)
+const isSettled = ref(false)
 
 const pointKeys = [
   'home.chooseTransactionCount',
@@ -83,34 +88,42 @@ const pointKeys = [
 const copyKeys = ['home.usdtToTrx', 'home.trxToUsdt'] as const
 
 let io: IntersectionObserver | null = null
-let readyFallback = 0
+let settleTimer = 0
+let started = false
+
+const markReady = () => {
+  if (started) return
+  started = true
+  void nextTick(() => {
+    requestAnimationFrame(() => {
+      isReady.value = true
+      settleTimer = window.setTimeout(() => {
+        isSettled.value = true
+      }, 1500)
+    })
+  })
+}
 
 onMounted(() => {
-  const el = sectionRef.value
+  const el = headerRef.value
   if (!el || typeof IntersectionObserver === 'undefined') {
-    isReady.value = true
+    markReady()
     return
   }
 
-  readyFallback = window.setTimeout(() => {
-    isReady.value = true
-  }, 1200)
-
   io = new IntersectionObserver(
     ([entry]) => {
-      if (entry.isIntersecting) {
-        isReady.value = true
-        window.clearTimeout(readyFallback)
-        io?.disconnect()
-      }
+      if (!entry.isIntersecting) return
+      markReady()
+      io?.disconnect()
     },
-    { threshold: 0.08, rootMargin: '80px 0px 0px 0px' },
+    { threshold: 0.2, rootMargin: '0px' },
   )
   io.observe(el)
 })
 
 onUnmounted(() => {
-  window.clearTimeout(readyFallback)
+  window.clearTimeout(settleTimer)
   io?.disconnect()
   io = null
 })
@@ -184,20 +197,6 @@ onUnmounted(() => {
   margin-top: u(56);
 }
 
-.workflow-bolt {
-  position: absolute;
-  z-index: 0;
-  left: 30%;
-  top: u(-48);
-  width: u(410);
-  height: auto;
-  aspect-ratio: 3 / 4;
-  display: block;
-  pointer-events: none;
-  object-fit: contain;
-  opacity: 0.86;
-}
-
 .workflow-top,
 .workflow-bottom {
   position: relative;
@@ -223,15 +222,35 @@ onUnmounted(() => {
 }
 
 .workflow-primary {
+  position: relative;
   min-height: u(248);
   display: flex;
   flex-direction: column;
   justify-content: center;
   margin-left: 3%;
-  padding: u(48) u(28) u(48) u(56);
+  padding: u(48) u(42);
   color: #fff;
   background: #165dff;
   box-shadow: 0 u(18) u(30) rgba(22, 93, 255, 0.1);
+}
+
+.workflow-mark {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  object-fit: contain;
+}
+
+.workflow-mark-pc {
+  left: u(48);
+  bottom: u(36);
+  width: u(28);
+  height: auto;
+  aspect-ratio: 45 / 61;
+}
+
+.workflow-mark-mobile {
+  display: none;
 }
 
 .workflow-primary h3,
@@ -347,45 +366,37 @@ onUnmounted(() => {
 
 .how-header {
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(16px);
   transition:
-    opacity 0.55s ease,
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.workflow-bolt {
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 0.8s ease,
-    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1.5s ease-in-out,
+    transform 1.5s ease-in-out;
 }
 
 .workflow-primary {
   opacity: 0;
-  transform: translateX(-20px);
+  transform: translateX(-24px);
   transition:
-    opacity 0.6s ease,
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 1.5s ease-in-out,
+    transform 1.5s ease-in-out,
     box-shadow 0.28s ease;
 }
 
 .workflow-points li,
 .workflow-copy p {
   opacity: 0;
-  transform: translateX(16px);
+  transform: translateX(18px);
   transition:
-    opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms),
-    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1) var(--delay, 0ms);
+    opacity 1.5s ease-in-out var(--delay, 0ms),
+    transform 1.5s ease-in-out var(--delay, 0ms);
 }
 
 .workflow-secondary,
 .workflow-secondary-detail {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(18px);
   transition:
-    opacity 0.55s ease 0.18s,
-    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.18s,
+    opacity 1.5s ease-in-out 0.2s,
+    transform 1.5s ease-in-out 0.2s,
     box-shadow 0.28s ease;
 }
 
@@ -399,39 +410,33 @@ onUnmounted(() => {
   transform: none;
 }
 
-.is-ready .workflow-bolt {
-  opacity: 0.86;
-  transform: none;
-  animation: workflow-bolt-float 5.6s ease-in-out 0.7s infinite;
-}
-
-.is-ready .workflow-primary {
+.is-settled .workflow-primary {
   transition:
     transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.28s ease;
 }
 
-.is-ready .workflow-primary:hover {
+.is-settled .workflow-primary:hover {
   transform: translateY(-6px);
   box-shadow: 0 u(22) u(36) rgba(22, 93, 255, 0.2);
 }
 
-.is-ready .workflow-points li,
-.is-ready .workflow-copy p {
+.is-settled .workflow-points li,
+.is-settled .workflow-copy p {
   cursor: default;
   transition:
     transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
     color 0.25s ease;
 }
 
-.is-ready .workflow-points li:hover,
-.is-ready .workflow-copy p:hover {
+.is-settled .workflow-points li:hover,
+.is-settled .workflow-copy p:hover {
   transform: translateX(6px);
   color: #165dff;
 }
 
-.is-ready .workflow-points li:hover svg,
-.is-ready .workflow-copy p:hover svg {
+.is-settled .workflow-points li:hover svg,
+.is-settled .workflow-copy p:hover svg {
   transform: scale(1.12);
 }
 
@@ -440,31 +445,20 @@ onUnmounted(() => {
   transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.is-ready .workflow-secondary-stack {
+.is-settled .workflow-secondary-stack {
   transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.is-ready .workflow-secondary-stack:hover {
+.is-settled .workflow-secondary-stack:hover {
   transform: translateY(-5px);
 }
 
-.is-ready .workflow-secondary-stack:hover .workflow-secondary {
+.is-settled .workflow-secondary-stack:hover .workflow-secondary {
   box-shadow: 0 u(20) u(32) rgba(10, 27, 69, 0.2);
-}
-
-@keyframes workflow-bolt-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .how-header,
-  .workflow-bolt,
   .workflow-primary,
   .workflow-points li,
   .workflow-copy p,
@@ -473,15 +467,14 @@ onUnmounted(() => {
   .is-ready .workflow-primary,
   .is-ready .workflow-points li,
   .is-ready .workflow-copy p,
-  .is-ready .workflow-secondary-stack {
+  .is-settled .workflow-primary,
+  .is-settled .workflow-points li,
+  .is-settled .workflow-copy p,
+  .is-settled .workflow-secondary-stack {
     opacity: 1;
     transform: none;
     transition: none;
     animation: none;
-  }
-
-  .workflow-bolt {
-    opacity: 0.86;
   }
 }
 
@@ -508,8 +501,17 @@ onUnmounted(() => {
     margin-top: 28px;
   }
 
-  .workflow-bolt {
+  .workflow-mark-pc {
     display: none;
+  }
+
+  .workflow-mark-mobile {
+    display: block;
+    left: 26px;
+    bottom: 24px;
+    width: 18px;
+    height: auto;
+    aspect-ratio: 20 / 27;
   }
 
   .workflow-top,
@@ -525,6 +527,10 @@ onUnmounted(() => {
     min-height: 0;
     margin-left: 0;
     padding: 24px 20px;
+  }
+
+  .workflow-primary {
+    padding-bottom: 44px;
   }
 
   .workflow-primary h3,
