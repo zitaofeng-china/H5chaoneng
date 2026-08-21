@@ -97,16 +97,10 @@
             <template #dropdown>
               <el-dropdown-menu class="faq-menu-unique">
                 <el-dropdown-item
-                  :class="{ 'is-active': isHashActive('#question') }"
-                  @click.stop="handleToRouter('/', '#question')"
+                  :class="{ 'is-active': isHashActive('#fee') }"
+                  @click.stop="handleToRouter('/', '#fee')"
                 >
-                  {{ $t('nav.faq') }}
-                </el-dropdown-item>
-                <el-dropdown-item
-                  :class="{ 'is-active': isHashActive('#feature') }"
-                  @click.stop="handleToRouter('/', '#feature')"
-                >
-                  {{ $t('nav.features') }}
+                  {{ $t('nav.fee') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#howItWorks') }"
@@ -115,10 +109,16 @@
                   {{ $t('nav.howItWorks') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  :class="{ 'is-active': isHashActive('#fee') }"
-                  @click.stop="handleToRouter('/', '#fee')"
+                  :class="{ 'is-active': isHashActive('#feature') }"
+                  @click.stop="handleToRouter('/', '#feature')"
                 >
-                  {{ $t('nav.fee') }}
+                  {{ $t('nav.features') }}
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :class="{ 'is-active': isHashActive('#question') }"
+                  @click.stop="handleToRouter('/', '#question')"
+                >
+                  {{ $t('nav.faq') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#contact') }"
@@ -280,17 +280,10 @@
         <div class="menu-wrap">
           <div
             class="menu-item"
-            :class="{ 'is-active': isHashActive('#question') }"
-            @click.stop="handleToRouter('/', '#question')"
+            :class="{ 'is-active': isHashActive('#fee') }"
+            @click.stop="handleToRouter('/', '#fee')"
           >
-            {{ $t('nav.faq') }}
-          </div>
-          <div
-            class="menu-item"
-            :class="{ 'is-active': isHashActive('#feature') }"
-            @click.stop="handleToRouter('/', '#feature')"
-          >
-            {{ $t('nav.features') }}
+            {{ $t('nav.fee') }}
           </div>
           <div
             class="menu-item"
@@ -301,10 +294,17 @@
           </div>
           <div
             class="menu-item"
-            :class="{ 'is-active': isHashActive('#fee') }"
-            @click.stop="handleToRouter('/', '#fee')"
+            :class="{ 'is-active': isHashActive('#feature') }"
+            @click.stop="handleToRouter('/', '#feature')"
           >
-            {{ $t('nav.fee') }}
+            {{ $t('nav.features') }}
+          </div>
+          <div
+            class="menu-item"
+            :class="{ 'is-active': isHashActive('#question') }"
+            @click.stop="handleToRouter('/', '#question')"
+          >
+            {{ $t('nav.faq') }}
           </div>
           <div
             class="menu-item"
