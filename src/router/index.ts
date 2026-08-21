@@ -72,15 +72,12 @@ const router = createRouter({
       ],
     },
   ],
-  scrollBehavior(to) {
-    const { hash } = to
-    if (hash) {
-      return {
-        el: hash,
-        top: ['#energy', '#feature', '#fee', '#howItWorks', '#question'].includes(hash) ? 100 : 0,
-        behavior: 'smooth',
-      }
-    }
+  scrollBehavior(to, _from, savedPosition) {
+    // 首页营销区块是异步分包的，scrollBehavior 触发时锚点往往还不在 DOM。
+    // hash 滚动改由首页在区块挂载后处理，这里不能 return Promise，
+    // 否则会堵住启动阶段的 router.isReady()。
+    if (to.hash) return false
+    if (savedPosition) return savedPosition
     return { top: 0 }
   },
 })

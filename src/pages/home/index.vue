@@ -16,8 +16,10 @@
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent } from 'vue'
+import { defineAsyncComponent, onUnmounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import EnergyRental from './components/EnergyRental.vue'
+import { cancelHashScroll, hashToId, scrollToRouteHash } from '@/utils/hashScroll'
 
 // 首屏主转化区同步加载；下方营销区块异步分包
 const FeeDescription = defineAsyncComponent(() => import('./components/FeeDescription.vue'))
@@ -28,6 +30,23 @@ const HelpSection = defineAsyncComponent(() => import('./components/HelpSection.
 
 defineOptions({
   name: 'HomePage',
+})
+
+const route = useRoute()
+
+// 从其他页点导航锚点、或带着 hash 进入首页时，等异步区块进 DOM 再滚。
+watch(
+  () => route.hash,
+  (hash) => {
+    if (!hash) return
+    const exists = Boolean(document.getElementById(hashToId(hash)))
+    void scrollToRouteHash(hash, { behavior: exists ? 'smooth' : 'auto' })
+  },
+  { immediate: true, flush: 'post' },
+)
+
+onUnmounted(() => {
+  cancelHashScroll()
 })
 </script>
 
