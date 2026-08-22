@@ -479,26 +479,38 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+  /* 移动端按原型直接呈现，避免滚动入场动画造成区块短暂留白。 */
+  .how-header,
+  .workflow-primary,
+  .workflow-points li,
+  .workflow-copy p,
+  .workflow-secondary,
+  .workflow-secondary-detail {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   .how-container {
     /* 移动端不再等比缩放，回到 1:1 的移动端设计值 */
     --u: 1px;
 
-    padding: 48px 16px 52px;
+    padding: 26px 16px 32px;
   }
 
   .title {
-    font-size: 24px;
+    font-size: 28px;
     letter-spacing: 0;
   }
 
   .subtitle {
-    margin-top: 9px;
-    font-size: 14px;
+    margin-top: 7px;
+    font-size: 13px;
   }
 
   .workflow-stage {
-    gap: 18px;
-    margin-top: 28px;
+    gap: 12px;
+    margin-top: 18px;
   }
 
   .workflow-mark-pc {
@@ -507,9 +519,10 @@ onUnmounted(() => {
 
   .workflow-mark-mobile {
     display: block;
-    left: 26px;
-    bottom: 24px;
-    width: 18px;
+    top: 0;
+    left: 55%;
+    bottom: auto;
+    width: 22px;
     height: auto;
     aspect-ratio: 20 / 27;
   }
@@ -518,7 +531,15 @@ onUnmounted(() => {
   .workflow-bottom {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
+  }
+
+  /* 原型移动端：三条能量流程与主说明共用蓝色卡片。 */
+  .workflow-top {
+    box-sizing: border-box;
+    padding: 22px 18px 20px;
+    border-radius: 14px;
+    background: #2d63f5;
   }
 
   .workflow-primary,
@@ -526,16 +547,23 @@ onUnmounted(() => {
     width: 100%;
     min-height: 0;
     margin-left: 0;
-    padding: 24px 20px;
+    padding: 0;
   }
 
   .workflow-primary {
-    padding-bottom: 44px;
+    background: transparent;
+    box-shadow: none;
   }
 
   .workflow-primary h3,
   .workflow-secondary h3 {
+    font-size: 16px;
+  }
+
+  .workflow-primary p {
+    margin-top: 12px;
     font-size: 14px;
+    line-height: 1.65;
   }
 
   .workflow-points {
@@ -546,10 +574,20 @@ onUnmounted(() => {
 
   .workflow-points li,
   .workflow-copy p {
-    font-size: 12px;
+    font-size: 14px;
+    line-height: 1.65;
+  }
+
+  .workflow-points li {
+    color: #fff;
+  }
+
+  .workflow-points svg {
+    color: rgba(255, 255, 255, 0.86);
   }
 
   .workflow-copy {
+    order: 2;
     width: 100%;
     padding: 0;
   }
@@ -559,10 +597,21 @@ onUnmounted(() => {
   }
 
   .workflow-secondary-stack {
+    order: 1;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     margin-left: 0;
     margin-top: 0;
     padding-top: 0;
+  }
+
+  /* 原型移动端：合约标题、正文和两条流程合并为一张浅灰卡。 */
+  .workflow-bottom {
+    box-sizing: border-box;
+    padding: 24px 18px 22px;
+    border-radius: 12px;
+    background: #f4f5f7;
   }
 
   .workflow-secondary {
@@ -571,13 +620,31 @@ onUnmounted(() => {
     right: auto;
     width: 100%;
     min-height: 0;
-    margin-bottom: 10px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: 0;
+    color: #182230;
+    text-align: left;
+    background: transparent;
+    box-shadow: none;
   }
 
   .workflow-secondary-detail {
     min-height: 0;
-    padding: 20px;
+    padding: 0;
+    color: #182230;
+    background: transparent;
     font-size: 14px;
+    line-height: 1.75;
+  }
+
+  .workflow-copy {
+    gap: 12px;
+  }
+
+  .workflow-copy p {
+    color: #182230;
   }
 }
 </style>
