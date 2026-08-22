@@ -1,8 +1,14 @@
 <template>
   <section id="contact" class="help-section">
     <img
-      class="help-bg"
-      src="@/assets/images/home/lanhu/help-bg.png"
+      class="help-side help-side-left"
+      src="@/assets/images/home/lanhu/help-left.png"
+      alt=""
+      aria-hidden="true"
+    />
+    <img
+      class="help-side help-side-right"
+      src="@/assets/images/home/lanhu/help-right.png"
       alt=""
       aria-hidden="true"
     />
@@ -51,19 +57,34 @@ const handleViewProblems = () => {
 .help-section {
   position: relative;
   overflow: hidden;
-  min-height: 225px;
-  background: #e8f3ff;
+  height: clamp(200px, 15.625vw, 300px);
+  background: #e8f1ff;
   isolation: isolate;
 }
 
-.help-bg {
-  display: block;
-  width: 100%;
-  max-width: 1920px;
-  min-width: 1440px;
-  height: auto;
-  margin: 0 auto;
+.help-side {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  height: 100%;
+  width: auto;
+  object-fit: contain;
   pointer-events: none;
+  user-select: none;
+}
+
+.help-side-left {
+  left: 0;
+  object-position: left center;
+  mask-image: linear-gradient(to right, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 88%, transparent);
+}
+
+.help-side-right {
+  right: 0;
+  object-position: right center;
+  mask-image: linear-gradient(to left, #000 88%, transparent);
+  -webkit-mask-image: linear-gradient(to left, #000 88%, transparent);
 }
 
 .help-container {
@@ -131,29 +152,19 @@ const handleViewProblems = () => {
   box-shadow: 0 6px 14px rgba(22, 93, 255, 0.22);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .help-section {
-    min-height: 200px;
+    height: clamp(156px, 22.47vw, 184px);
   }
 
-  .help-bg {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    max-width: none;
-    min-width: 0;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+  .help-side-left {
+    mask-image: linear-gradient(to right, #000 78%, transparent);
+    -webkit-mask-image: linear-gradient(to right, #000 78%, transparent);
   }
 
-  .help-container {
-    position: relative;
-    top: auto;
-    left: auto;
-    width: auto;
-    transform: none;
-    padding: 36px 16px 40px;
+  .help-side-right {
+    mask-image: linear-gradient(to left, #000 78%, transparent);
+    -webkit-mask-image: linear-gradient(to left, #000 78%, transparent);
   }
 
   .help-title {
@@ -166,7 +177,7 @@ const handleViewProblems = () => {
 
   .help-buttons {
     gap: 8px;
-    margin-top: 16px;
+    margin-top: 14px;
   }
 
   .help-button {
