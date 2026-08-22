@@ -50,11 +50,13 @@
             'is-transfer': activeTab === 'transfer',
           }"
         >
-          <div
-            class="mode-label field-label"
-            :class="{ 'balance-mode-label': activeTab === 'balance' }"
-          >
-            {{ t('home.chooseMode') }}
+          <div class="mode-label-wrap">
+            <div
+              class="mode-label field-label"
+              :class="{ 'balance-mode-label': activeTab === 'balance' }"
+            >
+              {{ t('home.chooseMode') }}
+            </div>
           </div>
 
           <el-tabs v-model="activeTab" class="rental-tabs">
@@ -241,7 +243,8 @@ const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
 
-const activeTab = ref<'transfer' | 'balance'>('balance')
+// 蓝湖移动端原型以“转账租赁”为首屏入口，桌面 Web 保持原有“余额支付”默认态。
+const activeTab = ref<'transfer' | 'balance'>(isMobile.value ? 'transfer' : 'balance')
 const formRef = ref<FormInstance>()
 
 // 使用统一的地址管理 hook
@@ -730,9 +733,9 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .energy-rental {
-    padding: 0 6px 24px;
+    padding: 0 0 24px;
 
     .header {
       padding-bottom: 10px;
@@ -777,7 +780,7 @@ onUnmounted(() => {
 
     .rental-card {
       :deep(.el-card__body) {
-        padding: 10px;
+        padding: 6px;
         padding-bottom: 30px;
         overflow: hidden;
       }
@@ -808,6 +811,7 @@ onUnmounted(() => {
     height: auto;
     min-height: 0;
     padding: 20px 24px 8px;
+    overflow-x: hidden;
   }
 
   :deep(.ad-banner) {
@@ -818,12 +822,24 @@ onUnmounted(() => {
     margin: 0 auto;
   }
 
+  :deep(.ad-banner.is-coverflow) {
+    width: min(100%, 1120px);
+  }
+
   :deep(.ad-carousel),
   :deep(.ad-skeleton) {
     width: 100%;
     height: auto;
     aspect-ratio: 16 / 4.5;
     border-radius: 8px;
+  }
+
+  :deep(.ad-banner.is-coverflow .ad-carousel),
+  :deep(.ad-banner.is-coverflow .ad-skeleton) {
+    aspect-ratio: auto;
+    background: transparent;
+    overflow: visible;
+    border-radius: 0;
   }
 
   :deep(.ad-image) {
@@ -1413,7 +1429,7 @@ onUnmounted(() => {
   min-height: 0;
 }
 
-@media (min-width: 769px) {
+@media (min-width: 891px) {
   /* Keep the balance form aligned to the card's content box. */
   .rental-card.is-balance .mode-label,
   .rental-card.is-balance .rental-tabs {
@@ -1443,7 +1459,7 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .energy-rental {
     padding-bottom: 28px;
   }
@@ -1463,8 +1479,8 @@ onUnmounted(() => {
       padding: 0;
     }
 
-    :deep(.ad-carousel),
-    :deep(.ad-skeleton) {
+    :deep(.ad-banner:not(.is-coverflow) .ad-carousel),
+    :deep(.ad-banner:not(.is-coverflow) .ad-skeleton) {
       aspect-ratio: 16 / 5;
     }
   }
@@ -1498,7 +1514,10 @@ onUnmounted(() => {
   }
 
   .rental-section {
-    padding: 32px 10px 0;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 32px 0 0;
   }
 
   .rental-title {
@@ -1511,7 +1530,10 @@ onUnmounted(() => {
   }
 
   .checkout-steps {
-    margin: 22px auto 18px;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 22px 0 18px;
+    padding: 0 12px;
   }
 
   .checkout-step {
@@ -1537,7 +1559,7 @@ onUnmounted(() => {
   }
 
   .rental-card :deep(.el-card__body) {
-    padding: 0 10px 20px;
+    padding: 0 6px 20px;
   }
 
   .mode-section.is-balance {
@@ -1565,6 +1587,12 @@ onUnmounted(() => {
   .rental-card.is-transfer .rental-tabs {
     width: 100%;
     margin: 0;
+  }
+
+  .mode-label-wrap {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 12px;
   }
 
   .rental-card.is-transfer .mode-label {
@@ -1607,6 +1635,57 @@ onUnmounted(() => {
   .rental-card.is-balance .rental-form .action-buttons .el-button {
     height: 44px;
     font-size: 14px;
+  }
+
+  .rental-tabs :deep(.el-tabs__item) {
+    height: 40px;
+    flex: 1;
+    font-size: 13px;
+    line-height: 38px;
+  }
+
+  .rental-tabs :deep(.el-tabs__content) {
+    box-sizing: border-box;
+    padding: 0 12px;
+  }
+
+  /* 蓝湖移动稿为“余额支付 / 转账租赁”，仅调整移动端视觉顺序。 */
+  .rental-tabs :deep(.el-tabs__header) {
+    box-sizing: border-box;
+    padding: 0 12px;
+  }
+
+  .rental-tabs :deep(.el-tabs__nav) {
+    display: flex;
+    width: 100%;
+  }
+
+  .rental-tabs :deep(.el-tabs__item:nth-child(2)) {
+    order: 2;
+  }
+
+  .rental-tabs :deep(.el-tabs__item:nth-child(3)) {
+    order: 1;
+  }
+
+  .rental-card.is-transfer .rental-tabs :deep(.el-tabs__active-bar) {
+    width: 50% !important;
+    transform: translateX(100%) !important;
+  }
+
+  .rental-card.is-balance .rental-tabs :deep(.el-tabs__active-bar) {
+    width: 50% !important;
+    transform: translateX(0) !important;
+  }
+
+  .transfer-welfare-link {
+    margin-top: 16px;
+    padding: 0;
+
+    .page-link-btn {
+      width: 100%;
+      height: 36px;
+    }
   }
 }
 </style>
