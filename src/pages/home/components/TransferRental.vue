@@ -1,5 +1,15 @@
 <template>
   <div class="transfer-rental">
+    <div v-if="isMobile" class="transfer-explain">
+      <div class="explain-label">{{ t('transferRental.explain') }}</div>
+      <div class="explain-grid">
+        <div v-for="item in transferPackages" :key="item.count" class="explain-card">
+          <span class="explain-price">{{ item.price }} {{ t('common.trx') }}</span>
+          <span class="explain-count">{{ t('transferRental.buyCount', { count: item.count }) }}</span>
+        </div>
+      </div>
+    </div>
+
     <div class="instruction-note">
       <SvgIcon name="transfer-info" width="12" height="12" />
       {{ t('transferRental.note') }}
@@ -44,11 +54,17 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
+import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
+import { formatCryptoAmount } from '@/utils/number'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+
+const TRANSFER_COUNTS = [1, 2, 4, 20]
 
 interface Props {
   paymentAddress?: string
@@ -59,6 +75,18 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
+const commonStore = useCommonStore()
+const { isMobile } = storeToRefs(commonStore)
+const priceStore = usePriceStore()
+const { priceData } = storeToRefs(priceStore)
+
+const transferPackages = computed(() => {
+  const unit = Number.parseFloat(priceData.value?.stroke || '3.5')
+  return TRANSFER_COUNTS.map((count) => ({
+    count,
+    price: formatCryptoAmount(unit * count),
+  }))
+})
 
 const { loadingTimeout, resetTimer } = useAddressLoading({
   address: () => props.paymentAddress,
@@ -86,6 +114,68 @@ const tips = computed(() => [
 <style lang="scss" scoped>
 .transfer-rental {
   padding: 0;
+
+  .transfer-explain {
+    margin: 16px 0 0;
+  }
+
+  .explain-label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 20px;
+    padding-left: 12px;
+    color: #000;
+    font-size: 13px;
+    font-weight: 900;
+    line-height: 14px;
+  }
+
+  .explain-label::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 0;
+    width: 2px;
+    height: 16px;
+    border-radius: 2px;
+    background: #165dff;
+  }
+
+  .explain-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .explain-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 58px;
+    padding: 8px 6px;
+    box-sizing: border-box;
+    border: 1px solid rgba(22, 93, 255, 0.16);
+    border-radius: 4px;
+    background: #eef4ff;
+  }
+
+  .explain-price {
+    color: #165dff;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .explain-count {
+    color: rgba(30, 41, 59, 0.55);
+    font-size: 11px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
 
   .instruction-note {
     display: flex;
@@ -237,8 +327,14 @@ const tips = computed(() => [
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .transfer-rental {
+    @media (min-width: 560px) {
+      .explain-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+    }
+
     .instruction-note {
       min-height: 32px;
       margin: 12px 0 10px;
@@ -260,9 +356,20 @@ const tips = computed(() => [
 
       :deep(.qr-code),
       :deep(.status-container) {
-        width: 120px;
-        height: 120px;
+        width: 148px;
+        height: 148px;
       }
+
+      :deep(.wallet-address) {
+        margin-top: 8px;
+        font-size: 11px;
+        word-break: break-all;
+      }
+    }
+
+    :deep(.tips-section) {
+      margin: 8px 0 12px;
+      padding: 12px;
     }
 
     .loading-section {
