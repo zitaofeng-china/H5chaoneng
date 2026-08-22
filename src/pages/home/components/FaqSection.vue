@@ -224,7 +224,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 
 @media (max-width: 768px) {
   .faq-section {
-    padding: 48px 0 52px;
+    padding: 38px 0 40px;
   }
 
   .faq-container {
@@ -232,7 +232,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   }
 
   .faq-header {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   .faq-title {
@@ -245,12 +245,12 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   }
 
   .faq-list {
-    gap: 6px;
+    gap: 5px;
   }
 
   .faq-question {
-    min-height: 44px;
-    padding: 10px 13px;
+    min-height: 40px;
+    padding: 8px 12px;
     font-size: 12px;
   }
 
@@ -260,7 +260,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   }
 
   .faq-answer {
-    padding: 12px 13px 14px;
+    padding: 10px 12px 12px;
     font-size: 11px;
     line-height: 1.65;
   }
