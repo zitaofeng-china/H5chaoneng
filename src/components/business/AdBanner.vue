@@ -2,73 +2,78 @@
   <section
     v-if="showBanner"
     class="ad-banner"
-    :class="{ 'is-miniapp': instantSwitch }"
+    :class="{
+      'is-miniapp': instantSwitch,
+      'is-coverflow': useCoverflow,
+    }"
     aria-label="广告"
   >
     <div
       ref="carouselRef"
       class="ad-carousel"
       :class="{ 'is-dragging': isDragging, 'is-instant': instantSwitch }"
+      tabindex="0"
       @pointerdown="handlePointerDown"
       @pointermove="handlePointerMove"
       @pointerup="handlePointerUp"
       @pointercancel="handlePointerCancel"
+      @keydown="handleKeydown"
+      @mouseenter="pauseRotation"
+      @mouseleave="resumeRotation"
     >
-      <div class="ad-slides">
-        <component
-          :is="ad.link_url ? 'a' : 'div'"
-          v-for="(ad, index) in displayAds"
-          :key="getAdKey(ad, index)"
-          class="ad-slide"
-          :class="{ 'is-active': index === activeIndex }"
-          :href="ad.link_url ? resolveUrl(ad.link_url) : undefined"
-          :target="ad.link_url ? '_blank' : undefined"
-          :rel="ad.link_url ? 'noopener noreferrer' : undefined"
-          :aria-hidden="index !== activeIndex"
-          @click="handleSlideClick"
-        >
-          <img
-            class="ad-image"
-            :src="resolveUrl(ad.image_url)"
-            alt=""
-            draggable="false"
-            @error="handleImageError(ad)"
-          />
-        </component>
+      <div class="ad-stage">
+        <div class="ad-slides">
+          <component
+            :is="ad.link_url ? 'a' : 'div'"
+            v-for="(ad, index) in displayAds"
+            :key="getAdKey(ad, index)"
+            class="ad-slide"
+            :class="{ 'is-active': index === activeIndex }"
+            :style="getSlideStyle(index)"
+            :href="ad.link_url ? resolveUrl(ad.link_url) : undefined"
+            :target="ad.link_url ? '_blank' : undefined"
+            :rel="ad.link_url ? 'noopener noreferrer' : undefined"
+            :aria-hidden="index !== activeIndex"
+            @click="handleSlideClick($event, index)"
+          >
+            <img
+              class="ad-image"
+              :src="resolveUrl(ad.image_url)"
+              alt=""
+              draggable="false"
+              @error="handleImageError(ad)"
+            />
+          </component>
+        </div>
       </div>
 
       <template v-if="displayAds.length > 1">
-        <button
-          class="ad-arrow ad-arrow--prev"
-          type="button"
-          aria-label="上一个广告"
-          @click.stop="showPrevious"
-        >
-          <span class="ad-arrow__icon" aria-hidden="true"></span>
-        </button>
-        <button
-          class="ad-arrow ad-arrow--next"
-          type="button"
-          aria-label="下一个广告"
-          @click.stop="showNext"
-        >
-          <span class="ad-arrow__icon" aria-hidden="true"></span>
-        </button>
-      </template>
+        <div v-if="useCoverflow" class="ad-controls">
+          <div class="ad-track" aria-hidden="true">
+            <span
+              v-for="copy in [-1, 0, 1]"
+              :key="copy"
+              class="ad-track__fill"
+              :class="{ 'is-instant': trackInstant }"
+              :style="getTrackFillStyle(copy)"
+            ></span>
+          </div>
+        </div>
 
-      <div v-if="displayAds.length > 1" class="ad-dots" role="tablist" aria-label="广告切换">
-        <button
-          v-for="(ad, index) in displayAds"
-          :key="getAdKey(ad, index)"
-          class="ad-dot"
-          :class="{ 'is-active': index === activeIndex }"
-          type="button"
-          :aria-label="`切换到第 ${index + 1} 个广告`"
-          :aria-selected="index === activeIndex"
-          role="tab"
-          @click="selectAd(index)"
-        ></button>
-      </div>
+        <div v-else class="ad-dots" role="tablist" aria-label="广告切换">
+          <button
+            v-for="(ad, index) in displayAds"
+            :key="getAdKey(ad, index)"
+            class="ad-dot"
+            :class="{ 'is-active': index === activeIndex }"
+            type="button"
+            :aria-label="`切换到第 ${index + 1} 个广告`"
+            :aria-selected="index === activeIndex"
+            role="tab"
+            @click="selectAd(index)"
+          ></button>
+        </div>
+      </template>
     </div>
   </section>
 </template>
@@ -78,6 +83,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { adApi } from '@/api'
 import type { AdItem } from '@/api/modules/ad/types'
 import { isMiniAppRuntime } from '@/utils/telegram'
+import { storeToRefs } from 'pinia'
+import { useCommonStore } from '@/stores/useCommonStore'
 
 let cachedAds: AdItem[] | null = null
 
@@ -96,11 +103,29 @@ const failedImages = ref(new Set<string>())
 const carouselRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
 const suppressClick = ref(false)
+const dragProgress = ref(0)
+const trackIndex = ref(0)
+const trackInstant = ref(false)
+const prefersReducedMotion = ref(false)
 const instantSwitch = computed(() => isMiniAppRuntime())
+const commonStore = useCommonStore()
+const { isMobile } = storeToRefs(commonStore)
+const useCoverflow = computed(
+  () =>
+    isMobile.value &&
+    !instantSwitch.value &&
+    !prefersReducedMotion.value &&
+    displayAds.value.length > 1,
+)
 let pointerStartX = 0
 let pointerStartY = 0
 let pointerId: number | null = null
+let rotationPaused = false
 let rotationTimer: ReturnType<typeof setInterval> | undefined
+let trackSnapTimer: ReturnType<typeof setTimeout> | undefined
+let motionQuery: MediaQueryList | null = null
+const ROTATION_MS = 6500
+const TRACK_WRAP_MS = 460
 
 const displayAds = computed(() =>
   ads.value.filter((ad) => Boolean(ad.image_url) && !failedImages.value.has(String(ad.id))),
@@ -116,6 +141,7 @@ watch(displayAds, (list) => {
   if (activeIndex.value >= list.length) {
     activeIndex.value = 0
   }
+  snapTrackIndex(activeIndex.value)
   emitHasAd()
   if (list.length < 2) stopRotation()
 })
@@ -155,6 +181,108 @@ function getAdKey(ad: AdItem, index: number): string {
   return `${String(ad.id)}-${index}`
 }
 
+function wrapOffset(offset: number, total: number): number {
+  if (total <= 0) return 0
+  const half = total / 2
+  while (offset > half) offset -= total
+  while (offset < -half) offset += total
+  return offset
+}
+
+function getSlideStyle(index: number): Record<string, string> | undefined {
+  if (!useCoverflow.value) return undefined
+
+  const total = displayAds.value.length
+  const offset = wrapOffset(index - activeIndex.value + dragProgress.value, total)
+  const abs = Math.abs(offset)
+  const hidden = abs > 2.15
+
+  return {
+    '--ad-offset': String(offset),
+    '--ad-abs': String(abs),
+    zIndex: String(Math.round(24 - abs * 6)),
+    opacity: hidden ? '0' : abs > 1.15 ? String(Math.max(0.28, 0.82 - (abs - 1) * 0.38)) : '1',
+    pointerEvents: hidden || abs > 1.35 ? 'none' : 'auto',
+    visibility: hidden ? 'hidden' : 'visible',
+  }
+}
+
+function getTrackFillStyle(copy: number): Record<string, string> {
+  const total = displayAds.value.length || 1
+  const position = trackIndex.value - dragProgress.value + copy * total
+
+  return {
+    width: `${100 / total}%`,
+    transform: `translateX(${position * 100}%)`,
+  }
+}
+
+function clearTrackSnap() {
+  if (trackSnapTimer) {
+    clearTimeout(trackSnapTimer)
+    trackSnapTimer = undefined
+  }
+}
+
+function snapTrackIndex(index = activeIndex.value) {
+  const total = displayAds.value.length
+  clearTrackSnap()
+  trackInstant.value = true
+  trackIndex.value = total > 0 ? ((index % total) + total) % total : 0
+  requestAnimationFrame(() => {
+    trackInstant.value = false
+  })
+}
+
+function moduloIndex(value: number, total: number): number {
+  if (total <= 0) return 0
+  return ((value % total) + total) % total
+}
+
+function circularStep(from: number, to: number, total: number): number {
+  if (total <= 0) return 0
+  let step = to - from
+  while (step > total / 2) step -= total
+  while (step < -total / 2) step += total
+  return step
+}
+
+function advanceTrack(step: number) {
+  const total = displayAds.value.length
+  if (total < 2 || step === 0) return
+
+  const run = () => {
+    trackIndex.value += step
+    if (trackIndex.value < 0 || trackIndex.value >= total) {
+      trackSnapTimer = setTimeout(() => {
+        snapTrackIndex(moduloIndex(trackIndex.value, total))
+      }, TRACK_WRAP_MS)
+    }
+  }
+
+  clearTrackSnap()
+  if (trackIndex.value < 0 || trackIndex.value >= total) {
+    snapTrackIndex(moduloIndex(trackIndex.value, total))
+    requestAnimationFrame(() => {
+      requestAnimationFrame(run)
+    })
+    return
+  }
+
+  run()
+}
+
+function applyActiveIndex(index: number, step?: number) {
+  const total = displayAds.value.length
+  if (total < 2) return
+
+  const next = moduloIndex(index, total)
+  const from = moduloIndex(Math.round(trackIndex.value), total)
+  const delta = step ?? circularStep(from, next, total)
+  activeIndex.value = next
+  advanceTrack(delta)
+}
+
 function stopRotation() {
   if (rotationTimer) {
     clearInterval(rotationTimer)
@@ -164,7 +292,7 @@ function stopRotation() {
 
 function startRotation() {
   stopRotation()
-  if (displayAds.value.length < 2) return
+  if (rotationPaused || displayAds.value.length < 2) return
 
   rotationTimer = setInterval(() => {
     const total = displayAds.value.length
@@ -172,15 +300,24 @@ function startRotation() {
       stopRotation()
       return
     }
-    activeIndex.value = (activeIndex.value + 1) % total
-  }, 6500)
+    applyActiveIndex(activeIndex.value + 1, 1)
+  }, ROTATION_MS)
+}
+
+function pauseRotation() {
+  if (instantSwitch.value) return
+  rotationPaused = true
+  stopRotation()
+}
+
+function resumeRotation() {
+  rotationPaused = false
+  if (isDragging.value) return
+  startRotation()
 }
 
 function goToAd(index: number) {
-  const total = displayAds.value.length
-  if (total < 2) return
-
-  activeIndex.value = (index + total) % total
+  applyActiveIndex(index)
   startRotation()
 }
 
@@ -189,11 +326,13 @@ function selectAd(index: number) {
 }
 
 function showPrevious() {
-  goToAd(activeIndex.value - 1)
+  applyActiveIndex(activeIndex.value - 1, -1)
+  startRotation()
 }
 
 function showNext() {
-  goToAd(activeIndex.value + 1)
+  applyActiveIndex(activeIndex.value + 1, 1)
+  startRotation()
 }
 
 function isButtonTarget(target: EventTarget | null): boolean {
@@ -208,6 +347,8 @@ function handlePointerDown(event: PointerEvent) {
   pointerStartY = event.clientY
   isDragging.value = false
   suppressClick.value = false
+  dragProgress.value = 0
+  stopRotation()
   carouselRef.value?.setPointerCapture(event.pointerId)
 }
 
@@ -220,26 +361,39 @@ function handlePointerMove(event: PointerEvent) {
 
   isDragging.value = true
   event.preventDefault()
+
+  if (!useCoverflow.value) return
+
+  const width = carouselRef.value?.clientWidth || 1
+  dragProgress.value = Math.max(-1.2, Math.min(1.2, deltaX / (width * 0.3)))
 }
 
 function finishPointer(event: PointerEvent) {
   if (pointerId !== event.pointerId) return
 
   const deltaX = event.clientX - pointerStartX
-  if (isDragging.value && Math.abs(deltaX) >= 40) {
-    if (deltaX < 0) {
-      showNext()
-    } else {
+  const progress = dragProgress.value
+  const shouldFlip = useCoverflow.value
+    ? Math.abs(progress) >= 0.26
+    : isDragging.value && Math.abs(deltaX) >= 40
+
+  if (shouldFlip) {
+    const toPrev = useCoverflow.value ? progress > 0 : deltaX > 0
+    if (toPrev) {
       showPrevious()
+    } else {
+      showNext()
     }
     suppressClick.value = true
   }
 
   isDragging.value = false
+  dragProgress.value = 0
   pointerId = null
   if (carouselRef.value?.hasPointerCapture(event.pointerId)) {
     carouselRef.value.releasePointerCapture(event.pointerId)
   }
+  if (!rotationPaused) startRotation()
 }
 
 function handlePointerUp(event: PointerEvent) {
@@ -250,18 +404,41 @@ function handlePointerCancel(event: PointerEvent) {
   if (pointerId !== event.pointerId) return
 
   isDragging.value = false
+  dragProgress.value = 0
   pointerId = null
+  if (!rotationPaused) startRotation()
 }
 
-function handleSlideClick(event: MouseEvent) {
-  if (!suppressClick.value) return
+function handleKeydown(event: KeyboardEvent) {
+  if (displayAds.value.length < 2) return
+  if (event.key === 'ArrowLeft') {
+    event.preventDefault()
+    showPrevious()
+  } else if (event.key === 'ArrowRight') {
+    event.preventDefault()
+    showNext()
+  }
+}
 
-  event.preventDefault()
-  suppressClick.value = false
+function handleSlideClick(event: MouseEvent, index: number) {
+  if (suppressClick.value) {
+    event.preventDefault()
+    suppressClick.value = false
+    return
+  }
+
+  if (useCoverflow.value && index !== activeIndex.value) {
+    event.preventDefault()
+    goToAd(index)
+  }
 }
 
 function handleImageError(ad: AdItem) {
   failedImages.value = new Set(failedImages.value).add(String(ad.id))
+}
+
+function syncMotionPreference() {
+  prefersReducedMotion.value = Boolean(motionQuery?.matches)
 }
 
 async function loadAds() {
@@ -278,6 +455,7 @@ async function loadAds() {
       ads.value = normalizeAds(response.data)
       cachedAds = ads.value
       activeIndex.value = 0
+      snapTrackIndex(0)
       startRotation()
     } else if (import.meta.env.DEV) {
       console.warn('[AdBanner] 获取广告失败:', response.msg)
@@ -293,11 +471,16 @@ async function loadAds() {
 }
 
 onMounted(() => {
+  motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+  syncMotionPreference()
+  motionQuery.addEventListener('change', syncMotionPreference)
   void loadAds()
 })
 
 onUnmounted(() => {
   stopRotation()
+  clearTrackSnap()
+  motionQuery?.removeEventListener('change', syncMotionPreference)
 })
 </script>
 
@@ -317,6 +500,11 @@ onUnmounted(() => {
       border-radius: 0;
     }
   }
+
+  &.is-coverflow {
+    width: min(100%, 1120px);
+    margin: 0 auto 10px;
+  }
 }
 
 .ad-carousel,
@@ -331,12 +519,14 @@ onUnmounted(() => {
 .ad-carousel {
   touch-action: pan-y;
   cursor: grab;
+  outline: none;
 
   &.is-dragging {
     cursor: grabbing;
   }
 }
 
+.ad-stage,
 .ad-slides {
   position: relative;
   width: 100%;
@@ -397,63 +587,6 @@ onUnmounted(() => {
   font-weight: 700;
 }
 
-.ad-arrow {
-  position: absolute;
-  top: 50%;
-  z-index: 2;
-  display: grid;
-  width: 34px;
-  height: 54px;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  border: 0;
-  border-radius: 5px;
-  color: #fff;
-  background: rgba(0, 0, 0, 0.32);
-  font-size: 36px;
-  line-height: 1;
-  opacity: 0;
-  cursor: pointer;
-  transform: translateY(-50%);
-  transition: opacity 0.2s ease, background-color 0.2s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.5);
-  }
-}
-
-.ad-arrow__icon {
-  position: absolute;
-  inset: 0;
-  width: 10px;
-  height: 10px;
-  margin: auto;
-  border-top: 2px solid #fff;
-  border-right: 2px solid #fff;
-}
-
-.ad-arrow--prev .ad-arrow__icon {
-  transform: translateX(2px) rotate(-135deg);
-}
-
-.ad-arrow--next .ad-arrow__icon {
-  transform: translateX(-2px) rotate(45deg);
-}
-
-.ad-carousel:hover .ad-arrow,
-.ad-carousel:focus-within .ad-arrow {
-  opacity: 1;
-}
-
-.ad-arrow--prev {
-  left: 12px;
-}
-
-.ad-arrow--next {
-  right: 12px;
-}
-
 .ad-dots {
   position: absolute;
   right: 0;
@@ -475,6 +608,104 @@ onUnmounted(() => {
 
   &.is-active {
     background: #fff;
+  }
+}
+
+.ad-banner.is-coverflow {
+  --ad-shift: 72%;
+  --ad-tilt: -42deg;
+  --ad-depth: -160px;
+
+  .ad-carousel {
+    overflow: visible;
+    aspect-ratio: auto;
+    height: auto;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .ad-stage {
+    height: clamp(176px, 23vw, 248px);
+    perspective: 1480px;
+    perspective-origin: 50% 46%;
+    transform-style: preserve-3d;
+  }
+
+  .ad-slides {
+    transform-style: preserve-3d;
+  }
+
+  .ad-slide {
+    --ad-offset: 0;
+    --ad-abs: 0;
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    width: min(480px, 42%);
+    height: auto;
+    aspect-ratio: 16 / 7;
+    overflow: hidden;
+    border-radius: 14px;
+    background: #101828;
+    box-shadow:
+      0 22px 44px rgba(15, 23, 42, 0.18),
+      0 0 0 1px rgba(15, 23, 42, 0.08);
+    opacity: 1;
+    transform: translate(-50%, -50%) translateX(calc(var(--ad-offset) * var(--ad-shift)))
+      rotateY(calc(var(--ad-offset) * var(--ad-tilt)))
+      translateZ(calc(var(--ad-abs) * var(--ad-depth)))
+      scale(calc(1 - min(var(--ad-abs), 2) * 0.06));
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+    filter: brightness(calc(1 - min(var(--ad-abs), 1.6) * 0.18));
+    transition:
+      transform 0.62s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.45s ease,
+      filter 0.45s ease;
+  }
+
+  .ad-slide.is-active {
+    position: absolute;
+  }
+
+  .ad-carousel.is-dragging .ad-slide {
+    transition: none;
+  }
+
+  .ad-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 16px;
+  }
+
+  .ad-track {
+    position: relative;
+    overflow: hidden;
+    width: min(168px, 36vw);
+    height: 2px;
+    border-radius: 99px;
+    background: rgba(22, 93, 255, 0.14);
+  }
+
+  .ad-track__fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: #165dff;
+    transform-origin: left center;
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &.is-instant {
+      transition: none;
+    }
+  }
+
+  .ad-carousel.is-dragging .ad-track__fill {
+    transition: none;
   }
 }
 
@@ -517,8 +748,29 @@ onUnmounted(() => {
     margin-bottom: 12px;
   }
 
+  .ad-banner.is-coverflow {
+    --ad-shift: 62%;
+    --ad-tilt: -32deg;
+    --ad-depth: -96px;
+    margin-bottom: 8px;
+
+    .ad-stage {
+      height: clamp(148px, 42vw, 196px);
+    }
+
+    .ad-slide {
+      width: min(64%, 360px);
+      aspect-ratio: 16 / 8;
+      border-radius: 12px;
+    }
+
+    .ad-controls {
+      margin-top: 12px;
+    }
+  }
+
   @media (max-width: 400px) {
-    .ad-banner:not(.is-miniapp) {
+    .ad-banner:not(.is-miniapp):not(.is-coverflow) {
       width: 100%;
       max-width: none;
       margin-right: 0;
@@ -534,6 +786,10 @@ onUnmounted(() => {
   .ad-carousel,
   .ad-skeleton {
     aspect-ratio: 16 / 4;
+  }
+
+  .ad-banner.is-coverflow .ad-carousel {
+    aspect-ratio: auto;
   }
 
   .ad-fallback {
@@ -555,26 +811,6 @@ onUnmounted(() => {
   .ad-dot {
     width: 20px;
     height: 3px;
-  }
-
-  .ad-arrow {
-    width: 28px;
-    height: 42px;
-    font-size: 28px;
-    opacity: 0.8;
-  }
-
-  .ad-arrow__icon {
-    width: 9px;
-    height: 9px;
-  }
-
-  .ad-arrow--prev {
-    left: 8px;
-  }
-
-  .ad-arrow--next {
-    right: 8px;
   }
 }
 </style>
