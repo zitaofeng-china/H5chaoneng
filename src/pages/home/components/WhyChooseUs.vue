@@ -554,8 +554,23 @@ const items: Item[] = [
 }
 
 @media (max-width: 768px) {
+  /* 移动端按原型直接呈现，避免观察器尚未触发时图片区和列表留白。 */
+  .feature-header,
+  .token-art,
+  .feature-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .token-art-glow,
+  .token-art-usdt,
+  .token-art-trx {
+    animation: none;
+  }
+
   .why-choose-us {
-    padding: 48px 0 32px;
+    padding: 38px 0 28px;
   }
 
   .feature-container {
@@ -564,7 +579,7 @@ const items: Item[] = [
 
   .feature-header {
     padding: 0;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
 
   .title {
@@ -582,8 +597,8 @@ const items: Item[] = [
 
   .token-art {
     width: min(100%, 360px);
-    min-height: 280px;
-    margin: 0 auto 8px;
+    min-height: 246px;
+    margin: 0 auto 4px;
   }
 
   .token-art-stage {
@@ -593,10 +608,14 @@ const items: Item[] = [
 
   .feature-list {
     min-height: 0;
-    margin-top: 8px;
-    padding: 22px 18px 24px var(--rail);
-    gap: 18px;
+    margin-top: 4px;
+    padding: 16px 16px 18px var(--rail);
+    gap: 8px;
     justify-content: flex-start;
+  }
+
+  .feature-item {
+    padding: 14px 0;
   }
 
   .feature-copy {
@@ -604,12 +623,13 @@ const items: Item[] = [
   }
 
   .feature-copy h3 {
-    font-size: 15px;
+    font-size: 14px;
   }
 
   .feature-copy p {
-    font-size: 11px;
-    line-height: 1.55;
+    margin-top: 3px;
+    font-size: 10px;
+    line-height: 1.5;
   }
 }
 </style>
