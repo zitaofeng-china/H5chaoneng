@@ -83,8 +83,6 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { adApi } from '@/api'
 import type { AdItem } from '@/api/modules/ad/types'
 import { isMiniAppRuntime } from '@/utils/telegram'
-import { storeToRefs } from 'pinia'
-import { useCommonStore } from '@/stores/useCommonStore'
 
 let cachedAds: AdItem[] | null = null
 
@@ -108,11 +106,8 @@ const trackIndex = ref(0)
 const trackInstant = ref(false)
 const prefersReducedMotion = ref(false)
 const instantSwitch = computed(() => isMiniAppRuntime())
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
 const useCoverflow = computed(
   () =>
-    isMobile.value &&
     !instantSwitch.value &&
     !prefersReducedMotion.value &&
     displayAds.value.length > 1,
