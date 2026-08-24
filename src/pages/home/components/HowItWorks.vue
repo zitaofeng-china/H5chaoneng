@@ -13,17 +13,19 @@
       <div class="workflow-stage">
         <div class="workflow-top">
           <article class="workflow-primary">
-            <h3>{{ t('home.energyQuickRental') }}</h3>
+            <h3>
+              {{ t('home.energyQuickRental') }}
+              <img
+                class="workflow-mark workflow-mark-mobile"
+                :src="workflowBoltMobile"
+                alt=""
+                aria-hidden="true"
+              />
+            </h3>
             <p>{{ t('home.energyQuickRentalDesc') }}</p>
             <img
               class="workflow-mark workflow-mark-pc"
-              src="@/assets/images/home/lanhu/workflow-bolt.png"
-              alt=""
-              aria-hidden="true"
-            />
-            <img
-              class="workflow-mark workflow-mark-mobile"
-              src="@/assets/images/home/lanhu/workflow-bolt-mobile.png"
+              :src="workflowBolt"
               alt=""
               aria-hidden="true"
             />
@@ -68,6 +70,8 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import workflowBolt from '@/assets/images/home/lanhu/workflow-bolt.png'
+import workflowBoltMobile from '@/assets/images/home/lanhu/workflow-bolt-mobile.png'
 
 const { t } = useI18n()
 
@@ -517,14 +521,22 @@ onUnmounted(() => {
     display: none;
   }
 
+  .workflow-primary h3 {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
   .workflow-mark-mobile {
     display: block;
-    top: 0;
-    left: 55%;
+    position: static;
+    top: auto;
+    left: auto;
     bottom: auto;
     width: 22px;
     height: auto;
     aspect-ratio: 20 / 27;
+    flex: 0 0 auto;
   }
 
   .workflow-top,
