@@ -1,40 +1,46 @@
 <template>
-  <div class="auth-frame" :class="`is-${mode}`">
+  <div class="auth-frame" :class="[`is-${mode}`, layoutClass]">
     <div class="auth-hero" aria-hidden="true">
       <img :src="heroImage" alt="" class="auth-hero-img" />
-      <div class="auth-hero-blur" />
-      <div class="auth-hero-fade" />
+      <div v-if="isMobile" class="auth-hero-blur" />
+      <div v-if="isMobile" class="auth-hero-fade" />
     </div>
 
     <div class="auth-panel">
-      <div class="auth-brand">
-        <div class="auth-brand-inner">
-          <img :src="gasLogoMark" alt="GAS711" class="auth-brand-mark" />
-          <span class="auth-brand-name">GAS711</span>
+      <template v-if="isMobile">
+        <div class="auth-brand">
+          <div class="auth-brand-inner">
+            <img :src="gasLogoMark" alt="GAS711" class="auth-brand-mark" />
+            <span class="auth-brand-name">GAS711</span>
+          </div>
         </div>
-      </div>
 
-      <div class="auth-tabs" role="tablist">
-        <button
-          type="button"
-          role="tab"
-          class="auth-tab"
-          :class="{ 'is-active': mode === 'register' }"
-          :aria-selected="mode === 'register'"
-          @click="onSwitch('register')"
-        >
-          {{ t('register.title') }}
-        </button>
-        <button
-          type="button"
-          role="tab"
-          class="auth-tab"
-          :class="{ 'is-active': mode === 'login' }"
-          :aria-selected="mode === 'login'"
-          @click="onSwitch('login')"
-        >
-          {{ t('login.title') }}
-        </button>
+        <div class="auth-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            class="auth-tab"
+            :class="{ 'is-active': mode === 'register' }"
+            :aria-selected="mode === 'register'"
+            @click="onSwitch('register')"
+          >
+            {{ t('register.title') }}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            class="auth-tab"
+            :class="{ 'is-active': mode === 'login' }"
+            :aria-selected="mode === 'login'"
+            @click="onSwitch('login')"
+          >
+            {{ t('login.title') }}
+          </button>
+        </div>
+      </template>
+
+      <div v-else class="auth-header">
+        <div class="auth-title">{{ title }}</div>
       </div>
 
       <slot />
@@ -43,7 +49,10 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { useCommonStore } from '@/stores/useCommonStore'
 import heroImage from '@/assets/images/register-bg.png'
 import gasLogoMark from '@/assets/images/gas-logo-mark.png'
 
@@ -60,6 +69,11 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const { isMobile } = storeToRefs(useCommonStore())
+const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
+const title = computed(() =>
+  props.mode === 'login' ? t('login.title') : t('register.title'),
+)
 
 const onSwitch = (next: 'login' | 'register') => {
   if (next === props.mode) return
@@ -70,115 +84,81 @@ const onSwitch = (next: 'login' | 'register') => {
 <style scoped lang="scss">
 .auth-frame {
   position: relative;
-  min-height: 520px;
   display: flex;
-  justify-content: flex-end;
 }
 
 .auth-hero {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
   overflow: hidden;
 }
 
 .auth-hero-img {
   display: block;
   width: 100%;
-  height: 100%;
   object-fit: cover;
-  object-position: center;
-}
-
-.auth-hero-blur,
-.auth-hero-fade {
-  display: none;
 }
 
 .auth-panel {
   position: relative;
   z-index: 1;
-  flex: 0 0 50%;
-  width: 50%;
   box-sizing: border-box;
-  padding: 0 24px;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.86);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
-.auth-brand {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 8px 0;
-}
+.auth-frame.is-desktop {
+  min-height: 485px;
+  justify-content: flex-end;
 
-.auth-brand-inner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.auth-brand-mark {
-  display: block;
-  width: 22px;
-  height: 22px;
-  object-fit: contain;
-}
-
-.auth-brand-name {
-  display: block;
-  color: #1e3a5f;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: 0.02em;
-  line-height: 22px;
-}
-
-.auth-tabs {
-  display: flex;
-  align-items: center;
-  gap: 0;
-  height: 44px;
-  margin-bottom: 20px;
-  padding: 3px;
-  border-radius: 8px;
-  background: #f3f4f6;
-}
-
-.auth-tab {
-  flex: 1;
-  height: 100%;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: #6b7280;
-  font-size: 15px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-
-  &.is-active {
-    background: var(--theme-bg-blue);
-    color: #fff;
-    font-weight: 600;
-  }
-}
-
-@media (max-width: 768px) {
-  .auth-frame {
-    min-height: auto;
-    flex-direction: column;
-    justify-content: flex-start;
+  &.is-register {
+    min-height: 520px;
   }
 
   .auth-hero {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .auth-hero-img {
+    height: 100%;
+    object-position: center;
+  }
+
+  .auth-panel {
+    flex: 0 0 50%;
+    width: 50%;
+    margin-left: auto;
+    padding: 50px 24px 32px;
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 50px;
+  }
+
+  &.is-register .auth-header {
+    margin-bottom: 40px;
+  }
+
+  .auth-title {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+}
+
+.auth-frame.is-mobile {
+  min-height: auto;
+  flex-direction: column;
+  justify-content: flex-start;
+
+  .auth-hero {
     position: relative;
-    inset: auto;
     flex: 0 0 auto;
     width: 100%;
     height: 200px;
@@ -190,7 +170,6 @@ const onSwitch = (next: 'login' | 'register') => {
   }
 
   .auth-hero-blur {
-    display: block;
     position: absolute;
     left: 0;
     right: 0;
@@ -204,7 +183,6 @@ const onSwitch = (next: 'login' | 'register') => {
   }
 
   .auth-hero-fade {
-    display: block;
     position: absolute;
     left: 0;
     right: 0;
@@ -226,21 +204,68 @@ const onSwitch = (next: 'login' | 'register') => {
     margin: 0;
     padding: 0 20px;
     background: #fff;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
   }
 
   .auth-brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     margin: 8px 0;
   }
 
+  .auth-brand-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .auth-brand-mark {
+    display: block;
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+
+  .auth-brand-name {
+    display: block;
+    color: #1e3a5f;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 22px;
+  }
+
   .auth-tabs {
+    display: flex;
+    align-items: center;
+    gap: 0;
     height: 42px;
     margin-bottom: 16px;
+    padding: 3px;
+    border-radius: 8px;
+    background: #f3f4f6;
   }
 
   .auth-tab {
+    flex: 1;
+    height: 100%;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: #6b7280;
     font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
+
+    &.is-active {
+      background: var(--theme-bg-blue);
+      color: #fff;
+      font-weight: 600;
+    }
   }
 }
 </style>
