@@ -427,6 +427,8 @@
     "account": "アカウント",
     "email": "メールアドレス",
     "tgOfficial": "TG公式",
+    "tgUsername": "TGユーザー名",
+    "clickToGet": "タップして取得",
     "trxBalance": "TRX残高",
     "coinType": "入金通貨",
     "exchangeRate": "交換レート",

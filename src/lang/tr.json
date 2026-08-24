@@ -428,6 +428,8 @@
     "account": "Hesap",
     "email": "E-posta",
     "tgOfficial": "TG Resmi",
+    "tgUsername": "TG kullanıcı adı",
+    "clickToGet": "Almak için dokun",
     "trxBalance": "TRX Bakiyesi",
     "coinType": "Yükleme Para Birimi",
     "exchangeRate": "Döviz Kuru",

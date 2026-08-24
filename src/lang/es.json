@@ -428,6 +428,8 @@
     "account": "Cuenta",
     "email": "Correo Electrónico",
     "tgOfficial": "TG Oficial",
+    "tgUsername": "Usuario de TG",
+    "clickToGet": "Toca para obtener",
     "trxBalance": "Saldo TRX",
     "coinType": "Moneda de Recarga",
     "exchangeRate": "Tipo de Cambio",

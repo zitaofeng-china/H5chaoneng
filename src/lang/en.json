@@ -430,6 +430,8 @@
     "account": "Account",
     "email": "Email",
     "tgOfficial": "TG Official",
+    "tgUsername": "TG Username",
+    "clickToGet": "Tap to get",
     "trxBalance": "TRX Balance",
     "coinType": "Recharge Currency",
     "exchangeRate": "Exchange Rate",

@@ -427,6 +427,8 @@
     "account": "계정",
     "email": "이메일",
     "tgOfficial": "TG 공식",
+    "tgUsername": "TG 사용자명",
+    "clickToGet": "눌러서 받기",
     "trxBalance": "TRX 잔액",
     "coinType": "충전 통화",
     "exchangeRate": "환율",

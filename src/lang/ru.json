@@ -427,6 +427,8 @@
     "account": "Аккаунт",
     "email": "Электронная почта",
     "tgOfficial": "TG Официальный",
+    "tgUsername": "Имя в TG",
+    "clickToGet": "Нажмите, чтобы получить",
     "trxBalance": "Баланс TRX",
     "coinType": "Валюта пополнения",
     "exchangeRate": "Курс обмена",

@@ -426,6 +426,8 @@
     "account": "帳號",
     "email": "郵箱",
     "tgOfficial": "TG官方號",
+    "tgUsername": "TG用戶名",
+    "clickToGet": "點擊獲取",
     "trxBalance": "TRX餘額",
     "coinType": "充值幣種",
     "exchangeRate": "兌換匯率",

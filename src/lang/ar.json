@@ -428,6 +428,8 @@
     "account": "الحساب",
     "email": "البريد الإلكتروني",
     "tgOfficial": "TG الرسمي",
+    "tgUsername": "اسم مستخدم TG",
+    "clickToGet": "انقر للحصول",
     "trxBalance": "رصيد TRX",
     "coinType": "عملة الشحن",
     "exchangeRate": "سعر الصرف",

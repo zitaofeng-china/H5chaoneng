@@ -462,6 +462,8 @@
     "account": "账号",
     "email": "邮箱",
     "tgOfficial": "TG官方号",
+    "tgUsername": "TG用户名",
+    "clickToGet": "点击获取",
     "trxBalance": "TRX余额",
     "coinType": "充值币种",
     "exchangeRate": "兑换汇率",
