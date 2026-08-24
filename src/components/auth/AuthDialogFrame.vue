@@ -129,7 +129,7 @@ const onSwitch = (next: 'login' | 'register') => {
     width: 50%;
     margin-left: auto;
     padding: 50px 24px 32px;
-    background: rgba(255, 255, 255, 0.72);
+    background: rgba(255, 255, 255, 0.92);
   }
 
   .auth-header {
