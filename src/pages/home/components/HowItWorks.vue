@@ -117,7 +117,7 @@ onMounted(() => {
 
   io = new IntersectionObserver(
     ([entry]) => {
-      if (!entry.isIntersecting) return
+      if (!entry?.isIntersecting) return
       markReady()
       io?.disconnect()
     },
