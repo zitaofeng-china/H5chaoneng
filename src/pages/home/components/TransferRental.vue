@@ -47,8 +47,6 @@
     </div>
 
     <KindTips :tips="tips" />
-    
-    <!-- 跳转到福利订单 -->
   </div>
 </template>
 

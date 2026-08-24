@@ -36,7 +36,30 @@
         </div>
       </div>
 
-      <el-card
+      <div class="rental-board">
+        <button type="button" class="welfare-rail is-copy" @click="goToWelfare">
+          <span class="welfare-copy-panel">
+            <img class="welfare-copy-deco is-gold" :src="welfareCoinGoldImage" alt="" draggable="false" />
+            <img class="welfare-copy-deco is-star" :src="welfareStarImage" alt="" draggable="false" />
+            <img class="welfare-copy-deco is-sparkle" :src="welfareSparkleImage" alt="" draggable="false" />
+            <span class="welfare-kicker">{{ t('home.welfarePromoKicker') }}</span>
+            <strong class="welfare-rail-title">{{ t('home.welfareOrder') }}</strong>
+            <span class="welfare-deal">
+              <span class="welfare-deal-coins">
+                <img class="welfare-deal-coin is-usdt" :src="welfareCoinUsdtImage" alt="" draggable="false" />
+                <img class="welfare-deal-coin is-trx" :src="welfareCoinTrxImage" alt="" draggable="false" />
+              </span>
+              <span class="welfare-deal-copy">
+                <span class="welfare-deal-price">{{ welfarePrice }} {{ t('common.trx') }}</span>
+                <span class="welfare-deal-energy">{{ t('common.65000') }} {{ t('lease.energy') }}</span>
+              </span>
+            </span>
+            <span class="welfare-tagline">{{ t('home.welfarePromoTagline') }}</span>
+            <span class="welfare-cta">{{ t('home.welfarePromoCta') }}</span>
+          </span>
+        </button>
+
+        <el-card
         class="rental-card"
         :class="{
           'is-balance': activeTab === 'balance',
@@ -57,6 +80,12 @@
             >
               {{ t('home.chooseMode') }}
             </div>
+            <el-tooltip :content="t('home.welfareOrderSubtitle')" placement="top">
+              <button type="button" class="welfare-entry" @click="goToWelfare">
+                <img class="welfare-entry-gift" :src="welfareGiftBoxImage" alt="" draggable="false" />
+                {{ t('home.claimWelfare') }}
+              </button>
+            </el-tooltip>
           </div>
 
           <el-tabs v-model="activeTab" class="rental-tabs">
@@ -196,11 +225,23 @@
         </div>
       </el-card>
 
-      <div v-if="activeTab === 'transfer'" class="transfer-welfare-link">
-        <el-button type="warning" plain size="large" class="page-link-btn" @click="goToWelfare">
-          {{ t('home.goToWelfareOrder') }}
-          <span class="welfare-help" aria-hidden="true">?</span>
-        </el-button>
+        <button type="button" class="welfare-rail is-art" @click="goToWelfare" :aria-label="t('home.goToWelfareOrder')">
+          <span class="welfare-stage">
+            <span class="welfare-glow" aria-hidden="true"></span>
+            <img class="welfare-piece is-star-s" :src="welfareStarImage" alt="" draggable="false" />
+            <img class="welfare-piece is-star" :src="welfareStarImage" alt="" draggable="false" />
+            <img class="welfare-piece is-gold" :src="welfareCoinGoldImage" alt="" draggable="false" />
+            <img class="welfare-piece is-gift" :src="welfareGiftBoxImage" alt="" draggable="false" />
+            <img class="welfare-piece is-usdt" :src="welfareCoinUsdtImage" alt="" draggable="false" />
+            <img class="welfare-piece is-trx" :src="welfareCoinTrxImage" alt="" draggable="false" />
+            <img class="welfare-piece is-gold-s" :src="welfareCoinGoldSmallImage" alt="" draggable="false" />
+            <img class="welfare-piece is-sparkle" :src="welfareSparkleImage" alt="" draggable="false" />
+            <img class="welfare-piece is-sparkle-2" :src="welfareSparkleImage" alt="" draggable="false" />
+            <span class="welfare-gift-hint">
+              {{ t('home.welfarePromoGiftHint') }}
+            </span>
+          </span>
+        </button>
       </div>
     </section>
   </div>
@@ -217,7 +258,15 @@ import AdBanner from '@/components/business/AdBanner.vue'
 import { useLangStore } from '@/stores/useLangStore'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
+import { useSiteStore } from '@/stores/useSiteStore'
 import { useUserStore } from '@/stores/useUserStore'
+import welfareGiftBoxImage from '@/assets/images/welfare/welfare-gift-box.png'
+import welfareCoinTrxImage from '@/assets/images/welfare/welfare-coin-trx.png'
+import welfareCoinUsdtImage from '@/assets/images/welfare/welfare-coin-usdt.png'
+import welfareCoinGoldImage from '@/assets/images/welfare/welfare-coin-gold.png'
+import welfareCoinGoldSmallImage from '@/assets/images/welfare/welfare-coin-gold-s.png'
+import welfareStarImage from '@/assets/images/welfare/welfare-star.png'
+import welfareSparkleImage from '@/assets/images/welfare/welfare-sparkle.png'
 import { authApi } from '@/api'
 import { type BindAddressMap } from '@/api/modules/auth/types'
 import { OrderKind } from '@/api/modules/order/types'
@@ -237,10 +286,12 @@ const router = useRouter()
 const langStore = useLangStore()
 const commonStore = useCommonStore()
 const priceStore = usePriceStore()
+const siteStore = useSiteStore()
 const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
+const welfarePrice = computed(() => formatCryptoAmount(siteStore.wealPrice))
 const { loading: orderLoading, createOrder } = useOrderCreation()
 
 // 蓝湖移动端原型以“转账租赁”为首屏入口，桌面 Web 保持原有“余额支付”默认态。
@@ -613,16 +664,21 @@ onUnmounted(() => {
     }
 
     :deep(.el-input__wrapper) {
-      background: rgba(2, 15, 45, 0.03);
+      background: #fff;
       border-radius: 4px;
       box-shadow: none;
-      border: 1px solid rgba(2, 15, 45, 0.08);
+      border: 1px solid #b8bfc9;
       padding: 0 12px;
       min-height: 44px;
 
+      &:hover {
+        border-color: #9aa3af;
+      }
+
       &.is-disabled,
       &:has(.el-input__inner[readonly]) {
-        background: rgba(2, 15, 45, 0.02);
+        border-color: transparent;
+        background: rgba(2, 15, 45, 0.05);
         cursor: not-allowed;
       }
     }
@@ -927,6 +983,7 @@ onUnmounted(() => {
 
 .rental-section {
   padding: 20px 20px 0;
+  overflow: visible;
   background: #fff;
 }
 
@@ -1000,7 +1057,16 @@ onUnmounted(() => {
   background: #e4e7ec;
 }
 
+.rental-board {
+  position: relative;
+  width: min(100%, 896px);
+  margin: 0 auto;
+  overflow: visible;
+}
+
 .rental-card {
+  position: relative;
+  z-index: 3;
   width: min(100%, 896px);
   margin: 0 auto;
   border: 1px solid #f0f2f5;
@@ -1008,41 +1074,524 @@ onUnmounted(() => {
   box-shadow: 0 13px 22px rgba(0, 0, 0, 0.07);
 }
 
-.transfer-welfare-link {
-  display: flex;
-  justify-content: center;
-  margin: 20px auto 0;
+.welfare-rail {
+  display: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
 
-  .page-link-btn {
-    width: min(310px, 100%);
-    height: 30px;
-    padding: 0 14px;
-    border: 1px solid #ffad49;
-    border-radius: 3px;
-    color: #f39b25;
-    background: #fffaf2;
-    font-size: 12px;
-    font-weight: 500;
+@media (min-width: 1360px) {
+  .welfare-rail {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: min(240px, calc((100vw - 896px) / 2 - 56px));
+    transform: translateY(-50%);
   }
 
-  .welfare-help {
-    width: 12px;
-    height: 12px;
-    margin-left: 8px;
+  .welfare-rail.is-copy {
+    right: calc(100% + 48px);
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .welfare-rail.is-art {
+    left: calc(100% + 28px);
+    height: 400px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .welfare-copy-panel {
+    position: relative;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 18px 16px 16px;
+    border: 1px solid rgba(255, 173, 73, 0.38);
+    border-radius: 20px;
+    background:
+      radial-gradient(120px 80px at 100% 0%, rgba(255, 173, 73, 0.18), transparent 70%),
+      linear-gradient(180deg, #fff8ee 0%, #ffffff 48%, #f7f9ff 100%);
+    box-shadow:
+      0 14px 28px rgba(22, 93, 255, 0.06),
+      0 8px 16px rgba(255, 173, 73, 0.12);
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 18px;
+      left: 18px;
+      height: 3px;
+      border-radius: 0 0 3px 3px;
+      background: linear-gradient(90deg, #ffad49 0%, #ff5a1f 100%);
+    }
+  }
+
+  .welfare-rail.is-copy:hover .welfare-copy-panel {
+    border-color: rgba(255, 90, 31, 0.5);
+    box-shadow:
+      0 16px 32px rgba(22, 93, 255, 0.08),
+      0 10px 20px rgba(255, 90, 31, 0.16);
+  }
+
+  .welfare-copy-deco {
+    position: absolute;
+    z-index: 2;
+    pointer-events: none;
+    user-select: none;
+
+    &.is-gold {
+      top: -16px;
+      right: -18px;
+      width: 48px;
+      filter: drop-shadow(0 6px 8px rgba(245, 158, 11, 0.28));
+      animation: welfare-bob 4s ease-in-out infinite;
+    }
+
+    &.is-star {
+      top: 42px;
+      left: -14px;
+      width: 24px;
+      animation: welfare-spin-float 6.4s ease-in-out infinite;
+    }
+
+    &.is-sparkle {
+      top: -10px;
+      left: 16px;
+      width: 24px;
+      animation: welfare-twinkle 1.8s ease-in-out infinite;
+    }
+  }
+
+  .welfare-kicker,
+  .welfare-rail-title,
+  .welfare-deal,
+  .welfare-tagline,
+  .welfare-cta {
+    position: relative;
+    z-index: 1;
+  }
+
+  .welfare-kicker {
+    display: inline-flex;
+    align-items: center;
+    height: 22px;
+    padding: 0 8px;
+    border-radius: 11px;
+    background: rgba(255, 173, 73, 0.16);
+    color: #d97706;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .welfare-rail-title {
+    padding-right: 8px;
+    color: #182230;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .welfare-deal {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgba(22, 93, 255, 0.1) 0%, rgba(255, 173, 73, 0.1) 100%);
+  }
+
+  .welfare-deal-coins {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+  }
+
+  .welfare-deal-coin {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+
+    &.is-usdt {
+      z-index: 1;
+      filter: drop-shadow(0 3px 4px rgba(16, 185, 129, 0.22));
+    }
+
+    &.is-trx {
+      margin-left: -10px;
+      filter: drop-shadow(0 3px 4px rgba(239, 68, 68, 0.2));
+    }
+  }
+
+  .welfare-deal-copy {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .welfare-deal-price {
+    color: #165dff;
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.15;
+  }
+
+  .welfare-deal-energy {
+    color: #475467;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .welfare-tagline {
+    color: #667085;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  .welfare-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 38px;
+    margin-top: 2px;
+    border-radius: 19px;
+    background: linear-gradient(180deg, #ff8d42 0%, #ff5a1f 100%);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 8px 16px rgba(255, 90, 31, 0.28);
+    transition:
+      filter 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .welfare-rail.is-copy:hover .welfare-cta {
+    filter: brightness(1.05);
+    box-shadow: 0 10px 18px rgba(255, 90, 31, 0.36);
+  }
+
+  .welfare-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .welfare-glow {
+    position: absolute;
+    top: 18%;
+    left: 8%;
+    width: 84%;
+    height: 70%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 173, 73, 0.38) 0%, rgba(22, 93, 255, 0.14) 46%, transparent 74%);
+    filter: blur(10px);
+    animation: welfare-pulse 3.6s ease-in-out infinite;
+  }
+
+  .welfare-piece {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+
+    &.is-gift {
+      right: 22%;
+      bottom: 16%;
+      z-index: 4;
+      width: 64%;
+      filter: drop-shadow(0 16px 18px rgba(22, 93, 255, 0.2));
+      animation: welfare-float 3.8s ease-in-out infinite;
+    }
+
+    &.is-usdt {
+      top: 16%;
+      left: 0;
+      z-index: 3;
+      width: 34%;
+      filter: drop-shadow(0 8px 10px rgba(16, 185, 129, 0.22));
+      animation: welfare-bob 3.3s ease-in-out infinite;
+    }
+
+    &.is-trx {
+      top: 24%;
+      right: 0;
+      left: auto;
+      z-index: 5;
+      width: 34%;
+      filter: drop-shadow(0 8px 10px rgba(239, 68, 68, 0.22));
+      animation: welfare-bob 3.7s ease-in-out infinite 0.28s;
+    }
+
+    &.is-gold {
+      bottom: 22%;
+      left: 0;
+      z-index: 2;
+      width: 22%;
+      animation: welfare-bob 4.1s ease-in-out infinite 0.5s;
+    }
+
+    &.is-gold-s {
+      right: 2%;
+      bottom: 18%;
+      z-index: 3;
+      width: 16%;
+      animation: welfare-bob 3.5s ease-in-out infinite 0.18s;
+    }
+
+    &.is-star {
+      top: 8%;
+      right: 6%;
+      z-index: 2;
+      width: 16%;
+      animation: welfare-spin-float 6.2s ease-in-out infinite;
+    }
+
+    &.is-star-s {
+      top: 12%;
+      left: 8%;
+      z-index: 2;
+      width: 10%;
+      animation: welfare-spin-float 7s ease-in-out infinite 0.7s;
+    }
+
+    &.is-sparkle {
+      top: 2%;
+      right: 22%;
+      z-index: 6;
+      width: 20%;
+      animation: welfare-twinkle 1.8s ease-in-out infinite;
+    }
+
+    &.is-sparkle-2 {
+      left: 30%;
+      bottom: 18%;
+      z-index: 6;
+      width: 13%;
+      animation: welfare-twinkle 2.2s ease-in-out infinite 0.55s;
+    }
+  }
+
+  .welfare-gift-hint {
+    position: absolute;
+    right: 4%;
+    bottom: 4px;
+    left: 4%;
+    z-index: 7;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid currentColor;
-    border-radius: 50%;
-    font-size: 9px;
-    line-height: 1;
+    gap: 6px;
+    color: #165dff;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-align: center;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+    animation: welfare-float 3.8s ease-in-out infinite;
+
+    &::after {
+      content: '';
+      width: 7px;
+      height: 7px;
+      margin-top: 1px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(-45deg);
+      animation: welfare-hint-nudge 1.15s ease-in-out infinite;
+    }
+  }
+
+  .welfare-rail.is-art:hover .welfare-glow {
+    opacity: 1;
+  }
+
+  .welfare-rail.is-art:hover .welfare-gift-hint {
+    color: #ff5a1f;
   }
 }
 
+@keyframes welfare-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+@keyframes welfare-bob {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-7deg);
+  }
+  50% {
+    transform: translateY(-11px) rotate(8deg);
+  }
+}
+
+@keyframes welfare-spin-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(16deg);
+  }
+}
+
+@keyframes welfare-twinkle {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes welfare-pulse {
+  0%,
+  100% {
+    opacity: 0.7;
+    transform: scale(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes welfare-hint-nudge {
+  0%,
+  100% {
+    transform: rotate(-45deg) translate(0, 0);
+  }
+  50% {
+    transform: rotate(-45deg) translate(3px, 3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welfare-copy-deco,
+  .welfare-kicker-spark,
+  .welfare-piece,
+  .welfare-glow,
+  .welfare-gift-hint,
+  .welfare-gift-hint::after {
+    animation: none;
+  }
+}
+
+.mode-label-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  box-sizing: border-box;
+  width: calc(100% - 32px);
+  max-width: none;
+  margin: 32px 16px 0;
+}
+
+.mode-label-wrap .mode-label {
+  width: auto;
+  min-width: 0;
+  flex: 1;
+  margin: 0;
+}
+
+.welfare-entry {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 14px 0 8px;
+  border: 0;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #ff8d42 0%, #ff5a1f 100%);
+  color: #fff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 8px 16px rgba(255, 90, 31, 0.32);
+  animation: welfare-entry-pulse 2.4s ease-in-out infinite;
+  transition:
+    filter 0.2s ease,
+    box-shadow 0.2s ease;
+
+  &:hover {
+    filter: brightness(1.06);
+    box-shadow: 0 10px 18px rgba(255, 90, 31, 0.4);
+  }
+}
+
+.welfare-entry-gift {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+@media (min-width: 1360px) {
+  .welfare-entry {
+    display: none;
+  }
+}
+
+@keyframes welfare-entry-pulse {
+  0%,
+  100% {
+    box-shadow: 0 8px 16px rgba(255, 90, 31, 0.32);
+  }
+  50% {
+    box-shadow: 0 8px 22px rgba(255, 90, 31, 0.55);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welfare-entry {
+    animation: none;
+  }
+}
+
+.rental-board .rental-card {
+  width: 100%;
+  margin: 0;
+}
+
 .rental-card.is-balance {
-  width: min(100%, 930px);
+  width: 100%;
   min-height: 670px;
-  max-width: 930px;
+  max-width: none;
 }
 
 .rental-card.is-balance :deep(.el-card__body),
@@ -1121,7 +1670,7 @@ onUnmounted(() => {
 }
 
 .balance-mode-label {
-  margin-top: 32px !important;
+  margin-top: 0;
 }
 
 .field-label {
@@ -1258,10 +1807,15 @@ onUnmounted(() => {
   width: 100%;
   min-height: 44px;
   box-sizing: border-box;
-  border: 1px solid #e1e4ea;
+  border: 1px solid #b8bfc9;
   border-radius: 4px;
   background: #fff;
   box-shadow: none;
+}
+
+.rental-form :deep(.el-input__wrapper:hover),
+.rental-form :deep(.el-select__wrapper:hover) {
+  border-color: #9aa3af;
 }
 
 .energy-rental .rental-form :deep(.el-input__wrapper),
@@ -1405,17 +1959,15 @@ onUnmounted(() => {
 
 /* Keep the transfer tab's layout independent from the balance layout. */
 .rental-card.is-transfer {
-  width: min(100%, 930px);
-  max-width: 930px;
+  width: 100%;
+  max-width: none;
   box-sizing: border-box;
 }
 
 .rental-card.is-transfer .mode-label {
-  width: calc(100% - 32px);
+  width: auto;
   max-width: none;
-  margin-top: 32px;
-  margin-right: 16px;
-  margin-left: 16px;
+  margin: 0;
 }
 
 .rental-card.is-transfer .rental-tabs {
@@ -1431,7 +1983,6 @@ onUnmounted(() => {
 
 @media (min-width: 891px) {
   /* Keep the balance form aligned to the card's content box. */
-  .rental-card.is-balance .mode-label,
   .rental-card.is-balance .rental-tabs {
     width: calc(100% - 32px);
     max-width: none;
@@ -1566,9 +2117,8 @@ onUnmounted(() => {
     min-height: 0;
   }
 
-  .rental-card.is-balance .mode-label,
   .rental-card.is-balance .rental-tabs,
-  .rental-card.is-balance .field-label,
+  .rental-card.is-balance .rental-form .field-label,
   .rental-card.is-balance .rental-form,
   .rental-card.is-balance .rental-form .info-text,
   .rental-card.is-balance .rental-form :deep(.el-form-item),
@@ -1590,18 +2140,18 @@ onUnmounted(() => {
   }
 
   .mode-label-wrap {
-    box-sizing: border-box;
     width: 100%;
+    margin: 20px 0 0;
     padding: 0 12px;
   }
 
   .rental-card.is-transfer .mode-label {
-    width: 100%;
-    margin: 20px 0 0;
+    width: auto;
+    margin: 0;
   }
 
   .balance-mode-label {
-    margin-top: 20px !important;
+    margin-top: 0;
   }
 
   .rental-card.is-balance .field-label {
@@ -1678,14 +2228,19 @@ onUnmounted(() => {
     transform: translateX(0) !important;
   }
 
-  .transfer-welfare-link {
-    margin-top: 16px;
-    padding: 0;
+  .welfare-rail {
+    display: none;
+  }
 
-    .page-link-btn {
-      width: 100%;
-      height: 36px;
-    }
+  .welfare-entry {
+    height: 32px;
+    padding: 0 12px 0 6px;
+    font-size: 12px;
+  }
+
+  .welfare-entry-gift {
+    width: 24px;
+    height: 24px;
   }
 }
 </style>
