@@ -139,12 +139,12 @@
           :aria-label="$t('nav.contactUs')"
           @click="handleOpenToTelegram(tgAdmin)"
         >
-          <SvgIcon name="header-tg" width="18" height="18" />
+          <img :src="telegramIcon" alt="" class="action-icon" />
         </button>
         <div class="dropdown-popper-box lang-dropdown">
           <el-dropdown trigger="click" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
-              <SvgIcon name="header-lang" class="icon-svg" width="24" height="24" />
+              <img :src="langIcon" alt="" class="action-icon" />
             </div>
             <template #dropdown>
               <el-dropdown-menu class="lang-menu">
@@ -175,7 +175,7 @@
         <div class="dropdown-popper-box user-dropdown" v-if="isLogin">
           <el-dropdown trigger="hover" :teleported="true" popper-class="user-popper">
             <div class="user-icon">
-              <img :src="Avatar" alt="" class="user-avatar" />
+              <img :src="userAvatar" alt="" class="user-avatar" />
             </div>
             <template #dropdown>
               <el-dropdown-menu class="user-menu">
@@ -200,11 +200,21 @@
             {{ $t('login.title') }}
           </button>
         </div>
-        <div class="info-wrap" ref="menuBtn" v-if="isMobileView" @click="handleMenu('menu')">
-          <div class="dropdown-popper-box">
-            <SvgIcon name="menu" width="24" height="24" />
-          </div>
-        </div>
+        <button
+          v-if="isMobileView"
+          ref="menuBtn"
+          type="button"
+          class="header-action is-menu"
+          aria-label="menu"
+          :aria-expanded="isMenu"
+          @click="handleMenu('menu')"
+        >
+          <span class="menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
       </div>
     </div>
   </nav>
@@ -321,8 +331,10 @@
 
 <script setup lang="ts">
 import vClickOutside from 'element-plus/es/directives/click-outside/index.mjs'
-import Avatar from '@/assets/icons/header/avatar-01.svg'
 import gasLogoMark from '@/assets/images/gas-logo-mark.png'
+import telegramIcon from '@/assets/images/header/telegram.png'
+import langIcon from '@/assets/images/header/lang.png'
+import userAvatar from '@/assets/images/header/avatar.png'
 import { useHeaderNav } from './useHeaderNav'
 
 defineOptions({
@@ -564,15 +576,17 @@ const {
   flex: 0 0 auto;
   gap: 10px;
 
-  .header-action {
-    width: 34px;
-    height: 34px;
+  .header-action,
+  .info-wrap {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
     padding: 0;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(23, 102, 245, 0.65);
+    border: 1px solid #1766f5;
     border-radius: 8px;
     background: #fff;
     color: #1766f5;
@@ -583,38 +597,39 @@ const {
     &:hover {
       background: #eef4ff;
       border-color: #1766f5;
-    }
-
-    .svg-icon {
-      filter: brightness(0) saturate(100%) invert(28%) sepia(99%) saturate(3464%) hue-rotate(216deg)
-        brightness(96%) contrast(104%);
     }
   }
 
-  .info-wrap {
-    min-width: 34px;
-    width: 34px;
-    height: 34px;
-    box-sizing: border-box;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: #fff;
-    border: 1px solid rgba(23, 102, 245, 0.65);
-    border-radius: 8px;
-    color: #1766f5;
-    font: inherit;
-    cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+  .header-action.is-menu {
+    background: #1766f5;
+    border-color: #1766f5;
 
     &:hover {
-      background: #eef4ff;
-      border-color: #1766f5;
+      background: #0f5de7;
+      border-color: #0f5de7;
     }
+  }
 
-    .svg-icon {
-      filter: brightness(0) saturate(100%) invert(28%) sepia(99%) saturate(3464%) hue-rotate(216deg)
-        brightness(96%) contrast(104%);
+  .action-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .menu-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 16px;
+    height: 11px;
+
+    span {
+      display: block;
+      height: 2px;
+      border-radius: 1px;
+      background: #fff;
     }
   }
 }
@@ -624,10 +639,10 @@ const {
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  height: 28px;
+  height: 32px;
   padding: 2px 4px 2px 7px;
   border: 1px solid #1766f5;
-  border-radius: 4px;
+  border-radius: 6px;
   background: #1766f5;
   color: #fff;
   font-family: inherit;
@@ -691,13 +706,11 @@ const {
   }
 
   .user-avatar {
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     box-sizing: border-box;
     object-fit: cover;
     border-radius: 50%;
-    border: 2px solid #ff8a3d;
-    box-shadow: 0 0 0 1px rgba(23, 102, 245, 0.2);
     background: #e8f1ff;
   }
 }
@@ -705,21 +718,26 @@ const {
 .no-login {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: #344054;
+}
 
-  .btn {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: inherit;
-    font-family: inherit;
-    font-size: 12px;
-    cursor: pointer;
+.login-btn {
+  height: 32px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #1766f5;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 
-    &:hover {
-      color: #165dff;
-    }
+  &:hover {
+    background: #0f5de7;
+    color: #fff;
   }
 }
 
@@ -898,13 +916,9 @@ const {
     gap: 6px;
   }
 
-  .no-login {
-    gap: 4px;
-    font-size: 12px;
-  }
-  
   .logo-section {
-    min-width: 108px;
+    min-width: 0;
+    flex: 0 1 auto;
     gap: 6px;
   }
 
@@ -923,29 +937,26 @@ const {
 
   .right-section {
     gap: 5px;
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     justify-content: flex-end;
 
+    .header-action,
     .info-wrap {
-      min-width: 30px;
-      width: 30px;
-      height: 30px;
-      box-sizing: border-box;
-      
-      svg {
-        width: 19px;
-        height: 19px;
-      }
+      min-width: 32px;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
     }
 
-    .header-action {
-      width: 30px;
-      height: 30px;
+    .action-icon {
+      width: 18px;
+      height: 18px;
     }
   }
 
   .balance-recharge {
-    height: 30px;
+    height: 32px;
     padding: 2px 4px 2px 6px;
     gap: 4px;
     font-size: 11px;
@@ -963,7 +974,7 @@ const {
     }
 
     .recharge-text {
-      min-width: 38px;
+      min-width: 36px;
       height: 24px;
       padding: 0 6px;
       font-size: 10px;
@@ -972,21 +983,75 @@ const {
 
   .user-icon {
     .user-avatar {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
     }
   }
 
-  .no-login {
-    .btn {
-      font-size: 12px;
-      white-space: nowrap;
-    }
+  .login-btn {
+    height: 32px;
+    padding: 0 16px;
+    font-size: 14px;
   }
   
   .collapse-container {
     top: var(--layout-header-height, 50px);
     max-height: calc(100vh - var(--layout-header-height, 50px));
+  }
+}
+
+@media (max-width: 768px) {
+  .right-section {
+    gap: 4px;
+
+    .header-action,
+    .info-wrap {
+      min-width: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .action-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .menu-icon {
+      width: 14px;
+      height: 10px;
+    }
+  }
+
+  .login-btn {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .balance-recharge {
+    height: 28px;
+    padding: 1px 3px 1px 5px;
+    gap: 3px;
+    min-width: 0;
+    flex: 0 1 auto;
+
+    .balance-token-icon {
+      width: 12px;
+      height: 12px;
+      flex-basis: 12px;
+    }
+
+    .recharge-text {
+      min-width: 32px;
+      height: 22px;
+      padding: 0 5px;
+      font-size: 10px;
+    }
+  }
+
+  .user-icon .user-avatar {
+    width: 28px;
+    height: 28px;
   }
 }
 
@@ -1019,20 +1084,16 @@ const {
   .right-section {
     gap: 3px;
 
+    .header-action,
     .info-wrap {
-      min-width: 30px;
-      width: 30px;
-      height: 30px;
-      
-      svg {
-        width: 17px;
-        height: 17px;
-      }
+      min-width: 26px;
+      width: 26px;
+      height: 26px;
     }
 
-    .header-action {
-      width: 30px;
-      height: 30px;
+    .action-icon {
+      width: 14px;
+      height: 14px;
     }
   }
 
@@ -1062,18 +1123,15 @@ const {
 
   .user-icon {
     .user-avatar {
-      width: 28px;
-      height: 28px;
+      width: 26px;
+      height: 26px;
     }
   }
 
-  .no-login {
-    gap: 3px;
-    font-size: 11px;
-
-    .btn {
-      font-size: 11px;
-    }
+  .login-btn {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 12px;
   }
   
   .collapse-container {
