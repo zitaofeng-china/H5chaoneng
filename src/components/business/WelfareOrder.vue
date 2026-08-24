@@ -379,13 +379,32 @@ onUnmounted(() => {
     text-align: center;
 
     .page-link-btn {
+      --el-button-text-color: #165dff;
+      --el-button-bg-color: #f0f6ff;
+      --el-button-border-color: #c7dcff;
+      --el-button-hover-text-color: #165dff;
+      --el-button-hover-bg-color: #f0f6ff;
+      --el-button-hover-border-color: #c7dcff;
+      --el-button-active-text-color: #165dff;
+      --el-button-active-bg-color: #f0f6ff;
+      --el-button-active-border-color: #c7dcff;
       width: 100%;
       height: 42px;
       font-size: 14px;
       font-weight: 600;
       border-radius: 3px;
+      color: #165dff;
       background: #f0f6ff;
       border-color: #c7dcff;
+
+      &:hover,
+      &:focus,
+      &:focus-visible,
+      &:active {
+        color: #165dff;
+        background: #f0f6ff;
+        border-color: #c7dcff;
+      }
 
       .link-arrow {
         width: 20px;
