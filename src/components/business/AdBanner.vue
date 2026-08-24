@@ -18,23 +18,25 @@
       @pointerup="handlePointerUp"
       @pointercancel="handlePointerCancel"
       @keydown="handleKeydown"
+      @dragstart.prevent
       @mouseenter="pauseRotation"
       @mouseleave="resumeRotation"
     >
       <div class="ad-stage">
         <div class="ad-slides">
-          <component
-            :is="ad.link_url ? 'a' : 'div'"
+          <div
             v-for="(ad, index) in displayAds"
             :key="getAdKey(ad, index)"
             class="ad-slide"
-            :class="{ 'is-active': index === activeIndex }"
+            :class="{ 'is-active': index === activeIndex, 'is-link': Boolean(ad.link_url) }"
             :style="getSlideStyle(index)"
-            :href="ad.link_url ? resolveUrl(ad.link_url) : undefined"
-            :target="ad.link_url ? '_blank' : undefined"
-            :rel="ad.link_url ? 'noopener noreferrer' : undefined"
+            :role="ad.link_url ? 'link' : undefined"
+            :tabindex="ad.link_url && index === activeIndex ? 0 : -1"
             :aria-hidden="index !== activeIndex"
-            @click="handleSlideClick($event, index)"
+            draggable="false"
+            @click="handleSlideClick($event, index, ad)"
+            @keydown.enter.prevent="handleSlideClick($event, index, ad)"
+            @dragstart.prevent
           >
             <img
               class="ad-image"
@@ -43,7 +45,7 @@
               draggable="false"
               @error="handleImageError(ad)"
             />
-          </component>
+          </div>
         </div>
       </div>
 
@@ -82,7 +84,7 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { adApi } from '@/api'
 import type { AdItem } from '@/api/modules/ad/types'
-import { isMiniAppRuntime } from '@/utils/telegram'
+import { getTelegramWebApp, isMiniAppRuntime } from '@/utils/telegram'
 
 let cachedAds: AdItem[] | null = null
 
@@ -415,7 +417,20 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
-function handleSlideClick(event: MouseEvent, index: number) {
+function openAdLink(url: string) {
+  if (!url) return
+
+  const resolved = resolveUrl(url)
+  const tg = getTelegramWebApp()
+  if (typeof tg?.openLink === 'function') {
+    tg.openLink(resolved)
+    return
+  }
+
+  window.open(resolved, '_blank', 'noopener,noreferrer')
+}
+
+function handleSlideClick(event: MouseEvent | KeyboardEvent, index: number, ad: AdItem) {
   if (suppressClick.value) {
     event.preventDefault()
     suppressClick.value = false
@@ -425,7 +440,10 @@ function handleSlideClick(event: MouseEvent, index: number) {
   if (useCoverflow.value && index !== activeIndex.value) {
     event.preventDefault()
     goToAd(index)
+    return
   }
+
+  openAdLink(ad.link_url)
 }
 
 function handleImageError(ad: AdItem) {
@@ -537,6 +555,8 @@ onUnmounted(() => {
   height: 100%;
   color: inherit;
   text-decoration: none;
+  user-select: none;
+  -webkit-user-drag: none;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.28s ease;
@@ -546,6 +566,10 @@ onUnmounted(() => {
     z-index: 1;
     opacity: 1;
     pointer-events: auto;
+  }
+
+  &.is-link {
+    cursor: pointer;
   }
 }
 
@@ -559,6 +583,8 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 .ad-fallback {
