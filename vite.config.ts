@@ -5,7 +5,6 @@ import { defineConfig, loadEnv } from 'vite'
 import type { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -114,7 +113,6 @@ export default defineConfig(({ mode }) => {
     !isProduction && devBaseMigrationPlugin(base),
     vue(),
     vueJsx(),
-    !isProduction && vueDevTools(),
     !isProduction &&
       codeInspectorPlugin({
         bundler: 'vite',
