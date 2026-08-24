@@ -2,13 +2,13 @@
   <section id="contact" class="help-section">
     <img
       class="help-side help-side-left"
-      src="@/assets/images/home/lanhu/help-left.png"
+      :src="helpLeft"
       alt=""
       aria-hidden="true"
     />
     <img
       class="help-side help-side-right"
-      src="@/assets/images/home/lanhu/help-right.png"
+      :src="helpRight"
       alt=""
       aria-hidden="true"
     />
@@ -35,6 +35,8 @@ import { useRouter } from 'vue-router'
 import { handleOpenToTelegram } from '@/utils'
 import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
+import helpLeft from '@/assets/images/home/lanhu/help-left.png'
+import helpRight from '@/assets/images/home/lanhu/help-right.png'
 
 defineOptions({
   name: 'HelpSection',

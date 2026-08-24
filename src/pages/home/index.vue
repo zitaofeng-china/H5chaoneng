@@ -3,7 +3,7 @@
   <div class="fee-workflow-ambient">
     <img
       class="ambient-side-glow"
-      src="@/assets/images/home/lanhu/workflow-side-bg.png"
+      :src="workflowSideBg"
       alt=""
       aria-hidden="true"
     />
@@ -20,6 +20,7 @@ import { defineAsyncComponent, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import EnergyRental from './components/EnergyRental.vue'
 import { cancelHashScroll, hashToId, scrollToRouteHash } from '@/utils/hashScroll'
+import workflowSideBg from '@/assets/images/home/lanhu/workflow-side-bg.png'
 
 // 首屏主转化区同步加载；下方营销区块异步分包
 const FeeDescription = defineAsyncComponent(() => import('./components/FeeDescription.vue'))
