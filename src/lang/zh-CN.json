@@ -110,6 +110,7 @@
     "subtitle": "我们提供安全、快速、低成本的智能合约闪兑服务，让您的加密货币兑换更加便捷",
     "safeAndReliable": "安全可靠",
     "safeAndReliableDesc": "基于智能合约技术，所有交易在区块链上公开透明，无需信任，保障您的资产安全",
+    "safeAndReliableDescMobile": "基于智能合约技术，所有交易在区块链上公开透明，无法篡改，保障您的资产安全",
     "fastExchange": "快速闪兑",
     "fastExchangeDesc": "自动触发合约兑换，资金实时到账，无需等待，体验极速兑换服务",
     "lowCost": "低成本",

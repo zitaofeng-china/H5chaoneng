@@ -107,6 +107,7 @@
     "subtitle": "We provide safe, fast, and low-cost smart contract flash exchange service, making your cryptocurrency exchange more convenient",
     "safeAndReliable": "Safe and Reliable",
     "safeAndReliableDesc": "Based on smart contract technology, all transactions are transparent on the blockchain, no trust required, ensuring your asset security",
+    "safeAndReliableDescMobile": "Based on smart contract technology, all transactions are transparent on the blockchain, cannot be tampered with, ensuring your asset security",
     "fastExchange": "Fast Exchange",
     "fastExchangeDesc": "Automatically trigger contract exchange, funds real-time arrival, no waiting, experience instant exchange service",
     "lowCost": "Low Cost",

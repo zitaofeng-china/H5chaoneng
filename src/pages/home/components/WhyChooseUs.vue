@@ -5,29 +5,22 @@
     :class="{ 'is-ready': isReady, 'is-settled': isSettled }"
   >
     <header ref="headerRef" class="feature-header">
-      <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
-      <p class="subtitle">{{ t('home.subtitle') }}</p>
+      <div class="header-token" aria-hidden="true">
+        <img class="header-token-badge" :src="featureHeaderBadge" alt="" />
+      </div>
+      <div class="header-copy">
+        <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
+        <p class="subtitle">{{ t('home.subtitle') }}</p>
+      </div>
     </header>
 
     <div class="feature-container">
       <div class="feature-showcase">
         <div class="token-art" aria-hidden="true">
           <div class="token-art-stage">
-            <img
-              class="token-art-glow"
-              src="@/assets/images/home/lanhu/feature-bg.png"
-              alt=""
-            />
-            <img
-              class="token-art-usdt"
-              src="@/assets/images/home/lanhu/feature-inner-bg.png"
-              alt=""
-            />
-            <img
-              class="token-art-trx"
-              src="@/assets/images/home/lanhu/feature-coin.png"
-              alt=""
-            />
+            <img class="token-art-glow" :src="featureGlow" alt="" />
+            <img class="token-art-usdt" :src="featureUsdt" alt="" />
+            <img class="token-art-trx" :src="featureTrx" alt="" />
           </div>
         </div>
 
@@ -48,7 +41,10 @@
             </span>
             <div class="feature-copy">
               <h3>{{ t(item.titleKey) }}</h3>
-              <p>{{ t(item.descKey) }}</p>
+              <p>
+                <span class="desc-desktop">{{ t(item.descKey) }}</span>
+                <span class="desc-mobile">{{ t(item.descKeyMobile ?? item.descKey) }}</span>
+              </p>
             </div>
           </article>
         </div>
@@ -60,6 +56,10 @@
 <script setup lang="ts">
 import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import featureHeaderBadge from '@/assets/images/home/lanhu/feature-header-badge.png'
+import featureGlow from '@/assets/images/home/lanhu/feature-bg.png'
+import featureUsdt from '@/assets/images/home/lanhu/feature-inner-bg.png'
+import featureTrx from '@/assets/images/home/lanhu/feature-coin.png'
 import featureContractIcon from '@/assets/images/home/lanhu/feature-icon-contract.png'
 import featureFastIcon from '@/assets/images/home/lanhu/feature-icon-fast.png'
 import featureLowCostIcon from '@/assets/images/home/lanhu/feature-icon-low-cost.png'
@@ -132,6 +132,7 @@ type Item = {
   key: string
   titleKey: string
   descKey: string
+  descKeyMobile?: string
 }
 
 const items: Item[] = [
@@ -139,6 +140,7 @@ const items: Item[] = [
     key: 'safe',
     titleKey: 'home.safeAndReliable',
     descKey: 'home.safeAndReliableDesc',
+    descKeyMobile: 'home.safeAndReliableDescMobile',
   },
   {
     key: 'fast',
@@ -205,6 +207,14 @@ const items: Item[] = [
   color: rgba(71, 84, 103, 0.58);
   font-size: 12px;
   line-height: 1.6;
+}
+
+.header-token {
+  display: none;
+}
+
+.desc-mobile {
+  display: none;
 }
 
 .feature-showcase {
@@ -554,68 +564,134 @@ const items: Item[] = [
 }
 
 @media (max-width: 768px) {
-  /* 移动端按原型直接呈现，避免观察器尚未触发时图片区和列表留白。 */
+  /* 蓝湖 375 稿：币标 71×70，文案 291×58 从 x=42 叠入，底对齐。 */
   .feature-header,
-  .token-art,
   .feature-item {
     opacity: 1;
     transform: none;
     transition: none;
   }
 
-  .token-art-glow,
-  .token-art-usdt,
-  .token-art-trx {
-    animation: none;
-  }
-
   .why-choose-us {
-    padding: 38px 0 28px;
+    overflow: visible;
+    padding: 28px 0 32px;
   }
 
   .feature-container {
-    padding: 0 16px;
+    padding: 0 12px;
   }
 
+  /* 蓝湖 375：image32 71×70 @x=0；文案框 291×58 @x=42 底对齐，标题/副标题在框内居中。 */
   .feature-header {
-    padding: 0;
-    margin-bottom: 12px;
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    gap: 0;
+    width: 100%;
+    height: 70px;
+    margin: 0 0 18px;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+    text-align: left;
+  }
+
+  .header-token {
+    display: block;
+    flex: 0 0 71px;
+    width: 71px;
+    height: 70px;
+    margin-right: -29px;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .header-token-badge {
+    display: block;
+    width: 71px;
+    height: 70px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .header-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 291px;
+    max-width: 291px;
+    min-width: 0;
+    height: 58px;
+    z-index: 1;
   }
 
   .title {
+    margin: 0;
+    color: rgb(30, 41, 59);
     font-size: 24px;
+    font-weight: 900;
+    line-height: 24px;
+    text-align: center;
+    white-space: nowrap;
   }
 
   .subtitle {
-    margin-top: 8px;
-    font-size: 12px;
+    max-width: none;
+    margin: 0;
+    color: rgba(96, 96, 96, 0.8);
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 14px;
+    text-align: center;
   }
 
   .feature-showcase {
     display: block;
+    min-height: 0;
   }
 
   .token-art {
-    width: min(100%, 360px);
-    min-height: 246px;
-    margin: 0 auto 4px;
-  }
-
-  .token-art-stage {
-    width: 100%;
-    margin-left: 0;
+    display: none;
   }
 
   .feature-list {
+    --rail: 0px;
     min-height: 0;
-    margin-top: 4px;
-    padding: 16px 16px 18px var(--rail);
-    gap: 8px;
+    margin-top: 0;
+    padding: 0;
+    gap: 28px;
     justify-content: flex-start;
   }
 
+  .feature-frame,
+  .feature-list::before,
+  .feature-list::after {
+    content: none;
+    display: none;
+  }
+
   .feature-item {
-    padding: 14px 0;
+    padding: 0;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+
+  .feature-dot {
+    width: 32px;
+    height: 32px;
+    margin: 0;
+  }
+
+  .feature-item.featured .feature-dot {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .feature-dot-icon {
+    max-width: 18px;
+    max-height: 18px;
   }
 
   .feature-copy {
@@ -623,13 +699,33 @@ const items: Item[] = [
   }
 
   .feature-copy h3 {
-    font-size: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 22px;
+    color: #1e293b;
   }
 
   .feature-copy p {
-    margin-top: 3px;
-    font-size: 10px;
-    line-height: 1.5;
+    margin-top: 4px;
+    color: #667085;
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .feature-item.featured .feature-copy h3 {
+    color: #1e293b;
+  }
+
+  .feature-item.featured .feature-copy p {
+    color: #165dff;
+  }
+
+  .desc-desktop {
+    display: none;
+  }
+
+  .desc-mobile {
+    display: inline;
   }
 }
 </style>

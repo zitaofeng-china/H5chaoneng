@@ -103,6 +103,7 @@
     "subtitle": "我們提供安全、快速、低成本的智能合約閃兌服務，讓您的加密貨幣兌換更加便捷",
     "safeAndReliable": "安全可靠",
     "safeAndReliableDesc": "基於智能合約技術，所有交易在區塊鏈上公開透明，無需信任，保障您的資產安全",
+    "safeAndReliableDescMobile": "基於智能合約技術，所有交易在區塊鏈上公開透明，無法篡改，保障您的資產安全",
     "fastExchange": "快速閃兌",
     "fastExchangeDesc": "自動觸發合約兌換，資金實時到帳，無需等待，體驗極速兌換服務",
     "lowCost": "低成本",
