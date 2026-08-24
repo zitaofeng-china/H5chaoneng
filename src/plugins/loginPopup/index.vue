@@ -1,9 +1,10 @@
 <template>
-  <div class="login-dialog">
+  <div class="login-dialog" :class="layoutClass">
     <el-dialog
       v-model="visible"
+      :class="layoutClass"
       :show-close="true"
-      :width="864"
+      :width="isMobile ? '100%' : 864"
       header-class="login-header"
       align-center
       @close="handleClose"
@@ -14,6 +15,7 @@
             :rules="rules"
             ref="loginFormRef"
             class="login-form"
+            :class="layoutClass"
             autocomplete="on"
           >
             <el-form-item prop="username">
@@ -65,7 +67,7 @@
               </el-link>
             </div>
 
-            <el-form-item>
+            <el-form-item class="login-submit">
               <el-button
                 type="primary"
                 size="large"
@@ -76,6 +78,17 @@
                 {{ $t('login.loginButton') }}
               </el-button>
             </el-form-item>
+
+            <div class="register-link">
+              <el-button
+                type="primary"
+                plain
+                class="register-btn"
+                @click="switchToRegister"
+              >
+                {{ $t('login.register') }}
+              </el-button>
+            </div>
           </el-form>
       </AuthDialogFrame>
     </el-dialog>
@@ -83,9 +96,11 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useLoginForm } from '@/hooks/useLoginForm'
 import AuthDialogFrame from '@/components/auth/AuthDialogFrame.vue'
+import { useCommonStore } from '@/stores/useCommonStore'
 import type { LoginEmits } from './types'
 
 defineOptions({
@@ -94,6 +109,8 @@ defineOptions({
 
 const emit = defineEmits<LoginEmits>()
 const { proxy } = getCurrentInstance()!
+const { isMobile } = storeToRefs(useCommonStore())
+const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
 
 const {
   visible,

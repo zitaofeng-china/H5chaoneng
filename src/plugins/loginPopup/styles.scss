@@ -1,7 +1,6 @@
 /**
- * 登录弹窗样式
+ * 登录弹窗样式：Web / 移动端完全隔离
  */
-@use '@/assets/styles/_mixins.scss' as *;
 
 .login-header {
   padding: 0;
@@ -11,14 +10,78 @@
   overflow: hidden;
 
   :deep(.el-dialog) {
-    padding: 0px;
-    border-radius: 16px;
+    padding: 0;
     overflow: hidden;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
   }
 
   :deep(.el-dialog__header) {
     display: none;
+  }
+
+  :deep(.el-dialog__body) {
+    padding: 0;
+  }
+}
+
+.login-dialog.is-desktop {
+  :deep(.el-dialog) {
+    width: 864px;
+    height: auto;
+    border-radius: 16px;
+  }
+
+  :deep(.el-dialog__header) {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    border: none !important;
+  }
+
+  :deep(.el-dialog__headerbtn) {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    top: 16px;
+    right: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
+    z-index: 10;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+
+    .el-dialog__close {
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: bold;
+
+      &:hover {
+        color: #fff;
+      }
+    }
+  }
+}
+
+.login-dialog.is-mobile {
+  :deep(.el-dialog) {
+    width: 100% !important;
+    max-width: 100%;
+    max-height: 100vh;
+    margin: 0;
+    border-radius: 0;
+    overflow-y: auto;
+  }
+
+  :deep(.el-dialog__header) {
+    display: block !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    border: none !important;
   }
 
   :deep(.el-dialog__headerbtn) {
@@ -44,10 +107,6 @@
       }
     }
   }
-
-  :deep(.el-dialog__body) {
-    padding: 0;
-  }
 }
 
 .login-form {
@@ -55,12 +114,6 @@
   flex-direction: column;
 
   .el-form-item {
-    margin-bottom: 8px;
-
-    &:last-of-type {
-      margin-bottom: 8px;
-    }
-
     .input-wrapper {
       flex: 1;
       display: flex;
@@ -71,73 +124,158 @@
       }
 
       .custom-input {
-        height: 42px;
         flex: 1;
 
-        :deep(.el-input__wrapper) {
-          border-radius: 8px;
-          padding: 8px 12px;
-          background: #fff;
-          box-shadow: 0 0 0 1px #e5e7eb inset;
-          transition: box-shadow 0.2s ease;
-
-          &.is-focus {
-            box-shadow: 0 0 0 1px var(--theme-bg-blue) inset;
-          }
-        }
-
         :deep(.el-input__inner) {
-          font-size: 14px;
           color: #333;
           font-weight: 400;
 
           &::placeholder {
             color: var(--theme-text-muted-gray);
-            font-size: 14px;
             font-weight: 400;
           }
-        }
-      }
-
-      .send-code-btn {
-        height: 50px;
-        padding: 0 20px;
-        font-size: 14px;
-        font-weight: 500;
-        border-radius: 4px;
-        background: var(--theme-bg-blue);
-        border: none;
-        color: var(--theme-text-white);
-        white-space: nowrap;
-        min-width: 100px;
-
-        &:hover:not(:disabled) {
-          background: var(--theme-bg-blue);
-          opacity: 0.9;
-        }
-
-        &:disabled {
-          background: #e0e0e0;
-          color: #999;
-          cursor: not-allowed;
         }
       }
     }
   }
 }
 
+.login-form.is-desktop {
+  .el-form-item {
+    margin-bottom: 18px;
+
+    &.login-submit {
+      margin-top: 24px;
+      margin-bottom: 0;
+    }
+
+    .input-wrapper .custom-input {
+      height: 50px;
+
+      :deep(.el-input__wrapper) {
+        border-radius: 8px;
+        padding: 14px;
+        background: #fff;
+        box-shadow: 0 0 0 1px #e5e7eb inset;
+        transition: box-shadow 0.2s ease;
+
+        &.is-focus {
+          box-shadow: 0 0 0 1px var(--theme-bg-blue) inset;
+        }
+      }
+
+      :deep(.el-input__inner) {
+        font-size: 14px;
+
+        &::placeholder {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+
+  .form-actions {
+    margin-bottom: 0;
+    font-size: 14px;
+
+    :deep(.el-checkbox__label) {
+      font-size: 14px;
+    }
+
+    :deep(.el-link) {
+      font-size: 14px;
+    }
+  }
+
+  .login-btn {
+    height: 50px;
+    font-size: 18px;
+  }
+
+  .register-link {
+    display: flex;
+    margin-top: 16px;
+    margin-bottom: 0;
+
+    .register-btn {
+      height: 50px;
+      font-size: 16px;
+    }
+  }
+}
+
+.login-form.is-mobile {
+  .el-form-item {
+    margin-bottom: 8px;
+
+    &:last-of-type {
+      margin-bottom: 8px;
+    }
+
+    .input-wrapper .custom-input {
+      height: 40px;
+
+      :deep(.el-input__wrapper) {
+        border-radius: 8px;
+        padding: 8px 12px;
+        background: #fff;
+        box-shadow: 0 0 0 1px #e5e7eb inset;
+        transition: box-shadow 0.2s ease;
+
+        &.is-focus {
+          box-shadow: 0 0 0 1px var(--theme-bg-blue) inset;
+        }
+      }
+
+      :deep(.el-input__inner) {
+        font-size: 14px;
+
+        &::placeholder {
+          font-size: 14px;
+        }
+      }
+
+      .send-code-btn {
+        height: 44px;
+        font-size: 13px;
+        padding: 0 16px;
+        min-width: 90px;
+      }
+    }
+  }
+
+  .form-actions {
+    margin-bottom: 24px;
+    font-size: 13px;
+
+    :deep(.el-checkbox__label) {
+      font-size: 13px;
+    }
+
+    :deep(.el-link) {
+      font-size: 13px;
+    }
+  }
+
+  .login-btn {
+    height: 44px;
+    font-size: 15px;
+  }
+
+  .register-link {
+    display: none;
+  }
+}
+
 .form-actions {
-  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 14px;
 
   :deep(.el-checkbox) {
     height: auto;
 
     .el-checkbox__label {
-      font-size: 14px;
       color: var(--theme-text-gray);
       font-weight: 400;
       padding: 0 8px;
@@ -150,7 +288,6 @@
   }
 
   :deep(.el-link) {
-    font-size: 14px;
     color: var(--theme-bg-blue);
     text-decoration: none;
     font-weight: 500;
@@ -207,8 +344,6 @@
 
 .login-btn {
   width: 100%;
-  height: 50px;
-  font-size: 18px;
   font-weight: 600;
   border-radius: 8px;
   background: var(--theme-bg-blue);
@@ -239,20 +374,17 @@
 .register-link {
   display: flex;
   justify-content: center;
-  margin-top: 0;
 
   .register-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
-    height: 50px;
     margin: 0;
     border-radius: 8px;
     border-color: var(--theme-bg-blue) !important;
     background: #fff !important;
     color: var(--theme-bg-blue) !important;
-    font-size: 16px;
     font-weight: 600;
 
     &:hover {
@@ -260,98 +392,6 @@
       background: rgba(255, 255, 255, 0.3) !important;
       color: var(--theme-bg-blue) !important;
       transform: translateY(-1px);
-    }
-  }
-}
-
-// 移动端适配
-@media (max-width: 768px) {
-  .login-dialog {
-    :deep(.el-dialog) {
-      width: 100% !important;
-      max-width: 100%;
-      max-height: 100vh;
-      margin: 0;
-      border-radius: 0;
-      overflow-y: auto;
-    }
-
-    :deep(.el-dialog__header) {
-      display: block !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      height: 0 !important;
-      min-height: 0 !important;
-      border: none !important;
-    }
-
-    :deep(.el-dialog__body) {
-      padding: 0;
-    }
-  }
-
-  .login-form {
-    .el-form-item {
-      margin-bottom: 8px;
-
-      &:last-of-type {
-        margin-bottom: 8px;
-      }
-    }
-
-    .input-wrapper {
-      .custom-input {
-        height: 40px;
-
-        :deep(.el-input__wrapper) {
-          padding: 8px 12px;
-        }
-
-        :deep(.el-input__inner) {
-          font-size: 14px;
-        }
-      }
-
-      .send-code-btn {
-        height: 44px;
-        font-size: 13px;
-        padding: 0 16px;
-        min-width: 90px;
-      }
-    }
-  }
-
-  .form-actions {
-    margin-bottom: 24px;
-    font-size: 13px;
-
-    :deep(.el-checkbox__label) {
-      font-size: 13px;
-    }
-
-    :deep(.el-link) {
-      font-size: 13px;
-    }
-  }
-
-  .remember-demo {
-    margin: -8px 0 20px;
-    padding: 12px;
-  }
-
-  .login-btn {
-    height: 44px;
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .register-link {
-    margin-top: 8px;
-
-    .register-btn {
-      height: 44px;
-      font-size: 14px;
-      font-weight: 600;
     }
   }
 }
