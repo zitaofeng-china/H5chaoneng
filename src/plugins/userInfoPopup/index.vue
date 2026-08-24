@@ -14,11 +14,12 @@
           <div class="arrow-left-icon" @click.stop="handleClose">
             <iEpArrowLeft />
           </div>
-          {{ t('nav.userInfo') }}
+          <span class="user-info-title-text">{{ t('nav.userInfo') }}</span>
         </div>
       </template>
       
       <div class="user-info-content">
+        <img class="user-info-deco" :src="userInfoDecoImage" alt="" draggable="false" />
         <div class="desc-wrap">
           <div class="desc-item" v-for="row in userInfoData" :key="row.label">
             <div class="desc-label">{{ row.label }}</div>
@@ -75,6 +76,7 @@ import { useI18n } from 'vue-i18n'
 import { ElMessage } from '@/utils/element'
 import { Loading, RefreshRight } from '@element-plus/icons-vue'
 import type { UserInfoRow } from './types'
+import userInfoDecoImage from '@/assets/images/user-info/side-deco.png'
 
 defineOptions({
   name: 'UserInfoPopup',
@@ -93,7 +95,12 @@ const secretKeyLoading = ref(false)
 const secretKeyCountdown = ref(60)
 let secretKeyTimer: ReturnType<typeof window.setInterval> | null = null
 
-const secretKeyDisplay = computed(() => secretKey.value || '点击获取')
+const secretKeyDisplay = computed(() => secretKey.value || t('recharge.clickToGet'))
+
+const formatTgUsername = (name?: string) => {
+  if (!name) return '-'
+  return name.startsWith('@') ? name : `@${name}`
+}
 
 const clearSecretKeyTimer = () => {
   if (secretKeyTimer) {
@@ -189,7 +196,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
     return [
       { label: t('recharge.account'), value: '-' },
       { label: t('recharge.email'), value: '-' },
-      { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
+      { label: t('recharge.tgUsername'), value: '-' },
       { label: t('recharge.trxBalance'), value: '0.00 TRX' },
       { label: 'Key', value: '', type: 'secretKey' },
     ]
@@ -198,7 +205,7 @@ const userInfoData = computed<UserInfoRow[]>(() => {
   return [
     { label: t('recharge.account'), value: userInfo.username || '-' },
     { label: t('recharge.email'), value: userInfo.email || '-' },
-    { label: t('recharge.tgOfficial'), value: siteStore.tgAdmin || '-' },
+    { label: t('recharge.tgUsername'), value: formatTgUsername(userInfo.tg_user_name) },
     { label: t('recharge.trxBalance'), value: `${formatBalance(userInfo.trx_balance)} TRX` },
     { label: 'Key', value: '', type: 'secretKey' },
   ]
@@ -281,7 +288,12 @@ onBeforeUnmount(() => {
 }
 
 .user-info-content {
+  position: relative;
   padding: 20px 0;
+}
+
+.user-info-deco {
+  display: none;
 }
 
 .desc-wrap {
@@ -399,6 +411,12 @@ onBeforeUnmount(() => {
       padding: 0;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    :deep(.el-overlay-dialog) {
+      overflow: hidden;
     }
 
     :deep(.el-dialog__header) {
@@ -408,37 +426,71 @@ onBeforeUnmount(() => {
     }
 
     :deep(.el-dialog__body) {
+      position: relative;
       flex: 1;
       padding: 60px 16px 20px;
       overflow-y: auto;
+      background: #fff;
     }
 
     .user-info-title {
-      height: 54px;
+      height: 44px;
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--theme-text-white);
-      font-size: 17px;
+      color: #182230;
+      font-size: 16px;
       font-weight: 600;
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: var(--theme-bg);
       z-index: 99;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      isolation: isolate;
+      background: #fff;
+      box-shadow: none;
+
+      .user-info-title-text {
+        position: relative;
+        z-index: 1;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-color: #fff;
+        background-image:
+          var(--theme-home-band-1-color),
+          var(--theme-home-grid-vertical);
+        background-size:
+          100% 44px,
+          auto 300px;
+        background-position: 0 0, 0 0;
+        background-repeat: no-repeat, repeat;
+        -webkit-mask-image: var(--theme-home-grid-mask);
+        mask-image: var(--theme-home-grid-mask);
+        -webkit-mask-size: 100% calc(6 * var(--theme-home-band-height, 30px));
+        mask-size: 100% calc(6 * var(--theme-home-band-height, 30px));
+        -webkit-mask-position: 0 0;
+        mask-position: 0 0;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+      }
 
       .arrow-left-icon {
         position: absolute;
-        left: 16px;
+        left: 8px;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: center;
         width: 32px;
         height: 32px;
-        color: var(--theme-text-white);
+        color: #182230;
         cursor: pointer;
         transition: opacity 0.3s ease;
 
@@ -458,8 +510,23 @@ onBeforeUnmount(() => {
     padding: 0;
   }
 
+  .user-info-deco {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 248px;
+    right: 0;
+    width: 165px;
+    height: 187px;
+    pointer-events: none;
+    object-fit: contain;
+  }
+
   .desc-wrap {
-    border-radius: 6px;
+    position: relative;
+    z-index: 1;
+    border-radius: 8px;
+    background: #fff;
     font-size: 13px;
 
     .desc-item {
@@ -483,6 +550,7 @@ onBeforeUnmount(() => {
 
   .key-text-button {
     max-width: calc(100% - 68px);
+    color: var(--theme-primary-blue);
 
     span {
       overflow: hidden;
