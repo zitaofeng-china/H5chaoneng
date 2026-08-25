@@ -12,20 +12,26 @@
             <button
               v-for="(opt, idx) in row.options"
               :key="idx"
-              :class="[
-                'pill',
-                selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '',
-                isCustomSelected(rIdx, idx) ? 'is-custom-value' : '',
-              ]"
+              type="button"
+              :class="['pill', selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
               @click="onSelect(rIdx, idx, opt)"
             >
-              <template v-if="isCustomSelected(rIdx, idx)">
-                <span class="pill-kicker">{{ t('lease.custom') }}</span>
-                <span class="pill-value">{{ customCounts[rIdx] }}{{ t('common.purchase') }}</span>
-              </template>
-              <template v-else>{{ opt }}</template>
+              {{ opt }}
             </button>
           </div>
+        </div>
+        <div v-if="isCustomActive" class="custom-input-wrap">
+          <el-input
+            :model-value="customCountInput"
+            type="number"
+            min="1"
+            max="1000"
+            class="custom-count-input"
+            @input="handleCustomInput"
+          >
+            <template #prefix>{{ t('lease.customCount') }}</template>
+            <template #suffix>{{ t('common.purchase') }}</template>
+          </el-input>
         </div>
       </div>
 
@@ -33,12 +39,12 @@
       <div class="mobile-selection" v-else>
         <div class="selection-item">
           <label class="selection-label">
-            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            <span class="label-marker" aria-hidden="true"></span>
             {{ t('lease.selectDuration') }}
           </label>
           <el-select
             v-model="mobileSelectedDuration"
-            :placeholder="t('lease.selectDuration')"
+            :placeholder="t('lease.selectDurationPlaceholder')"
             @change="onMobileDurationChange"
             class="duration-select"
           >
@@ -53,26 +59,34 @@
 
         <div class="selection-item">
           <label class="selection-label">
-            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            <span class="label-marker" aria-hidden="true"></span>
             {{ t('lease.selectQuantity') }}
           </label>
-          <div class="row-options">
-            <button
-              v-for="(opt, idx) in mobileCountOptions"
-              :key="idx"
-              :class="[
-                'pill',
-                mobileSelectedCount === idx ? 'active' : '',
-                isCustomSelected(mobileSelectedDuration, idx) ? 'is-custom-value' : '',
-              ]"
-              @click="onMobileCountChange(idx, opt)"
-            >
-              <template v-if="isCustomSelected(mobileSelectedDuration, idx)">
-                <span class="pill-kicker">{{ t('lease.custom') }}</span>
-                <span class="pill-value">{{ customCounts[mobileSelectedDuration] }}{{ t('common.purchase') }}</span>
-              </template>
-              <template v-else>{{ opt }}</template>
-            </button>
+          <div class="count-package-panel">
+            <div class="row-options">
+              <button
+                v-for="(opt, idx) in mobileCountOptions"
+                :key="idx"
+                type="button"
+                :class="['pill', mobileSelectedCount === idx ? 'active' : '']"
+                @click="onMobileCountChange(idx, opt)"
+              >
+                {{ opt }}
+              </button>
+            </div>
+            <div v-if="isCustomActive" class="custom-input-wrap">
+              <el-input
+                :model-value="customCountInput"
+                type="number"
+                min="1"
+                max="1000"
+                class="custom-count-input"
+                @input="handleCustomInput"
+              >
+                <template #prefix>{{ t('lease.customCount') }}</template>
+                <template #suffix>{{ t('common.purchase') }}</template>
+              </el-input>
+            </div>
           </div>
         </div>
       </div>
@@ -158,42 +172,12 @@
         </el-form>
       </div>
     </div>
-
-    <!-- 自定义数量对话框 -->
-    <el-dialog
-      v-model="customDialogVisible"
-      :title="t('lease.customCount')"
-      width="400px"
-      :close-on-click-modal="false"
-      align-center
-      class="custom-count-dialog"
-    >
-      <el-form :model="customForm" :rules="customRules" ref="customFormRef" label-width="36px">
-        <el-form-item :label="t('lease.count')" prop="count">
-          <el-input
-            v-model.number="customForm.count"
-            type="number"
-            :placeholder="t('lease.enterCustomCount')"
-            min="1"
-            clearable
-            @keyup.enter="confirmCustomCount"
-          >
-            <template #suffix>{{ t('common.purchase') }}</template>
-          </el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="customDialogVisible = false">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" @click="confirmCustomCount">{{ t('common.confirm') }}</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage } from '@/utils/element'
 import { type FormInstance, type FormRules } from 'element-plus'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
@@ -226,9 +210,7 @@ const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
 
 const CUSTOM_COL = 4
-
-const isCustomSelected = (rowIdx: number, idx: number) =>
-  idx === CUSTOM_COL && !!customCounts.value[rowIdx]
+const CUSTOM_MAX = 1000
 
 const rows = computed(() => [
   {
@@ -316,16 +298,37 @@ const mobileCountOptions = computed(() => {
   return rows.value[mobileSelectedDuration.value]?.options || []
 })
 
-// 自定义对话框状态
-const customDialogVisible = ref(false)
-const customFormRef = ref<FormInstance>()
-const customForm = reactive({
-  count: 1,
-})
-const customRowIndex = ref<number>(0)
-
-// 存储自定义数量
 const customCounts = ref<Record<number, number>>({})
+
+const isCustomActive = computed(() => selecteIndex.value[1] === CUSTOM_COL)
+
+const customCountInput = computed({
+  get: () => customCounts.value[selecteIndex.value[0]] ?? 1,
+  set: (val: number | string | null) => {
+    applyCustomCount(selecteIndex.value[0], val)
+  },
+})
+
+function applyCustomCount(rowIdx: number, val: number | string | null) {
+  const n = parseInt(String(val), 10)
+  customCounts.value[rowIdx] = Number.isFinite(n)
+    ? Math.min(CUSTOM_MAX, Math.max(1, Math.trunc(n)))
+    : 1
+}
+
+function handleCustomInput(val: string | number | Event) {
+  const raw =
+    val && typeof val === 'object' && 'target' in val
+      ? (val.target as HTMLInputElement).value
+      : val
+  applyCustomCount(selecteIndex.value[0], raw as string | number)
+}
+
+function ensureCustomCount(rowIdx: number) {
+  if (!customCounts.value[rowIdx]) {
+    customCounts.value[rowIdx] = 1
+  }
+}
 
 // 根据选中的行（时长）动态获取单价
 const unitPrice = computed(() => {
@@ -469,26 +472,6 @@ const rules = computed<FormRules<RentalForm>>(() => ({
   ],
 }))
 
-// 自定义表单验证规则
-const customRules = computed<FormRules>(() => ({
-  count: [
-    { required: true, message: t('formValidation.countRequired'), trigger: 'blur' },
-    { type: 'number', message: t('formValidation.countMustBeNumber'), trigger: 'blur' },
-    {
-      validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
-        if (value < 1) {
-          callback(new Error(t('formValidation.countMustBePositive')))
-        } else if (value > 1000) {
-          callback(new Error(t('formValidation.countTooLarge')))
-        } else {
-          callback()
-        }
-      },
-      trigger: 'blur',
-    },
-  ],
-}))
-
 watch([unitPrice, count, total, energy, totalEnergy, validity], () => {
   form.unitPrice = unitPrice.value
   form.count = count.value
@@ -502,12 +485,8 @@ watch(wallet, (v) => (form.wallet = v))
 
 function onSelect(rowIdx: number, idx: number, opt: string) {
   selecteIndex.value = [rowIdx, idx]
-
-  // 判断是否点击了"自定义"或者是最后一个按钮（自定义按钮的位置）
   if (opt === t('lease.custom') || idx === CUSTOM_COL) {
-    customRowIndex.value = rowIdx
-    customForm.count = customCounts.value[rowIdx] || 1
-    customDialogVisible.value = true
+    ensureCustomCount(rowIdx)
   }
 }
 
@@ -522,27 +501,8 @@ const onMobileDurationChange = (durationIdx: number) => {
 const onMobileCountChange = (countIdx: number, opt: string) => {
   mobileSelectedCount.value = countIdx
   selecteIndex.value = [mobileSelectedDuration.value, countIdx]
-  
-  // 判断是否选择了"自定义"或者是最后一个选项（自定义按钮的位置）
   if (opt === t('lease.custom') || countIdx === CUSTOM_COL) {
-    customRowIndex.value = mobileSelectedDuration.value
-    customForm.count = customCounts.value[mobileSelectedDuration.value] || 1
-    customDialogVisible.value = true
-  }
-}
-
-// 确认自定义数量
-const confirmCustomCount = async () => {
-  if (!customFormRef.value) return
-
-  try {
-    await customFormRef.value.validate()
-    // 保存自定义数量
-    customCounts.value[customRowIndex.value] = customForm.count
-    customDialogVisible.value = false
-    ElMessage.success(t('formValidation.customCountSet'))
-  } catch (error) {
-    console.error('Validation failed:', error)
+    ensureCustomCount(mobileSelectedDuration.value)
   }
 }
 
@@ -677,24 +637,54 @@ const rentNow = async () => {
   }
 }
 
-.pill-kicker,
-.pill-value {
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.custom-input-wrap {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 10px;
 }
 
-.pill-kicker {
-  font-size: 9px;
-  font-weight: 500;
-  line-height: 1.1;
-}
+.custom-count-input {
+  width: 100%;
 
-.pill-value {
-  font-size: 10px;
-  font-weight: 600;
-  line-height: 1.1;
+  :deep(.el-input__wrapper) {
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 0 0 1px #e1e6ee inset;
+  }
+
+  :deep(.el-input__inner) {
+    height: 38px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input__prefix) {
+    margin-right: 10px;
+    color: #98a2b3;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  :deep(.el-input__suffix) {
+    color: #98a2b3;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  :deep(input[type='number']) {
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+  }
 }
 
 .details-card {
@@ -801,118 +791,7 @@ const rentNow = async () => {
   font-weight: 700;
 }
 
-:deep(.custom-count-dialog) {
-  align-self: center;
-  height: auto !important;
-  min-height: 0;
-  max-height: calc(100vh - 80px);
-  overflow: visible;
-  width: 320px !important;
-  margin: 0 auto;
-  padding: 0;
-  border-radius: 6px;
-  background: #fff;
-  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.18);
-
-  .el-dialog__header {
-    margin: 0;
-    padding: 9px 12px 7px;
-  }
-
-  .el-dialog__title {
-    color: #1f2937;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1.2;
-  }
-
-  .el-dialog__headerbtn {
-    top: 8px;
-    right: 8px;
-    width: 22px;
-    height: 22px;
-    border-radius: 4px;
-    background: #eef0f3;
-
-    .el-dialog__close {
-      color: #667085;
-      font-size: 13px;
-    }
-  }
-
-  .el-dialog__body {
-    margin: 0;
-    padding: 3px 12px 8px;
-  }
-
-  .el-form-item {
-    margin-bottom: 0;
-  }
-
-  .el-form-item__label {
-    width: 36px !important;
-    height: 28px;
-    padding: 0 6px 0 0;
-    overflow: visible;
-    white-space: nowrap;
-    color: #475467;
-    font-size: 11px;
-    font-weight: 500;
-    line-height: 28px;
-  }
-
-  .el-form-item__content {
-    min-width: 0;
-    margin-left: 0 !important;
-    line-height: 1;
-  }
-
-  .el-input__wrapper {
-    min-height: 28px;
-    padding: 0 8px;
-    border-radius: 2px;
-    box-shadow: 0 0 0 1px #dfe4eb inset;
-  }
-
-  .el-input__inner {
-    height: 26px;
-    color: #344054;
-    font-size: 11px;
-  }
-
-  .el-input__suffix {
-    color: #98a2b3;
-    font-size: 10px;
-  }
-
-  .el-form-item.is-error .el-input__wrapper {
-    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
-  }
-
-  .el-dialog__footer {
-    padding: 5px 12px 10px;
-    display: flex;
-    gap: 6px;
-  }
-
-  .el-button {
-    flex: 1;
-    min-width: 0;
-    height: 28px;
-    margin: 0 !important;
-    padding: 0 8px;
-    border-radius: 3px;
-    font-size: 10px;
-    font-weight: 500;
-  }
-
-  .el-button--primary {
-    border-color: var(--theme-bg-blue);
-    background: var(--theme-bg-blue);
-  }
-}
-
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .time-rental-page {
     padding: 2px 6px 24px;
   }
@@ -941,45 +820,107 @@ const rentNow = async () => {
     .selection-label {
       display: flex;
       align-items: center;
-      gap: 4px;
-      color: #344054;
-      font-size: 12px;
+      min-height: 16px;
+      padding-left: 0;
+      color: #1e293b;
+      font-size: 14px;
       font-weight: 600;
       line-height: 1.2;
+    }
+
+    .label-marker {
+      width: 3px;
+      height: 14px;
+      margin-right: 8px;
+      border-radius: 1px;
+      background: var(--theme-bg-blue);
     }
 
     :deep(.el-select) {
       width: 100%;
 
       .el-input__wrapper {
-        min-height: 38px;
-        padding: 0 10px;
+        min-height: 40px;
+        padding: 0 12px;
         border: 1px solid #e1e6ee;
-        border-radius: 3px;
+        border-radius: 8px;
         background: #fff;
         box-shadow: none;
       }
 
       .el-input__inner {
-        height: 38px;
+        height: 40px;
         color: #344054;
         font-size: 13px;
       }
     }
 
+    .count-package-panel {
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+    }
+
     .row-options {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 6px;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
     }
 
     .pill {
-      height: 36px;
-      padding: 0 8px;
+      flex-direction: row;
+      height: 32px;
+      padding: 0 4px;
+      border-radius: 8px;
+      background: #f3f4f6;
+      color: #667085;
       font-size: 12px;
+      font-weight: 600;
+      box-shadow: none;
+
+      &:hover {
+        background: #e8eaed;
+        color: #344054;
+      }
+
+      &.active {
+        background: var(--theme-bg-blue);
+        color: #fff;
+        box-shadow: none;
+      }
 
       &:last-child {
-        grid-column: 1 / -1;
+        grid-column: auto;
+      }
+    }
+
+    .custom-input-wrap {
+      margin-top: 10px;
+    }
+
+    .custom-count-input {
+      :deep(.el-input__wrapper) {
+        min-height: 40px;
+        padding: 0 12px;
+        border-radius: 8px;
+        background: #fff;
+        box-shadow: 0 0 0 1px #e5e7eb inset;
+      }
+
+      :deep(.el-input__inner) {
+        height: 38px;
+        color: #1f2937;
+        font-size: 14px;
+        font-weight: 600;
+      }
+
+      :deep(.el-input__prefix),
+      :deep(.el-input__suffix) {
+        color: #98a2b3;
+        font-size: 13px;
+        font-weight: 500;
       }
     }
   }
@@ -1012,75 +953,6 @@ const rentNow = async () => {
     height: 42px;
     margin-top: 6px;
     font-size: 13px;
-  }
-
-  :deep(.custom-count-dialog) {
-    width: 230px !important;
-
-    .el-dialog__header {
-      padding: 10px 10px 8px;
-    }
-
-    .el-dialog__title {
-      font-size: 10px;
-      line-height: 12px;
-    }
-
-    .el-dialog__headerbtn {
-      top: 7px;
-      right: 8px;
-      width: 18px;
-      height: 18px;
-
-      .el-dialog__close {
-        font-size: 11px;
-      }
-    }
-
-    .el-dialog__body {
-      padding: 4px 9px 7px;
-    }
-
-    .el-form-item {
-      height: 18px;
-    }
-
-    .el-form-item__label {
-      width: 28px !important;
-      height: 18px;
-      padding-right: 4px;
-      overflow: visible;
-      white-space: nowrap;
-      font-size: 9px;
-      line-height: 18px;
-    }
-
-    .el-input__wrapper {
-      height: 18px;
-      min-height: 18px;
-      padding: 0 5px;
-    }
-
-    .el-input__inner {
-      height: 16px;
-      font-size: 10px;
-    }
-
-    .el-input__suffix {
-      font-size: 9px;
-    }
-
-    .el-dialog__footer {
-      padding: 7px 9px 7px;
-      gap: 5px;
-    }
-
-    .el-button {
-      height: 20px;
-      padding: 0 6px;
-      border-radius: 2px;
-      font-size: 9px;
-    }
   }
 }
 </style>
