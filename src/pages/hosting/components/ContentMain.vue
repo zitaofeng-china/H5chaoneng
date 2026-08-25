@@ -11,7 +11,9 @@
     </section>
 
     <section class="hosting-section">
-      <h2 class="section-title">{{ t('hosting.address') }}</h2>
+      <h2 class="section-title is-required">
+        <span class="required-mark" aria-hidden="true">*</span>{{ t('hosting.address') }}：
+      </h2>
       <el-form
         ref="formRef"
         :model="formData"
@@ -304,7 +306,7 @@ onMounted(() => {
 .section-title {
   display: flex;
   align-items: center;
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   padding-left: 10px;
   position: relative;
   color: #1e293b;
@@ -322,6 +324,14 @@ onMounted(() => {
     background: #1766f5;
     transform: translateY(-50%);
   }
+
+  .required-mark {
+    margin-right: 2px;
+    color: #f56c6c;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1;
+  }
 }
 
 .fee-grid {
@@ -331,29 +341,32 @@ onMounted(() => {
 }
 
 .fee-item {
-  min-height: 78px;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  padding: 16px 12px;
-  border-radius: 8px;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid #b8d4ff;
+  border-radius: 4px;
   background: #edf4ff;
   text-align: center;
 }
 
 .fee-price {
   color: #1766f5;
-  font-size: 16px;
+  font-size: 14.85px;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.15;
+  white-space: nowrap;
 }
 
 .fee-desc {
   color: rgba(71, 84, 103, 0.72);
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 14.52px;
+  line-height: 1.15;
+  white-space: nowrap;
 }
 
 .details-form {
@@ -443,12 +456,18 @@ onMounted(() => {
   }
 
   .fee-item {
-    min-height: 68px;
-    padding: 12px 8px;
+    padding: 8px 6px;
+    gap: 3px;
   }
 
   .fee-price {
-    font-size: 14px;
+    font-size: 12.87px;
+    line-height: 1.15;
+  }
+
+  .fee-desc {
+    font-size: 13.31px;
+    line-height: 1.15;
   }
 
   .host-btn {
@@ -458,12 +477,6 @@ onMounted(() => {
 
   .details-form :deep(.el-textarea__inner) {
     font-size: 13px;
-  }
-}
-
-@media (max-width: 480px) {
-  .fee-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>
