@@ -5,21 +5,22 @@
       <div class="section-label">{{ t('home.welfareOrder') }}说明</div>
 
       <div class="welfare-info">
-        <div class="info-item">
+        <div class="info-item is-flame">
           <img class="icon" :src="welfareFlameImage" alt="" />
           <span class="text">{{ t('home.welfareInfo1', { price: welfarePrice }) }}</span>
         </div>
-        <div class="info-item">
-          <img class="icon" :src="welfareTelegramImage" alt="" />
+        <div class="info-item is-bolt">
+          <img class="icon" :src="welfareBoltImage" alt="" />
           <span class="text">{{ t('home.welfareInfo2', { price: welfarePrice }) }}</span>
         </div>
-        <div class="info-item">
-          <img class="icon" :src="welfareBoltImage" alt="" />
+        <div class="info-item is-telegram">
+          <img class="icon" :src="welfareTelegramImage" alt="" />
           <span class="text">{{ t('home.welfareInfo3') }}</span>
         </div>
       </div>
 
       <div class="welfare-tips">
+        <img class="tips-gift" :src="welfareGiftImage" alt="" />
         <div class="tips-copy">
           <div class="tips-title">
             <span>{{ t('home.welfareTipsTitle') }}</span>
@@ -29,7 +30,6 @@
             <div class="tip-item">{{ t('home.welfareTip2') }}</div>
           </div>
         </div>
-        <img class="tips-gift" :src="welfareGiftImage" alt="" />
       </div>
 
       <el-button 
@@ -300,6 +300,7 @@ onUnmounted(() => {
 
   .welfare-tips {
     display: flex;
+    flex-direction: row-reverse;
     align-items: center;
     justify-content: space-between;
     min-height: 124px;
@@ -415,79 +416,137 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .welfare-order {
-    padding: 32px 12px 36px;
+    padding: 28px 16px 36px;
 
     .page-title {
-      margin-bottom: 14px;
+      margin-bottom: 16px;
       font-size: 24px;
     }
 
     .welfare-card {
+      border-radius: 16px;
+
       :deep(.el-card__body) {
-        padding: 14px 12px;
+        padding: 16px;
       }
     }
 
     .welfare-info {
       display: flex;
-      align-items: stretch;
-      padding: 8px 4px;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 14px;
+      padding: 0;
+      background: none;
+      border-radius: 0;
 
       .info-item {
-        flex: 1;
-        gap: 5px;
-        padding: 0 6px;
-        font-size: 10px;
+        flex: none;
+        width: 100%;
+        gap: 12px;
+        padding: 10px 14px;
+        font-size: 13px;
+        border-right: 0;
+        border-radius: 12px;
+
+        &.is-flame {
+          background: #eaf3ff;
+        }
+
+        &.is-bolt {
+          background: #fff6e8;
+        }
+
+        &.is-telegram {
+          background: #f6eeff;
+        }
 
         .icon {
-          width: 23px;
-          height: 23px;
+          width: 36px;
+          height: 36px;
+        }
+
+        .text {
+          line-height: 1.4;
         }
       }
     }
 
     .welfare-tips {
-      min-height: 84px;
-      padding: 10px;
+      display: block;
+      min-height: 0;
+      margin-top: 12px;
+      padding: 14px 12px 14px 16px;
+      border-radius: 12px;
+
+      &::after {
+        content: '';
+        display: table;
+        clear: both;
+      }
+
+      .tips-gift {
+        float: right;
+        width: 80px;
+        height: 56px;
+        margin: 0 0 4px 8px;
+      }
+
+      .tips-copy {
+        padding-right: 0;
+      }
 
       .tips-title {
-        font-size: 12px;
-        margin-bottom: 5px;
+        font-size: 14px;
+        margin-bottom: 8px;
       }
 
       .tips-content {
         .tip-item {
-          padding-left: 12px;
-          font-size: 10px;
-          line-height: 1.55;
+          padding-left: 22px;
+          font-size: 12px;
+          line-height: 1.65;
 
           &::before {
-            width: 7px;
-            height: 7px;
+            top: 0.28em;
+            width: 14px;
+            height: 14px;
+            background: #22c55e;
+          }
+
+          &::after {
+            content: '';
+            position: absolute;
+            top: calc(0.28em + 4px);
+            left: 4px;
+            width: 6px;
+            height: 3.5px;
+            border-radius: 0;
+            border-left: 1.6px solid #fff;
+            border-bottom: 1.6px solid #fff;
+            background: none;
+            transform: rotate(-45deg);
           }
         }
-      }
-
-      .tips-gift {
-        width: 105px;
-        height: 53px;
       }
     }
 
     .buy-button {
-      height: 38px;
-      margin: 10px 0 8px;
-      font-size: 12px;
+      height: 44px;
+      margin: 12px 0 10px;
+      font-size: 15px;
+      border-radius: 8px;
     }
 
     .page-link-section {
       padding: 0;
 
       .page-link-btn {
-        height: 32px;
-        font-size: 11px;
+        height: 40px;
+        font-size: 14px;
+        border-radius: 8px;
       }
     }
   }
