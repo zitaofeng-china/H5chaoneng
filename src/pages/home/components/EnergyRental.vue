@@ -222,6 +222,20 @@
               </el-form>
             </el-tab-pane>
           </el-tabs>
+          <div v-if="isMobile" class="mobile-welfare-link">
+            <button type="button" class="mobile-welfare-btn" @click="goToWelfare">
+              <span class="mobile-welfare-copy">
+                {{ t('home.goToWelfareOrder') }}
+                <span class="mobile-welfare-arrow" aria-hidden="true"></span>
+              </span>
+              <img
+                class="mobile-welfare-gift"
+                :src="welfareMobileBtnGiftImage"
+                alt=""
+                draggable="false"
+              />
+            </button>
+          </div>
         </div>
       </el-card>
 
@@ -261,6 +275,7 @@ import { usePriceStore } from '@/stores/usePriceStore'
 import { useSiteStore } from '@/stores/useSiteStore'
 import { useUserStore } from '@/stores/useUserStore'
 import welfareGiftBoxImage from '@/assets/images/welfare/welfare-gift-box.png'
+import welfareMobileBtnGiftImage from '@/assets/images/welfare/welfare-mobile-btn-gift.png'
 import welfareCoinTrxImage from '@/assets/images/welfare/welfare-coin-trx.png'
 import welfareCoinUsdtImage from '@/assets/images/welfare/welfare-coin-usdt.png'
 import welfareCoinGoldImage from '@/assets/images/welfare/welfare-coin-gold.png'
@@ -2233,14 +2248,83 @@ onUnmounted(() => {
   }
 
   .welfare-entry {
-    height: 32px;
-    padding: 0 12px 0 6px;
-    font-size: 12px;
+    display: none;
   }
 
-  .welfare-entry-gift {
-    width: 24px;
-    height: 24px;
+  .mobile-welfare-link {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 16px 12px 0;
+    overflow: visible;
+  }
+
+  .mobile-welfare-btn {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    width: 100%;
+    height: 44px;
+    padding: 0 84px 0 16px;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+    border: 1px solid #ffad49;
+    border-radius: 8px;
+    background: #fffaf2;
+    color: #f39b25;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+
+    &:hover,
+    &:focus,
+    &:focus-visible,
+    &:active {
+      color: #f39b25;
+      background: #fffaf2;
+      border-color: #ffad49;
+    }
+  }
+
+  .mobile-welfare-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .mobile-welfare-arrow {
+    position: relative;
+    flex: 0 0 16px;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 46%;
+      width: 5px;
+      height: 5px;
+      border-top: 1.5px solid currentColor;
+      border-right: 1.5px solid currentColor;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+  }
+
+  .mobile-welfare-gift {
+    position: absolute;
+    right: 6px;
+    top: 50%;
+    width: 82px;
+    height: 41px;
+    object-fit: contain;
+    pointer-events: none;
+    transform: translateY(-50%);
   }
 }
 </style>
