@@ -47,3 +47,6 @@ components.d.ts
 
 # Playwright CLI session artifacts
 .playwright-cli/
+
+# Local screenshot / UI verification dumps
+/output/
