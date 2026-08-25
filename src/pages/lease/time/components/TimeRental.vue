@@ -12,10 +12,18 @@
             <button
               v-for="(opt, idx) in row.options"
               :key="idx"
-              :class="['pill', selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
+              :class="[
+                'pill',
+                selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '',
+                isCustomSelected(rIdx, idx) ? 'is-custom-value' : '',
+              ]"
               @click="onSelect(rIdx, idx, opt)"
             >
-              {{ opt }}
+              <template v-if="isCustomSelected(rIdx, idx)">
+                <span class="pill-kicker">{{ t('lease.custom') }}</span>
+                <span class="pill-value">{{ customCounts[rIdx] }}{{ t('common.purchase') }}</span>
+              </template>
+              <template v-else>{{ opt }}</template>
             </button>
           </div>
         </div>
@@ -52,10 +60,18 @@
             <button
               v-for="(opt, idx) in mobileCountOptions"
               :key="idx"
-              :class="['pill', mobileSelectedCount === idx ? 'active' : '']"
+              :class="[
+                'pill',
+                mobileSelectedCount === idx ? 'active' : '',
+                isCustomSelected(mobileSelectedDuration, idx) ? 'is-custom-value' : '',
+              ]"
               @click="onMobileCountChange(idx, opt)"
             >
-              {{ opt }}
+              <template v-if="isCustomSelected(mobileSelectedDuration, idx)">
+                <span class="pill-kicker">{{ t('lease.custom') }}</span>
+                <span class="pill-value">{{ customCounts[mobileSelectedDuration] }}{{ t('common.purchase') }}</span>
+              </template>
+              <template v-else>{{ opt }}</template>
             </button>
           </div>
         </div>
@@ -68,7 +84,7 @@
           ref="formRef"
           :model="form"
           :rules="rules"
-          label-width="115px"
+          label-position="top"
           label-suffix=":"
           class="details-form"
           :class="{ 'derail-form-m': isMobile }"
@@ -209,17 +225,10 @@ const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
 
-const getCustomOptionLabel = (rowIdx: number) => {
-  const customCount = customCounts.value[rowIdx]
-  if (!customCount) {
-    return t('lease.custom')
-  }
+const CUSTOM_COL = 4
 
-  return t('lease.customSelected', {
-    count: customCount,
-    unit: t('common.purchase'),
-  })
-}
+const isCustomSelected = (rowIdx: number, idx: number) =>
+  idx === CUSTOM_COL && !!customCounts.value[rowIdx]
 
 const rows = computed(() => [
   {
@@ -231,7 +240,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      getCustomOptionLabel(0),
+      t('lease.custom'),
     ],
   },
   {
@@ -243,7 +252,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      getCustomOptionLabel(1),
+      t('lease.custom'),
     ],
   },
   {
@@ -255,7 +264,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      getCustomOptionLabel(2),
+      t('lease.custom'),
     ],
   },
   {
@@ -267,7 +276,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      getCustomOptionLabel(3),
+      t('lease.custom'),
     ],
   },
   {
@@ -279,7 +288,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      getCustomOptionLabel(4),
+      t('lease.custom'),
     ],
   },
   {
@@ -291,7 +300,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      getCustomOptionLabel(5),
+      t('lease.custom'),
     ],
   },
 ])
@@ -338,11 +347,11 @@ const unitPrice = computed(() => {
 const unitPriceDisplay = computed(() => formatCryptoAmount(unitPrice.value))
 const count = computed(() => {
   const [rowIdx, colIdx] = selecteIndex.value
+  if (colIdx === CUSTOM_COL) {
+    return customCounts.value[rowIdx] || 1
+  }
   const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
-
-  // 从选项文本中提取数字
-  const num = parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
-  return num
+  return parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
 })
 
 const energy = ref(6.5)
@@ -495,7 +504,7 @@ function onSelect(rowIdx: number, idx: number, opt: string) {
   selecteIndex.value = [rowIdx, idx]
 
   // 判断是否点击了"自定义"或者是最后一个按钮（自定义按钮的位置）
-  if (opt === t('lease.custom') || idx === 4) {
+  if (opt === t('lease.custom') || idx === CUSTOM_COL) {
     customRowIndex.value = rowIdx
     customForm.count = customCounts.value[rowIdx] || 1
     customDialogVisible.value = true
@@ -515,7 +524,7 @@ const onMobileCountChange = (countIdx: number, opt: string) => {
   selecteIndex.value = [mobileSelectedDuration.value, countIdx]
   
   // 判断是否选择了"自定义"或者是最后一个选项（自定义按钮的位置）
-  if (opt === t('lease.custom') || countIdx === 4) {
+  if (opt === t('lease.custom') || countIdx === CUSTOM_COL) {
     customRowIndex.value = mobileSelectedDuration.value
     customForm.count = customCounts.value[mobileSelectedDuration.value] || 1
     customDialogVisible.value = true
@@ -638,6 +647,12 @@ const rentNow = async () => {
   min-width: 0;
   height: 30px;
   padding: 0 3px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  overflow: hidden;
   border: none;
   border-radius: 3px;
   background: #f0f2f4;
@@ -646,6 +661,7 @@ const rentNow = async () => {
   font-size: 11px;
   font-weight: 500;
   line-height: 1;
+  white-space: nowrap;
   cursor: pointer;
   transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
 
@@ -659,6 +675,26 @@ const rentNow = async () => {
     color: var(--theme-text-white);
     box-shadow: 0 2px 5px rgba(22, 93, 255, 0.12);
   }
+}
+
+.pill-kicker,
+.pill-value {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill-kicker {
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
+.pill-value {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.1;
 }
 
 .details-card {
@@ -702,6 +738,14 @@ const rentNow = async () => {
     min-height: 0;
     margin-left: 0 !important;
     line-height: 1;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :deep(.el-form-item__error) {
+    position: static;
+    padding-top: 4px;
+    line-height: 1.3;
   }
 
   :deep(.el-input) {
