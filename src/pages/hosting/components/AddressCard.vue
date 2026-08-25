@@ -1,14 +1,14 @@
 <template>
   <div class="address-card">
-    <div class="address-row">
-      <div class="address-box" :title="item.address">{{ item.address }}</div>
+    <div class="address-box" :title="item.address">{{ item.address }}</div>
+    <div class="address-footer">
+      <div class="address-stats">
+        <span>{{ $t('hosting.todayUsed') }}：{{ todayUsed }} {{ $t('common.purchase') }}</span>
+        <span>{{ $t('hosting.historyUsed') }}：{{ historyUsed }} {{ $t('common.purchase') }}</span>
+      </div>
       <button type="button" class="delete-btn" @click="onDelete?.()">
         {{ $t('hosting.deleteHosting') }}
       </button>
-    </div>
-    <div class="address-stats">
-      <span>{{ $t('hosting.historyUsed') }}：{{ historyUsed }} {{ $t('common.purchase') }}</span>
-      <span>{{ $t('hosting.todayUsed') }}：{{ todayUsed }} {{ $t('common.purchase') }}</span>
     </div>
   </div>
 </template>
@@ -29,17 +29,11 @@ const todayUsed = computed(() => Number(props.item.today_count ?? 0))
 <style scoped lang="scss">
 .address-card {
   width: 100%;
-}
-
-.address-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  min-height: var(--hosting-card-height, 88px);
+  box-sizing: border-box;
 }
 
 .address-box {
-  flex: 1;
-  min-width: 0;
   height: 40px;
   padding: 0 12px;
   display: flex;
@@ -52,6 +46,25 @@ const todayUsed = computed(() => Number(props.item.today_count ?? 0))
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.address-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 40px;
+  margin-top: 8px;
+}
+
+.address-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  color: #98a2b3;
+  font-size: 12px;
+  line-height: 1.4;
 }
 
 .delete-btn {
@@ -68,24 +81,30 @@ const todayUsed = computed(() => Number(props.item.today_count ?? 0))
   cursor: pointer;
   transition: background-color 0.2s ease;
 
-  &:hover {
+  &:hover,
+  &:focus {
     background: #2d78ff;
+    color: #fff;
+  }
+
+  &:active {
+    background: #1766f5;
+    color: #fff;
   }
 }
 
-.address-stats {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  color: #98a2b3;
-  font-size: 12px;
-  line-height: 1.4;
-}
-
 @media (max-width: 890px) {
+  .address-card {
+    min-height: var(--hosting-card-height, 80px);
+  }
+
   .address-box {
     height: 36px;
     font-size: 12px;
+  }
+
+  .address-footer {
+    min-height: 36px;
   }
 
   .delete-btn {
@@ -96,13 +115,6 @@ const todayUsed = computed(() => Number(props.item.today_count ?? 0))
 
   .address-stats {
     font-size: 11px;
-  }
-}
-
-@media (max-width: 480px) {
-  .address-stats {
-    flex-direction: column;
-    gap: 4px;
   }
 }
 </style>

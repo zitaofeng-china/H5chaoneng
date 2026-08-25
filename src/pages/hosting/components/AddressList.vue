@@ -50,7 +50,7 @@ const loadingMore = ref(false)
 const error = ref('')
 const hostingList = ref<HostingAddressItem[]>([])
 const listRef = ref<HTMLElement>()
-const pageSize = 4
+const pageSize = 6
 const currentPage = ref(1)
 const hasMore = ref(true)
 
@@ -230,10 +230,16 @@ onUnmounted(() => {
 
 <style scoped lang="scss">
 .activation-list {
+  --hosting-visible-count: 3;
+  --hosting-card-height: 88px;
+  --hosting-list-gap: 12px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  max-height: 280px;
+  gap: var(--hosting-list-gap);
+  max-height: calc(
+    var(--hosting-visible-count) * var(--hosting-card-height) +
+      (var(--hosting-visible-count) - 1) * var(--hosting-list-gap)
+  );
   overflow-y: auto;
   overscroll-behavior: contain;
   padding-right: 2px;
@@ -278,8 +284,8 @@ onUnmounted(() => {
 
 @media (max-width: 890px) {
   .activation-list {
-    gap: 14px;
-    max-height: 320px;
+    --hosting-card-height: 80px;
+    --hosting-list-gap: 12px;
     padding-right: 0;
   }
 
