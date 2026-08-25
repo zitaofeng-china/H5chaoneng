@@ -218,8 +218,9 @@
   "lease": {
     "byTime": "Zamana Göre Kiralama",
     "byCount": "Adete Göre Kiralama",
-    "selectDuration": "Süre Seçin",
-    "selectQuantity": "Miktar Seçin",
+    "selectDuration": "Süre seçin",
+    "selectDurationPlaceholder": "Geçerlilik süresini seçin",
+    "selectQuantity": "Adet paketini seçin",
     "selectCount1Hour": "1 saat geçerli",
     "selectCount3Hours": "3 saat geçerli",
     "selectCount1Day": "1 gün geçerli",

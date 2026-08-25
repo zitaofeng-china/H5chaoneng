@@ -217,8 +217,9 @@
   "lease": {
     "byTime": "按時間租用",
     "byCount": "按筆數租用",
-    "selectDuration": "選擇租用時長",
-    "selectQuantity": "選擇購買數量",
+    "selectDuration": "請選擇時長",
+    "selectDurationPlaceholder": "請選擇有效時長",
+    "selectQuantity": "請選擇筆數套餐",
     "selectCount1Hour": "有效1小時",
     "selectCount3Days": "有效3天",
     "selectCount1Day": "有效1天",

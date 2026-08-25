@@ -218,8 +218,9 @@
   "lease": {
     "byTime": "Alquilar por Tiempo",
     "byCount": "Alquilar por Cantidad",
-    "selectDuration": "Seleccionar Duración",
-    "selectQuantity": "Seleccionar Cantidad",
+    "selectDuration": "Seleccionar duración",
+    "selectDurationPlaceholder": "Seleccionar período de validez",
+    "selectQuantity": "Seleccionar paquete de conteo",
     "selectCount1Hour": "Válido por 1 hora",
     "selectCount3Hours": "Válido por 3 horas",
     "selectCount1Day": "Válido por 1 día",
