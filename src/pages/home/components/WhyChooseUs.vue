@@ -36,7 +36,7 @@
             @focusin="hoveredIndex = index"
             @click="hoveredIndex = index"
           >
-            <span class="feature-dot" :class="`tone-${index + 1}`">
+            <span class="feature-dot">
               <img class="feature-dot-icon" :src="featureIcons[index]" alt="" />
             </span>
             <div class="feature-copy">
@@ -420,6 +420,8 @@ const items: Item[] = [
   box-sizing: border-box;
   position: relative;
   z-index: 2;
+  overflow: hidden;
+  background: transparent;
   transition:
     transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.28s ease;
@@ -432,32 +434,9 @@ const items: Item[] = [
 
 .feature-dot-icon {
   display: block;
-  max-width: 20px;
-  max-height: 20px;
-}
-
-.tone-1 {
-  background: #dbeafe;
-}
-
-.tone-2 {
-  background: rgba(220, 252, 231, 0.5);
-}
-
-.tone-3 {
-  background: rgba(255, 237, 213, 0.5);
-}
-
-.tone-4 {
-  background: rgba(243, 232, 255, 0.5);
-}
-
-.tone-5 {
-  background: rgba(254, 226, 226, 0.5);
-}
-
-.tone-6 {
-  background: rgba(254, 249, 195, 0.5);
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
 }
 
 .feature-copy {
@@ -690,8 +669,8 @@ const items: Item[] = [
   }
 
   .feature-dot-icon {
-    max-width: 18px;
-    max-height: 18px;
+    width: 32px;
+    height: 32px;
   }
 
   .feature-copy {
