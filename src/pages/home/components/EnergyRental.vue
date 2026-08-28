@@ -915,9 +915,30 @@ onUnmounted(() => {
     border-radius: 0;
   }
 
+  :deep(.ad-banner.is-solo .ad-carousel),
+  :deep(.ad-banner.is-solo .ad-skeleton),
+  :deep(.ad-banner.is-miniapp .ad-carousel),
+  :deep(.ad-banner.is-miniapp .ad-skeleton) {
+    aspect-ratio: auto;
+    height: auto;
+    overflow: hidden;
+    background: transparent;
+  }
+
+  :deep(.ad-banner.is-miniapp .ad-carousel),
+  :deep(.ad-banner.is-miniapp .ad-skeleton) {
+    border-radius: 0;
+  }
+
   :deep(.ad-image) {
     object-fit: cover;
     object-position: center;
+  }
+
+  :deep(.ad-banner.is-solo .ad-image) {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
   }
 
   &.has-ad.is-miniapp:not(:has(.ad-banner.is-coverflow)) {
@@ -934,7 +955,15 @@ onUnmounted(() => {
     :deep(.ad-carousel),
     :deep(.ad-skeleton) {
       width: 100%;
+      height: auto;
+      aspect-ratio: auto;
       border-radius: 0;
+    }
+
+    :deep(.ad-image) {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
     }
   }
 }
@@ -2052,10 +2081,34 @@ onUnmounted(() => {
 
     &.has-ad.is-miniapp:not(:has(.ad-banner.is-coverflow)) {
       padding: 0;
+
+      :deep(.ad-carousel),
+      :deep(.ad-skeleton) {
+        aspect-ratio: auto;
+        height: auto;
+      }
+
+      :deep(.ad-image) {
+        height: auto;
+        object-fit: contain;
+      }
     }
 
-    :deep(.ad-banner:not(.is-coverflow) .ad-carousel),
-    :deep(.ad-banner:not(.is-coverflow) .ad-skeleton) {
+    &.has-ad:has(.ad-banner.is-solo) {
+      :deep(.ad-carousel),
+      :deep(.ad-skeleton) {
+        aspect-ratio: auto;
+        height: auto;
+      }
+
+      :deep(.ad-image) {
+        height: auto;
+        object-fit: contain;
+      }
+    }
+
+    :deep(.ad-banner:not(.is-coverflow):not(.is-solo):not(.is-miniapp) .ad-carousel),
+    :deep(.ad-banner:not(.is-coverflow):not(.is-solo):not(.is-miniapp) .ad-skeleton) {
       aspect-ratio: var(--ad-image-ratio, 16 / 7);
     }
   }
