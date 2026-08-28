@@ -4,7 +4,6 @@
 
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ElMessage } from '@/utils/element'
 import { useUserStore } from '@/stores/useUserStore'
 import {
   isTelegramMiniApp,
@@ -20,9 +19,6 @@ import { post } from '@/api/request'
 
 /** 登录失败全屏提示（未开放 Mini App） */
 export const TG_LOGIN_BLOCKED_MESSAGE = '您的账号未开放MiniAPP，请联系代理开启！！！'
-const TG_LOGIN_SUCCESS_MESSAGE = '登录成功'
-const TG_LOGIN_EXPIRE_TIME_PREFIX = '登录有效期至'
-const TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE = '登录过期时间异常，请联系客服'
 /** 关闭倒计时秒数 */
 export const TG_LOGIN_BLOCKED_COUNTDOWN = 2
 
@@ -32,12 +28,6 @@ function isEmptyData(data: unknown): boolean {
     return Object.keys(data).length === 0
   }
   return false
-}
-
-function formatExpireTime(time: number): string {
-  const date = new Date(time)
-  const pad = (value: number) => String(value).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 }
 
 /** 走统一 request：自动带 Site；InitData 放自定义 Header */
@@ -153,10 +143,8 @@ export function useTelegramLogin() {
         // 保存过期时间（后端返回秒级时间戳，需要转为毫秒）
         const expiredAt = (data.expired_at ?? data.expirated_at) as number | undefined
         const expiredAtMs = Number(expiredAt) * 1000
-        let expireTip = ''
         if (Number.isFinite(expiredAtMs) && expiredAtMs > 0) {
           setTokenExpiredAt(expiredAtMs)
-          expireTip = `${TG_LOGIN_EXPIRE_TIME_PREFIX}：${formatExpireTime(expiredAtMs)}`
         }
 
         // 保存用户信息
@@ -165,25 +153,6 @@ export function useTelegramLogin() {
         }
 
         console.log('[Telegram] 自动登录成功')
-        // 合并为一条提示，避免 success/info 同时弹出叠在一起
-        if (expireTip) {
-          ElMessage.success({
-            message: `${TG_LOGIN_SUCCESS_MESSAGE}，${expireTip}`,
-            duration: 2000,
-            showClose: true,
-          })
-        } else {
-          ElMessage.success({
-            message: TG_LOGIN_SUCCESS_MESSAGE,
-            duration: 2000,
-            showClose: true,
-          })
-          ElMessage.warning({
-            message: TG_LOGIN_EXPIRE_TIME_ERROR_MESSAGE,
-            duration: 2000,
-            showClose: true,
-          })
-        }
 
         // 动态站点跳转：后端返回站点标识时，跳转到对应站点
         if (responseSite && responseSite !== getSite()) {
