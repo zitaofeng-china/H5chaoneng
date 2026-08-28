@@ -644,7 +644,7 @@ onUnmounted(() => {
     .energy-radio-group {
       display: flex;
       width: 630px;
-      background: rgba(2, 15, 45, 0.03);
+      background: transparent;
       border-radius: 4px;
       box-sizing: border-box;
 
@@ -1788,7 +1788,7 @@ onUnmounted(() => {
   padding: 0;
   border: 1px solid #e1e4ea;
   border-radius: 4px;
-  background: #f9fafb;
+  background: #fff;
   box-shadow: none;
   color: #606060;
   font-size: 14px;
@@ -1805,8 +1805,9 @@ onUnmounted(() => {
 
 .energy-rental .rental-form .energy-radio-group {
   width: 100%;
-  padding: 4px;
+  padding: 0;
   gap: 10px;
+  background: transparent;
 }
 
 .energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner) {
@@ -1814,6 +1815,11 @@ onUnmounted(() => {
   line-height: 42px;
   border: 1px solid #d0d5dd;
   box-shadow: none;
+  background: #fff;
+}
+
+.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner:hover) {
+  background: #fff;
 }
 
 .energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
