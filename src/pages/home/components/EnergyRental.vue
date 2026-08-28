@@ -37,7 +37,7 @@
       </div>
 
       <div class="rental-board">
-        <button type="button" class="welfare-rail is-copy" @click="goToWelfare">
+        <button v-if="showWelfare" type="button" class="welfare-rail is-copy" @click="goToWelfare">
           <span class="welfare-copy-panel">
             <img class="welfare-copy-deco is-gold" :src="welfareCoinGoldImage" alt="" draggable="false" />
             <img class="welfare-copy-deco is-star" :src="welfareStarImage" alt="" draggable="false" />
@@ -80,7 +80,7 @@
             >
               {{ t('home.chooseMode') }}
             </div>
-            <el-tooltip :content="t('home.welfareOrderSubtitle')" placement="top">
+            <el-tooltip v-if="showWelfare" :content="t('home.welfareOrderSubtitle')" placement="top">
               <button type="button" class="welfare-entry" @click="goToWelfare">
                 <img class="welfare-entry-gift" :src="welfareGiftBoxImage" alt="" draggable="false" />
                 {{ t('home.claimWelfare') }}
@@ -222,7 +222,7 @@
               </el-form>
             </el-tab-pane>
           </el-tabs>
-          <div v-if="isMobile" class="mobile-welfare-link">
+          <div v-if="isMobile && showWelfare" class="mobile-welfare-link">
             <button type="button" class="mobile-welfare-btn" @click="goToWelfare">
               <span class="mobile-welfare-copy">
                 {{ t('home.goToWelfareOrder') }}
@@ -239,7 +239,7 @@
         </div>
       </el-card>
 
-        <button type="button" class="welfare-rail is-art" @click="goToWelfare" :aria-label="t('home.goToWelfareOrder')">
+        <button v-if="showWelfare" type="button" class="welfare-rail is-art" @click="goToWelfare" :aria-label="t('home.goToWelfareOrder')">
           <span class="welfare-stage">
             <span class="welfare-glow" aria-hidden="true"></span>
             <img class="welfare-piece is-star-s" :src="welfareStarImage" alt="" draggable="false" />
@@ -293,8 +293,10 @@ import { storeToRefs } from 'pinia'
 import { formatCryptoAmount } from '@/utils/number'
 import { withSitePrefix } from '@/utils/site'
 import { isMiniAppRuntime } from '@/utils/telegram'
+import { SHOW_WELFARE } from '@/constants/features'
 
 const { t } = useI18n()
+const showWelfare = SHOW_WELFARE
 const hasAd = ref<boolean | null>(null)
 const isMiniApp = ref(isMiniAppRuntime())
 const router = useRouter()
