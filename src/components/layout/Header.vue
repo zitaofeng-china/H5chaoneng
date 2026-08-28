@@ -75,6 +75,7 @@
 
         <!-- 福利订单独立菜单项 -->
         <div
+          v-if="showWelfare"
           class="nav-link"
           :class="{ 'is-active': isActive('/welfare') }"
           @click="handleToRouter('/welfare')"
@@ -279,6 +280,7 @@
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="showWelfare"
         :title="$t('nav.welfareOrder')"
         name="0"
         disabled
@@ -336,10 +338,13 @@ import telegramIcon from '@/assets/images/header/telegram.png'
 import langIcon from '@/assets/images/header/lang.png'
 import userAvatar from '@/assets/images/header/avatar.png'
 import { useHeaderNav } from './useHeaderNav'
+import { SHOW_WELFARE } from '@/constants/features'
 
 defineOptions({
   name: 'LayoutHeader',
 })
+
+const showWelfare = SHOW_WELFARE
 
 const {
   isMobileView,
