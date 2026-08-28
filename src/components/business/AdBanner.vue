@@ -3,7 +3,8 @@
     v-if="showBanner"
     class="ad-banner"
     :class="{
-      'is-miniapp': isMiniApp && !useCoverflow,
+      'is-miniapp': isMiniApp && useSolo,
+      'is-solo': useSolo,
       'is-coverflow': useCoverflow,
     }"
     aria-label="广告"
@@ -27,51 +28,103 @@
       @mouseenter="pauseRotation"
       @mouseleave="resumeRotation"
     >
-      <div class="ad-stage">
-        <div class="ad-stage__sizer" aria-hidden="true"></div>
-        <div class="ad-slides">
-          <component
-            :is="ad.link_url ? 'a' : 'div'"
-            v-for="(ad, index) in displayAds"
-            :key="getAdKey(ad, index)"
-            class="ad-slide"
-            :class="{
-              'is-active': index === activeIndex,
-              'is-link': Boolean(ad.link_url) && index === activeIndex,
-            }"
-            :style="getSlideStyle(index)"
-            :href="ad.link_url && index === activeIndex ? resolveUrl(ad.link_url) : undefined"
-            :target="ad.link_url && index === activeIndex ? '_blank' : undefined"
-            :rel="ad.link_url && index === activeIndex ? 'noopener noreferrer' : undefined"
-            :data-index="index"
-            :tabindex="ad.link_url && index === activeIndex ? 0 : -1"
-            :aria-hidden="index !== activeIndex"
-            draggable="false"
-            @click="handleSlideClick($event, index, ad)"
-            @keydown.enter.prevent="handleSlideClick($event, index, ad)"
-            @dragstart.prevent
-          >
-            <img
-              class="ad-image"
-              :src="resolveUrl(ad.image_url)"
-              alt=""
+      <div class="ad-stage-wrap">
+        <div class="ad-stage">
+          <div class="ad-stage__sizer" aria-hidden="true"></div>
+          <div class="ad-slides">
+            <component
+              :is="!useSolo && ad.link_url ? 'a' : 'div'"
+              v-for="(ad, index) in displayAds"
+              :key="getAdKey(ad, index)"
+              class="ad-slide"
+              :class="{
+                'is-active': index === activeIndex,
+                'is-link': Boolean(ad.link_url) && index === activeIndex && !useSolo,
+              }"
+              :style="getSlideStyle(index)"
+              :href="!useSolo && ad.link_url && index === activeIndex ? resolveUrl(ad.link_url) : undefined"
+              :target="!useSolo && ad.link_url && index === activeIndex ? '_blank' : undefined"
+              :rel="!useSolo && ad.link_url && index === activeIndex ? 'noopener noreferrer' : undefined"
+              :data-index="index"
+              :tabindex="!useSolo && ad.link_url && index === activeIndex ? 0 : -1"
+              :aria-hidden="index !== activeIndex"
               draggable="false"
-              @error="handleImageError(ad)"
-            />
-          </component>
+              @click="handleSlideClick($event, index, ad)"
+              @keydown.enter.prevent="handleSlideClick($event, index, ad)"
+              @dragstart.prevent
+            >
+              <img
+                class="ad-image"
+                :src="resolveUrl(ad.image_url)"
+                alt=""
+                draggable="false"
+                @error="handleImageError(ad)"
+              />
+            </component>
+          </div>
+        </div>
+
+        <div
+          v-if="useCoverflow && displayAds.length > 1"
+          class="ad-side-hit is-prev"
+          aria-hidden="true"
+          @click="handleSideHitClick($event, -1)"
+        ></div>
+        <div
+          v-if="useCoverflow && displayAds.length > 1"
+          class="ad-side-hit is-next"
+          aria-hidden="true"
+          @click="handleSideHitClick($event, 1)"
+        ></div>
+
+        <div v-if="useSolo" class="ad-hotspots" aria-hidden="true">
+          <div class="ad-hotspot is-prev" @click.stop="handleSoloZoneClick($event, 'prev')"></div>
+          <div class="ad-hotspot is-link" @click.stop="handleSoloZoneClick($event, 'link')"></div>
+          <div class="ad-hotspot is-next" @click.stop="handleSoloZoneClick($event, 'next')"></div>
+          <div class="ad-hotspot is-swipe"></div>
         </div>
       </div>
 
       <template v-if="displayAds.length > 1">
-        <div v-if="useCoverflow" class="ad-controls">
-          <div class="ad-track" aria-hidden="true">
-            <span
-              v-for="copy in [-1, 0, 1]"
-              :key="copy"
-              class="ad-track__fill"
-              :class="{ 'is-instant': trackInstant }"
-              :style="getTrackFillStyle(copy)"
-            ></span>
+        <div v-if="useCoverflow || useSolo" class="ad-controls">
+          <div
+            ref="trackRef"
+            class="ad-track"
+            role="tablist"
+            aria-label="广告位置"
+            @pointerdown="handleTrackPointerDown"
+            @pointermove="handleTrackPointerMove"
+            @pointerup="handleTrackPointerUp"
+            @pointercancel="handleTrackPointerCancel"
+            @click="handleTrackBarClick"
+          >
+            <div class="ad-track__rail" aria-hidden="true">
+              <span
+                v-for="copy in [-1, 0, 1]"
+                :key="copy"
+                class="ad-track__fill"
+                :class="{ 'is-instant': trackInstant }"
+                :style="getTrackFillStyle(copy)"
+              ></span>
+              <span
+                v-for="tick in trackTicks"
+                :key="`tick-${tick}`"
+                class="ad-track__tick"
+                :style="{ left: `${(tick / displayAds.length) * 100}%` }"
+              ></span>
+            </div>
+            <div class="ad-track__hits">
+              <button
+                v-for="(ad, index) in displayAds"
+                :key="getAdKey(ad, index)"
+                class="ad-track__hit"
+                type="button"
+                role="tab"
+                :aria-label="`切换到第 ${index + 1} 个广告`"
+                :aria-selected="index === activeIndex"
+                @click="handleTrackHitClick($event, index)"
+              ></button>
+            </div>
           </div>
         </div>
 
@@ -114,6 +167,7 @@ const activeIndex = ref(0)
 const loaded = ref(Boolean(cachedAds))
 const failedImages = ref(new Set<string>())
 const carouselRef = ref<HTMLElement | null>(null)
+const trackRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
 const isOrbiting = ref(false)
 const suppressClick = ref(false)
@@ -122,23 +176,37 @@ const visualIndex = ref(0)
 const trackIndex = ref(0)
 const trackInstant = ref(false)
 const prefersReducedMotion = ref(false)
+const isCompact = ref(
+  typeof window !== 'undefined' && window.matchMedia('(max-width: 890px)').matches,
+)
 const isMiniApp = computed(() => isMiniAppRuntime())
+const useSolo = computed(() => isMiniApp.value || isCompact.value)
 const useCoverflow = computed(
-  () => !prefersReducedMotion.value && displayAds.value.length > 0,
+  () => !useSolo.value && !prefersReducedMotion.value && displayAds.value.length > 0,
 )
 const instantSwitch = computed(() => !useCoverflow.value)
+const trackTicks = computed(() => {
+  const total = displayAds.value.length
+  if (total < 2) return []
+  return Array.from({ length: total - 1 }, (_, index) => index + 1)
+})
 let pointerStartX = 0
 let pointerStartY = 0
 let pointerId: number | null = null
 let dragOriginVisual = 0
+let trackPointerId: number | null = null
+let trackStartX = 0
+let trackDragging = false
 let rotationPaused = false
 let rotationTimer: ReturnType<typeof setInterval> | undefined
 let trackSnapTimer: ReturnType<typeof setTimeout> | undefined
 let orbitRaf = 0
 let motionQuery: MediaQueryList | null = null
+let compactQuery: MediaQueryList | null = null
 const ROTATION_MS = 6500
 const TRACK_WRAP_MS = 460
 const ORBIT_MS = 620
+const TRACK_SWIPE_PX = 24
 
 const displayAds = computed(() =>
   ads.value.filter((ad) => Boolean(ad.image_url) && !failedImages.value.has(String(ad.id))),
@@ -159,6 +227,12 @@ watch(displayAds, (list) => {
   snapTrackIndex(activeIndex.value)
   emitHasAd()
   if (list.length < 2) stopRotation()
+})
+
+watch(useCoverflow, () => {
+  stopOrbit()
+  visualIndex.value = activeIndex.value
+  snapTrackIndex(activeIndex.value)
 })
 
 if (loaded.value) emitHasAd()
@@ -449,15 +523,36 @@ function showNext() {
 }
 
 function isButtonTarget(target: EventTarget | null): boolean {
-  return target instanceof Element && Boolean(target.closest('button'))
+  return target instanceof Element && Boolean(target.closest('button, .ad-dot'))
+}
+
+function isChromeTarget(target: EventTarget | null): boolean {
+  return (
+    target instanceof Element &&
+    Boolean(
+      target.closest(
+        '.ad-track, .ad-controls, .ad-dots, .ad-hotspot.is-link, .ad-hotspot.is-prev, .ad-hotspot.is-next',
+      ),
+    )
+  )
 }
 
 function isActiveSlideTarget(target: EventTarget | null): boolean {
   return target instanceof Element && Boolean(target.closest('.ad-slide.is-active'))
 }
 
+function consumeSuppressedClick(event?: Event): boolean {
+  if (!suppressClick.value) return false
+  event?.preventDefault()
+  event?.stopPropagation()
+  suppressClick.value = false
+  return true
+}
+
 function handlePointerDown(event: PointerEvent) {
-  if (displayAds.value.length < 2 || isButtonTarget(event.target)) return
+  if (displayAds.value.length < 2 || isButtonTarget(event.target) || isChromeTarget(event.target)) {
+    return
+  }
   if (useCoverflow.value && isActiveSlideTarget(event.target)) return
 
   stopOrbit()
@@ -618,15 +713,135 @@ function activateAd(index: number, ad: AdItem, event?: Event) {
   openCenterLink(ad, event)
 }
 
-function handleCarouselClick(event: MouseEvent) {
-  if (suppressClick.value) {
-    event.preventDefault()
-    suppressClick.value = false
+function handleSideHitClick(event: MouseEvent, direction: -1 | 1) {
+  if (consumeSuppressedClick(event)) return
+  event.preventDefault()
+  event.stopPropagation()
+  if (direction < 0) {
+    showPrevious()
+  } else {
+    showNext()
+  }
+}
+
+function handleSoloZoneClick(event: MouseEvent, zone: 'prev' | 'next' | 'link') {
+  if (consumeSuppressedClick(event)) return
+  event.preventDefault()
+
+  if (zone === 'prev') {
+    if (displayAds.value.length > 1) showPrevious()
+    return
+  }
+  if (zone === 'next') {
+    if (displayAds.value.length > 1) showNext()
     return
   }
 
+  const ad = displayAds.value[activeIndex.value]
+  if (ad) openCenterLink(ad, event)
+}
+
+function handleTrackPointerDown(event: PointerEvent) {
+  if (displayAds.value.length < 2) return
+
+  event.stopPropagation()
+  trackPointerId = event.pointerId
+  trackStartX = event.clientX
+  trackDragging = false
+  suppressClick.value = false
+  stopRotation()
+}
+
+function handleTrackPointerMove(event: PointerEvent) {
+  if (trackPointerId !== event.pointerId) return
+
+  const deltaX = event.clientX - trackStartX
+  if (Math.abs(deltaX) < 8) return
+
+  trackDragging = true
+  if (trackRef.value && !trackRef.value.hasPointerCapture(event.pointerId)) {
+    trackRef.value.setPointerCapture(event.pointerId)
+  }
+  event.preventDefault()
+}
+
+function finishTrackPointer(event: PointerEvent) {
+  if (trackPointerId !== event.pointerId) return
+
+  const deltaX = event.clientX - trackStartX
+  const shouldFlip = trackDragging && Math.abs(deltaX) >= TRACK_SWIPE_PX
+  const captured = trackRef.value?.hasPointerCapture(event.pointerId)
+
+  trackPointerId = null
+  trackDragging = false
+  if (captured) {
+    trackRef.value?.releasePointerCapture(event.pointerId)
+  }
+
+  if (shouldFlip) {
+    suppressClick.value = true
+    if (deltaX > 0) {
+      showPrevious()
+    } else {
+      showNext()
+    }
+  }
+
+  if (!rotationPaused) startRotation()
+}
+
+function handleTrackPointerUp(event: PointerEvent) {
+  finishTrackPointer(event)
+}
+
+function handleTrackPointerCancel(event: PointerEvent) {
+  if (trackPointerId !== event.pointerId) return
+
+  trackPointerId = null
+  trackDragging = false
+  if (trackRef.value?.hasPointerCapture(event.pointerId)) {
+    trackRef.value.releasePointerCapture(event.pointerId)
+  }
+  if (!rotationPaused) startRotation()
+}
+
+function indexFromTrackX(clientX: number): number | null {
+  const total = displayAds.value.length
+  const el = trackRef.value
+  if (!el || total < 2) return null
+
+  const rect = el.getBoundingClientRect()
+  if (rect.width <= 0) return null
+
+  const ratio = (clientX - rect.left) / rect.width
+  return Math.min(total - 1, Math.max(0, Math.floor(ratio * total)))
+}
+
+function handleTrackBarClick(event: MouseEvent) {
+  if (consumeSuppressedClick(event)) return
+  event.stopPropagation()
+
+  const index = indexFromTrackX(event.clientX)
+  if (index == null) return
+  selectAd(index)
+}
+
+function handleTrackHitClick(event: MouseEvent, index: number) {
+  if (consumeSuppressedClick(event)) return
+  event.stopPropagation()
+  selectAd(index)
+}
+
+function handleCarouselClick(event: MouseEvent) {
+  if (consumeSuppressedClick(event)) return
+
   const target = event.target
-  if (target instanceof Element && target.closest('.ad-slide')) return
+  if (
+    target instanceof Element &&
+    target.closest('.ad-slide, .ad-side-hit, .ad-hotspot, .ad-track, .ad-controls, .ad-dots')
+  ) {
+    return
+  }
 
   const found = findAdAtPoint(event.clientX, event.clientY)
   if (!found) return
@@ -634,9 +849,10 @@ function handleCarouselClick(event: MouseEvent) {
 }
 
 function handleSlideClick(event: MouseEvent | KeyboardEvent, index: number, ad: AdItem) {
-  if (suppressClick.value) {
+  if (consumeSuppressedClick(event)) return
+
+  if (useSolo.value) {
     event.preventDefault()
-    suppressClick.value = false
     return
   }
 
@@ -644,6 +860,15 @@ function handleSlideClick(event: MouseEvent | KeyboardEvent, index: number, ad: 
     event.preventDefault()
     goToAd(index)
     return
+  }
+
+  if (useCoverflow.value && event instanceof MouseEvent) {
+    const found = findAdAtPoint(event.clientX, event.clientY)
+    if (found && found.index !== activeIndex.value) {
+      event.preventDefault()
+      goToAd(found.index)
+      return
+    }
   }
 
   openCenterLink(ad, event)
@@ -655,6 +880,10 @@ function handleImageError(ad: AdItem) {
 
 function syncMotionPreference() {
   prefersReducedMotion.value = Boolean(motionQuery?.matches)
+}
+
+function syncCompactLayout() {
+  isCompact.value = Boolean(compactQuery?.matches)
 }
 
 async function loadAds() {
@@ -692,6 +921,9 @@ onMounted(() => {
   motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
   syncMotionPreference()
   motionQuery.addEventListener('change', syncMotionPreference)
+  compactQuery = window.matchMedia('(max-width: 890px)')
+  syncCompactLayout()
+  compactQuery.addEventListener('change', syncCompactLayout)
   void loadAds()
 })
 
@@ -700,6 +932,7 @@ onUnmounted(() => {
   stopOrbit()
   clearTrackSnap()
   motionQuery?.removeEventListener('change', syncMotionPreference)
+  compactQuery?.removeEventListener('change', syncCompactLayout)
 })
 </script>
 
@@ -710,15 +943,46 @@ onUnmounted(() => {
   width: min(100%, 896px);
   margin: 0 auto 16px;
 
-  &.is-miniapp {
-    width: 100%;
-    max-width: none;
-    margin: 0;
-
+  &.is-solo {
     .ad-carousel,
     .ad-skeleton {
       width: 100%;
+      height: auto;
+      aspect-ratio: auto;
+      overflow: hidden;
+    }
+
+    .ad-stage-wrap,
+    .ad-stage,
+    .ad-slides {
+      height: auto;
+    }
+
+    .ad-slide.is-active {
+      height: auto;
+    }
+
+    .ad-image {
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      object-position: center;
+    }
+
+    .ad-controls {
+      margin-top: 10px;
+    }
+  }
+
+  &.is-miniapp {
+    width: 100%;
+    max-width: none;
+    margin: 0 0 12px;
+
+    .ad-carousel,
+    .ad-skeleton {
       border-radius: 0;
+      background: transparent;
     }
   }
 
@@ -747,6 +1011,7 @@ onUnmounted(() => {
   }
 }
 
+.ad-stage-wrap,
 .ad-stage,
 .ad-slides {
   position: relative;
@@ -858,8 +1123,12 @@ onUnmounted(() => {
     background: transparent;
   }
 
+  .ad-stage-wrap,
   .ad-stage {
     height: auto;
+  }
+
+  .ad-stage {
     perspective: 1480px;
     perspective-origin: 50% 46%;
     transform-style: preserve-3d;
@@ -910,6 +1179,27 @@ onUnmounted(() => {
 
   .ad-slide:not(.is-active) {
     cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .ad-side-hit {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 6;
+    width: calc((100% - var(--ad-card-width)) / 2);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .ad-side-hit.is-prev {
+    left: 0;
+  }
+
+  .ad-side-hit.is-next {
+    right: 0;
   }
 
   .ad-carousel.is-dragging .ad-slide,
@@ -918,40 +1208,134 @@ onUnmounted(() => {
   }
 
   .ad-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin-top: 16px;
   }
+}
 
-  .ad-track {
-    position: relative;
-    overflow: hidden;
-    width: min(168px, 36vw);
-    height: 2px;
-    border-radius: 99px;
-    background: rgba(22, 93, 255, 0.14);
-  }
+.ad-hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 25% 50% 25%;
+  grid-template-rows: 70% 30%;
+  pointer-events: none;
+}
 
-  .ad-track__fill {
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: block;
-    height: 100%;
-    border-radius: inherit;
-    background: #165dff;
-    transform-origin: left center;
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+.ad-hotspot {
+  pointer-events: auto;
+}
 
-    &.is-instant {
-      transition: none;
-    }
-  }
+.ad-hotspot.is-prev,
+.ad-hotspot.is-next {
+  cursor: pointer;
+}
 
-  .ad-carousel.is-dragging .ad-track__fill {
+.ad-hotspot.is-prev {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.ad-hotspot.is-link {
+  grid-column: 2;
+  grid-row: 1;
+  cursor: pointer;
+}
+
+.ad-hotspot.is-next {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.ad-hotspot.is-swipe {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  cursor: grab;
+  touch-action: none;
+}
+
+.ad-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ad-track {
+  position: relative;
+  width: min(248px, 58vw);
+  height: 28px;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.ad-track__rail {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  left: 0;
+  overflow: hidden;
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #d5dbe6 0%, #e8ecf3 42%, #f4f6fa 100%);
+  box-shadow:
+    0 1px 2px rgba(255, 255, 255, 0.9),
+    inset 0 1px 2px rgba(15, 23, 42, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.65);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.ad-track__fill {
+  position: absolute;
+  top: 1px;
+  left: 0;
+  display: block;
+  height: 4px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, #6aa2ff 0%, #165dff 52%, #0b46d6 100%);
+  box-shadow:
+    0 1px 3px rgba(22, 93, 255, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(8, 40, 140, 0.2);
+  transform-origin: left center;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.is-instant {
     transition: none;
   }
+}
+
+.ad-track__tick {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  width: 1px;
+  height: 100%;
+  margin-left: -0.5px;
+  background: rgba(15, 23, 42, 0.22);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.55);
+  pointer-events: none;
+}
+
+.ad-track__hits {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+}
+
+.ad-track__hit {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.ad-carousel.is-dragging .ad-track__fill {
+  transition: none;
 }
 
 .ad-skeleton {
@@ -1028,8 +1412,11 @@ onUnmounted(() => {
     aspect-ratio: var(--ad-image-ratio);
   }
 
-  .ad-banner.is-coverflow .ad-carousel {
+  .ad-banner.is-coverflow .ad-carousel,
+  .ad-banner.is-solo .ad-carousel,
+  .ad-banner.is-miniapp .ad-carousel {
     aspect-ratio: auto;
+    height: auto;
   }
 
   .ad-fallback {
