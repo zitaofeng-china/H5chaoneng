@@ -21,6 +21,7 @@
       @pointermove="handlePointerMove"
       @pointerup="handlePointerUp"
       @pointercancel="handlePointerCancel"
+      @click="handleCarouselClick"
       @keydown="handleKeydown"
       @dragstart.prevent
       @mouseenter="pauseRotation"
@@ -29,13 +30,20 @@
       <div class="ad-stage">
         <div class="ad-stage__sizer" aria-hidden="true"></div>
         <div class="ad-slides">
-          <div
+          <component
+            :is="ad.link_url ? 'a' : 'div'"
             v-for="(ad, index) in displayAds"
             :key="getAdKey(ad, index)"
             class="ad-slide"
-            :class="{ 'is-active': index === activeIndex, 'is-link': Boolean(ad.link_url) }"
+            :class="{
+              'is-active': index === activeIndex,
+              'is-link': Boolean(ad.link_url) && index === activeIndex,
+            }"
             :style="getSlideStyle(index)"
-            :role="ad.link_url ? 'link' : undefined"
+            :href="ad.link_url && index === activeIndex ? resolveUrl(ad.link_url) : undefined"
+            :target="ad.link_url && index === activeIndex ? '_blank' : undefined"
+            :rel="ad.link_url && index === activeIndex ? 'noopener noreferrer' : undefined"
+            :data-index="index"
             :tabindex="ad.link_url && index === activeIndex ? 0 : -1"
             :aria-hidden="index !== activeIndex"
             draggable="false"
@@ -50,7 +58,7 @@
               draggable="false"
               @error="handleImageError(ad)"
             />
-          </div>
+          </component>
         </div>
       </div>
 
@@ -444,8 +452,13 @@ function isButtonTarget(target: EventTarget | null): boolean {
   return target instanceof Element && Boolean(target.closest('button'))
 }
 
+function isActiveSlideTarget(target: EventTarget | null): boolean {
+  return target instanceof Element && Boolean(target.closest('.ad-slide.is-active'))
+}
+
 function handlePointerDown(event: PointerEvent) {
   if (displayAds.value.length < 2 || isButtonTarget(event.target)) return
+  if (useCoverflow.value && isActiveSlideTarget(event.target)) return
 
   stopOrbit()
   pointerId = event.pointerId
@@ -456,7 +469,6 @@ function handlePointerDown(event: PointerEvent) {
   suppressClick.value = false
   dragProgress.value = 0
   stopRotation()
-  carouselRef.value?.setPointerCapture(event.pointerId)
 }
 
 function handlePointerMove(event: PointerEvent) {
@@ -466,7 +478,10 @@ function handlePointerMove(event: PointerEvent) {
   const deltaY = event.clientY - pointerStartY
   if (Math.abs(deltaX) < 8 || Math.abs(deltaX) <= Math.abs(deltaY)) return
 
-  isDragging.value = true
+  if (!isDragging.value) {
+    isDragging.value = true
+    carouselRef.value?.setPointerCapture(event.pointerId)
+  }
   event.preventDefault()
 
   if (!useCoverflow.value) return
@@ -539,13 +554,82 @@ function openAdLink(url: string) {
   if (!url) return
 
   const resolved = resolveUrl(url)
-  const tg = getTelegramWebApp()
-  if (typeof tg?.openLink === 'function') {
-    tg.openLink(resolved)
+  if (isMiniAppRuntime()) {
+    const tg = getTelegramWebApp()
+    if (typeof tg?.openLink === 'function') {
+      tg.openLink(resolved)
+      return
+    }
+  }
+
+  const opened = window.open(resolved, '_blank', 'noopener,noreferrer')
+  if (!opened) {
+    window.location.assign(resolved)
+  }
+}
+
+function findAdAtPoint(clientX: number, clientY: number): { index: number; ad: AdItem } | null {
+  const hit = document.elementFromPoint(clientX, clientY)
+  const slide = hit instanceof Element ? hit.closest('.ad-slide') : null
+  if (!slide || !carouselRef.value?.contains(slide)) return null
+
+  const index = Number(slide.getAttribute('data-index'))
+  if (!Number.isInteger(index) || index < 0 || index >= displayAds.value.length) return null
+
+  return { index, ad: displayAds.value[index] }
+}
+
+function isModifiedClick(event: Event): boolean {
+  return (
+    event instanceof MouseEvent &&
+    (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0)
+  )
+}
+
+function openCenterLink(ad: AdItem, event?: Event) {
+  if (!ad.link_url) return
+
+  if (event && isModifiedClick(event)) return
+
+  if (isMiniAppRuntime() || event instanceof KeyboardEvent) {
+    event?.preventDefault()
+    openAdLink(ad.link_url)
     return
   }
 
-  window.open(resolved, '_blank', 'noopener,noreferrer')
+  if (event instanceof MouseEvent) {
+    const target = event.target
+    const onSlideLink = target instanceof Element && Boolean(target.closest('a.ad-slide'))
+    if (onSlideLink) return
+  }
+
+  event?.preventDefault()
+  openAdLink(ad.link_url)
+}
+
+function activateAd(index: number, ad: AdItem, event?: Event) {
+  if (useCoverflow.value && index !== activeIndex.value) {
+    event?.preventDefault()
+    goToAd(index)
+    return
+  }
+
+  openCenterLink(ad, event)
+}
+
+function handleCarouselClick(event: MouseEvent) {
+  if (suppressClick.value) {
+    event.preventDefault()
+    suppressClick.value = false
+    return
+  }
+
+  const target = event.target
+  if (target instanceof Element && target.closest('.ad-slide')) return
+
+  const found = findAdAtPoint(event.clientX, event.clientY)
+  if (!found) return
+  activateAd(found.index, found.ad, event)
 }
 
 function handleSlideClick(event: MouseEvent | KeyboardEvent, index: number, ad: AdItem) {
@@ -555,15 +639,13 @@ function handleSlideClick(event: MouseEvent | KeyboardEvent, index: number, ad: 
     return
   }
 
-  if (ad.link_url) {
-    openAdLink(ad.link_url)
-    return
-  }
-
   if (useCoverflow.value && index !== activeIndex.value) {
     event.preventDefault()
     goToAd(index)
+    return
   }
+
+  openCenterLink(ad, event)
 }
 
 function handleImageError(ad: AdItem) {
@@ -823,6 +905,10 @@ onUnmounted(() => {
 
   .ad-slide.is-active {
     position: absolute;
+  }
+
+  .ad-slide:not(.is-active) {
+    cursor: pointer;
   }
 
   .ad-carousel.is-dragging .ad-slide,
