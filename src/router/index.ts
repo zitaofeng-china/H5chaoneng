@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { SHOW_WELFARE } from '@/constants/features'
 
 // 路由名称到页面标题的映射
 const routeTitleMap: Record<string, string> = {
@@ -33,11 +34,21 @@ const router = createRouter({
           name: 'Home',
           component: () => import('@/pages/home/index.vue'),
         },
-        {
-          path: 'welfare',
-          name: 'Welfare',
-          component: () => import('@/pages/welfare/index.vue'),
-        },
+        SHOW_WELFARE
+          ? {
+              path: 'welfare',
+              name: 'Welfare',
+              component: () => import('@/pages/welfare/index.vue'),
+            }
+          : {
+              path: 'welfare',
+              name: 'Welfare',
+              redirect: (to) => {
+                const site = to.params.site
+                const sitePath = Array.isArray(site) ? site[0] : site
+                return sitePath ? `/${sitePath}/` : '/'
+              },
+            },
         {
           path: 'lease-time',
           name: 'TimeRentPage',
