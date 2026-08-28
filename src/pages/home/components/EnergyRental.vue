@@ -919,7 +919,7 @@ onUnmounted(() => {
     object-fit: cover;
   }
 
-  &.has-ad.is-miniapp {
+  &.has-ad.is-miniapp:not(:has(.ad-banner.is-coverflow)) {
     width: 100%;
     padding: 0;
 
@@ -2043,7 +2043,7 @@ onUnmounted(() => {
       padding: 14px 12px 4px;
     }
 
-    &.has-ad.is-miniapp {
+    &.has-ad.is-miniapp:not(:has(.ad-banner.is-coverflow)) {
       padding: 0;
     }
 

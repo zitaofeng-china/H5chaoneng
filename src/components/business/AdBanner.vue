@@ -3,7 +3,7 @@
     v-if="showBanner"
     class="ad-banner"
     :class="{
-      'is-miniapp': instantSwitch,
+      'is-miniapp': isMiniApp && !useCoverflow,
       'is-coverflow': useCoverflow,
     }"
     aria-label="广告"
@@ -107,13 +107,11 @@ const dragProgress = ref(0)
 const trackIndex = ref(0)
 const trackInstant = ref(false)
 const prefersReducedMotion = ref(false)
-const instantSwitch = computed(() => isMiniAppRuntime())
+const isMiniApp = computed(() => isMiniAppRuntime())
 const useCoverflow = computed(
-  () =>
-    !instantSwitch.value &&
-    !prefersReducedMotion.value &&
-    displayAds.value.length > 1,
+  () => !prefersReducedMotion.value && displayAds.value.length > 1,
 )
+const instantSwitch = computed(() => !useCoverflow.value)
 let pointerStartX = 0
 let pointerStartY = 0
 let pointerId: number | null = null
