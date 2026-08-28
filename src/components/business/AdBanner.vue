@@ -970,7 +970,7 @@ onUnmounted(() => {
     }
 
     .ad-controls {
-      margin-top: 10px;
+      margin-top: 0;
     }
   }
 
