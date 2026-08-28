@@ -71,14 +71,6 @@
               <SvgIcon name="footer-telegram" width="16" height="16" />
               <span>{{ displayTelegram }}</span>
             </button>
-            <button type="button" class="contact-item" @click="handleOpenEmail(emailContact)">
-              <SvgIcon name="footer-email" width="16" height="16" />
-              <span>{{ emailContact }}</span>
-            </button>
-            <button type="button" class="contact-item" @click="handleOXAccount(twitterHandle)">
-              <SvgIcon name="footer-twitter" width="16" height="16" />
-              <span>{{ displayTwitter }}</span>
-            </button>
           </div>
         </section>
       </div>
@@ -95,7 +87,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { handleOpenEmail, handleOpenToTelegram, handleOXAccount } from '@/utils'
+import { handleOpenToTelegram, handleOXAccount } from '@/utils'
 import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
 import gasLogoMark from '@/assets/images/gas-logo-mark.png'
@@ -122,8 +114,6 @@ const telegramHandle = computed(() => {
 const displayTelegram = computed(() => withAt(telegramHandle.value))
 
 const twitterHandle = computed(() => String(t('footer.twitterContact') || '').trim())
-const displayTwitter = computed(() => withAt(twitterHandle.value))
-const emailContact = computed(() => String(t('footer.emailContact') || '').trim())
 
 const currentYear = computed(() => new Date().getFullYear())
 
