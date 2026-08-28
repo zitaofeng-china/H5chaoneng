@@ -574,9 +574,10 @@ function findAdAtPoint(clientX: number, clientY: number): { index: number; ad: A
   if (!slide || !carouselRef.value?.contains(slide)) return null
 
   const index = Number(slide.getAttribute('data-index'))
-  if (!Number.isInteger(index) || index < 0 || index >= displayAds.value.length) return null
+  const ad = displayAds.value[index]
+  if (!Number.isInteger(index) || !ad) return null
 
-  return { index, ad: displayAds.value[index] }
+  return { index, ad }
 }
 
 function isModifiedClick(event: Event): boolean {
