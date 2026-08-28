@@ -903,7 +903,7 @@ onUnmounted(() => {
   :deep(.ad-skeleton) {
     width: 100%;
     height: auto;
-    aspect-ratio: 16 / 4.5;
+    aspect-ratio: var(--ad-image-ratio, 16 / 7);
     border-radius: 8px;
   }
 
@@ -917,6 +917,7 @@ onUnmounted(() => {
 
   :deep(.ad-image) {
     object-fit: cover;
+    object-position: center;
   }
 
   &.has-ad.is-miniapp:not(:has(.ad-banner.is-coverflow)) {
@@ -2049,7 +2050,7 @@ onUnmounted(() => {
 
     :deep(.ad-banner:not(.is-coverflow) .ad-carousel),
     :deep(.ad-banner:not(.is-coverflow) .ad-skeleton) {
-      aspect-ratio: 16 / 5;
+      aspect-ratio: var(--ad-image-ratio, 16 / 7);
     }
   }
 

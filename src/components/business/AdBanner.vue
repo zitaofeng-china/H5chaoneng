@@ -11,7 +11,11 @@
     <div
       ref="carouselRef"
       class="ad-carousel"
-      :class="{ 'is-dragging': isDragging, 'is-instant': instantSwitch }"
+      :class="{
+        'is-dragging': isDragging,
+        'is-instant': instantSwitch,
+        'is-orbiting': isOrbiting,
+      }"
       tabindex="0"
       @pointerdown="handlePointerDown"
       @pointermove="handlePointerMove"
@@ -23,6 +27,7 @@
       @mouseleave="resumeRotation"
     >
       <div class="ad-stage">
+        <div class="ad-stage__sizer" aria-hidden="true"></div>
         <div class="ad-slides">
           <div
             v-for="(ad, index) in displayAds"
@@ -102,25 +107,30 @@ const loaded = ref(Boolean(cachedAds))
 const failedImages = ref(new Set<string>())
 const carouselRef = ref<HTMLElement | null>(null)
 const isDragging = ref(false)
+const isOrbiting = ref(false)
 const suppressClick = ref(false)
 const dragProgress = ref(0)
+const visualIndex = ref(0)
 const trackIndex = ref(0)
 const trackInstant = ref(false)
 const prefersReducedMotion = ref(false)
 const isMiniApp = computed(() => isMiniAppRuntime())
 const useCoverflow = computed(
-  () => !prefersReducedMotion.value && displayAds.value.length > 1,
+  () => !prefersReducedMotion.value && displayAds.value.length > 0,
 )
 const instantSwitch = computed(() => !useCoverflow.value)
 let pointerStartX = 0
 let pointerStartY = 0
 let pointerId: number | null = null
+let dragOriginVisual = 0
 let rotationPaused = false
 let rotationTimer: ReturnType<typeof setInterval> | undefined
 let trackSnapTimer: ReturnType<typeof setTimeout> | undefined
+let orbitRaf = 0
 let motionQuery: MediaQueryList | null = null
 const ROTATION_MS = 6500
 const TRACK_WRAP_MS = 460
+const ORBIT_MS = 620
 
 const displayAds = computed(() =>
   ads.value.filter((ad) => Boolean(ad.image_url) && !failedImages.value.has(String(ad.id))),
@@ -133,9 +143,11 @@ function emitHasAd() {
 }
 
 watch(displayAds, (list) => {
+  stopOrbit()
   if (activeIndex.value >= list.length) {
     activeIndex.value = 0
   }
+  visualIndex.value = activeIndex.value
   snapTrackIndex(activeIndex.value)
   emitHasAd()
   if (list.length < 2) stopRotation()
@@ -184,22 +196,119 @@ function wrapOffset(offset: number, total: number): number {
   return offset
 }
 
+function easeCoverflow(t: number): number {
+  if (t <= 0) return 0
+  if (t >= 1) return 1
+  return 1 - (1 - t) ** 4
+}
+
+function getCoverflowMetrics() {
+  const banner = carouselRef.value?.closest('.ad-banner')
+  if (banner) {
+    const cs = getComputedStyle(banner)
+    const shift = parseFloat(cs.getPropertyValue('--ad-shift'))
+    const tilt = parseFloat(cs.getPropertyValue('--ad-tilt'))
+    const depth = parseFloat(cs.getPropertyValue('--ad-depth'))
+    if (Number.isFinite(shift) && Number.isFinite(tilt) && Number.isFinite(depth)) {
+      return { shift, tilt, depth }
+    }
+  }
+
+  const mobile = window.matchMedia('(max-width: 768px)').matches
+  return mobile
+    ? { shift: 56, tilt: -28, depth: -72 }
+    : { shift: 70, tilt: -36, depth: -120 }
+}
+
+function getCoverflowTransform(offset: number, shift: number, tilt: number, depth: number): string {
+  const abs = Math.abs(offset)
+  const unit = Math.floor(abs)
+  const frac = abs - unit
+  const angle = frac * (Math.PI / 2)
+  const xPct = offset * shift
+  const zPx = (unit + (1 - Math.cos(angle))) * depth
+  const rot = offset * tilt
+  const scale = 1 - Math.min(abs, 2) * 0.06
+
+  return `translate(-50%, -50%) translateX(${xPct}%) rotateY(${rot}deg) translateZ(${zPx}px) scale(${scale})`
+}
+
 function getSlideStyle(index: number): Record<string, string> | undefined {
   if (!useCoverflow.value) return undefined
 
   const total = displayAds.value.length
-  const offset = wrapOffset(index - activeIndex.value + dragProgress.value, total)
+  const offset = wrapOffset(index - visualIndex.value, total)
   const abs = Math.abs(offset)
-  const hidden = abs > 2.15
+  const hidden = abs > 1.45
+  const { shift, tilt, depth } = getCoverflowMetrics()
 
   return {
     '--ad-offset': String(offset),
     '--ad-abs': String(abs),
+    transform: getCoverflowTransform(offset, shift, tilt, depth),
     zIndex: String(Math.round(24 - abs * 6)),
-    opacity: hidden ? '0' : abs > 1.15 ? String(Math.max(0.28, 0.82 - (abs - 1) * 0.38)) : '1',
-    pointerEvents: hidden || abs > 1.35 ? 'none' : 'auto',
+    opacity: hidden ? '0' : '1',
+    pointerEvents: hidden ? 'none' : 'auto',
     visibility: hidden ? 'hidden' : 'visible',
   }
+}
+
+function stopOrbit() {
+  if (orbitRaf) {
+    cancelAnimationFrame(orbitRaf)
+    orbitRaf = 0
+  }
+  isOrbiting.value = false
+}
+
+function animateVisualTo(target: number) {
+  const total = displayAds.value.length
+  const next = moduloIndex(target, total)
+
+  if (total < 2 || !useCoverflow.value) {
+    visualIndex.value = next
+    return
+  }
+
+  stopOrbit()
+
+  const from = visualIndex.value
+  let step = next - from
+  while (step > total / 2) step -= total
+  while (step < -total / 2) step += total
+
+  if (Math.abs(step) < 0.001) {
+    visualIndex.value = next
+    return
+  }
+
+  const to = from + step
+  const duration = Math.max(280, Math.min(ORBIT_MS, ORBIT_MS * Math.abs(step)))
+  const start = performance.now()
+  isOrbiting.value = true
+
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - start) / duration)
+    visualIndex.value = from + (to - from) * easeCoverflow(t)
+    if (t < 1) {
+      orbitRaf = requestAnimationFrame(tick)
+      return
+    }
+    orbitRaf = 0
+    isOrbiting.value = false
+    const snapped = moduloIndex(Math.round(to), total)
+    if (snapped !== visualIndex.value) {
+      trackInstant.value = true
+      visualIndex.value = snapped
+      requestAnimationFrame(() => {
+        trackInstant.value = false
+      })
+    } else {
+      visualIndex.value = snapped
+    }
+  }
+
+  orbitRaf = requestAnimationFrame(tick)
 }
 
 function getTrackFillStyle(copy: number): Record<string, string> {
@@ -276,6 +385,7 @@ function applyActiveIndex(index: number, step?: number) {
   const delta = step ?? circularStep(from, next, total)
   activeIndex.value = next
   advanceTrack(delta)
+  animateVisualTo(next)
 }
 
 function stopRotation() {
@@ -337,9 +447,11 @@ function isButtonTarget(target: EventTarget | null): boolean {
 function handlePointerDown(event: PointerEvent) {
   if (displayAds.value.length < 2 || isButtonTarget(event.target)) return
 
+  stopOrbit()
   pointerId = event.pointerId
   pointerStartX = event.clientX
   pointerStartY = event.clientY
+  dragOriginVisual = visualIndex.value
   isDragging.value = false
   suppressClick.value = false
   dragProgress.value = 0
@@ -360,27 +472,18 @@ function handlePointerMove(event: PointerEvent) {
   if (!useCoverflow.value) return
 
   const width = carouselRef.value?.clientWidth || 1
-  dragProgress.value = Math.max(-1.2, Math.min(1.2, deltaX / (width * 0.3)))
+  const progress = Math.max(-1.2, Math.min(1.2, deltaX / (width * 0.3)))
+  dragProgress.value = progress
+  visualIndex.value = dragOriginVisual - progress
 }
 
 function finishPointer(event: PointerEvent) {
   if (pointerId !== event.pointerId) return
 
   const deltaX = event.clientX - pointerStartX
-  const progress = dragProgress.value
   const shouldFlip = useCoverflow.value
-    ? Math.abs(progress) >= 0.26
+    ? Math.abs(visualIndex.value - activeIndex.value) >= 0.26
     : isDragging.value && Math.abs(deltaX) >= 40
-
-  if (shouldFlip) {
-    const toPrev = useCoverflow.value ? progress > 0 : deltaX > 0
-    if (toPrev) {
-      showPrevious()
-    } else {
-      showNext()
-    }
-    suppressClick.value = true
-  }
 
   isDragging.value = false
   dragProgress.value = 0
@@ -388,6 +491,19 @@ function finishPointer(event: PointerEvent) {
   if (carouselRef.value?.hasPointerCapture(event.pointerId)) {
     carouselRef.value.releasePointerCapture(event.pointerId)
   }
+
+  if (shouldFlip) {
+    const toPrev = useCoverflow.value ? visualIndex.value < activeIndex.value : deltaX > 0
+    if (toPrev) {
+      showPrevious()
+    } else {
+      showNext()
+    }
+    suppressClick.value = true
+  } else if (useCoverflow.value) {
+    animateVisualTo(activeIndex.value)
+  }
+
   if (!rotationPaused) startRotation()
 }
 
@@ -401,6 +517,10 @@ function handlePointerCancel(event: PointerEvent) {
   isDragging.value = false
   dragProgress.value = 0
   pointerId = null
+  if (carouselRef.value?.hasPointerCapture(event.pointerId)) {
+    carouselRef.value.releasePointerCapture(event.pointerId)
+  }
+  if (useCoverflow.value) animateVisualTo(activeIndex.value)
   if (!rotationPaused) startRotation()
 }
 
@@ -435,13 +555,15 @@ function handleSlideClick(event: MouseEvent | KeyboardEvent, index: number, ad: 
     return
   }
 
-  if (useCoverflow.value && index !== activeIndex.value) {
-    event.preventDefault()
-    goToAd(index)
+  if (ad.link_url) {
+    openAdLink(ad.link_url)
     return
   }
 
-  openAdLink(ad.link_url)
+  if (useCoverflow.value && index !== activeIndex.value) {
+    event.preventDefault()
+    goToAd(index)
+  }
 }
 
 function handleImageError(ad: AdItem) {
@@ -466,6 +588,8 @@ async function loadAds() {
       ads.value = normalizeAds(response.data)
       cachedAds = ads.value
       activeIndex.value = 0
+      visualIndex.value = 0
+      stopOrbit()
       snapTrackIndex(0)
       startRotation()
     } else if (import.meta.env.DEV) {
@@ -490,6 +614,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   stopRotation()
+  stopOrbit()
   clearTrackSnap()
   motionQuery?.removeEventListener('change', syncMotionPreference)
 })
@@ -497,6 +622,8 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .ad-banner {
+  --ad-image-ratio: 16 / 7;
+  --ad-card-width: min(46%, 500px);
   width: min(100%, 896px);
   margin: 0 auto 16px;
 
@@ -522,7 +649,7 @@ onUnmounted(() => {
 .ad-skeleton {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 16 / 4;
+  aspect-ratio: var(--ad-image-ratio);
   border-radius: 6px;
   background: rgba(2, 15, 45, 0.05);
 }
@@ -542,6 +669,10 @@ onUnmounted(() => {
   position: relative;
   width: 100%;
   height: 100%;
+}
+
+.ad-stage__sizer {
+  display: none;
 }
 
 .ad-slide {
@@ -580,6 +711,7 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
@@ -631,9 +763,9 @@ onUnmounted(() => {
 }
 
 .ad-banner.is-coverflow {
-  --ad-shift: 72%;
-  --ad-tilt: -42deg;
-  --ad-depth: -160px;
+  --ad-shift: 70%;
+  --ad-tilt: -36deg;
+  --ad-depth: -120px;
 
   .ad-carousel {
     overflow: visible;
@@ -644,13 +776,24 @@ onUnmounted(() => {
   }
 
   .ad-stage {
-    height: clamp(176px, 23vw, 248px);
+    height: auto;
     perspective: 1480px;
     perspective-origin: 50% 46%;
     transform-style: preserve-3d;
   }
 
+  .ad-stage__sizer {
+    display: block;
+    width: var(--ad-card-width);
+    aspect-ratio: var(--ad-image-ratio);
+    margin-inline: auto;
+    visibility: hidden;
+    pointer-events: none;
+  }
+
   .ad-slides {
+    position: absolute;
+    inset: 0;
     transform-style: preserve-3d;
   }
 
@@ -660,9 +803,9 @@ onUnmounted(() => {
     inset: auto;
     top: 50%;
     left: 50%;
-    width: min(480px, 42%);
+    width: var(--ad-card-width);
     height: auto;
-    aspect-ratio: 16 / 7;
+    aspect-ratio: var(--ad-image-ratio);
     overflow: hidden;
     border-radius: 14px;
     background: #101828;
@@ -670,24 +813,20 @@ onUnmounted(() => {
       0 22px 44px rgba(15, 23, 42, 0.18),
       0 0 0 1px rgba(15, 23, 42, 0.08);
     opacity: 1;
-    transform: translate(-50%, -50%) translateX(calc(var(--ad-offset) * var(--ad-shift)))
-      rotateY(calc(var(--ad-offset) * var(--ad-tilt)))
-      translateZ(calc(var(--ad-abs) * var(--ad-depth)))
-      scale(calc(1 - min(var(--ad-abs), 2) * 0.06));
+    transform: translate(-50%, -50%);
     transform-style: preserve-3d;
     backface-visibility: hidden;
     filter: brightness(calc(1 - min(var(--ad-abs), 1.6) * 0.18));
-    transition:
-      transform 0.62s cubic-bezier(0.22, 1, 0.36, 1),
-      opacity 0.45s ease,
-      filter 0.45s ease;
+    transition: opacity 0.45s ease;
+    will-change: transform;
   }
 
   .ad-slide.is-active {
     position: absolute;
   }
 
-  .ad-carousel.is-dragging .ad-slide {
+  .ad-carousel.is-dragging .ad-slide,
+  .ad-carousel.is-orbiting .ad-slide {
     transition: none;
   }
 
@@ -768,18 +907,13 @@ onUnmounted(() => {
   }
 
   .ad-banner.is-coverflow {
-    --ad-shift: 62%;
-    --ad-tilt: -32deg;
-    --ad-depth: -96px;
+    --ad-shift: 56%;
+    --ad-tilt: -28deg;
+    --ad-depth: -72px;
+    --ad-card-width: min(72%, 360px);
     margin-bottom: 8px;
 
-    .ad-stage {
-      height: clamp(148px, 42vw, 196px);
-    }
-
     .ad-slide {
-      width: min(64%, 360px);
-      aspect-ratio: 16 / 8;
       border-radius: 12px;
     }
 
@@ -804,7 +938,7 @@ onUnmounted(() => {
 
   .ad-carousel,
   .ad-skeleton {
-    aspect-ratio: 16 / 4;
+    aspect-ratio: var(--ad-image-ratio);
   }
 
   .ad-banner.is-coverflow .ad-carousel {
