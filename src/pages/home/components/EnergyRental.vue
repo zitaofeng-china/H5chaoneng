@@ -2145,7 +2145,7 @@ onUnmounted(() => {
     width: 100%;
     box-sizing: border-box;
     margin: 0;
-    padding: 32px 0 0;
+    padding: 12px 0 0;
   }
 
   .rental-title {
