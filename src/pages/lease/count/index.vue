@@ -86,7 +86,8 @@ defineOptions({
 
     :deep(.common-title) {
       margin-bottom: 12px;
-      font-size: 28px;
+      font-size: 22px;
+      font-weight: 700;
     }
   }
 }

@@ -21,7 +21,11 @@
               @click="onSelect(option.rowIndex, option.index)"
             >
               <span class="option-price">{{ option.price }} {{ t('common.trx') }}</span>
-              <span class="option-count">{{ option.count }}{{ t('common.purchase') }}</span>
+              <span class="option-count">{{
+                isMobile
+                  ? t('transferRental.buyCount', { count: option.count })
+                  : `${option.count}${t('common.purchase')}`
+              }}</span>
             </button>
             <button
               type="button"
@@ -62,19 +66,45 @@
           :rules="rules"
           label-position="top"
           label-suffix=""
+          hide-required-asterisk
           class="details-form"
           :class="{ 'derail-form-m': isMobile }"
         >
           <el-form-item :label="t('lease.totalPrice')" prop="total">
             <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile }">
-              <template #prefix v-if="isMobile"> {{ t('lease.totalPrice') }} </template>
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.totalPrice') }}<span class="req-star">*</span>
+                </span>
+              </template>
               <template #suffix> {{ t('common.trx') }} </template>
             </el-input>
           </el-form-item>
-          <el-form-item :label="t('lease.walletAddress')" prop="wallet">
-            <el-input v-model="wallet" :placeholder="t('lease.enterAddress')" />
+          <el-form-item
+            :label="t('lease.walletAddress')"
+            prop="wallet"
+            :show-message="false"
+            class="wallet-field"
+            :class="{ 'is-invalid': walletShowError }"
+          >
+            <el-input
+              v-model="wallet"
+              :placeholder="walletPlaceholder"
+              :class="{ 'm-input': isMobile }"
+            >
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.walletAddress') }}
+                </span>
+              </template>
+              <template #suffix v-if="isMobile && walletShowError && !wallet">
+                <span class="wallet-error-hint">{{ t('formValidation.walletRequired') }}</span>
+              </template>
+            </el-input>
           </el-form-item>
-          <el-form-item :label="$t('home.savedAddress')" prop="selectedAddress">
+          <el-form-item :label="$t('home.savedAddress')" prop="selectedAddress" :show-message="false">
             <template #label>
               <span class="saved-address-label">
                 <span>{{ $t('home.savedAddress') }}</span>
@@ -84,47 +114,69 @@
                 </span>
               </span>
             </template>
-            <el-select
-              v-model="selectedAddress"
-              :placeholder="$t('home.selectSavedAddress')"
-              style="width: 100%"
-              :class="{ 'm-input': isMobile }"
+            <div
+              class="saved-select-wrap"
+              :class="{ 'mobile-combo': isMobile, 'has-value': !!selectedAddress }"
             >
-              <template #empty>
-                <div class="custom-empty">
-                  {{ $t('home.noSavedAddress') }}
-                </div>
-              </template>
-              <el-option
-                v-for="addr in addressOptions"
-                :key="addr.value"
-                :label="addr.label"
-                :value="addr.value"
+              <el-select
+                v-model="selectedAddress"
+                :placeholder="$t('home.selectSavedAddress')"
+                style="width: 100%"
+                :class="{ 'm-input': isMobile }"
+                popper-class="count-saved-address-dropdown"
+                placement="bottom-start"
+                :fallback-placements="['bottom-start', 'top-start']"
+                :offset="4"
+                fit-input-width
+                :show-arrow="false"
+                :popper-options="savedDropdownPopperOptions"
               >
-                <div class="address-option">
-                  <span class="address-text">{{ addr.label }}</span>
-                  <svg
-                    class="delete-icon"
-                    width="24"
-                    height="24"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    @click.stop="handleDeleteAddress(addr.value)"
-                  >
-                    <rect opacity="0.1" width="24" height="24" rx="4.5" fill="#020F2D"/>
-                    <g opacity="0.6" clip-path="url(#count-rental-delete-icon)">
-                      <path d="M12.0002 11.1161L8.46101 7.57695C8.22392 7.33985 7.82483 7.3365 7.58076 7.58057C7.33498 7.82635 7.33506 8.21876 7.57713 8.46083L11.1163 12L7.57713 15.5391C7.34003 15.7762 7.33668 16.1753 7.58076 16.4194C7.82654 16.6652 8.21894 16.6651 8.46102 16.423L12.0002 12.8839L15.5393 16.423C15.7764 16.6601 16.1755 16.6635 16.4196 16.4194C16.6654 16.1736 16.6653 15.7812 16.4232 15.5392L12.8841 12L16.4232 8.46083C16.6603 8.22373 16.6637 7.82465 16.4196 7.58057C16.1738 7.33479 15.7814 7.33487 15.5393 7.57695L12.0002 11.1161Z" fill="white"/>
-                    </g>
-                    <defs>
-                      <clipPath id="count-rental-delete-icon">
-                        <rect width="10" height="10" fill="white" transform="translate(7 7)"/>
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </div>
-              </el-option>
-            </el-select>
+                <template #prefix v-if="isMobile">
+                  <span class="inline-label">
+                    <span class="label-marker" aria-hidden="true"></span>
+                    {{ $t('home.savedAddress') }}
+                  </span>
+                </template>
+                <template #empty>
+                  <div class="custom-empty">
+                    {{ $t('home.noSavedAddress') }}
+                  </div>
+                </template>
+                <el-option
+                  v-for="addr in addressOptions"
+                  :key="addr.value"
+                  :label="addr.label"
+                  :value="addr.value"
+                >
+                  <div class="address-option">
+                    <span class="address-text">{{ addr.label }}</span>
+                    <svg
+                      class="delete-icon"
+                      width="24"
+                      height="24"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      @click.stop="handleDeleteAddress(addr.value)"
+                    >
+                      <rect opacity="0.1" width="24" height="24" rx="4.5" fill="#020F2D"/>
+                      <g opacity="0.6" clip-path="url(#count-rental-delete-icon)">
+                        <path d="M12.0002 11.1161L8.46101 7.57695C8.22392 7.33985 7.82483 7.3365 7.58076 7.58057C7.33498 7.82635 7.33506 8.21876 7.57713 8.46083L11.1163 12L7.57713 15.5391C7.34003 15.7762 7.33668 16.1753 7.58076 16.4194C7.82654 16.6652 8.21894 16.6651 8.46102 16.423L12.0002 12.8839L15.5393 16.423C15.7764 16.6601 16.1755 16.6635 16.4196 16.4194C16.6654 16.1736 16.6653 15.7812 16.4232 15.5392L12.8841 12L16.4232 8.46083C16.6603 8.22373 16.6637 7.82465 16.4196 7.58057C16.1738 7.33479 15.7814 7.33487 15.5393 7.57695L12.0002 11.1161Z" fill="white"/>
+                      </g>
+                      <defs>
+                        <clipPath id="count-rental-delete-icon">
+                          <rect width="10" height="10" fill="white" transform="translate(7 7)"/>
+                        </clipPath>
+                      </defs>
+                    </svg>
+                  </div>
+                </el-option>
+              </el-select>
+            </div>
+            <p v-if="isMobile" class="mobile-save-tip">
+              <SvgIcon name="fee-info" width="12" height="12" />
+              <span>{{ $t('home.saveTip') }}</span>
+            </p>
           </el-form-item>
 
           <el-form-item>
@@ -192,6 +244,30 @@ import { useCountRental } from './useCountRental'
 
 defineOptions({ name: 'CountRental' })
 
+const savedDropdownPopperOptions = {
+  modifiers: [
+    {
+      name: 'sameWidth',
+      enabled: true,
+      phase: 'beforeWrite' as const,
+      requires: ['computeStyles'],
+      fn({
+        state,
+      }: {
+        state: {
+          styles: { popper: Record<string, string> }
+          rects: { reference: { width: number } }
+        }
+      }) {
+        const width = `${Math.round(state.rects.reference.width)}px`
+        state.styles.popper.width = width
+        state.styles.popper.minWidth = width
+        state.styles.popper.maxWidth = width
+      },
+    },
+  ],
+}
+
 const {
   t,
   isMobile,
@@ -205,6 +281,8 @@ const {
   customCount,
   selectedAddress,
   wallet,
+  walletPlaceholder,
+  walletShowError,
   addressOptions,
   totalDisplay,
   formRef,
@@ -222,14 +300,12 @@ const {
 
 const countOptions = computed(() => {
   return rows.value.flatMap((row, rowIndex) =>
-    row.counts
-      .map((count, index) => ({
-        rowIndex,
-        index,
-        count,
-        price: row.prices[index],
-      }))
-      .filter((option) => option.count !== 7),
+    row.counts.map((count, index) => ({
+      rowIndex,
+      index,
+      count,
+      price: row.prices[index],
+    })),
   )
 })
 </script>
@@ -237,4 +313,124 @@ const countOptions = computed(() => {
 <style scoped lang="scss">
 @use '@/assets/styles/detail-form.scss';
 @use './CountRental.scss';
+</style>
+
+<style lang="scss">
+.count-saved-address-dropdown.el-popper {
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid #dcdfe6;
+  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+
+  .el-popper__arrow {
+    display: none !important;
+  }
+
+  .el-select-dropdown {
+    box-sizing: border-box;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .el-select-dropdown__wrap,
+  .el-scrollbar,
+  .el-scrollbar__wrap {
+    max-width: 100%;
+  }
+
+  .el-select-dropdown__empty {
+    padding: 0 !important;
+  }
+
+  .custom-empty {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 36px;
+    min-height: 36px;
+    padding: 0 12px;
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+  }
+
+  .el-select-dropdown__list {
+    padding: 0;
+    margin: 0;
+  }
+
+  .el-select-dropdown__item {
+    height: 40px !important;
+    min-height: 40px !important;
+    padding: 0 12px !important;
+    overflow: hidden !important;
+    border-radius: 0;
+    color: #334155;
+    font-size: 13px;
+    line-height: 40px !important;
+  }
+
+  .el-select-dropdown__item.is-hovering,
+  .el-select-dropdown__item:hover {
+    background: #f5f7fa;
+  }
+
+  .el-select-dropdown__item.is-selected {
+    color: var(--theme-bg-blue, #165dff);
+    font-weight: 600;
+    background: #f0f5ff;
+  }
+
+  .address-option {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    min-height: 40px !important;
+    overflow: hidden !important;
+  }
+
+  .address-text {
+    display: block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    padding-right: 28px !important;
+    line-height: 40px !important;
+    font-size: 13px !important;
+  }
+
+  .delete-icon {
+    position: absolute !important;
+    top: 50% !important;
+    right: 0 !important;
+    width: 20px !important;
+    height: 20px !important;
+    transform: translateY(-50%) !important;
+  }
+}
+
+@media (min-width: 891px) {
+  .count-saved-address-dropdown.el-popper {
+    padding: 4px 0;
+    border-radius: 3px;
+    border-color: #e7ecf3;
+  }
+
+  .count-saved-address-dropdown.el-popper .custom-empty {
+    height: 40px;
+    min-height: 40px;
+  }
+}
 </style>

@@ -743,7 +743,7 @@ const rentNow = async () => {
   }
 
   :deep(.el-input__wrapper) {
-    min-height: 34px;
+    min-height: 38px;
     padding: 1px 10px;
     border-radius: 3px;
     background: #fff;
@@ -756,7 +756,7 @@ const rentNow = async () => {
   }
 
   :deep(.el-input__inner) {
-    height: 32px;
+    height: 36px;
     color: #344054;
     font-size: 12px;
     font-weight: 600;
@@ -780,15 +780,27 @@ const rentNow = async () => {
 }
 
 :deep(.rent-btn) {
+  box-sizing: border-box;
   width: 100%;
   height: 38px;
+  min-height: 38px;
   margin-top: 4px;
+  padding: 0 12px;
   border: none;
   border-radius: 3px;
   background: var(--theme-bg-orange);
   color: var(--theme-text-white);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
+  line-height: 1;
+  --el-button-size: 38px;
+
+  &:hover,
+  &:focus {
+    border-color: transparent;
+    background: #f45d0f;
+    color: var(--theme-text-white);
+  }
 }
 
 @media (max-width: 890px) {
@@ -946,13 +958,16 @@ const rentNow = async () => {
   }
 
   :deep(.el-input__wrapper) {
-    min-height: 36px;
+    min-height: 38px;
   }
 
   :deep(.rent-btn) {
-    height: 42px;
+    height: 38px;
+    min-height: 38px;
     margin-top: 6px;
+    padding: 0 12px;
     font-size: 13px;
+    --el-button-size: 38px;
   }
 }
 </style>

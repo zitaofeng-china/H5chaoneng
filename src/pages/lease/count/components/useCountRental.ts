@@ -66,7 +66,7 @@ export function useCountRental() {
   })
 
   const rows = computed(() => {
-    const counts = [1, 3, 5, 7, 10]
+    const counts = [1, 2, 4, 20]
     return [
       {
         options: counts.map((count) => {
@@ -96,6 +96,7 @@ export function useCountRental() {
   const isCustom = ref(false)
   const customCount = ref<number>(1)
   const selectedAddress = ref('')
+  const walletShowError = ref(false)
   const bindAddressKind = AddressKind.COUNT_RENTAL
 
   const getBindAddressMap = (): BindAddressMap => {
@@ -131,6 +132,18 @@ export function useCountRental() {
 
   const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
   const totalDisplay = computed(() => formatCryptoAmount(total.value))
+
+  const walletPlaceholder = computed(() => {
+    if (walletShowError.value && !wallet.value) {
+      return isMobile.value ? '' : t('formValidation.walletRequired')
+    }
+    return isMobile.value ? t('countRental.enterAddress') : t('lease.enterAddress')
+  })
+
+  const applyEmptyWalletFeedback = () => {
+    if (wallet.value || selectedAddress.value) return
+    walletShowError.value = true
+  }
 
   const formRef = ref<FormInstance>()
   const form = reactive<RentalForm>({
@@ -202,13 +215,25 @@ export function useCountRental() {
 
   watch(wallet, (v) => {
     form.wallet = v
+    if (v) {
+      walletShowError.value = false
+      formRef.value?.clearValidate(['wallet', 'selectedAddress'])
+    }
   })
   watch(selectedAddress, (v) => {
     form.selectedAddress = v
+    if (v) {
+      walletShowError.value = false
+      formRef.value?.clearValidate(['wallet', 'selectedAddress'])
+    }
   })
 
   const handleSaveAddress = async () => {
     if (!formRef.value) return
+
+    if (!wallet.value) {
+      applyEmptyWalletFeedback()
+    }
 
     try {
       await formRef.value.validateField('wallet')
@@ -235,6 +260,10 @@ export function useCountRental() {
         await userStore.fetchUserInfo({ force: true })
       }
     } catch (error) {
+      if (!wallet.value) {
+        applyEmptyWalletFeedback()
+        return
+      }
       console.error('【ERROR INFO】:', error)
     }
   }
@@ -298,6 +327,10 @@ export function useCountRental() {
   const handleRent = async () => {
     if (!formRef.value) return
 
+    if (!wallet.value && !selectedAddress.value) {
+      applyEmptyWalletFeedback()
+    }
+
     try {
       await formRef.value.validate()
 
@@ -317,7 +350,10 @@ export function useCountRental() {
         selectedAddress.value = ''
       }
     } catch (error) {
-      console.error('【ERROR INFO】:', error)
+      applyEmptyWalletFeedback()
+      if (wallet.value || selectedAddress.value) {
+        console.error('【ERROR INFO】:', error)
+      }
     }
   }
 
@@ -352,6 +388,8 @@ export function useCountRental() {
     customCount,
     selectedAddress,
     wallet,
+    walletPlaceholder,
+    walletShowError,
     addressOptions,
     totalDisplay,
     formRef,
