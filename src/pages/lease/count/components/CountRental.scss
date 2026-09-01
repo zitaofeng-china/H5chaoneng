@@ -587,9 +587,15 @@
       box-shadow: 0 0 0 1px #dcdfe6 !important;
     }
 
+    :deep(.wallet-field .el-input__wrapper),
+    :deep(.wallet-field .el-input__wrapper:hover),
+    :deep(.wallet-field .el-input.is-focus .el-input__wrapper) {
+      background: #fff;
+    }
+
     :deep(.wallet-field.is-error .el-input__wrapper),
     :deep(.wallet-field.is-invalid .el-input__wrapper) {
-      background: #f2f4f7;
+      background: #fff;
       box-shadow: 0 0 0 2px #f56c6c !important;
     }
 
@@ -662,11 +668,14 @@
   }
 
   .mobile-combo {
-    :deep(.el-select__wrapper) {
+    :deep(.el-select__wrapper),
+    :deep(.el-select__wrapper:hover),
+    :deep(.el-select__wrapper.is-hovering),
+    :deep(.el-select__wrapper.is-focused) {
       min-height: 44px;
       padding: 0 14px 0 0;
       border-radius: 4px;
-      background: #f2f4f7;
+      background: #fff;
       box-shadow: 0 0 0 1px #dcdfe6;
     }
 
@@ -720,7 +729,7 @@
 
   .details-form :deep(.el-form-item.is-error .mobile-combo .el-select__wrapper),
   .details-form :deep(.el-form-item.is-error .el-select__wrapper) {
-    background: #f2f4f7;
+    background: #fff;
     box-shadow: 0 0 0 1px #dcdfe6 !important;
   }
 
