@@ -197,13 +197,19 @@
       <KindTips :tips="tips" />
     </div>
 
-    <!-- USDT 付款地址弹窗 -->
+    <!-- USDT 付款地址弹窗：挂到 body，避免被页面 isolation / Telegram 浮标压住 -->
     <el-dialog
       v-model="showPaymentDialog"
       :title="t('countRental.usdtPaymentTitle')"
-      width="500px"
+      :width="isMobile ? '90%' : '500px'"
+      class="count-usdt-payment-dialog"
+      :class="{ 'is-mobile': isMobile }"
+      modal-class="count-usdt-payment-overlay"
+      append-to-body
+      align-center
+      center
+      :z-index="3000"
       :close-on-click-modal="false"
-      :class="{ 'mobile-dialog': isMobile }"
     >
       <div class="payment-dialog">
         <!-- 温馨提示移到顶部 -->
@@ -239,7 +245,7 @@
 <script setup lang="ts">
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
-import { computed } from 'vue'
+import { computed, onUnmounted, watch } from 'vue'
 import { useCountRental } from './useCountRental'
 
 defineOptions({ name: 'CountRental' })
@@ -297,6 +303,18 @@ const {
   handleRent,
   handleBuy,
 } = useCountRental()
+
+watch(
+  showPaymentDialog,
+  (open) => {
+    document.body.classList.toggle('count-usdt-payment-open', open)
+  },
+  { immediate: true },
+)
+
+onUnmounted(() => {
+  document.body.classList.remove('count-usdt-payment-open')
+})
 
 const countOptions = computed(() => {
   return rows.value.flatMap((row, rowIndex) =>
@@ -432,5 +450,96 @@ const countOptions = computed(() => {
     height: 40px;
     min-height: 40px;
   }
+}
+
+.count-usdt-payment-overlay .el-overlay-dialog {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: 16px 0;
+}
+
+.count-usdt-payment-dialog.el-dialog {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  margin: auto !important;
+
+  .el-dialog__header,
+  .el-dialog__header.show-close {
+    margin: 0;
+    padding: 16px 44px 12px 20px;
+    text-align: center;
+  }
+
+  .el-dialog__title {
+    color: #182230;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+
+  .el-dialog__headerbtn {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+  }
+
+  .el-dialog__body {
+    padding: 4px 20px 20px;
+  }
+}
+
+.count-usdt-payment-dialog.is-mobile.el-dialog {
+  width: 90% !important;
+  max-width: 400px;
+  max-height: min(85vh, 720px);
+  height: auto;
+  border-radius: 12px;
+
+  .el-dialog__header,
+  .el-dialog__header.show-close {
+    flex-shrink: 0;
+    padding: 14px 40px 10px 16px;
+  }
+
+  .el-dialog__title {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  .el-dialog__headerbtn {
+    top: 10px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .el-dialog__body {
+    flex: 0 1 auto;
+    min-height: 0;
+    padding: 0 14px 16px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+body.count-usdt-payment-open {
+  overflow: hidden !important;
+}
+
+body.count-usdt-payment-open .app-shell {
+  overflow: hidden !important;
+}
+
+body.count-usdt-payment-open .telegram-float {
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 </style>

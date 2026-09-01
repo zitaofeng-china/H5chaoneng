@@ -434,6 +434,9 @@
 
       span {
         flex: 1;
+        min-width: 0;
+        word-break: keep-all;
+        overflow-wrap: anywhere;
       }
     }
   }
@@ -750,49 +753,68 @@
     }
   }
 
-  :deep(.el-dialog) {
-    width: 90% !important;
-    max-width: 400px;
-    margin: auto;
-    border-radius: 10px;
-  }
-
-  :deep(.el-dialog__header) {
-    margin: 0;
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--theme-border-light);
-  }
-
-  :deep(.el-dialog__body) {
-    margin: 0;
-    padding: 14px 16px;
-  }
-
   .payment-dialog {
     .payment-tips {
-      margin-bottom: 14px;
-      padding: 11px;
+      margin-bottom: 12px;
+      padding: 10px 12px;
 
       .tip-item {
-        font-size: 11px;
+        gap: 6px;
+        margin-bottom: 6px;
+        font-size: 12px;
+        line-height: 1.55;
+
+        svg {
+          margin-top: 3px;
+        }
       }
     }
 
     :deep(.qr-section) {
-      padding: 0 !important;
+      padding: 4px 0 8px !important;
 
       .section-title {
+        margin-bottom: 8px;
         font-size: 14px;
       }
 
-      .qr-code {
-        width: 172px !important;
-        height: 172px !important;
+      .qr-code,
+      .status-container {
+        width: 160px !important;
+        height: 160px !important;
       }
 
       .wallet-address {
+        display: inline-flex;
+        box-sizing: border-box;
+        width: auto;
+        max-width: 100%;
+        align-items: flex-start;
+        justify-content: center;
         margin-top: 8px;
-        font-size: 11px;
+        padding: 0 4px;
+        font-size: 12px;
+
+        .address-text {
+          flex: 0 1 auto;
+          min-width: 0;
+          max-width: calc(100% - 28px);
+          overflow: visible;
+          font-size: 12px;
+          line-height: 1.45;
+          text-align: left;
+          text-overflow: unset;
+          white-space: normal;
+          word-break: break-all;
+          overflow-wrap: anywhere;
+        }
+      }
+
+      .tips-info {
+        margin-top: 8px;
+        padding: 0;
+        font-size: 12px;
+        line-height: 1.45;
       }
     }
   }
