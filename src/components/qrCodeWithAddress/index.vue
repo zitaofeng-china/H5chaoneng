@@ -262,22 +262,35 @@ const handleRetry = () => {
     }
 
     .wallet-address {
-      gap: 4px;
+      display: inline-flex;
+      box-sizing: border-box;
+      width: auto;
+      max-width: 100%;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 6px;
+      padding: 0 4px;
       font-size: 12px;
-      padding: 0 12px;
 
       .address-text {
-        font-size: 11px;
-        line-height: 1.4;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
+        flex: 0 1 auto;
+        min-width: 0;
+        max-width: calc(100% - 28px);
+        font-size: 12px;
+        line-height: 1.45;
+        overflow: visible;
+        text-align: left;
+        text-overflow: unset;
+        white-space: normal;
+        word-break: break-all;
+        overflow-wrap: anywhere;
       }
-      
+
       .copy-button {
-        height: 20px !important;
-        width: 20px !important;
-        min-width: 20px !important;
+        margin-top: 1px !important;
+        height: 22px !important;
+        width: 22px !important;
+        min-width: 22px !important;
       }
     }
 
