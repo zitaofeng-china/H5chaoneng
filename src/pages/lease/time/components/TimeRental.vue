@@ -104,64 +104,90 @@
           :class="{ 'derail-form-m': isMobile }"
         >
           <el-form-item :label="t('lease.unitPrice')" prop="unitPrice">
-            <el-input :model-value="unitPriceDisplay" disabled class="m-input" v-if="isMobile">
-              <template #prefix>{{ t('lease.unitPrice') }}</template>
-              <template #suffix> {{ t('common.trx') }} </template>
-            </el-input>
-            <el-input :model-value="unitPriceDisplay" disabled v-else>
+            <el-input :model-value="unitPriceDisplay" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.unitPrice') }}<span class="req-star">*</span>
+                </span>
+              </template>
               <template #suffix>{{ t('common.trx') }}</template>
             </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.count')" prop="count">
-            <el-input v-model="count" disabled class="m-input" v-if="isMobile">
-              <template #prefix>{{ t('lease.count') }}</template>
-              <template #suffix> {{ t('common.purchase') }} </template>
-            </el-input>
-            <el-input :model-value="count" disabled v-else>
+            <el-input :model-value="count" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.count') }}<span class="req-star">*</span>
+                </span>
+              </template>
               <template #suffix>{{ t('common.purchase') }}</template>
             </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.totalPrice')" prop="total">
-            <el-input :model-value="totalDisplay" class="m-input" disabled>
-              <template #prefix v-if="isMobile">{{ t('lease.totalPrice') }}</template>
-              <template #suffix> {{ t('common.trx') }} </template>
+            <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.totalPrice') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ t('common.trx') }}</template>
             </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.validity')" prop="validity">
-            <el-input v-model="validity" disabled class="m-input" v-if="isMobile">
-              <template #prefix>{{ t('lease.validity') }}</template>
-              <template #suffix> {{ validityUnit }} </template>
-            </el-input>
-            <el-input :model-value="validity" disabled v-else>
+            <el-input :model-value="validity" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.validity') }}<span class="req-star">*</span>
+                </span>
+              </template>
               <template #suffix>{{ validityUnit }}</template>
             </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.singleEnergy')" prop="energy">
-            <el-input v-model="energy" disabled class="m-input" v-if="isMobile">
-              <template #prefix v-if="isMobile">{{ t('lease.singleEnergy') }}</template>
-              <template #suffix> {{ t('common.w') }} </template>
-            </el-input>
-            <el-input :model-value="energy" disabled v-else>
+            <el-input :model-value="energy" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.singleEnergy') }}<span class="req-star">*</span>
+                </span>
+              </template>
               <template #suffix>{{ t('common.w') }}</template>
             </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.totalEnergy')" prop="totalEnergy">
-            <el-input v-model="totalEnergy" disabled class="m-input" v-if="isMobile">
-              <template #prefix v-if="isMobile">{{ t('lease.totalEnergy') }}</template>
-              <template #suffix> {{ t('common.w') }} </template>
-            </el-input>
-            <el-input :model-value="totalEnergy" disabled v-else>
+            <el-input :model-value="totalEnergy" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.totalEnergy') }}<span class="req-star">*</span>
+                </span>
+              </template>
               <template #suffix>{{ t('common.w') }}</template>
             </el-input>
           </el-form-item>
 
-          <el-form-item :label="t('lease.walletAddress')" prop="wallet">
-            <el-input v-model="wallet" :placeholder="t('lease.enterAddress')" />
+          <el-form-item :label="t('lease.walletAddress')" prop="wallet" class="wallet-field">
+            <el-input
+              v-model="wallet"
+              :placeholder="walletPlaceholder"
+              :class="{ 'm-input': isMobile }"
+            >
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.walletAddress') }}<span class="req-star">*</span>
+                </span>
+              </template>
+            </el-input>
           </el-form-item>
 
           <el-form-item>
@@ -372,6 +398,9 @@ const validityUnit = computed(() => {
   return unit === 'hour' ? t('common.hour') : t('common.day')
 })
 const wallet = ref('')
+const walletPlaceholder = computed(() =>
+  isMobile.value ? t('countRental.enterAddress') : t('lease.enterAddress'),
+)
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
 const totalDisplay = computed(() => formatCryptoAmount(total.value))
@@ -687,6 +716,23 @@ const rentNow = async () => {
   }
 }
 
+.inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  color: var(--theme-text-black);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.req-star {
+  margin-left: 1px;
+  color: #f56c6c;
+  font-weight: 700;
+}
+
 .details-card {
   margin-top: 0;
 
@@ -850,50 +896,60 @@ const rentNow = async () => {
 
     :deep(.el-select) {
       width: 100%;
+    }
 
-      .el-input__wrapper {
-        min-height: 40px;
-        padding: 0 12px;
-        border: 1px solid #e1e6ee;
-        border-radius: 8px;
-        background: #fff;
-        box-shadow: none;
-      }
+    :deep(.el-select .el-input__wrapper),
+    :deep(.el-select__wrapper),
+    :deep(.el-select__wrapper:hover),
+    :deep(.el-select__wrapper.is-hovering),
+    :deep(.el-select__wrapper.is-focused) {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 0 0 1px #dcdfe6;
+    }
 
-      .el-input__inner {
-        height: 40px;
-        color: #344054;
-        font-size: 13px;
-      }
+    :deep(.el-select .el-input__inner) {
+      height: 44px;
+      color: #344054;
+      font-size: 14px;
+    }
+
+    :deep(.el-select__placeholder),
+    :deep(.el-select__selected-item) {
+      color: #344054;
+      font-size: 14px;
+      font-weight: 500;
     }
 
     .count-package-panel {
       box-sizing: border-box;
       padding: 10px;
       border: 1px solid #e5e7eb;
-      border-radius: 12px;
+      border-radius: 4px;
       background: #fff;
     }
 
     .row-options {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
-      gap: 8px;
+      gap: 4px;
     }
 
     .pill {
       flex-direction: row;
       height: 32px;
       padding: 0 4px;
-      border-radius: 8px;
-      background: #f3f4f6;
+      border-radius: 4px;
+      background: #e5e7eb;
       color: #667085;
       font-size: 12px;
       font-weight: 600;
       box-shadow: none;
 
       &:hover {
-        background: #e8eaed;
+        background: #d1d5db;
         color: #344054;
       }
 
@@ -916,9 +972,9 @@ const rentNow = async () => {
       :deep(.el-input__wrapper) {
         min-height: 40px;
         padding: 0 12px;
-        border-radius: 8px;
-        background: #fff;
-        box-shadow: 0 0 0 1px #e5e7eb inset;
+        border-radius: 4px;
+        background: #f2f4f7;
+        box-shadow: 0 0 0 1px #dcdfe6;
       }
 
       :deep(.el-input__inner) {
@@ -944,30 +1000,109 @@ const rentNow = async () => {
     }
   }
 
-  :deep(.el-form-item) {
-    margin-bottom: 8px;
+  .inline-label {
+    font-size: 14px;
+    font-weight: 600;
   }
 
-  :deep(.el-input__inner) {
-    font-size: 13px;
+  .label-marker {
+    width: 3px;
+    height: 14px;
+    margin-right: 8px;
+    margin-left: 0;
+    border-radius: 2px;
+    background: var(--theme-bg-blue);
   }
 
-  :deep(.el-input__prefix),
-  :deep(.el-input__suffix) {
-    font-size: 12px;
-  }
+  .details-form {
+    :deep(.el-form-item) {
+      margin-bottom: 8px;
+    }
 
-  :deep(.el-input__wrapper) {
-    min-height: 38px;
+    :deep(.el-form-item__label) {
+      display: none !important;
+    }
+
+    :deep(.el-form-item__content) {
+      margin-left: 0 !important;
+    }
+
+    :deep(.el-input__wrapper) {
+      min-height: 44px;
+      padding: 0 14px 0 0;
+      border-radius: 4px;
+      background: #f2f4f7;
+      box-shadow: 0 0 0 1px #dcdfe6;
+    }
+
+    :deep(.el-input.is-disabled .el-input__wrapper) {
+      background: #f2f4f7;
+      box-shadow: 0 0 0 1px #dcdfe6;
+      cursor: default;
+    }
+
+    :deep(.el-form-item.is-error .el-input__wrapper),
+    :deep(.el-input.is-error .el-input__wrapper) {
+      background: #f2f4f7;
+      box-shadow: 0 0 0 1px #dcdfe6 !important;
+    }
+
+    :deep(.wallet-field .el-input__wrapper),
+    :deep(.wallet-field .el-input__wrapper:hover),
+    :deep(.wallet-field .el-input.is-focus .el-input__wrapper) {
+      background: #fff;
+    }
+
+    :deep(.wallet-field.is-error .el-input__wrapper) {
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--el-color-danger) inset !important;
+    }
+
+    :deep(.el-input__inner) {
+      height: 44px;
+      text-align: right;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+      --el-input-placeholder-color: #94a3b8;
+    }
+
+    :deep(.el-input.is-disabled .el-input__inner) {
+      color: #64748b;
+      -webkit-text-fill-color: #64748b;
+      cursor: default;
+    }
+
+    :deep(.el-input__inner::placeholder) {
+      color: #94a3b8;
+      -webkit-text-fill-color: #94a3b8;
+    }
+
+    :deep(.el-input__prefix) {
+      padding-left: 0;
+      margin-left: 0;
+      color: var(--theme-text-black);
+    }
+
+    :deep(.el-input__suffix) {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    :deep(.el-input__prefix-inner) {
+      padding-left: 0;
+      padding-right: 8px;
+    }
   }
 
   :deep(.rent-btn) {
-    height: 38px;
-    min-height: 38px;
+    height: 44px;
+    min-height: 44px;
     margin-top: 6px;
     padding: 0 12px;
-    font-size: 13px;
-    --el-button-size: 38px;
+    font-size: 14px;
+    --el-button-size: 44px;
   }
 }
 </style>
