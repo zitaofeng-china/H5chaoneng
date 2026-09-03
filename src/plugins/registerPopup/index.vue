@@ -4,6 +4,7 @@
       v-model="visible"
       :class="layoutClass"
       :show-close="true"
+      :fullscreen="isMobile"
       :width="isMobile ? '100%' : 864"
       header-class="register-header"
       align-center
@@ -101,7 +102,7 @@
               <el-button
                 type="primary"
                 size="large"
-                class="register-btn"
+                class="register-btn tactile-btn"
                 @click="onRegister"
                 :loading="loading"
               >
@@ -113,7 +114,7 @@
               <el-button
                 type="primary"
                 plain
-                class="login-btn"
+                class="login-btn tactile-btn"
                 @click="switchToLogin"
               >
                 {{ $t('login.loginButton') }}
@@ -132,6 +133,7 @@ import { useRegisterForm } from '@/hooks/useRegisterForm'
 import AuthDialogFrame from '@/components/auth/AuthDialogFrame.vue'
 import { getPopup } from '@/plugins/popupRegistry'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import type { RegisterEmits } from './types'
 
 defineOptions({
@@ -140,6 +142,7 @@ defineOptions({
 
 const emit = defineEmits<RegisterEmits>()
 const { isMobile } = storeToRefs(useCommonStore())
+const { tmaHapticImpact, tmaHapticSelection } = useTelegramHaptics()
 const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
 
 const {
@@ -159,6 +162,7 @@ const handleClose = async () => {
 }
 
 const onRegister = async () => {
+  tmaHapticImpact('light')
   const success = await handleRegister()
   if (success) {
     await handleClose()
@@ -166,6 +170,7 @@ const onRegister = async () => {
 }
 
 const switchToLogin = () => {
+  tmaHapticSelection()
   getPopup('loginPopup')?.open()
   setTimeout(() => {
     handleClose()

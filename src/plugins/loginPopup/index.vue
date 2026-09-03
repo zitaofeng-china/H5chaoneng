@@ -4,6 +4,7 @@
       v-model="visible"
       :class="layoutClass"
       :show-close="true"
+      :fullscreen="isMobile"
       :width="isMobile ? '100%' : 864"
       header-class="login-header"
       align-center
@@ -71,7 +72,7 @@
               <el-button
                 type="primary"
                 size="large"
-                class="login-btn"
+                class="login-btn tactile-btn"
                 @click="onLogin"
                 :loading="loading"
               >
@@ -83,7 +84,7 @@
               <el-button
                 type="primary"
                 plain
-                class="register-btn"
+                class="register-btn tactile-btn"
                 @click="switchToRegister"
               >
                 {{ $t('login.register') }}
@@ -101,6 +102,7 @@ import { storeToRefs } from 'pinia'
 import { useLoginForm } from '@/hooks/useLoginForm'
 import AuthDialogFrame from '@/components/auth/AuthDialogFrame.vue'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import type { LoginEmits } from './types'
 
 defineOptions({
@@ -110,6 +112,7 @@ defineOptions({
 const emit = defineEmits<LoginEmits>()
 const { proxy } = getCurrentInstance()!
 const { isMobile } = storeToRefs(useCommonStore())
+const { tmaHapticImpact, tmaHapticSelection } = useTelegramHaptics()
 const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
 
 const {
@@ -132,6 +135,7 @@ const handleClose = async () => {
 }
 
 const onLogin = async () => {
+  tmaHapticImpact('light')
   const success = await handleLogin()
   if (success) {
     await handleClose()
@@ -139,6 +143,7 @@ const onLogin = async () => {
 }
 
 const switchToReset = () => {
+  tmaHapticSelection()
   if (proxy?.$resetPopup) {
     proxy.$resetPopup.open()
     setTimeout(() => {
@@ -149,6 +154,7 @@ const switchToReset = () => {
 }
 
 const switchToRegister = () => {
+  tmaHapticSelection()
   if (proxy?.$registerPopup) {
     proxy.$registerPopup.open()
     setTimeout(() => {
