@@ -53,6 +53,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useCommonStore } from '@/stores/useCommonStore'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import heroImage from '@/assets/images/register-bg.png'
 import gasLogoMark from '@/assets/images/gas-logo-mark.png'
 
@@ -70,6 +71,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const { isMobile } = storeToRefs(useCommonStore())
+const { tmaHapticSelection } = useTelegramHaptics()
 const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
 const title = computed(() =>
   props.mode === 'login' ? t('login.title') : t('register.title'),
@@ -77,6 +79,7 @@ const title = computed(() =>
 
 const onSwitch = (next: 'login' | 'register') => {
   if (next === props.mode) return
+  tmaHapticSelection()
   emit('switch', next)
 }
 </script>
@@ -153,20 +156,25 @@ const onSwitch = (next: 'login' | 'register') => {
 }
 
 .auth-frame.is-mobile {
-  min-height: auto;
+  min-height: 100vh;
+  height: 100%;
+  flex: 1;
+  display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  background: #ffffff;
 
   .auth-hero {
     position: relative;
     flex: 0 0 auto;
     width: 100%;
-    height: 200px;
+    height: 136px;
+    overflow: hidden;
   }
 
   .auth-hero-img {
-    height: 118%;
-    object-position: center 28%;
+    height: 115%;
+    object-position: center 22%;
   }
 
   .auth-hero-blur {
@@ -174,10 +182,10 @@ const onSwitch = (next: 'login' | 'register') => {
     left: 0;
     right: 0;
     bottom: 0;
-    height: 40px;
+    height: 32px;
     pointer-events: none;
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     mask-image: linear-gradient(180deg, transparent 0%, #000 70%, #000 100%);
     -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 70%, #000 100%);
   }
@@ -187,30 +195,32 @@ const onSwitch = (next: 'login' | 'register') => {
     left: 0;
     right: 0;
     bottom: -1px;
-    height: 44px;
+    height: 36px;
     pointer-events: none;
     background: linear-gradient(
       180deg,
       rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.34) 40%,
-      rgba(255, 255, 255, 0.78) 75%,
-      #fff 100%
+      rgba(255, 255, 255, 0.45) 40%,
+      rgba(255, 255, 255, 0.85) 75%,
+      #ffffff 100%
     );
   }
 
   .auth-panel {
-    flex: none;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     width: 100%;
     margin: 0;
-    padding: 0 20px;
-    background: #fff;
+    padding: 0 20px 24px;
+    background: #ffffff;
   }
 
   .auth-brand {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 8px 0;
+    margin: 4px 0 8px;
   }
 
   .auth-brand-inner {
@@ -222,49 +232,49 @@ const onSwitch = (next: 'login' | 'register') => {
 
   .auth-brand-mark {
     display: block;
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     object-fit: contain;
   }
 
   .auth-brand-name {
     display: block;
-    color: #1e3a5f;
-    font-size: 16px;
+    color: var(--theme-text-black, #182230);
+    font-size: 15px;
     font-weight: 700;
     letter-spacing: 0.02em;
-    line-height: 22px;
+    line-height: 20px;
   }
 
   .auth-tabs {
     display: flex;
     align-items: center;
     gap: 0;
-    height: 42px;
-    margin-bottom: 16px;
+    height: 36px;
+    margin-bottom: 12px;
     padding: 3px;
-    border-radius: 8px;
-    background: #f3f4f6;
+    border-radius: var(--theme-radius-sm, 4px);
+    background: #f1f5f9;
+    box-sizing: border-box;
   }
 
   .auth-tab {
     flex: 1;
     height: 100%;
     border: 0;
-    border-radius: 6px;
+    border-radius: var(--theme-radius-sm, 4px);
     background: transparent;
-    color: #6b7280;
-    font-size: 14px;
+    color: var(--theme-text-gray, #64748b);
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
-    transition:
-      background 0.2s ease,
-      color 0.2s ease;
+    transition: all 0.2s ease;
 
     &.is-active {
-      background: var(--theme-bg-blue);
-      color: #fff;
-      font-weight: 600;
+      background: #ffffff;
+      color: var(--theme-primary-blue, #165dff);
+      box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.08));
+      font-weight: 700;
     }
   }
 }
