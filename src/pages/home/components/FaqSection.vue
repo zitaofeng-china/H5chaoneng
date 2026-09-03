@@ -15,7 +15,7 @@
         >
           <button
             type="button"
-            class="faq-question"
+            class="faq-question tactile-btn"
             :aria-expanded="activeIndex === index"
             @click.stop="toggleItem(index)"
           >
@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useSiteStore } from '@/stores/useSiteStore'
+import { tmaHapticSelection } from '@/utils/telegram'
 
 defineOptions({
   name: 'FaqSection',
@@ -80,6 +81,7 @@ const faqItems: FaqItem[] = [
 ]
 
 const toggleItem = (index: number) => {
+  tmaHapticSelection()
   activeIndex.value = activeIndex.value === index ? -1 : index
 }
 
@@ -130,10 +132,11 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 
 .faq-item {
   overflow: hidden;
-  border: 1px solid #dce3ed;
-  border-radius: 8px;
-  background: #fff;
-  box-shadow: 0 4px 12px rgba(30, 41, 59, 0.03);
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-lg, 8px);
+  background: #ffffff;
+  box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .faq-question {
@@ -145,8 +148,8 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   gap: 18px;
   padding: 18px 20px;
   border: 0;
-  color: #253246;
-  background: #fff;
+  color: var(--theme-text-black, #182230);
+  background: #ffffff;
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -156,7 +159,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   transition: color 0.25s ease, padding 0.32s ease;
 
   &:hover {
-    color: #165dff;
+    color: var(--theme-primary-blue, #165dff);
   }
 
   svg {
@@ -166,12 +169,17 @@ const formatAnswerWithTgAdmin = (answer: string) => {
   }
 }
 
+.faq-item.active {
+  border-color: rgba(22, 93, 255, 0.35);
+  box-shadow: var(--theme-shadow-md, 0 4px 14px -2px rgba(15, 23, 42, 0.06));
+}
+
 .faq-item.active .faq-question {
   padding-bottom: 16px;
 }
 
 .faq-item.active .faq-question svg {
-  color: #165dff;
+  color: var(--theme-primary-blue, #165dff);
   transform: rotate(180deg);
 }
 
@@ -192,8 +200,8 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 
 .faq-answer {
   padding: 16px 20px 18px;
-  border-top: 1px solid #dce3ed;
-  color: rgba(71, 84, 103, 0.74);
+  border-top: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.7));
+  color: var(--theme-text-gray, rgba(71, 84, 103, 0.74));
   font-size: 12px;
   line-height: 1.75;
   white-space: pre-line;

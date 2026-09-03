@@ -143,10 +143,11 @@ defineOptions({
 .fee-content {
   display: flex;
   flex-direction: column;
-  background: var(--theme-text-white);
-  border-radius: 4px;
+  background: var(--theme-bg-white, #ffffff);
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-lg, 8px);
   overflow: hidden;
-  box-shadow: 0 10px 24px rgba(21, 47, 92, 0.07);
+  box-shadow: var(--theme-shadow-md, 0 4px 14px -2px rgba(15, 23, 42, 0.06));
 }
 
 .fee-columns {
@@ -198,9 +199,9 @@ defineOptions({
   &.fee-item-bg {
     margin-top: 10px;
     padding: 10px;
-    border-radius: 5px;
-    background: rgba(22, 93, 255, 0.1);
-    color: var(--theme-bg-blue);
+    border-radius: var(--theme-radius-sm, 4px);
+    background: rgba(22, 93, 255, 0.08);
+    color: var(--theme-primary-blue, #165dff);
 
     .fee-info {
       color: var(--theme-bg-blue);
