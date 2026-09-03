@@ -210,7 +210,34 @@
   --theme-border-light: rgba(245, 245, 245, 1);
   --theme-border-subtle: rgba(0, 0, 0, 0.03);
 
-  /* 阴影 */
+  /* ========== Web3 现代质感体系（微圆角规范：轻微柔化防刺眼，杜绝膨胀圆角） ========== */
+  /* 圆角规范：轻微带一些不显生硬即可（微标3px / 输入表单4px / 通用控件与按钮6px / 外层主卡片8px） */
+  --theme-radius-xs: 3px;
+  --theme-radius-sm: 4px;
+  --theme-radius-md: 6px;
+  --theme-radius-lg: 8px;
+  --theme-radius-xl: 8px;
+  --theme-radius-pill: 6px;
+
+  /* 现代双层弥散微光阴影 */
+  --theme-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --theme-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --theme-shadow-md: 0 4px 14px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --theme-shadow-lg: 0 10px 25px -4px rgba(15, 23, 42, 0.07), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --theme-shadow-xl: 0 20px 35px -6px rgba(15, 23, 42, 0.09), 0 8px 16px -3px rgba(15, 23, 42, 0.05);
+  --theme-shadow-glow-blue: 0 0 0 1px rgba(22, 93, 255, 0.15), 0 8px 24px -4px rgba(22, 93, 255, 0.2);
+  --theme-shadow-glow-green: 0 0 0 1px rgba(54, 211, 153, 0.2), 0 8px 24px -4px rgba(54, 211, 153, 0.25);
+
+  /* 质感微边框 */
+  --theme-card-border: rgba(226, 232, 240, 0.9);
+  --theme-card-border-glow: rgba(22, 93, 255, 0.25);
+  --theme-card-bg-gradient: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --theme-card-glass: rgba(255, 255, 255, 0.88);
+
+  /* 兼容历史组件拼写别名 */
+  --theme-text-mute: var(--theme-text-muted);
+
+  /* 阴影（兼容历史变量） */
   --theme-shadow-strong: rgba(0, 0, 0, 0.07);
   --theme-shadow-strong-hover: rgba(0, 0, 0, 0.09);
   --theme-shadow-soft: rgba(0, 0, 0, 0.04);

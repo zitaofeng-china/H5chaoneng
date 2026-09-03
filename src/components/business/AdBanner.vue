@@ -60,6 +60,7 @@
                 draggable="false"
                 @error="handleImageError(ad)"
               />
+              <span class="ad-shine" aria-hidden="true"></span>
             </component>
           </div>
         </div>
@@ -1027,6 +1028,7 @@ onUnmounted(() => {
   position: absolute;
   inset: 0;
   z-index: 0;
+  overflow: hidden;
   display: block;
   width: 100%;
   height: 100%;
@@ -1063,6 +1065,40 @@ onUnmounted(() => {
   user-select: none;
   -webkit-user-drag: none;
   pointer-events: none;
+}
+
+.ad-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -45%;
+    left: 0;
+    width: 42%;
+    height: 190%;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0) 28%,
+      rgba(210, 230, 255, 0.14) 42%,
+      rgba(255, 255, 255, 0.62) 50%,
+      rgba(210, 230, 255, 0.14) 58%,
+      rgba(255, 255, 255, 0) 72%,
+      transparent 100%
+    );
+    transform: translateX(-180%) rotate(22deg);
+    opacity: 0;
+  }
+}
+
+.ad-slide.is-active .ad-shine::after {
+  animation: ad-card-shine 4.4s ease-in-out infinite;
 }
 
 .ad-fallback {
@@ -1371,6 +1407,24 @@ onUnmounted(() => {
   }
 }
 
+@keyframes ad-card-shine {
+  0% {
+    transform: translateX(-180%) rotate(22deg);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  26% {
+    transform: translateX(280%) rotate(22deg);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(280%) rotate(22deg);
+    opacity: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .ad-banner {
     width: 100%;
@@ -1438,6 +1492,12 @@ onUnmounted(() => {
   .ad-dot {
     width: 20px;
     height: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ad-slide.is-active .ad-shine::after {
+    animation: none;
   }
 }
 </style>

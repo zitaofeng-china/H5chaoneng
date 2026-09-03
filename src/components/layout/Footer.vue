@@ -15,15 +15,7 @@
               :aria-label="$t('footer.telegramContact')"
               @click="handleOpenToTelegram(telegramHandle)"
             >
-              <SvgIcon name="footer-telegram" width="16" height="16" />
-            </button>
-            <button
-              type="button"
-              class="social-icon"
-              :aria-label="$t('footer.twitterContact')"
-              @click="handleOXAccount(twitterHandle)"
-            >
-              <SvgIcon name="footer-twitter" width="14" height="14" />
+              <SvgIcon name="footer-telegram" width="14" height="14" viewBox="0 0 18 18" />
             </button>
           </div>
         </section>
@@ -68,7 +60,7 @@
           <h2 class="section-title">{{ $t('footer.contactUs') }}</h2>
           <div class="contact-list">
             <button type="button" class="contact-item" @click="handleOpenToTelegram(telegramHandle)">
-              <SvgIcon name="footer-telegram" width="16" height="16" />
+              <SvgIcon name="footer-telegram" width="16" height="16" viewBox="0 0 18 18" />
               <span>{{ displayTelegram }}</span>
             </button>
           </div>
@@ -87,7 +79,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import { handleOpenToTelegram, handleOXAccount } from '@/utils'
+import { handleOpenToTelegram } from '@/utils'
 import { withSitePrefix } from '@/utils/site'
 import { useSiteStore } from '@/stores/useSiteStore'
 import gasLogoMark from '@/assets/images/gas-logo-mark.png'
@@ -112,8 +104,6 @@ const telegramHandle = computed(() => {
 })
 
 const displayTelegram = computed(() => withAt(telegramHandle.value))
-
-const twitterHandle = computed(() => String(t('footer.twitterContact') || '').trim())
 
 const currentYear = computed(() => new Date().getFullYear())
 
@@ -226,16 +216,26 @@ const handleToRouter = (path: string, hash?: string) => {
 }
 
 .social-icon {
+  box-sizing: border-box;
   width: 24px;
   height: 24px;
-  display: grid;
-  place-items: center;
+  padding: 0;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
   border-radius: 50%;
   color: #fff;
   background: rgba(255, 255, 255, 0.1);
   transition:
     background 0.2s ease,
     transform 0.2s ease;
+
+  :deep(.svg-icon) {
+    display: block;
+    flex-shrink: 0;
+  }
 
   &:hover {
     background: rgba(31, 117, 255, 0.45);

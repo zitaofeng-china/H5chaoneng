@@ -39,20 +39,6 @@ export const handleOpenToTelegramBot = (botId: string | number) => {
   }
 }
 
-/**
- * 打开X账号链接
- * @param username - X账号用户名（可以带或不带 @ 符号）
- */
-export const handleOXAccount = (username: string) => {
-  if (!username) return
-  
-  // 移除开头的 @ 符号（如果有）
-  const cleanUsername = username.startsWith('@') ? username.slice(1) : username
-  
-  const url = `https://x.com/${cleanUsername}`
-  window.open(url, '_blank')
-}
-
 export const handleOpenEmail = (mailto: string) => {
   window.open(`mailto:${mailto}`, '_blank')
 }

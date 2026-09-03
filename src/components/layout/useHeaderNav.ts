@@ -14,7 +14,7 @@ import { setLocale } from '@/lang'
 import type { Locale } from '@/lang/types'
 import { getSite, DEFAULT_SITE, withSitePrefix } from '@/utils/site'
 import { formatBalance } from '@/utils/number'
-import { isTelegramMiniApp } from '@/utils/telegram'
+import { isTelegramMiniApp, tmaHapticSelection, tmaHapticImpact } from '@/utils/telegram'
 import { clearAuthSession } from '@/utils/session'
 import { ElMessage } from '@/utils/element'
 import { useI18n } from 'vue-i18n'
@@ -98,6 +98,7 @@ export function useHeaderNav() {
   const isHashActive = (hash: string) => route.hash === hash
 
   const handleToRouter = (path: string, hash?: string) => {
+    tmaHapticSelection()
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
     router.push({ path: withSitePrefix(normalizedPath), hash })
 
@@ -107,11 +108,13 @@ export function useHeaderNav() {
   }
 
   const handleLanguageChange = (local: Locale) => {
+    tmaHapticSelection()
     localLang.value = local
     void setLocale(local)
   }
 
   const handleLogin = () => {
+    tmaHapticImpact('light')
     if (isTgEnv) {
       ElMessage.warning({
         message: t('common.pleaseLogin'),
@@ -124,26 +127,32 @@ export function useHeaderNav() {
   }
 
   const handleRegister = () => {
+    tmaHapticImpact('light')
     void proxy?.$registerPopup?.open()
   }
 
   const handleRechange = () => {
+    tmaHapticImpact('light')
     void proxy?.$rechargePopup?.open()
   }
 
   const handleModifyPassword = () => {
+    tmaHapticImpact('light')
     void proxy?.$revisePasswordPopup?.open()
   }
 
   const handleUserInfo = () => {
+    tmaHapticImpact('light')
     void proxy?.$userInfoPopup?.open()
   }
 
   const handleTgRelogin = () => {
+    tmaHapticImpact('light')
     window.location.reload()
   }
 
   const handleLogout = async () => {
+    tmaHapticImpact('light')
     try {
       await logout()
       await clearAuthSession()
@@ -156,6 +165,7 @@ export function useHeaderNav() {
   }
 
   const handleChange = (_val: CollapseModelValue) => {
+    tmaHapticSelection()
     // collapse 展开状态由 activeNames 托管
   }
 
@@ -165,6 +175,9 @@ export function useHeaderNav() {
   }
 
   const handleMenu = (type: 'menu' | 'router' = 'menu') => {
+    if (type === 'menu') {
+      tmaHapticImpact('light')
+    }
     isMenu.value = type !== 'menu' ? false : !isMenu.value
   }
 

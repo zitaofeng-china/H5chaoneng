@@ -109,3 +109,77 @@ export function telegramClose() {
   const tg = getTelegramWebApp()
   tg?.close()
 }
+
+/**
+ * 触发轻触选择震动（齿轮微触感：适用于 Tab 切换、单选套餐卡、币种切换）
+ */
+export function tmaHapticSelection() {
+  const tg = getTelegramWebApp()
+  if (tg?.HapticFeedback) {
+    try {
+      tg.HapticFeedback.selectionChanged()
+    } catch {
+      // ignore
+    }
+  }
+}
+
+/**
+ * 触发物理下压碰撞震动（按键回弹触感：适用于立即租用、计算器、确认、复制等按钮）
+ */
+export function tmaHapticImpact(style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft' = 'light') {
+  const tg = getTelegramWebApp()
+  if (tg?.HapticFeedback) {
+    try {
+      tg.HapticFeedback.impactOccurred(style)
+    } catch {
+      // ignore
+    }
+  }
+}
+
+/**
+ * 触发状态通知震动（成功/失败/警告双击：适用于复制成功、支付完成、校验失败）
+ */
+export function tmaHapticNotification(type: 'success' | 'warning' | 'error' = 'success') {
+  const tg = getTelegramWebApp()
+  if (tg?.HapticFeedback) {
+    try {
+      tg.HapticFeedback.notificationOccurred(type)
+    } catch {
+      // ignore
+    }
+  }
+}
+
+/**
+ * 禁用垂直下拉误滑关闭手势（锁定 Mini App 视口边界）
+ */
+export function tmaDisableVerticalSwipes() {
+  const tg = getTelegramWebApp()
+  try {
+    if (typeof tg?.disableVerticalSwipes === 'function') {
+      tg.disableVerticalSwipes()
+    }
+  } catch {
+    // ignore
+  }
+}
+
+/**
+ * 同步 Telegram 顶栏与底栏背景色
+ */
+export function tmaSyncThemeColors(headerColor = '#ffffff', bgColor = '#ffffff') {
+  const tg = getTelegramWebApp()
+  try {
+    if (typeof tg?.setHeaderColor === 'function') {
+      tg.setHeaderColor(headerColor)
+    }
+    if (typeof tg?.setBackgroundColor === 'function') {
+      tg.setBackgroundColor(bgColor)
+    }
+  } catch {
+    // ignore
+  }
+}
+

@@ -70,9 +70,11 @@ const displayStock = computed(() => formatCryptoAmount(props.stock))
 
 <style scoped lang="scss">
 .rate-card {
-  padding: 16px;
-  background: var(--theme-card-bg-light);
-  border-radius: 4px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-md, 6px);
+  box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
   color: var(--theme-text-mute);
   font-size: 14px;
   display: flex;
@@ -92,33 +94,35 @@ const displayStock = computed(() => formatCryptoAmount(props.stock))
 
       .rate-label-inline {
         font-size: 13px;
-        color: var(--theme-text-mute);
-        font-weight: 500;
+        color: var(--theme-text-muted);
+        font-weight: 600;
         white-space: nowrap;
       }
 
       .rate-text {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 5px;
         font-size: 14px;
         color: var(--theme-text-black);
-        font-weight: 500;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
       }
 
       .rate-unit {
-        color: var(--theme-text-mute);
-        font-weight: 400;
+        color: var(--theme-text-muted);
+        font-weight: 500;
       }
 
       .rate-symbol {
         margin: 0 4px;
-        color: var(--theme-text-mute);
+        color: var(--theme-text-muted);
       }
 
       .rate-value {
-        color: var(--theme-bg-blue);
-        font-weight: 600;
+        color: #10b981;
+        font-weight: 800;
+        font-size: 15px;
       }
     }
   }
@@ -128,10 +132,12 @@ const displayStock = computed(() => formatCryptoAmount(props.stock))
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(226, 232, 240, 0.9);
 
     .note-text {
-      font-size: 13px;
-      color: var(--theme-text-mute);
+      font-size: 12px;
+      color: var(--theme-text-muted);
       line-height: 1.5;
     }
 
@@ -143,11 +149,13 @@ const displayStock = computed(() => formatCryptoAmount(props.stock))
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        font-size: 13px;
-        color: var(--theme-text-mute);
+        font-size: 12px;
+        color: var(--theme-text-muted);
+        font-variant-numeric: tabular-nums;
 
         .rate-unit {
-          font-weight: 500;
+          font-weight: 600;
+          color: var(--theme-text-black);
         }
       }
     }
@@ -158,20 +166,25 @@ const displayStock = computed(() => formatCryptoAmount(props.stock))
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    color: var(--theme-text-mute);
+    font-size: 12px;
+    color: var(--theme-text-muted);
+    padding-top: 4px;
+    border-top: 1px dashed rgba(226, 232, 240, 0.9);
 
     .stock-label {
-      color: var(--theme-text-mute);
+      color: var(--theme-text-muted);
+      font-weight: 500;
     }
 
     .stock-value {
       color: var(--theme-text-black);
-      font-weight: 500;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
     }
 
     .rate-unit {
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--theme-text-muted);
     }
   }
 }

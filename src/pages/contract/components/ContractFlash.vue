@@ -2,10 +2,27 @@
   <div class="contract-flash">
     <el-card class="rental-card">
       <div class="section-label">{{ t('contract.title') }}</div>
-      <el-tabs v-model="activeTab" class="rental-tabs">
-        <el-tab-pane :label="t('contract.usdtToTrx')" name="USDT" />
-        <el-tab-pane :label="t('contract.trxToUsdt')" name="TRX" />
-        <el-form
+      <div class="swap-split" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          :class="{ 'is-active': activeTab === 'USDT' }"
+          :aria-selected="activeTab === 'USDT'"
+          @click="activeTab = 'USDT'"
+        >
+          {{ t('contract.usdtToTrx') }}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          :class="{ 'is-active': activeTab === 'TRX' }"
+          :aria-selected="activeTab === 'TRX'"
+          @click="activeTab = 'TRX'"
+        >
+          {{ t('contract.trxToUsdt') }}
+        </button>
+      </div>
+      <el-form
           ref="formRef"
           :model="formData"
           label-position="top"
@@ -52,7 +69,6 @@
           :max-trx="maxLimits.trx"
           @retry="handleRetryFetchAddress" 
         />
-      </el-tabs>
     </el-card>
   </div>
 </template>
@@ -66,12 +82,19 @@ import { AddressKind } from '@/api/modules/address/types'
 import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { logger } from '@/utils/logger'
 import { formatCryptoAmount } from '@/utils/number'
+import { tmaHapticSelection } from '@/utils/telegram'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
 const { t } = useI18n()
 
 const activeTab = ref('USDT')
+
+watch(activeTab, (newTab, oldTab) => {
+  if (oldTab !== undefined && newTab !== oldTab) {
+    tmaHapticSelection()
+  }
+})
 
 // 使用统一的地址管理 hook
 const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymentAddress(AddressKind.FLASH_EXCHANGE)
@@ -281,81 +304,84 @@ onMounted(() => {
   }
 
   .section-label {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    font-weight: 700;
   }
 
   .rental-card {
     width: min(760px, calc(100% - 48px));
     max-width: 760px;
     margin: 0 auto;
-    border-radius: 5px;
-    border: none;
-    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.1);
+    border-radius: var(--theme-radius-lg, 8px);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    box-shadow: var(--theme-shadow-lg, 0 10px 25px -4px rgba(15, 23, 42, 0.07));
+    background: #ffffff;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
     :deep(.el-card__body) {
       padding: 24px 28px 28px;
     }
   }
 
-  .rental-tabs {
-    :deep(.el-tabs__header) {
-      margin: 0 0 16px;
-    }
+  .swap-split {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 4px;
+    border-radius: var(--theme-radius-md, 6px);
+    background: rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(226, 232, 240, 0.8);
 
-    :deep(.el-tabs__content) {
-      overflow: initial;
-    }
-
-    :deep(.el-tabs__nav-wrap::after) {
-      display: none;
-    }
-
-    :deep(.el-tabs__nav-scroll) {
-      overflow: visible;
-    }
-
-    :deep(.el-tabs__nav) {
-      width: 100%;
-      display: flex;
-      background: rgba(2, 15, 45, 0.03);
-      border-radius: 4px;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    :deep(.el-tabs__item) {
+    button {
       flex: 1;
-      height: 38px;
+      min-width: 0;
+      height: 40px;
       line-height: 38px;
-      padding: 0;
-      text-align: center;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      border-radius: var(--theme-radius-sm, 4px);
+      background: transparent;
+      color: #64748b;
+      font-family: inherit;
+      font-size: 14px;
       font-weight: 600;
-      font-size: 13px;
-      color: rgba(30, 41, 59, 0.6);
-      border-radius: 4px;
-      transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      appearance: none;
+      box-shadow: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:hover:not(.is-active) {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.5);
+      }
 
       &.is-active {
-        color: var(--theme-text-white);
-        background: var(--theme-bg-blue);
-        box-shadow: 0 1px 4px rgba(22, 93, 255, 0.2);
+        color: #0f172a;
+        background: #ffffff;
+        border-color: rgba(226, 232, 240, 0.9);
+        box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05)), 0 1px 2px rgba(15, 23, 42, 0.03);
+        font-weight: 700;
       }
-    }
-
-    :deep(.el-tabs__active-bar) {
-      display: none;
     }
   }
 
   .form-wrap {
     .field-label {
       margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 700;
     }
 
     :deep(.el-form-item) {
-      margin-bottom: 12px;
+      margin-bottom: 16px;
 
       .el-form-item__content {
         justify-content: center;
@@ -363,48 +389,57 @@ onMounted(() => {
 
       .el-input {
         width: 100%;
-        font-size: 13px;
 
         .el-input__wrapper {
-          min-height: 40px;
-          height: 40px;
-          background: #f1f2f4;
-          border-radius: 4px;
-          box-shadow: none;
-          border: none;
+          min-height: 48px;
+          height: 48px;
+          background: #ffffff;
+          border-radius: var(--theme-radius-sm, 4px);
+          box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+          border: 1.5px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
           padding: 0 14px;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+          &:hover {
+            border-color: rgba(22, 93, 255, 0.4);
+          }
+
+          &.is-focus {
+            border-color: var(--theme-primary-blue, #165dff);
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
+          }
         }
 
         .el-input__inner {
           text-align: left;
-          height: 38px;
-          line-height: 38px;
-          font-size: 13px;
+          height: 46px;
+          line-height: 46px;
+          font-size: 16px;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
           color: var(--theme-text-black);
         }
 
         .el-input__suffix-inner {
-          color: #98a2b3;
-          font-size: 12px;
-          font-weight: 500;
-        }
-
-        .el-input__inner {
-          cursor: auto;
-
-          &::placeholder {
-            color: var(--theme-text-light-gray);
-            -webkit-text-fill-color: var(--theme-text-light-gray);
-          }
+          display: inline-flex;
+          align-items: center;
+          padding: 3px 10px;
+          border-radius: var(--theme-radius-xs, 3px);
+          background: rgba(15, 23, 42, 0.05);
+          color: #1e293b;
+          font-size: 13px;
+          font-weight: 700;
         }
 
         &.is-disabled {
           .el-input__wrapper {
-            background: #f1f2f4;
+            background: #f8fafc;
+            border-color: rgba(226, 232, 240, 0.8);
           }
 
           .el-input__inner {
-            color: #667085;
+            color: var(--theme-primary-blue, #165dff);
+            font-weight: 800;
             -webkit-text-fill-color: initial;
           }
         }
@@ -413,49 +448,7 @@ onMounted(() => {
   }
 
   :deep(.rate-card) {
-    margin: 0;
-    padding: 12px 16px;
-    border-radius: 4px;
-    gap: 6px;
-    font-size: 11px;
-
-    .rate-section {
-      .rate-main {
-        gap: 6px;
-
-        .rate-label-inline,
-        .rate-text {
-          font-size: 11px;
-        }
-
-        .rate-text {
-          gap: 3px;
-        }
-
-        .rate-symbol {
-          margin: 0 3px;
-        }
-      }
-    }
-
-    .note-section {
-      gap: 4px;
-
-      .note-text,
-      .limits-row .limit-item {
-        font-size: 11px;
-        line-height: 1.45;
-      }
-
-      .limits-row {
-        gap: 16px;
-      }
-    }
-
-    .stock-section {
-      gap: 6px;
-      font-size: 11px;
-    }
+    margin: 16px 0 0;
   }
 
   :deep(.qr-section) {
@@ -577,19 +570,17 @@ onMounted(() => {
       font-size: 11px;
     }
 
-    .rental-tabs {
-      :deep(.el-tabs__header) {
-        margin: 0 0 12px;
-      }
+    .swap-split {
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 4px;
+      border-radius: 8px;
 
-      :deep(.el-tabs__nav) {
-        padding: 2px;
-      }
-
-      :deep(.el-tabs__item) {
-        height: 36px;
+      button {
+        height: 38px;
         line-height: 36px;
         font-size: 12px;
+        border-radius: 6px;
       }
     }
 

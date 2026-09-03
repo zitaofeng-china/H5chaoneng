@@ -19,6 +19,8 @@ import {
   isTelegramEnvironment,
   isTelegramMiniApp,
   telegramExpand,
+  tmaDisableVerticalSwipes,
+  tmaSyncThemeColors,
 } from '@/utils/telegram'
 
 const route = useRoute()
@@ -48,6 +50,8 @@ watch(
     if (active) {
       telegramExpand()
       applyTelegramFullWidth()
+      tmaDisableVerticalSwipes()
+      tmaSyncThemeColors('#ffffff', '#ffffff')
     }
   },
   { immediate: true },
@@ -156,16 +160,20 @@ onUnmounted(() => {
 .app-shell {
   --layout-header-height: var(--theme-home-band-height, 50px);
   padding-top: var(--layout-header-height);
-  overflow: hidden;
+  padding-bottom: max(16px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
   overflow-y: auto;
   min-height: 100vh;
+  min-height: 100dvh;
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
+  -webkit-overflow-scrolling: touch;
 
   &.is-miniapp {
     width: 100%;
     max-width: 100%;
+    overscroll-behavior-y: none;
   }
 
   &.is-404 {

@@ -1,18 +1,32 @@
 <template>
   <div class="transfer-rental">
-    <div v-if="isMobile" class="transfer-explain">
-      <div class="explain-label">{{ t('transferRental.explain') }}</div>
+    <div class="transfer-explain">
+      <div class="explain-label">
+        <span>{{ t('transferRental.explain') }}</span>
+        <span class="explain-subhint">转账对应 TRX 即可自动到账能量</span>
+      </div>
       <div class="explain-grid">
-        <div v-for="item in transferPackages" :key="item.count" class="explain-card">
-          <span class="explain-price">{{ item.price }} {{ t('common.trx') }}</span>
-          <span class="explain-count">{{ t('transferRental.buyCount', { count: item.count }) }}</span>
+        <div
+          v-for="item in transferPackages"
+          :key="item.count"
+          class="explain-card tactile-btn"
+          role="button"
+          tabindex="0"
+          @click="handlePackageClick"
+        >
+          <div class="explain-price tabular-nums">
+            {{ item.price }} <span class="price-unit">{{ t('common.trx') }}</span>
+          </div>
+          <div class="explain-count">
+            {{ t('transferRental.buyCount', { count: item.count }) }}
+          </div>
         </div>
       </div>
     </div>
 
     <div class="instruction-note">
-      <SvgIcon name="transfer-info" width="12" height="12" />
-      {{ t('transferRental.note') }}
+      <SvgIcon name="transfer-info" width="14" height="14" />
+      <span>{{ t('transferRental.note') }}</span>
     </div>
 
     <!-- 二维码区域 -->
@@ -59,6 +73,7 @@ import { useAddressLoading } from '@/hooks/useAddressLoading'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { formatCryptoAmount } from '@/utils/number'
+import { tmaHapticSelection, tmaHapticImpact } from '@/utils/telegram'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 
@@ -94,7 +109,12 @@ const emit = defineEmits<{
   retry: []
 }>()
 
+const handlePackageClick = () => {
+  tmaHapticSelection()
+}
+
 const handleRetry = () => {
+  tmaHapticImpact('light')
   resetTimer()
   emit('retry')
 }
@@ -118,32 +138,38 @@ const tips = computed(() => [
   }
 
   .explain-label {
-    position: relative;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     min-height: 20px;
-    padding-left: 12px;
-    color: #000;
+    padding-left: 10px;
+    position: relative;
+    color: var(--theme-text-black);
     font-size: 13px;
-    font-weight: 900;
-    line-height: 14px;
-  }
+    font-weight: 700;
 
-  .explain-label::before {
-    content: '';
-    position: absolute;
-    top: 2px;
-    left: 0;
-    width: 2px;
-    height: 16px;
-    border-radius: 2px;
-    background: #165dff;
+    &::before {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 0;
+      width: 3px;
+      height: 15px;
+      border-radius: 2px;
+      background: var(--theme-primary-blue, #165dff);
+    }
+
+    .explain-subhint {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--theme-text-light-gray-muted);
+    }
   }
 
   .explain-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
     margin-top: 10px;
   }
 
@@ -152,26 +178,45 @@ const tips = computed(() => [
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    min-height: 58px;
+    gap: 3px;
+    min-height: 62px;
     padding: 8px 6px;
     box-sizing: border-box;
-    border: 1px solid rgba(22, 93, 255, 0.16);
-    border-radius: 4px;
-    background: #eef4ff;
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-md, 6px);
+    background: var(--theme-card-bg-gradient, linear-gradient(180deg, #ffffff 0%, #f8fafc 100%));
+    box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+      border-color: var(--theme-primary-blue, #165dff);
+      box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.975);
+    }
   }
 
   .explain-price {
-    color: #165dff;
-    font-size: 15px;
-    font-weight: 700;
+    color: var(--theme-primary-blue, #165dff);
+    font-size: 16px;
+    font-weight: 800;
     line-height: 1.2;
+
+    .price-unit {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(22, 93, 255, 0.7);
+    }
   }
 
   .explain-count {
-    color: rgba(30, 41, 59, 0.55);
+    color: var(--theme-text-muted);
     font-size: 11px;
-    font-weight: 500;
+    font-weight: 600;
     line-height: 1.2;
   }
 
@@ -179,60 +224,43 @@ const tips = computed(() => [
     display: flex;
     align-items: center;
     gap: 8px;
-    min-height: 30px;
-    margin: 16px 0 14px;
-    padding: 0 12px;
+    min-height: 32px;
+    margin: 14px 0 10px;
+    padding: 6px 12px;
     box-sizing: border-box;
-    border: 1px solid #ffd3d9;
-    border-radius: 4px;
-    background: #fff1f2;
-    color: #c13555;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: var(--theme-radius-sm, 4px);
+    background: rgba(245, 158, 11, 0.08);
+    color: #b45309;
     font-size: 12px;
     font-weight: 500;
     line-height: 1.4;
 
     :deep(svg) {
       flex-shrink: 0;
-      color: #d94d70;
+      color: #f59e0b;
     }
   }
 
-  .qr-section-wrapper :deep(.qr-section) {
-    padding: 8px 0 14px;
-  }
-
-  .qr-section-wrapper :deep(.section-title) {
-    margin-bottom: 10px;
-    font-size: 14px;
-  }
-
-  .qr-section-wrapper :deep(.qr-code),
-  .qr-section-wrapper :deep(.status-container) {
-    width: 192px;
-    height: 192px;
-  }
-
-  .qr-section-wrapper :deep(.wallet-address) {
-    margin-top: 10px;
-    font-size: 12px;
-  }
-
-  .qr-section-wrapper :deep(.tips-info) {
-    display: none;
+  .qr-section-wrapper {
+    margin: 4px 0;
   }
 
   :deep(.tips-section) {
-    margin: 8px 0 20px;
+    margin: 10px 0 16px;
     padding: 14px 16px;
+    border-radius: var(--theme-radius-md, 6px);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
   }
 
   :deep(.tips-section .tips-title) {
     margin-bottom: 10px;
-    font-size: 12px;
+    font-size: 13px;
+    font-weight: 700;
   }
 
   :deep(.tips-section .tips-list) {
-    gap: 6px;
+    gap: 8px;
   }
 
   :deep(.tips-section .tip-text) {
@@ -243,15 +271,16 @@ const tips = computed(() => [
   .loading-section {
     text-align: center;
     padding: 32px 0;
-    background: rgba(2, 15, 45, 0.02);
-    border-radius: 8px;
+    background: rgba(22, 93, 255, 0.02);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-md, 12px);
     margin: 16px 0;
 
     .loading-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--theme-text-black);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .loading-placeholder {
@@ -259,7 +288,7 @@ const tips = computed(() => [
       flex-direction: column;
       align-items: center;
       gap: 16px;
-      padding: 40px 0;
+      padding: 32px 0;
 
       .el-icon {
         color: var(--theme-bg-blue);
@@ -275,16 +304,16 @@ const tips = computed(() => [
   .error-section {
     text-align: center;
     padding: 32px 0;
-    background: rgba(245, 108, 108, 0.05);
-    border-radius: 8px;
+    background: rgba(245, 108, 108, 0.04);
+    border-radius: var(--theme-radius-md, 12px);
     border: 1px dashed rgba(245, 108, 108, 0.3);
     margin: 16px 0;
 
     .error-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--theme-text-black);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .error-placeholder {
@@ -292,7 +321,7 @@ const tips = computed(() => [
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      padding: 40px 0;
+      padding: 32px 0;
 
       .error-icon {
         color: #F56C6C;
@@ -327,6 +356,10 @@ const tips = computed(() => [
 
 @media (max-width: 890px) {
   .transfer-rental {
+    .explain-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
     @media (min-width: 560px) {
       .explain-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -336,33 +369,13 @@ const tips = computed(() => [
     .instruction-note {
       min-height: 32px;
       margin: 12px 0 10px;
-      padding: 4px 10px;
+      padding: 6px 10px;
       font-size: 11px;
       line-height: 1.5;
     }
 
     .qr-section-wrapper {
       margin: 0;
-
-      :deep(.qr-section) {
-        padding: 8px 0 12px;
-      }
-
-      :deep(.section-title) {
-        font-size: 14px;
-      }
-
-      :deep(.qr-code),
-      :deep(.status-container) {
-        width: 148px;
-        height: 148px;
-      }
-
-      :deep(.wallet-address) {
-        margin-top: 8px;
-        font-size: 11px;
-        word-break: break-all;
-      }
     }
 
     :deep(.tips-section) {

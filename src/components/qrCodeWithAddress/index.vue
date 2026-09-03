@@ -1,69 +1,95 @@
 <template>
   <div class="qr-section">
-    <div class="section-title" v-if="title">{{ title }}</div>
-    
+    <div v-if="title" class="section-title">{{ title }}</div>
+
     <!-- 加载状态 -->
     <div v-if="loading" class="status-container loading-state">
       <div class="status-content">
-        <el-icon class="is-loading status-icon" :size="48">
+        <el-icon class="is-loading status-icon" :size="40">
           <Loading />
         </el-icon>
-        <div class="status-text">{{ loadingText || '加载中...' }}</div>
-        <div class="status-hint" v-if="loadingHint">{{ loadingHint }}</div>
+        <div class="status-text">{{ loadingText || t('common.loading') + '...' }}</div>
+        <div v-if="loadingHint" class="status-hint">{{ loadingHint }}</div>
       </div>
     </div>
-    
+
     <!-- 错误状态 -->
     <div v-else-if="error" class="status-container error-state">
       <div class="status-content">
-        <el-icon class="status-icon error-icon" :size="48">
+        <el-icon class="status-icon error-icon" :size="40">
           <CircleClose />
         </el-icon>
-        <div class="status-text error-text">{{ errorText || '加载失败' }}</div>
-        <div class="status-hint" v-if="errorHint">{{ errorHint }}</div>
-        <el-button 
+        <div class="status-text error-text">{{ errorText || t('common.loadFailed') }}</div>
+        <div v-if="errorHint" class="status-hint">{{ errorHint }}</div>
+        <el-button
           v-if="showRetry"
-          type="primary" 
-          size="small" 
-          class="retry-btn"
+          type="primary"
+          size="small"
+          class="retry-btn tactile-btn"
           @click="handleRetry"
         >
           <el-icon><RefreshRight /></el-icon>
-          {{ retryText || '重试' }}
+          {{ retryText || t('common.retry') }}
         </el-button>
       </div>
     </div>
-    
-    <!-- 正常显示二维码 -->
-    <template v-else>
-      <div class="qr-code">
-        <img :src="qrCode" alt="QR Code" class="qr-image" />
+
+    <!-- 正常显示二维码与金融级地址卡 -->
+    <div v-else class="qr-main-card">
+      <!-- 瞄准角标视窗 -->
+      <div class="qr-viewport">
+        <div class="target-frame">
+          <img :src="qrCode" alt="QR Code" class="qr-image" />
+        </div>
       </div>
-      <div class="wallet-address">
-        <span class="address-text">{{ address }}</span>
-        <el-button
-          link
-          type="primary"
-          @click="handleCopy"
-          class="copy-button"
-          :loading="isCopying"
+
+      <!-- 钱包地址卡片（首尾高亮 + 触感复制） -->
+      <div
+        class="wallet-address-card tactile-btn"
+        :class="{ 'is-copied': isCopied }"
+        role="button"
+        tabindex="0"
+        :title="t('transferRental.copyAddress')"
+        @click="handleCopy"
+        @keydown.enter.prevent="handleCopy"
+        @keydown.space.prevent="handleCopy"
+      >
+        <span class="network-badge" aria-label="TRON Network">T</span>
+        <div class="address-split mono-address" :title="address">
+          <span class="address-chunk is-edge">{{ addressPrefix }}</span>
+          <span class="address-chunk is-mid">{{ addressMiddle }}</span>
+          <span class="address-chunk is-edge">{{ addressSuffix }}</span>
+        </div>
+
+        <button
+          type="button"
+          class="copy-pill-btn"
+          :class="{ 'is-success': isCopied }"
+          :disabled="isCopying"
+          @click.stop="handleCopy"
         >
-          <SvgIcon name="transfer-copy" width="24" height="24" />
-        </el-button>
+          <el-icon v-if="isCopied" class="copy-icon"><Check /></el-icon>
+          <SvgIcon v-else name="transfer-copy" width="14" height="14" class="copy-icon" />
+          <span class="copy-label">{{ isCopied ? '已复制' : '复制' }}</span>
+        </button>
       </div>
-      <div class="tips-info" v-if="tip">
+
+      <!-- 提示信息 -->
+      <div v-if="tip" class="tips-info">
         <SvgIcon name="fee-info" width="12" height="12" />
-        {{ tip }}
+        <span>{{ tip }}</span>
       </div>
-    </template>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useQRCode } from '@vueuse/integrations/useQRCode'
 import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
-import { Loading, CircleClose, RefreshRight } from '@element-plus/icons-vue'
+import { tmaHapticImpact, tmaHapticNotification } from '@/utils/telegram'
+import { Loading, CircleClose, RefreshRight, Check } from '@element-plus/icons-vue'
 
 interface Props {
   address: string
@@ -89,17 +115,52 @@ const emit = defineEmits<{
   retry: []
 }>()
 
-// 生成二维码
-const qrCode = useQRCode(computed(() => props.address))
+const { t } = useI18n()
 
-// 复制功能
+// 生成二维码（紧凑留白 margin: 1，消除多余过厚白边）
+const qrCode = useQRCode(computed(() => props.address), {
+  errorCorrectionLevel: 'M',
+  margin: 1,
+})
+
+// 复制功能与触感状态
 const { isCopying, copyText } = useCopyToClipboard()
+const isCopied = ref(false)
+let copyTimer: number | null = null
+
+// 地址切分（首尾高亮）
+const addressPrefix = computed(() => {
+  const addr = props.address || ''
+  return addr.length > 12 ? addr.slice(0, 6) : addr
+})
+
+const addressMiddle = computed(() => {
+  const addr = props.address || ''
+  return addr.length > 12 ? addr.slice(6, -6) : ''
+})
+
+const addressSuffix = computed(() => {
+  const addr = props.address || ''
+  return addr.length > 12 ? addr.slice(-6) : ''
+})
 
 const handleCopy = () => {
+  if (!props.address) return
+  tmaHapticImpact('light')
   copyText(props.address)
+  isCopied.value = true
+
+  // Telegram Mini App 触感通知反馈
+  tmaHapticNotification('success')
+
+  if (copyTimer) clearTimeout(copyTimer)
+  copyTimer = window.setTimeout(() => {
+    isCopied.value = false
+  }, 2000)
 }
 
 const handleRetry = () => {
+  tmaHapticImpact('light')
   emit('retry')
 }
 </script>
@@ -113,32 +174,21 @@ const handleRetry = () => {
     font-size: 18px;
     font-weight: 700;
     color: var(--theme-text-black);
-    margin-bottom: 8px;
-  }
-
-  .qr-code {
-    width: 192px;
-    height: 192px;
-    margin: 0 auto;
-
-    .qr-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    margin-bottom: 12px;
+    letter-spacing: -0.01em;
   }
 
   // 状态容器（加载和错误）
   .status-container {
-    width: 192px;
-    height: 192px;
+    width: 200px;
+    height: 200px;
     margin: 0 auto;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 2px dashed rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    background: rgba(0, 0, 0, 0.02);
+    border: 2px dashed rgba(22, 93, 255, 0.2);
+    border-radius: var(--theme-radius-md, 6px);
+    background: rgba(22, 93, 255, 0.03);
 
     .status-content {
       display: flex;
@@ -150,11 +200,12 @@ const handleRetry = () => {
 
       .status-icon {
         flex-shrink: 0;
+        color: var(--theme-primary-blue, #165dff);
       }
 
       .status-text {
         font-size: 14px;
-        font-weight: 500;
+        font-weight: 600;
         color: var(--theme-text-black);
       }
 
@@ -170,70 +221,167 @@ const handleRetry = () => {
         display: flex;
         align-items: center;
         gap: 4px;
+        border-radius: var(--theme-radius-sm, 4px);
       }
     }
   }
 
-  // 加载状态
-  .loading-state {
-    border-color: rgba(22, 93, 255, 0.2);
-    background: rgba(22, 93, 255, 0.03);
-
-    .status-icon {
-      color: var(--el-color-primary);
-    }
-  }
-
-  // 错误状态
   .error-state {
     border-color: rgba(220, 38, 38, 0.2);
     background: rgba(220, 38, 38, 0.03);
 
-    .error-icon {
-      color: #DC2626;
-    }
-
+    .error-icon,
     .error-text {
-      color: #DC2626;
+      color: #dc2626;
     }
   }
 
-  .wallet-address {
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
+  // 二维码瞄准视窗
+  .qr-viewport {
+    display: flex;
     justify-content: center;
-    gap: 4px;
-    font-size: 14px;
-    color: var(--theme-text-black);
-    max-width: 100%;
-  }
+    margin: 0 auto;
 
-  .address-text {
-    font-family: 'Courier New', monospace;
-    word-break: break-all;
-    flex-shrink: 1;
-    min-width: 0;
-  }
+    .target-frame {
+      position: relative;
+      display: inline-block;
+      padding: 6px;
+      background: #ffffff;
+      border-radius: var(--theme-radius-md, 6px);
+      border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+      box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
 
-  .copy-button {
-    padding: 0 !important;
-    margin: 0 !important;
-    height: 24px !important;
-    width: 24px !important;
-    min-width: 24px !important;
-    flex-shrink: 0;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-color: var(--theme-primary-blue, #165dff);
+        pointer-events: none;
+      }
 
-    :deep(svg) {
-      font-size: 14px;
+      &::before {
+        top: -3px;
+        left: -3px;
+        border-top: 2px solid;
+        border-left: 2px solid;
+        border-top-left-radius: 3px;
+      }
+
+      &::after {
+        bottom: -3px;
+        right: -3px;
+        border-bottom: 2px solid;
+        border-right: 2px solid;
+        border-bottom-right-radius: 3px;
+      }
+
+      .qr-image {
+        display: block;
+        width: 168px;
+        height: 168px;
+        object-fit: contain;
+        border-radius: 2px;
+      }
     }
-    
-    :deep(.el-button__text) {
-      padding: 0 !important;
-      margin: 0 !important;
+  }
+
+  // 钱包地址金融卡
+  .wallet-address-card {
+    margin: 14px auto 0;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #ffffff;
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-md, 6px);
+    box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
+    cursor: pointer;
+    box-sizing: border-box;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+      border-color: var(--theme-primary-blue, #165dff);
+      box-shadow: var(--theme-shadow-glow-blue);
+    }
+
+    &.is-copied {
+      border-color: var(--theme-primary-green, #36d399);
+      box-shadow: var(--theme-shadow-glow-green);
+    }
+
+    .network-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: rgba(193, 53, 53, 0.1);
+      color: #c13535;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .address-split {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+      font-size: 13px;
+      line-height: 1.4;
+
+      .address-chunk {
+        &.is-edge {
+          font-weight: 700;
+          color: var(--theme-text-black);
+          flex-shrink: 0;
+        }
+
+        &.is-mid {
+          color: rgba(30, 41, 59, 0.45);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding: 0 1px;
+        }
+      }
+    }
+
+    .copy-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      flex-shrink: 0;
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(22, 93, 255, 0.15);
+      background: rgba(22, 93, 255, 0.06);
+      color: var(--theme-primary-blue, #165dff);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s ease;
+
+      &:hover {
+        background: var(--theme-primary-blue, #165dff);
+        color: #ffffff;
+      }
+
+      &.is-success {
+        background: var(--theme-primary-green, #36d399);
+        border-color: var(--theme-primary-green, #36d399);
+        color: #ffffff;
+      }
+
+      .copy-icon {
+        font-size: 13px;
+      }
     }
   }
 
@@ -242,72 +390,49 @@ const handleRetry = () => {
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    font-weight: 700;
-    margin-top: 6px;
-    color: #C13535;
+    font-weight: 600;
+    margin-top: 10px;
+    color: #c13535;
+    gap: 4px;
 
     svg {
-      color: #C13535;
-      padding-right: 2px;
+      color: #c13535;
+      flex-shrink: 0;
     }
   }
 }
 
 @media (max-width: 768px) {
   .qr-section {
-    padding: 12px 0 16px;
+    padding: 12px 0 14px;
 
     .section-title {
       font-size: 15px;
+      margin-bottom: 10px;
     }
 
-    .wallet-address {
-      display: inline-flex;
-      box-sizing: border-box;
-      width: auto;
-      max-width: 100%;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 6px;
-      padding: 0 4px;
-      font-size: 12px;
+    .qr-viewport .target-frame .qr-image {
+      width: 144px;
+      height: 144px;
+    }
 
-      .address-text {
-        flex: 0 1 auto;
-        min-width: 0;
-        max-width: calc(100% - 28px);
+    .wallet-address-card {
+      padding: 8px 10px;
+      gap: 6px;
+
+      .address-split {
         font-size: 12px;
-        line-height: 1.45;
-        overflow: visible;
-        text-align: left;
-        text-overflow: unset;
-        white-space: normal;
-        word-break: break-all;
-        overflow-wrap: anywhere;
       }
 
-      .copy-button {
-        margin-top: 1px !important;
-        height: 22px !important;
-        width: 22px !important;
-        min-width: 22px !important;
+      .copy-pill-btn {
+        padding: 4px 8px;
+        font-size: 11px;
       }
     }
 
     .tips-info {
       font-size: 11px;
-      line-height: 1.4;
-      padding: 0 8px;
-    }
-
-    .status-container {
-      .status-content {
-        padding: 16px;
-
-        .status-hint {
-          font-size: 11px;
-        }
-      }
+      padding: 0 6px;
     }
   }
 }

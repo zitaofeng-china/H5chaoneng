@@ -292,7 +292,12 @@ import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { storeToRefs } from 'pinia'
 import { formatCryptoAmount } from '@/utils/number'
 import { withSitePrefix } from '@/utils/site'
-import { isMiniAppRuntime } from '@/utils/telegram'
+import {
+  isMiniAppRuntime,
+  tmaHapticSelection,
+  tmaHapticImpact,
+  tmaHapticNotification,
+} from '@/utils/telegram'
 import { SHOW_WELFARE } from '@/constants/features'
 
 const { t } = useI18n()
@@ -326,7 +331,10 @@ const createEnergyOptions = () => [
 const energyOptions = ref(createEnergyOptions())
 
 // 监听标签页切换，当切换到转账租赁时获取付款地址
-watch(activeTab, async (newTab) => {
+watch(activeTab, async (newTab, oldTab) => {
+  if (oldTab !== undefined) {
+    tmaHapticSelection()
+  }
   if (newTab === 'transfer' && !paymentAddress.value) {
     await fetchPaymentAddress()
   }
@@ -334,6 +342,7 @@ watch(activeTab, async (newTab) => {
 
 // 处理重试
 const handleRetryFetchAddress = () => {
+  tmaHapticImpact('light')
   fetchPaymentAddress()
 }
 
@@ -361,7 +370,10 @@ const unitPrice = computed(() => {
   return formatCryptoAmount(formData.energy === 131000 ? flashPrice * 2 : flashPrice)
 })
 
-watch([() => formData.energy, () => langStore.currentLocale], () => {
+watch([() => formData.energy, () => langStore.currentLocale], ([newEnergy], [oldEnergy]) => {
+  if (oldEnergy !== undefined && newEnergy !== oldEnergy) {
+    tmaHapticSelection()
+  }
   energyOptions.value = createEnergyOptions()
 })
 
@@ -412,13 +424,20 @@ const addressOptions = computed(() => {
 })
 
 const handleSaveAddress = async () => {
+  tmaHapticImpact('light')
   if (!formRef.value) return
 
   try {
     await formRef.value.validateField('address')
 
     if (!formData.address) {
-      ElMessage.warning(t('formValidation.enterAddressToSave'))
+      ElMessage.warning(t('formValidation.enterAddressFirst'))
+      return
+    }
+
+    // 检查地址格式
+    if (formData.address.length < 10) {
+      ElMessage.warning(t('formValidation.addressTooShort'))
       return
     }
 
@@ -439,10 +458,12 @@ const handleSaveAddress = async () => {
     })
 
     if (success) {
+      tmaHapticNotification('success')
       // 重新获取用户信息（强制刷新 bind_address）
       await userStore.fetchUserInfo({ force: true })
     }
   } catch (error) {
+    tmaHapticNotification('error')
     console.error('【ERROR INFO】:', error)
   }
 }
@@ -473,6 +494,7 @@ const handleDeleteAddress = async (address: string) => {
     })
 
     if (success) {
+      tmaHapticNotification('success')
       // 如果删除的是当前选中的地址，清空选择
       if (formData.selectedAddress === address) {
         formData.selectedAddress = ''
@@ -485,11 +507,13 @@ const handleDeleteAddress = async (address: string) => {
     if (error === 'cancel') {
       return
     }
+    tmaHapticNotification('error')
     console.error('【ERROR INFO】:', error)
   }
 }
 
 const handleRentNow = async () => {
+  tmaHapticImpact('light')
   if (!formRef.value) return
 
   try {
@@ -508,9 +532,10 @@ const handleRentNow = async () => {
     })
     
     if (success) {
-      // 订单创建成功后的处理
+      tmaHapticNotification('success')
     }
   } catch (error) {
+    tmaHapticNotification('error')
     console.error('【ERROR INFO】:', error)
   }
 }
@@ -549,9 +574,11 @@ onUnmounted(() => {
   .rental-card {
     max-width: 896px;
     margin: 0 auto;
-    border-radius: 8px;
-    border: none;
-    box-shadow: 0px 14px 30px 0px rgba(0, 0, 0, 0.08);
+    border-radius: var(--theme-radius-lg, 8px);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    box-shadow: var(--theme-shadow-lg, 0 10px 25px -4px rgba(15, 23, 42, 0.07));
+    background: #ffffff;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
     :deep(.el-card__body) {
       padding: 24px;
@@ -561,6 +588,7 @@ onUnmounted(() => {
   .rental-tabs {
     :deep(.el-tabs__header) {
       margin: 0 0 22px;
+      overflow: visible;
     }
 
     :deep(.el-tabs__content) {
@@ -571,6 +599,7 @@ onUnmounted(() => {
       display: none;
     }
 
+    :deep(.el-tabs__nav-wrap),
     :deep(.el-tabs__nav-scroll) {
       overflow: visible;
     }
@@ -578,30 +607,46 @@ onUnmounted(() => {
     :deep(.el-tabs__nav) {
       width: 100%;
       display: flex;
-      background: rgba(2, 15, 45, 0.03);
-      border-radius: 4px;
-      padding: 3px;
+      align-items: stretch;
+      gap: 6px;
       box-sizing: border-box;
+      padding: 4px;
+      border-radius: var(--theme-radius-md, 6px);
+      background: rgba(15, 23, 42, 0.04);
+      border: 1px solid rgba(226, 232, 240, 0.8);
     }
 
     :deep(.el-tabs__item) {
       flex: 1;
-      height: 44px;
-      line-height: 44px;
-      padding: 0;
+      min-width: 0;
+      height: 40px;
+      line-height: 38px;
+      padding: 0 12px;
       text-align: center;
-      font-weight: 700;
+      font-weight: 600;
       font-size: 14px;
-      color: rgba(30, 41, 59, 0.6);
-      border-radius: 4px;
-      transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+      color: #64748b;
+      border: 1px solid transparent;
+      border-radius: var(--theme-radius-sm, 4px);
+      background: transparent;
+      box-shadow: none;
+      cursor: pointer;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:hover:not(.is-active) {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.5);
+      }
 
       &.is-active {
-        color: var(--theme-text-white);
-        background: var(--theme-bg-blue);
-        box-shadow: 0px 4px 10px 0px rgba(22, 93, 255, 0.25);
+        color: #0f172a;
+        background: #ffffff;
+        border-color: rgba(226, 232, 240, 0.9);
+        box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05)), 0 1px 2px rgba(15, 23, 42, 0.03);
+        font-weight: 700;
       }
     }
 
@@ -622,8 +667,61 @@ onUnmounted(() => {
     :deep(.el-form-item) {
       margin-bottom: 18px;
 
-      .el-form-item__content {
-        justify-content: center;
+      .el-radio-group {
+        width: 100%;
+        display: flex;
+        gap: 12px;
+      }
+
+      .energy-radio-button {
+        flex: 1;
+        min-width: 0;
+
+        :deep(.el-radio-button__inner) {
+          width: 100%;
+          min-height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 8px 12px;
+          border: 1.5px solid var(--theme-card-border, rgba(226, 232, 240, 0.9)) !important;
+          border-radius: var(--theme-radius-md, 6px) !important;
+          background: var(--theme-card-bg-gradient, linear-gradient(180deg, #ffffff 0%, #f8fafc 100%));
+          font-weight: 700;
+          font-size: 14px;
+          font-variant-numeric: tabular-nums;
+          color: #334155;
+          box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04)) !important;
+          outline: none;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+          &:hover {
+            border-color: var(--theme-primary-blue, #165dff) !important;
+            background: #ffffff;
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            transform: scale(0.98);
+          }
+        }
+
+        &:first-child :deep(.el-radio-button__inner),
+        &:last-child :deep(.el-radio-button__inner) {
+          border-radius: var(--theme-radius-md, 6px) !important;
+        }
+
+        :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner),
+        :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner:hover),
+        &.is-active :deep(.el-radio-button__inner),
+        &.is-active:first-child :deep(.el-radio-button__inner),
+        &.is-active:last-child :deep(.el-radio-button__inner) {
+          color: var(--theme-primary-blue, #165dff) !important;
+          background: rgba(22, 93, 255, 0.04) !important;
+          border-color: var(--theme-primary-blue, #165dff) !important;
+          box-shadow: 0 0 0 1px #165dff, var(--theme-shadow-glow-blue) !important;
+        }
       }
     }
 
@@ -641,38 +739,6 @@ onUnmounted(() => {
       }
     }
 
-    .energy-radio-group {
-      display: flex;
-      width: 630px;
-      background: transparent;
-      border-radius: 4px;
-      box-sizing: border-box;
-
-      .energy-radio-button {
-        flex: 1;
-
-        :deep(.el-radio-button__inner) {
-          width: 100%;
-          height: 36px;
-          padding: 0;
-          line-height: 36px;
-          border: none;
-          background: transparent;
-          font-weight: 700;
-          font-size: 14px;
-          color: rgba(30, 41, 59, 0.6);
-          border-radius: 4px;
-          box-shadow: none;
-          outline: none;
-        }
-
-        :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-          background: var(--theme-bg-blue);
-          color: var(--theme-text-white);
-        }
-      }
-    }
-
     .energy-row {
       display: flex;
       justify-content: center;
@@ -681,22 +747,27 @@ onUnmounted(() => {
     }
 
     :deep(.el-input__wrapper) {
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: none;
-      border: 1px solid #b8bfc9;
-      padding: 0 12px;
-      min-height: 44px;
+      background: #ffffff;
+      border-radius: var(--theme-radius-sm, 4px);
+      border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+      box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+      padding: 0 14px;
+      min-height: 46px;
+      transition: all 0.2s ease;
 
       &:hover {
-        border-color: #9aa3af;
+        border-color: rgba(22, 93, 255, 0.4);
+      }
+
+      &.is-focus {
+        border-color: var(--theme-primary-blue, #165dff);
+        box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
       }
 
       &.is-disabled,
-      &:has(.el-input__inner[readonly]) {
-        border-color: transparent;
-        background: rgba(2, 15, 45, 0.05);
-        cursor: not-allowed;
+      &.is-readonly {
+        background: #f8fafc;
+        border-color: rgba(226, 232, 240, 0.8);
       }
     }
 
@@ -768,26 +839,57 @@ onUnmounted(() => {
 
     .action-buttons {
       display: flex;
-      gap: 2px;
-      width: 630px;
+      align-items: stretch;
+      gap: 12px;
+      width: 100%;
+      max-width: 630px;
+      margin: 20px auto 0;
+      box-sizing: border-box;
+      padding: 0;
+      background: transparent;
+      box-shadow: none;
 
       .el-button {
         flex: 1;
-        height: 52px;
-        border-radius: 4px;
-        font-size: 16px;
+        min-width: 0;
+        height: 48px;
+        margin: 0;
+        border-radius: var(--theme-radius-md, 6px);
+        font-size: 15px;
         font-weight: 700;
+        letter-spacing: 0.02em;
+        transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover {
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: scale(0.98);
+        }
       }
     }
 
     :deep(.btn-save) {
+      color: #fff;
       background: var(--theme-bg-blue);
-      border: none;
+      border: 1px solid var(--theme-bg-blue);
+      box-shadow: 0 4px 14px -2px rgba(22, 93, 255, 0.35);
+
+      &:hover {
+        box-shadow: 0 6px 20px -2px rgba(22, 93, 255, 0.45);
+      }
     }
 
     :deep(.btn-rent) {
+      color: #fff;
       background: var(--theme-bg-orange);
-      border: none;
+      border: 1px solid var(--theme-bg-orange);
+      box-shadow: 0 4px 14px -2px rgba(255, 104, 22, 0.35);
+
+      &:hover {
+        box-shadow: 0 6px 20px -2px rgba(255, 104, 22, 0.45);
+      }
     }
 
     .custom-empty {
@@ -834,8 +936,8 @@ onUnmounted(() => {
       }
 
       .action-buttons .el-button {
-        height: 44px;
-        font-size: 14px;
+        height: 40px;
+        font-size: 13px;
       }
 
       :deep(.el-select) {
@@ -1669,6 +1771,11 @@ onUnmounted(() => {
   margin: 0;
 }
 
+.rental-tabs :deep(.el-tabs__nav-wrap),
+.rental-tabs :deep(.el-tabs__nav-scroll) {
+  overflow: visible;
+}
+
 .rental-tabs :deep(.el-tabs__nav-wrap::after),
 .rental-tabs :deep(.el-tabs__active-bar) {
   display: none;
@@ -1677,43 +1784,60 @@ onUnmounted(() => {
 .rental-tabs :deep(.el-tabs__nav) {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  align-items: stretch;
+  justify-content: stretch;
   box-sizing: border-box;
-  gap: 14px;
-  padding: 0;
-  background: transparent;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #e8ecf2;
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
 }
 
 .rental-tabs :deep(.el-tabs__item) {
   flex: 1;
   min-width: 0;
-  height: 44px;
+  height: 40px;
   box-sizing: border-box;
-  padding: 0;
-  border: 1px solid #e1e4ea;
-  border-radius: 4px;
-  color: #606060;
-  background: #f9fafb;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 42px;
+  padding: 0 8px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  border-radius: 6px;
+  color: #334155;
+  background: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 38px;
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 3px 6px rgba(15, 23, 42, 0.1);
+}
+
+.rental-tabs :deep(.el-tabs__item:hover:not(.is-active)) {
+  color: #334155;
+  background: #f8fafc;
 }
 
 .rental-tabs :deep(.el-tabs__item.is-active) {
   color: #fff;
   border-color: #165dff;
   background: #165dff;
-  box-shadow: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 4px rgba(22, 93, 255, 0.28),
+    0 4px 10px rgba(22, 93, 255, 0.32);
 }
 
 .energy-rental .rental-tabs :deep(.el-tabs__nav) {
-  gap: 14px;
-  padding: 0;
-  background: transparent;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #e8ecf2;
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
 }
 
 .balance-mode-label {
@@ -1800,9 +1924,14 @@ onUnmounted(() => {
 
 .energy-radio-group {
   display: flex;
+  align-items: stretch;
   box-sizing: border-box;
-  justify-content: space-between;
-  gap: 14px;
+  justify-content: stretch;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #e8ecf2;
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
 }
 
 .energy-radio-group .energy-radio-button {
@@ -1812,47 +1941,86 @@ onUnmounted(() => {
 
 .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner) {
   width: 100%;
-  height: 44px;
+  height: 40px;
   box-sizing: border-box;
-  padding: 0;
-  border: 1px solid #e1e4ea;
-  border-radius: 4px;
+  padding: 0 8px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  border-radius: 6px !important;
   background: #fff;
-  box-shadow: none;
-  color: #606060;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 42px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 3px 6px rgba(15, 23, 42, 0.1) !important;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 38px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+.energy-radio-group .energy-radio-button:first-child :deep(.el-radio-button__inner),
+.energy-radio-group .energy-radio-button:last-child :deep(.el-radio-button__inner) {
+  border-radius: 6px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 3px 6px rgba(15, 23, 42, 0.1) !important;
+}
+
+.energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner),
+.energy-radio-group .energy-radio-button.is-active :deep(.el-radio-button__inner) {
   color: #fff;
   border-color: #165dff;
   background: #165dff;
-  box-shadow: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 4px rgba(22, 93, 255, 0.28),
+    0 4px 10px rgba(22, 93, 255, 0.32) !important;
 }
 
 .energy-rental .rental-form .energy-radio-group {
   width: 100%;
-  padding: 0;
-  gap: 10px;
-  background: transparent;
+  padding: 4px;
+  gap: 8px;
+  border-radius: 8px;
+  background: #e8ecf2;
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
 }
 
-.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner) {
-  height: 44px;
-  line-height: 42px;
-  border: 1px solid #d0d5dd;
-  box-shadow: none;
+.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button:first-child :deep(.el-radio-button__inner),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button:last-child :deep(.el-radio-button__inner) {
+  height: 40px;
+  line-height: 38px;
+  border: 1px solid rgba(15, 23, 42, 0.04);
+  border-radius: 6px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 2px rgba(15, 23, 42, 0.08),
+    0 3px 6px rgba(15, 23, 42, 0.1) !important;
   background: #fff;
 }
 
 .energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__inner:hover) {
-  background: #fff;
+  color: #334155;
+  background: #f8fafc;
 }
 
-.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
+.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner:hover),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button.is-active :deep(.el-radio-button__inner),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button.is-active :deep(.el-radio-button__inner:hover),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button.is-active:first-child :deep(.el-radio-button__inner),
+.energy-rental .rental-form .energy-radio-group .energy-radio-button.is-active:last-child :deep(.el-radio-button__inner) {
+  color: #fff;
   border-color: #165dff;
+  background: #165dff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 4px rgba(22, 93, 255, 0.28),
+    0 4px 10px rgba(22, 93, 255, 0.32) !important;
 }
 
 .rental-form :deep(.el-input__wrapper),
@@ -1973,34 +2141,70 @@ onUnmounted(() => {
 .rental-form .action-buttons {
   width: 100%;
   display: flex;
-  gap: 20px;
+  align-items: stretch;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 4px;
+  border-radius: 8px;
+  background: #e8ecf2;
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
 }
 
 .energy-rental .rental-form .action-buttons {
   width: 100%;
-  gap: 20px;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 8px;
+  background: #e8ecf2;
+  box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
 }
 
 .rental-form .action-buttons .el-button {
   flex: 1;
-  height: 50px;
+  min-width: 0;
+  height: 44px;
   margin: 0;
-  border: 0;
-  border-radius: 4px;
-  font-size: 16px;
+  border-radius: 6px;
+  font-size: 14px;
   font-weight: 700;
 }
 
 .energy-rental .rental-form .action-buttons .el-button {
-  height: 50px;
+  height: 44px;
 }
 
 .rental-form :deep(.btn-save) {
+  color: #fff;
   background: #165dff;
+  border: 1px solid #165dff;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 4px rgba(22, 93, 255, 0.28),
+    0 4px 10px rgba(22, 93, 255, 0.32);
+}
+
+.rental-form :deep(.btn-save:hover),
+.rental-form :deep(.btn-save:focus) {
+  color: #fff;
+  background: #3d75ff;
+  border-color: #3d75ff;
 }
 
 .rental-form :deep(.btn-rent) {
+  color: #fff;
   background: #ff6816;
+  border: 1px solid #ff6816;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 2px 4px rgba(255, 104, 22, 0.28),
+    0 4px 10px rgba(255, 104, 22, 0.32);
+}
+
+.rental-form :deep(.btn-rent:hover),
+.rental-form :deep(.btn-rent:focus) {
+  color: #fff;
+  background: #ff812e;
+  border-color: #ff812e;
 }
 
 .rental-form .custom-empty {
@@ -2257,18 +2461,21 @@ onUnmounted(() => {
 
   .rental-card.is-balance .rental-form .action-buttons {
     gap: 8px;
+    padding: 4px;
   }
 
   .rental-card.is-balance .rental-form .action-buttons .el-button {
-    height: 44px;
-    font-size: 14px;
+    height: 40px;
+    font-size: 13px;
+    border-radius: 6px;
   }
 
   .rental-tabs :deep(.el-tabs__item) {
-    height: 40px;
+    height: 38px;
     flex: 1;
-    font-size: 13px;
-    line-height: 38px;
+    font-size: 12px;
+    line-height: 36px;
+    border-radius: 6px;
   }
 
   .rental-tabs :deep(.el-tabs__content) {
@@ -2285,6 +2492,11 @@ onUnmounted(() => {
   .rental-tabs :deep(.el-tabs__nav) {
     display: flex;
     width: 100%;
+    gap: 8px;
+    padding: 4px;
+    border-radius: 8px;
+    background: #e8ecf2;
+    box-shadow: inset 0 1px 4px rgba(15, 23, 42, 0.14);
   }
 
   .rental-tabs :deep(.el-tabs__item:nth-child(2)) {

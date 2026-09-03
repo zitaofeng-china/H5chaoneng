@@ -378,7 +378,9 @@ const {
 
 <style lang="scss" scoped>
 .navbar {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   padding: 0 24px;
   height: var(--layout-header-height, 50px);
   min-height: var(--layout-header-height, 50px);
@@ -389,9 +391,10 @@ const {
   right: 0;
   top: 0;
   z-index: 1000;
-  border-bottom: 0;
-  box-shadow: none;
+  border-bottom: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.7));
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
   box-sizing: border-box;
+  transition: all 0.2s ease;
 }
 
 .navbar-grid {
@@ -399,7 +402,7 @@ const {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-color: #fff;
+  background-color: rgba(255, 255, 255, 0.75);
   background-image:
     var(--theme-home-band-1-color),
     var(--theme-home-grid-vertical);
@@ -583,35 +586,48 @@ const {
 
   .header-action,
   .info-wrap {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
     padding: 0;
     box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid #1766f5;
-    border-radius: 8px;
-    background: #fff;
-    color: #1766f5;
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-sm, 6px);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+    color: var(--theme-primary-blue, #165dff);
     font: inherit;
     cursor: pointer;
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-      background: #eef4ff;
-      border-color: #1766f5;
+      background: #f8fafc;
+      border-color: rgba(22, 93, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
     }
   }
 
   .header-action.is-menu {
-    background: #1766f5;
-    border-color: #1766f5;
+    border-radius: var(--theme-radius-sm, 6px);
+    background: var(--theme-primary-blue, #165dff);
+    border-color: var(--theme-primary-blue, #165dff);
+    box-shadow: 0 2px 8px rgba(22, 93, 255, 0.25);
 
     &:hover {
       background: #0f5de7;
       border-color: #0f5de7;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
     }
   }
 
@@ -639,38 +655,44 @@ const {
   }
 }
 
-/* 图 2：蓝底余额区 + 独立白色充值按钮 */
+/* 蓝底余额区 + 独立白色充值按钮（克制利落的 6px 微圆角） */
 .balance-recharge {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  height: 32px;
-  padding: 2px 4px 2px 7px;
-  border: 1px solid #1766f5;
-  border-radius: 6px;
-  background: #1766f5;
+  gap: 8px;
+  height: 34px;
+  padding: 2px 4px 2px 10px;
+  border: 1px solid rgba(22, 93, 255, 0.2);
+  border-radius: var(--theme-radius-md, 6px);
+  background: linear-gradient(135deg, #165dff 0%, #0052d9 100%);
+  box-shadow: 0 2px 10px rgba(22, 93, 255, 0.25);
   color: #fff;
   font-family: inherit;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   line-height: 1;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
-    background: #0f5de7;
-    box-shadow: 0 2px 8px rgba(23, 102, 245, 0.12);
+    box-shadow: 0 4px 14px rgba(22, 93, 255, 0.35);
+    transform: translateY(-1px);
 
     .recharge-text {
-      background: #f5f8ff;
+      background: #ffffff;
+      color: #0052d9;
     }
   }
 
+  &:active {
+    transform: scale(0.98);
+  }
+
   .balance-token-icon {
-    width: 14px;
-    height: 14px;
-    flex: 0 0 14px;
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
   }
 
   .balance-amount {
@@ -680,17 +702,18 @@ const {
 
   .recharge-text {
     min-width: 48px;
-    height: 22px;
-    padding: 0 8px;
+    height: 24px;
+    padding: 0 10px;
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 3px;
-    background: #fff;
-    color: #1766f5;
+    border-radius: var(--theme-radius-sm, 4px);
+    background: #ffffff;
+    color: #165dff;
     font-size: 11px;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -752,12 +775,27 @@ const {
   top: var(--layout-header-height, 50px);
   left: 0;
   right: 0;
-  z-index: 99;
-  background: var(--theme-bg-white);
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+  border-radius: 0 0 var(--theme-radius-lg, 8px) var(--theme-radius-lg, 8px);
+  box-shadow: var(--theme-shadow-xl, 0 20px 30px -10px rgba(15, 23, 42, 0.15));
   overflow: hidden;
   overflow-y: auto;
+  animation: drawer-fade-slide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes drawer-fade-slide {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   /* 美化滚动条 */
   &::-webkit-scrollbar {
@@ -765,26 +803,28 @@ const {
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.02);
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(15, 23, 42, 0.1);
     border-radius: 2px;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.15);
+      background: rgba(15, 23, 42, 0.2);
     }
   }
 
   :deep(.el-collapse) {
-    padding: 10px 14px 14px;
-    border-radius: 0 0 12px 12px;
+    padding: 12px 14px 18px;
+    border-radius: 0 0 var(--theme-radius-lg, 8px) var(--theme-radius-lg, 8px);
+    border: none;
+    background: transparent;
   }
 
   :deep(.el-collapse-item__arrow) {
     transform: rotateZ(90deg);
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 
     &.is-active {
       transform: rotateZ(-90deg);
@@ -792,16 +832,22 @@ const {
   }
 
   :deep(.el-collapse-item__header) {
-    height: 44px;
-    line-height: 44px;
-    border-radius: 6px;
-    border-bottom-color: transparent;
-    background: rgba(2, 15, 45, 0.03);
-    transition: all 0.3s ease;
-    margin-bottom: 2px;
+    height: 48px;
+    line-height: 48px;
+    border-radius: var(--theme-radius-md, 8px);
+    border: 1px solid transparent;
+    background: rgba(15, 23, 42, 0.03);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-bottom: 6px;
 
     &:hover {
-      background: rgba(2, 15, 45, 0.05);
+      background: #ffffff;
+      border-color: rgba(226, 232, 240, 0.9);
+      box-shadow: var(--theme-shadow-xs);
+    }
+
+    &:active {
+      transform: scale(0.985);
     }
   }
 
@@ -811,25 +857,30 @@ const {
   }
 
   :deep(.el-collapse-item) {
+    border: none;
+    background: transparent;
+
     &:not(:last-child) {
       margin-bottom: 6px;
     }
 
-    // Element Plus 自动添加的展开状态（不显示绿色）
     &.is-active {
       .el-collapse-item__header {
-        background: rgba(2, 15, 45, 0.05);
+        background: #ffffff;
+        border-color: rgba(226, 232, 240, 0.9);
+        box-shadow: var(--theme-shadow-xs);
       }
     }
 
-    // 我们自定义的路由激活状态（显示绿色）
     &.route-active {
       .el-collapse-item__header {
-        background: rgba(22, 93, 255, 0.08);
+        background: rgba(22, 93, 255, 0.06);
+        border-color: rgba(22, 93, 255, 0.25);
       }
 
       .el-collapse-item__title {
-        color: #165dff;
+        color: var(--theme-primary-blue, #165dff);
+        font-weight: 700;
       }
     }
 
@@ -842,7 +893,7 @@ const {
         cursor: pointer;
         
         &:active {
-          background: rgba(2, 15, 45, 0.08);
+          background: rgba(22, 93, 255, 0.06);
         }
       }
     }
@@ -857,6 +908,7 @@ const {
 
   :deep(.el-collapse-item__wrap) {
     border: none;
+    background: transparent;
   }
 
   .menu-wrap {
@@ -864,43 +916,46 @@ const {
     padding: 0 6px;
 
     .menu-item {
-      padding: 0 14px;
-      height: 40px;
+      padding: 0 16px;
+      height: 42px;
       display: flex;
       align-items: center;
       font-size: 13px;
       font-weight: 500;
-      border-radius: 5px;
+      border-radius: var(--theme-radius-sm, 6px);
       cursor: pointer;
-      transition: all 0.3s ease;
+      margin: 3px 0;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
 
       &::before {
         content: '';
         position: absolute;
-        left: 7px;
+        left: 8px;
         top: 50%;
         transform: translateY(-50%);
-        width: 3px;
-        height: 3px;
-        background: #165dff;
+        width: 4px;
+        height: 4px;
+        background: var(--theme-primary-blue, #165dff);
         border-radius: 50%;
         opacity: 0;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
       }
 
       &:hover {
-        background: rgba(2, 15, 45, 0.03);
+        background: rgba(15, 23, 42, 0.04);
+        color: #0f172a;
       }
 
       &:active {
-        background: rgba(2, 15, 45, 0.06);
+        transform: scale(0.985);
       }
 
       &.is-active {
-        color: #165dff;
+        color: var(--theme-primary-blue, #165dff);
         background: rgba(22, 93, 255, 0.08);
-        font-weight: 600;
+        font-weight: 700;
+        padding-left: 20px;
 
         &::before {
           opacity: 1;
