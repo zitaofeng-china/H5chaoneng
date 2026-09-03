@@ -1853,10 +1853,10 @@ onUnmounted(() => {
   align-items: center;
   gap: 0;
   margin: 16px 0 0 16px;
-  padding-left: 12px;
-  color: #000;
+  padding-left: 10px;
+  color: var(--theme-text-black, #182230);
   font-size: 14px;
-  font-weight: 900;
+  font-weight: 700;
   line-height: 14px;
   white-space: nowrap;
 }
@@ -1864,12 +1864,13 @@ onUnmounted(() => {
 .field-label::before {
   content: '';
   position: absolute;
-  top: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   left: 0;
-  width: 2px;
-  height: 16px;
-  border-radius: 2px;
-  background: #165dff;
+  width: 3px;
+  height: 14px;
+  border-radius: 1.5px;
+  background: var(--theme-primary-blue, #165dff);
 }
 
 .saved-address-label {
@@ -2411,13 +2412,10 @@ onUnmounted(() => {
     margin-left: 0;
   }
 
-  .rental-card.is-balance .rental-tabs {
-    margin-top: 16px;
-  }
-
+  .rental-card.is-balance .rental-tabs,
   .rental-card.is-transfer .rental-tabs {
     width: 100%;
-    margin: 0;
+    margin: 16px 0 0;
   }
 
   .mode-label-wrap {
@@ -2435,6 +2433,7 @@ onUnmounted(() => {
     margin-top: 0;
   }
 
+  .field-label,
   .rental-card.is-balance .field-label {
     font-size: 13px;
   }

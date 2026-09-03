@@ -144,18 +144,20 @@ const tips = computed(() => [
     min-height: 20px;
     padding-left: 10px;
     position: relative;
-    color: var(--theme-text-black);
-    font-size: 13px;
+    color: var(--theme-text-black, #182230);
+    font-size: 14px;
     font-weight: 700;
+    line-height: 14px;
 
     &::before {
       content: '';
       position: absolute;
-      top: 2px;
+      top: 50%;
+      transform: translateY(-50%);
       left: 0;
       width: 3px;
-      height: 15px;
-      border-radius: 2px;
+      height: 14px;
+      border-radius: 1.5px;
       background: var(--theme-primary-blue, #165dff);
     }
 
@@ -356,6 +358,10 @@ const tips = computed(() => [
 
 @media (max-width: 890px) {
   .transfer-rental {
+    .explain-label {
+      font-size: 13px;
+    }
+
     .explain-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
