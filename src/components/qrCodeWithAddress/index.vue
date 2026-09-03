@@ -244,45 +244,21 @@ const handleRetry = () => {
 
     .target-frame {
       position: relative;
-      display: inline-block;
-      padding: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
       background: #ffffff;
       border-radius: var(--theme-radius-md, 6px);
       border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
-      box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
-
-      &::before,
-      &::after {
-        content: '';
-        position: absolute;
-        width: 10px;
-        height: 10px;
-        border-color: var(--theme-primary-blue, #165dff);
-        pointer-events: none;
-      }
-
-      &::before {
-        top: -3px;
-        left: -3px;
-        border-top: 2px solid;
-        border-left: 2px solid;
-        border-top-left-radius: 3px;
-      }
-
-      &::after {
-        bottom: -3px;
-        right: -3px;
-        border-bottom: 2px solid;
-        border-right: 2px solid;
-        border-bottom-right-radius: 3px;
-      }
+      box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.06));
 
       .qr-image {
         display: block;
         width: 168px;
         height: 168px;
         object-fit: contain;
-        border-radius: 2px;
+        border-radius: 4px;
       }
     }
   }
@@ -390,13 +366,13 @@ const handleRetry = () => {
     align-items: center;
     justify-content: center;
     font-size: 12px;
-    font-weight: 600;
+    font-weight: 500;
     margin-top: 10px;
-    color: #c13535;
+    color: var(--theme-text-gray, #64748b);
     gap: 4px;
 
     svg {
-      color: #c13535;
+      color: var(--theme-primary-blue, #165dff);
       flex-shrink: 0;
     }
   }
@@ -404,24 +380,31 @@ const handleRetry = () => {
 
 @media (max-width: 768px) {
   .qr-section {
-    padding: 12px 0 14px;
+    padding: 8px 8px 12px;
 
     .section-title {
-      font-size: 15px;
-      margin-bottom: 10px;
+      font-size: 14px;
+      margin-bottom: 8px;
     }
 
-    .qr-viewport .target-frame .qr-image {
-      width: 144px;
-      height: 144px;
+    .qr-viewport .target-frame {
+      padding: 6px;
+
+      .qr-image {
+        width: 140px;
+        height: 140px;
+      }
     }
 
     .wallet-address-card {
-      padding: 8px 10px;
+      margin: 10px auto 0;
+      padding: 6px 8px;
       gap: 6px;
+      width: 100%;
+      border-radius: var(--theme-radius-md, 6px);
 
       .address-split {
-        font-size: 12px;
+        font-size: 11px;
       }
 
       .copy-pill-btn {
@@ -432,7 +415,13 @@ const handleRetry = () => {
 
     .tips-info {
       font-size: 11px;
-      padding: 0 6px;
+      margin-top: 8px;
+      padding: 0 4px;
+      color: var(--theme-text-gray, #64748b);
+
+      svg {
+        color: var(--theme-primary-blue, #165dff);
+      }
     }
   }
 }

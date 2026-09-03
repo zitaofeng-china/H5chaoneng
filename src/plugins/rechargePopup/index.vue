@@ -2,8 +2,8 @@
   <div class="recharge-dialog">
     <el-dialog
       v-model="visible"
-      :show-close="!isMobile"
-      :width="864"
+      :show-close="true"
+      :width="isMobile ? '92%' : '480px'"
       :autofocus="false"
       center
       align-center
@@ -23,7 +23,7 @@
         <el-tabs
           v-model="selectedCoin"
           class="coin-tabs"
-          @tab-change="handleCoinChange"
+          @tab-change="onCoinChange"
         >
           <el-tab-pane :label="t('common.trx')" name="TRX" />
           <el-tab-pane :label="t('common.usdt')" name="USDT" />
@@ -34,9 +34,9 @@
             <div
               v-for="amount in presetAmounts"
               :key="amount"
-              class="amount-btn"
+              class="amount-btn tactile-btn tabular-nums"
               :class="{ active: selectedAmount === amount && !isCustomAmount }"
-              @click="selectPresetAmount(amount)"
+              @click="onSelectPresetAmount(amount)"
             >
               {{ formatCryptoAmount(amount) }} {{ selectedCoin }}
             </div>
@@ -79,16 +79,16 @@
             </div>
             <div v-if="estimatedTrxAmount" class="rate-row estimated-row">
               <span>{{ t('recharge.estimatedTrx') }}</span>
-              <span class="rate-value">{{ estimatedTrxAmount }} TRX</span>
+              <span class="rate-value tabular-nums">{{ estimatedTrxAmount }} TRX</span>
             </div>
           </div>
 
           <el-button
             type="primary"
             size="large"
-            class="confirm-amount-btn"
+            class="confirm-amount-btn tactile-btn"
             :disabled="!isAmountValid"
-            @click="confirmAmount"
+            @click="onConfirmAmount"
           >
             {{ t('recharge.confirmAmount') }}
           </el-button>
@@ -98,13 +98,13 @@
       <!-- 第二步：显示充值地址和二维码 -->
       <div v-else class="recharge-content step-two">
         <div class="selected-amount-display">
-          <div class="amount-value">
+          <div class="amount-value tabular-nums">
             {{ displayActualAmount }} {{ actualCoin }}
             <el-button
               link
               type="primary"
-              @click="copyActualAmount"
-              class="copy-amount-btn"
+              @click="onCopyActualAmount"
+              class="copy-amount-btn tactile-btn"
               :loading="isCopying"
             >
               <SvgIcon name="transfer-copy" width="16" height="16" />
@@ -151,6 +151,7 @@ import { useI18n } from 'vue-i18n'
 import { Money } from '@element-plus/icons-vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
 import { formatCryptoAmount } from '@/utils/number'
+import { tmaHapticSelection, tmaHapticImpact, tmaHapticNotification } from '@/utils/telegram'
 
 defineOptions({
   name: 'RechargePopup',
@@ -191,7 +192,29 @@ const {
   close,
 } = useRecharge()
 
+const onCoinChange = (coin: any) => {
+  tmaHapticSelection()
+  handleCoinChange(coin)
+}
+
+const onSelectPresetAmount = (amount: number) => {
+  tmaHapticSelection()
+  selectPresetAmount(amount)
+}
+
+const onConfirmAmount = () => {
+  tmaHapticImpact('light')
+  confirmAmount()
+}
+
+const onCopyActualAmount = () => {
+  tmaHapticImpact('light')
+  copyActualAmount()
+  tmaHapticNotification('success')
+}
+
 const handleClose = () => {
+  tmaHapticImpact('light')
   close()
 }
 
