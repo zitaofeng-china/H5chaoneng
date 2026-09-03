@@ -1,15 +1,15 @@
 <template>
-  <div class="reset-dialog">
+  <div class="reset-dialog" :class="layoutClass">
     <el-dialog
       v-model="visible"
       :show-close="true"
-      :width="864"
-      :height="552"
+      :fullscreen="isMobile"
+      :width="isMobile ? '100%' : 864"
       header-class="reset-header"
       align-center
       @close="handleClose"
     >
-      <div class="reset-container">
+      <div class="reset-container" :class="layoutClass">
         <div class="reset-background" aria-hidden="true">
           <img :src="RegisterBg" alt="" class="reset-bg" />
           <div class="reset-bg-blur" />
@@ -19,9 +19,10 @@
         <div class="reset-right">
           <div class="reset-header">
             <div class="reset-title">{{ t('reset.title') }}</div>
+            <div class="reset-subtitle">{{ t('reset.subtitle') }}</div>
           </div>
 
-          <el-form :model="resetForm" :rules="rules" ref="resetFormRef" class="reset-form">
+          <el-form :model="resetForm" :rules="rules" ref="resetFormRef" class="reset-form" :class="layoutClass">
             <el-form-item prop="email">
               <div class="input-wrapper">
                 <el-input
@@ -51,7 +52,7 @@
                   </template>
                   <template #suffix>
                     <div
-                      class="countdown"
+                      class="countdown-pill tactile-btn"
                       :class="{ disabled: countdown > 0 }"
                       @click="handleSendVerificationCode"
                     >
@@ -99,11 +100,11 @@
               </div>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item class="reset-submit">
               <el-button
                 type="primary"
                 size="large"
-                class="reset-btn"
+                class="reset-btn tactile-btn"
                 @click="onReset"
                 :loading="loading"
               >
@@ -123,10 +124,14 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useResetForm } from '@/hooks/useResetForm'
 import RegisterBg from '@/assets/images/register-bg.png'
 import { getPopup } from '@/plugins/popupRegistry'
+import { useCommonStore } from '@/stores/useCommonStore'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import type { ResetEmits } from './types'
 
 defineOptions({
@@ -135,6 +140,9 @@ defineOptions({
 
 const { t } = useI18n()
 const emit = defineEmits<ResetEmits>()
+const { isMobile } = storeToRefs(useCommonStore())
+const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
+const { tmaHapticImpact, tmaHapticSelection } = useTelegramHaptics()
 
 const {
   visible,
@@ -156,6 +164,7 @@ const handleClose = async () => {
 }
 
 const onReset = async () => {
+  tmaHapticImpact('light')
   const success = await handleReset()
   if (success) {
     await handleClose()
@@ -163,6 +172,7 @@ const onReset = async () => {
 }
 
 const switchToLogin = () => {
+  tmaHapticSelection()
   getPopup('loginPopup')?.open()
   setTimeout(() => {
     handleClose()

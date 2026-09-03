@@ -446,6 +446,7 @@
   },
   "reset": {
     "title": "重置密码",
+    "subtitle": "请输入您的注册邮箱，验证后设置新密码",
     "emailPlaceholder": "请输入邮箱",
     "codePlaceholder": "请输入验证码",
     "getCode": "获取验证码",

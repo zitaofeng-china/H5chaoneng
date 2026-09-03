@@ -416,6 +416,7 @@
   },
   "reset": {
     "title": "Reset Password",
+    "subtitle": "Enter your registered email to reset password",
     "emailPlaceholder": "Please enter email",
     "codePlaceholder": "Please enter verification code",
     "getCode": "Get Code",
