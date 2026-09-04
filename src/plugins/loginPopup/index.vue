@@ -7,10 +7,10 @@
       :fullscreen="isMobile"
       :width="isMobile ? '100%' : 864"
       header-class="login-header"
-      align-center
+      :align-center="!isMobile"
       @close="handleClose"
     >
-      <AuthDialogFrame mode="login" @switch="onAuthSwitch">
+      <AuthDialogFrame mode="login" @switch="onAuthSwitch" @close="handleClose">
           <el-form
             :model="loginForm"
             :rules="rules"

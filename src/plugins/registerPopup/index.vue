@@ -7,10 +7,10 @@
       :fullscreen="isMobile"
       :width="isMobile ? '100%' : 864"
       header-class="register-header"
-      align-center
+      :align-center="!isMobile"
       @close="handleClose"
     >
-      <AuthDialogFrame mode="register" @switch="onAuthSwitch">
+      <AuthDialogFrame mode="register" @switch="onAuthSwitch" @close="handleClose">
           <el-form
             :model="registerForm"
             :rules="rules"
