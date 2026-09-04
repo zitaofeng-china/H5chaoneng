@@ -1,5 +1,16 @@
 <template>
   <div class="auth-frame" :class="[`is-${mode}`, layoutClass]">
+    <!-- 移动端顶部关闭小控件（小方块样式，与 PC 端保持一致） -->
+    <button
+      v-if="isMobile"
+      type="button"
+      class="mobile-close-btn tactile-btn"
+      aria-label="Close"
+      @click="emit('close')"
+    >
+      <el-icon :size="13"><Close /></el-icon>
+    </button>
+
     <div class="auth-hero" aria-hidden="true">
       <img :src="heroImage" alt="" class="auth-hero-img" />
       <div v-if="isMobile" class="auth-hero-blur" />
@@ -52,6 +63,7 @@
 import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
+import { Close } from '@element-plus/icons-vue'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import heroImage from '@/assets/images/register-bg.png'
@@ -67,6 +79,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   switch: [mode: 'login' | 'register']
+  close: []
 }>()
 
 const { t } = useI18n()
@@ -275,6 +288,37 @@ const onSwitch = (next: 'login' | 'register') => {
       color: var(--theme-primary-blue, #165dff);
       box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.08));
       font-weight: 700;
+    }
+  }
+
+  .mobile-close-btn {
+    position: absolute;
+    top: max(12px, env(safe-area-inset-top));
+    right: 14px;
+    z-index: 30;
+    width: 28px;
+    height: 28px;
+    border-radius: var(--theme-radius-sm, 4px);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--theme-text-gray, #64748b);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.98);
+      border-color: rgba(22, 93, 255, 0.25);
+      color: var(--theme-text-black, #0f172a);
+    }
+
+    &:active {
+      transform: scale(0.94);
+      background: rgba(241, 245, 249, 0.95);
     }
   }
 }
