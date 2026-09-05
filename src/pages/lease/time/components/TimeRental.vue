@@ -127,8 +127,8 @@
             </el-input>
           </el-form-item>
 
-          <el-form-item :label="t('lease.totalPrice')" prop="total">
-            <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile }">
+          <el-form-item :label="t('lease.totalPrice')" prop="total" class="total-price-item">
+            <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile, 'total-price-input': true }">
               <template #prefix v-if="isMobile">
                 <span class="inline-label">
                   <span class="label-marker" aria-hidden="true"></span>
@@ -191,7 +191,13 @@
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" class="rent-btn" @click="rentNow">
+            <el-button
+              type="primary"
+              class="rent-btn primary-btn"
+              :loading="orderLoading"
+              :disabled="orderLoading"
+              @click="rentNow"
+            >
               {{ t('lease.rentNowButton') }} ({{ totalDisplay }} {{ t('common.trx') }})
             </el-button>
           </el-form-item>
@@ -209,11 +215,17 @@ import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useOrderCreation } from '@/hooks/useOrderCreation'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import { OrderKind } from '@/api/modules/order/types'
 import { storeToRefs } from 'pinia'
 import { formatCryptoAmount } from '@/utils/number'
 
 defineOptions({ name: 'TimeRental' })
+
+const isValidTronAddress = (address: string): boolean => {
+  if (!address || typeof address !== 'string') return false
+  return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address.trim())
+}
 
 interface RentalForm {
   unitPrice: number
@@ -234,6 +246,7 @@ const { isMobile } = storeToRefs(commonStore)
 const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
+const { tmaHapticImpact, tmaHapticSelection, tmaHapticNotification } = useTelegramHaptics()
 
 const CUSTOM_COL = 4
 const CUSTOM_MAX = 1000
@@ -498,6 +511,16 @@ const rules = computed<FormRules<RentalForm>>(() => ({
   wallet: [
     { required: true, message: t('formValidation.walletRequired'), trigger: 'blur' },
     { min: 5, message: t('formValidation.walletTooShort'), trigger: 'blur' },
+    {
+      validator: (_rule: unknown, value: string, callback: (error?: string | Error) => void) => {
+        if (!isValidTronAddress(value)) {
+          callback(new Error(t('formValidation.enterValidAddress')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
   ],
 }))
 
@@ -513,6 +536,7 @@ watch([unitPrice, count, total, energy, totalEnergy, validity], () => {
 watch(wallet, (v) => (form.wallet = v))
 
 function onSelect(rowIdx: number, idx: number, opt: string) {
+  tmaHapticSelection()
   selecteIndex.value = [rowIdx, idx]
   if (opt === t('lease.custom') || idx === CUSTOM_COL) {
     ensureCustomCount(rowIdx)
@@ -521,6 +545,7 @@ function onSelect(rowIdx: number, idx: number, opt: string) {
 
 // 移动端时长选择变化
 const onMobileDurationChange = (durationIdx: number) => {
+  tmaHapticSelection()
   mobileSelectedDuration.value = durationIdx
   mobileSelectedCount.value = 0 // 重置数量选择
   selecteIndex.value = [durationIdx, 0]
@@ -528,6 +553,7 @@ const onMobileDurationChange = (durationIdx: number) => {
 
 // 移动端数量选择变化
 const onMobileCountChange = (countIdx: number, opt: string) => {
+  tmaHapticSelection()
   mobileSelectedCount.value = countIdx
   selecteIndex.value = [mobileSelectedDuration.value, countIdx]
   if (opt === t('lease.custom') || countIdx === CUSTOM_COL) {
@@ -538,6 +564,7 @@ const onMobileCountChange = (countIdx: number, opt: string) => {
 const rentNow = async () => {
   if (!formRef.value) return
   
+  tmaHapticImpact('medium')
   try {
     await formRef.value.validate()
 
@@ -556,15 +583,17 @@ const rentNow = async () => {
       count: count.value,
       duration: durationInSeconds,
       kind: OrderKind.KindTimeEnergy,
-      target: [wallet.value],
+      target: [wallet.value.trim()],
       userId: userInfo.value?.id || 0,
       context: 'lease_time',
     })
     
     if (success) {
+      tmaHapticNotification('success')
       wallet.value = ''
     }
   } catch (error) {
+    tmaHapticNotification('error')
     console.error('【ERROR INFO】:', error)
   }
 }
@@ -642,27 +671,34 @@ const rentNow = async () => {
   justify-content: center;
   gap: 1px;
   overflow: hidden;
-  border: none;
-  border-radius: 3px;
-  background: #f0f2f4;
-  color: #98a2b3;
+  border: 1px solid rgba(22, 93, 255, 0.14);
+  border-radius: 4px;
+  background: #f4f8ff;
+  color: var(--theme-text-blue);
   font-family: inherit;
   font-size: 11px;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
-  transition: background-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    background: #e8ebef;
-    color: #667085;
+    border-color: rgba(22, 93, 255, 0.35);
+    background: #eaf1ff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(22, 93, 255, 0.08);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   &.active {
-    background: var(--theme-bg-blue);
-    color: var(--theme-text-white);
-    box-shadow: 0 2px 5px rgba(22, 93, 255, 0.12);
+    border-color: transparent;
+    background: linear-gradient(135deg, #165dff 0%, #0e42d2 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(22, 93, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
   }
 }
 
@@ -823,6 +859,27 @@ const rentNow = async () => {
   :deep(.el-form-item.is-error .el-input__wrapper) {
     box-shadow: 0 0 0 1px var(--el-color-danger) inset;
   }
+
+  :deep(.total-price-item) {
+    .el-input__wrapper {
+      background: #f8fafc !important;
+      box-shadow: 0 0 0 1px #cbd5e1 inset !important;
+    }
+
+    .el-input__inner {
+      color: #0f172a !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif !important;
+      -webkit-text-fill-color: #0f172a !important;
+    }
+
+    .el-input__suffix {
+      color: #ea580c !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+    }
+  }
 }
 
 :deep(.rent-btn) {
@@ -833,19 +890,27 @@ const rentNow = async () => {
   margin-top: 4px;
   padding: 0 12px;
   border: none;
-  border-radius: 3px;
-  background: var(--theme-bg-orange);
+  border-radius: 4px;
+  background: linear-gradient(135deg, #ff7a18 0%, #ea580c 100%);
   color: var(--theme-text-white);
   font-size: 13px;
   font-weight: 700;
   line-height: 1;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --el-button-size: 38px;
 
   &:hover,
   &:focus {
     border-color: transparent;
-    background: #f45d0f;
+    background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
     color: var(--theme-text-white);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.35);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 }
 
@@ -939,24 +1004,31 @@ const rentNow = async () => {
 
     .pill {
       flex-direction: row;
-      height: 32px;
+      height: 34px;
       padding: 0 4px;
+      border: 1px solid rgba(22, 93, 255, 0.12);
       border-radius: 4px;
-      background: #e5e7eb;
-      color: #667085;
+      background: #f4f8ff;
+      color: #1e293b;
       font-size: 12px;
       font-weight: 600;
       box-shadow: none;
+      transition: all 0.2s ease;
+
+      &:active {
+        transform: scale(0.97);
+      }
 
       &:hover {
-        background: #d1d5db;
-        color: #344054;
+        background: #eaf1ff;
+        color: var(--theme-text-blue);
       }
 
       &.active {
-        background: var(--theme-bg-blue);
-        color: #fff;
-        box-shadow: none;
+        border-color: transparent;
+        background: linear-gradient(135deg, #165dff 0%, #0e42d2 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(22, 93, 255, 0.2);
       }
 
       &:last-child {
@@ -1094,6 +1166,27 @@ const rentNow = async () => {
       padding-left: 0;
       padding-right: 8px;
     }
+
+    :deep(.total-price-item) {
+      .el-input__wrapper {
+        background: #f8fafc !important;
+        box-shadow: 0 0 0 1px #cbd5e1 !important;
+      }
+
+      .el-input__inner {
+        color: #0f172a !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif !important;
+        -webkit-text-fill-color: #0f172a !important;
+      }
+
+      .el-input__suffix {
+        color: #ea580c !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+      }
+    }
   }
 
   :deep(.rent-btn) {
@@ -1102,6 +1195,7 @@ const rentNow = async () => {
     margin-top: 6px;
     padding: 0 12px;
     font-size: 14px;
+    border-radius: 6px;
     --el-button-size: 44px;
   }
 }
