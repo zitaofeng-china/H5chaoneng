@@ -2,6 +2,8 @@
  * 认证模块类型定义
  */
 
+export type BindAddressMap = Partial<Record<number, string[]>>
+
 // 用户信息
 export interface UserInfo {
   id: number // 用户ID
@@ -10,7 +12,7 @@ export interface UserInfo {
   agent_id: number // 代理ID
   trx_balance: string // TRX 余额
   usdt_balance: number // USDT 余额
-  address_list: string[] | null // 地址列表
+  bind_address: BindAddressMap | null // 按订单类型绑定的地址列表
   status: number // 状态：1-正常
   username: string // 用户名
   email: string // 邮箱
@@ -66,48 +68,10 @@ export interface ResetPasswordParams {
   verify_code: string // 验证码
 }
 
-// 修改密码请求参数（旧接口）
-export interface RevisePasswordParams {
-  oldPassword: string
-  newPassword: string
-  confirmPassword?: string
-}
-
-// 发送验证码请求参数
-export interface SendCodeParams {
-  email: string
-  type: 'register' | 'reset' | 'verify'
-}
-
 // 发送邮箱验证码请求参数
 export interface SendEmailCodeParams {
   channel: string // 验证码类型（忘记密码场景固定为 "change_passwd"）
   email: string // 电子邮箱
-}
-
-// 发送验证码响应数据
-export interface SendCodeResponse {
-  success: boolean
-  message: string
-  expiresIn: number // 验证码有效期（秒）
-}
-
-// 验证 Token 响应
-export interface VerifyTokenResponse {
-  valid: boolean
-  userInfo?: UserInfo
-}
-
-// 刷新 Token 请求参数
-export interface RefreshTokenParams {
-  refreshToken: string
-}
-
-// 刷新 Token 响应数据
-export interface RefreshTokenResponse {
-  token: string
-  refreshToken: string
-  expiresIn: number
 }
 
 // 登出响应

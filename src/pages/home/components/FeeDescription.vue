@@ -31,7 +31,10 @@
               <div class="fee-item">
                 <div class="fee-info">
                   <SvgIcon name="fee-info" width="12" height="12" />
-                  <div class="text">{{ $t('fee.feeInfo') }}</div>
+                  <div class="text">
+                    <span class="fee-info-desktop">{{ $t('fee.feeInfo') }}</span>
+                    <span class="fee-info-mobile">{{ $t('fee.feeInfoMobile') }}</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -105,23 +108,26 @@ defineOptions({
 
 <style lang="scss" scoped>
 .fee-description {
-  padding: 100px 0;
-  background: var(--theme-bg-light);
+  position: relative;
+  padding: 64px 0 56px;
+  /* 背景改由父级 .fee-workflow-ambient 统一绘制的环境光渐变提供，
+     避免与“工作原理”区块的背景在拼接处出现断层空白。 */
+  background: transparent;
 }
 
 .fee-container {
-  max-width: 1000px;
+  max-width: 920px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 .fee-header {
   text-align: center;
-  margin-bottom: 50px;
+  margin-bottom: 44px;
 }
 
 .fee-title {
-  font-size: 40px;
+  font-size: 34px;
   font-weight: 700;
   color: var(--theme-text-black);
   margin-bottom: 10px;
@@ -137,10 +143,11 @@ defineOptions({
 .fee-content {
   display: flex;
   flex-direction: column;
-  background: var(--theme-text-white);
-  border-radius: 16px;
+  background: var(--theme-bg-white, #ffffff);
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-lg, 8px);
   overflow: hidden;
-  box-shadow: 0px 13px 22px 0px rgba(0, 0, 0, 0.07);
+  box-shadow: var(--theme-shadow-md, 0 4px 14px -2px rgba(15, 23, 42, 0.06));
 }
 
 .fee-columns {
@@ -149,7 +156,7 @@ defineOptions({
 }
 
 .fee-column {
-  padding: 30px;
+  padding: 28px 32px 24px;
 
   &:not(:last-child) {
     border-right: 1px solid rgba(245, 245, 245, 1);
@@ -163,7 +170,7 @@ defineOptions({
 .column-title {
   display: flex;
   align-items: center;
-  font-size: 20px;
+  font-size: 17px;
   font-weight: 700;
   color: var(--theme-text-black);
 
@@ -183,7 +190,7 @@ defineOptions({
   justify-content: space-between;
   align-items: flex-start;
   padding: 5px 0 0 0;
-  font-size: 14px;
+  font-size: 12px;
 
   &:last-child {
     padding-top: 10px;
@@ -192,9 +199,9 @@ defineOptions({
   &.fee-item-bg {
     margin-top: 10px;
     padding: 10px;
-    border-radius: 5px;
-    background: rgba(22, 93, 255, 0.1);
-    color: var(--theme-bg-blue);
+    border-radius: var(--theme-radius-sm, 4px);
+    background: rgba(22, 93, 255, 0.08);
+    color: var(--theme-primary-blue, #165dff);
 
     .fee-info {
       color: var(--theme-bg-blue);
@@ -216,6 +223,10 @@ defineOptions({
       flex: 1;
       margin-left: 5px;
       line-height: 20px;
+    }
+
+    .fee-info-mobile {
+      display: none;
     }
 
     svg {
@@ -240,8 +251,8 @@ defineOptions({
 }
 
 .important-notice {
-  background: var(--theme-transfer-bg-light);
-  padding: 30px;
+  background: #f7f9fd;
+  padding: 24px 32px 26px;
 }
 
 .notice-header {
@@ -249,7 +260,7 @@ defineOptions({
 }
 
 .notice-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--theme-text-black);
 }
@@ -265,7 +276,7 @@ defineOptions({
   display: flex;
   align-items: center;
   gap: 5px;
-  font-size: 14px;
+  font-size: 12px;
   // line-height: 1;
 }
 
@@ -274,63 +285,72 @@ defineOptions({
   color: var(--theme-text-muted);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .fee-container {
     max-width: initial;
-    padding: 0 10px;
+    margin: 0;
+    padding: 0 16px;
   }
 
   .fee-description {
-    padding: 40px 0;
+    padding: 28px 0 24px;
   }
 
   .fee-header {
-    margin-bottom: 20px;
+    margin-bottom: 18px;
   }
 
   .fee-title {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     margin-bottom: 8px;
+    letter-spacing: 0.02em;
   }
 
   .fee-subtitle {
-    font-size: 13px;
+    font-size: 12px;
     line-height: 1.5;
+    color: #98a2b3;
+    opacity: 1;
+    padding: 0 8px;
   }
 
   .fee-content {
-    border-radius: 12px;
+    border-radius: 16px;
+    box-shadow: 0 8px 28px rgba(21, 47, 92, 0.06);
   }
 
   .fee-columns {
     grid-template-columns: 1fr;
 
-    &:not(:last-child) {
-      border: none;
-    }
-
     .fee-column {
       position: relative;
-      padding: 20px 18px;
+      padding: 20px 20px 8px;
 
       &:not(:last-child) {
+        padding-bottom: 12px;
+
         &::after {
-          display: block;
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 18px;
-          right: 18px;
-          border-top: 1px solid rgba(245, 245, 245, 1);
+          display: none;
         }
+      }
+
+      &:last-child {
+        padding-top: 12px;
+        padding-bottom: 8px;
       }
     }
   }
 
+  .column-header {
+    padding-bottom: 14px;
+  }
+
   .column-title {
+    color: var(--theme-text-blue);
     font-size: 16px;
     font-weight: 600;
+    letter-spacing: 0.01em;
 
     svg {
       width: 20px;
@@ -339,60 +359,112 @@ defineOptions({
     }
   }
 
+  .fee-list {
+    gap: 12px;
+  }
+
   .fee-item {
+    padding: 0;
     font-size: 13px;
+    line-height: 1.5;
+
+    &:last-child {
+      padding-top: 4px;
+    }
 
     .fee-label {
       font-size: 13px;
+      opacity: 0.7;
+      margin-right: 12px;
     }
 
     .fee-value {
       font-size: 13px;
+      font-weight: 600;
     }
 
     .fee-info {
+      opacity: 0.55;
+
+      .fee-info-desktop {
+        display: none;
+      }
+
+      .fee-info-mobile {
+        display: inline;
+      }
+
       .text {
-        font-size: 11px;
-        line-height: 18px;
+        font-size: 12px;
+        line-height: 20px;
       }
 
       svg {
-        width: 11px;
-        height: 11px;
+        width: 12px;
+        height: 12px;
+        padding-top: 4px;
+        flex-shrink: 0;
       }
     }
 
     &.fee-item-bg {
-      padding: 8px;
+      margin-top: 8px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #e8efff;
 
-      .fee-info .text {
-        font-size: 12px;
+      .fee-info {
+        opacity: 1;
+        color: var(--theme-bg-blue);
+
+        .text {
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        svg {
+          padding-top: 3px;
+        }
       }
     }
   }
 
   .important-notice {
-    padding: 20px 18px;
+    background: transparent;
+    padding: 12px 20px 22px;
+  }
+
+  .notice-header {
+    margin-bottom: 12px;
   }
 
   .notice-title {
-    font-size: 13px;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .notice-list {
+    gap: 12px;
   }
 
   .notice-item {
+    margin-top: 0;
+    align-items: flex-start;
     font-size: 13px;
-    gap: 6px;
+    gap: 8px;
 
     svg {
-      width: 11px;
-      height: 11px;
+      width: 14px;
+      height: 14px;
       flex-shrink: 0;
+      margin-top: 2px;
     }
   }
 
   .notice-text {
-    font-size: 12px;
-    line-height: 1.5;
+    font-size: 13px;
+    line-height: 1.55;
+    color: #667085;
   }
 }
 </style>

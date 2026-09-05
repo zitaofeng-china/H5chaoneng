@@ -9,21 +9,22 @@ import { handleHttpError } from './errorHandler'
 
 // 请求配置
 interface RequestConfig extends RequestInit {
-  params?: Record<string, any>
+  params?: Record<string, unknown> | object
   timeout?: number
+  headers?: HeadersInit
 }
 
 /**
  * 构建完整 URL
  */
-function buildUrl(url: string, params?: Record<string, any>): string {
+function buildUrl(url: string, params?: Record<string, unknown> | object): string {
   const fullUrl = url.startsWith('http') ? url : `${BASE_URL}${url}`
 
   if (!params || Object.keys(params).length === 0) {
     return fullUrl
   }
 
-  const queryString = Object.entries(params)
+  const queryString = Object.entries(params as Record<string, unknown>)
     .filter(([_, value]) => value !== undefined && value !== null)
     .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
     .join('&')
@@ -135,7 +136,7 @@ async function request<T = any>(
 /**
  * GET 请求
  */
-export function get<T = any>(url: string, params?: Record<string, any>, config?: RequestConfig) {
+export function get<T = unknown>(url: string, params?: Record<string, unknown> | object, config?: RequestConfig) {
   return request<T>(url, {
     method: 'GET',
     params,
@@ -146,7 +147,7 @@ export function get<T = any>(url: string, params?: Record<string, any>, config?:
 /**
  * POST 请求
  */
-export function post<T = any>(url: string, data?: any, config?: RequestConfig) {
+export function post<T = unknown>(url: string, data?: unknown, config?: RequestConfig) {
   return request<T>(url, {
     method: 'POST',
     body: JSON.stringify(data),
@@ -157,7 +158,7 @@ export function post<T = any>(url: string, data?: any, config?: RequestConfig) {
 /**
  * PUT 请求
  */
-export function put<T = any>(url: string, data?: any, config?: RequestConfig) {
+export function put<T = unknown>(url: string, data?: unknown, config?: RequestConfig) {
   return request<T>(url, {
     method: 'PUT',
     body: JSON.stringify(data),
@@ -168,7 +169,7 @@ export function put<T = any>(url: string, data?: any, config?: RequestConfig) {
 /**
  * PATCH 请求
  */
-export function patch<T = any>(url: string, data?: any, config?: RequestConfig) {
+export function patch<T = unknown>(url: string, data?: unknown, config?: RequestConfig) {
   return request<T>(url, {
     method: 'PATCH',
     body: JSON.stringify(data),
@@ -179,7 +180,7 @@ export function patch<T = any>(url: string, data?: any, config?: RequestConfig) 
 /**
  * DELETE 请求
  */
-export function deleteRequest<T = any>(url: string, params?: Record<string, any>, config?: RequestConfig) {
+export function deleteRequest<T = unknown>(url: string, params?: Record<string, unknown> | object, config?: RequestConfig) {
   return request<T>(url, {
     method: 'DELETE',
     params,

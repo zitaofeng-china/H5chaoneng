@@ -33,11 +33,31 @@ export function useFormValidation() {
   ])
 
   /**
-   * 密码验证规则
+   * 登录密码验证规则
+   * 登录只限制最少 6 位，不能增加纯数字限制，否则历史用户无法登录。
    */
   const passwordRules = computed<FormItemRule[]>(() => [
     { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
     { min: 6, message: t('login.passwordMinLength'), trigger: 'blur' },
+  ])
+
+  /**
+   * 注册密码验证规则
+   */
+  const registerPasswordRules = computed<FormItemRule[]>(() => [
+    { required: true, message: t('login.passwordRequired'), trigger: 'blur' },
+    { min: 6, message: t('register.passwordMinLength'), trigger: 'blur' },
+    { max: 20, message: t('register.passwordMaxLength'), trigger: 'blur' },
+    {
+      validator: (_rule, value, callback) => {
+        if (value && /^\d+$/.test(value)) {
+          callback(new Error(t('register.passwordNotOnlyNumbers')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
   ])
 
   /**
@@ -88,6 +108,7 @@ export function useFormValidation() {
     emailRules,
     usernameRules,
     passwordRules,
+    registerPasswordRules,
     confirmPasswordRules,
     verifyCodeRules,
     unitPriceRules,

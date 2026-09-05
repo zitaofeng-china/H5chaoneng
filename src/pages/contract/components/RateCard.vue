@@ -5,15 +5,15 @@
       <div class="rate-main">
         <span class="rate-label-inline">{{ t('contract.realtimeRate') }}</span>
         <span class="rate-text" v-if="coin.toUpperCase() === 'USDT'">
-          2 <span class="rate-unit">{{ t('common.usdt') }}</span>
+          {{ formatCryptoAmount(2) }} <span class="rate-unit">{{ t('common.usdt') }}</span>
           <span class="rate-symbol">≈</span>
-          <span class="rate-value">{{ rate }}</span>
+          <span class="rate-value">{{ displayRate }}</span>
           <span class="rate-unit">{{ t('common.trx') }}</span>
         </span>
         <span class="rate-text" v-else>
-          10 <span class="rate-unit">{{ coin.toUpperCase() }}</span>
+          {{ formatCryptoAmount(10) }} <span class="rate-unit">{{ coin.toUpperCase() }}</span>
           <span class="rate-symbol">≈</span>
-          <span class="rate-value">{{ rate }}</span>
+          <span class="rate-value">{{ displayRate }}</span>
           <span class="rate-unit">{{ t('common.usdt') }}</span>
         </span>
       </div>
@@ -24,10 +24,10 @@
       <div class="note-text">{{ t('contract.rateNote') }}</div>
       <div class="limits-row">
         <span class="limit-item">
-          <span class="rate-unit">{{ t('common.usdt') }}</span> ≥ 2
+          <span class="rate-unit">{{ t('common.usdt') }}</span> ≥ {{ formatCryptoAmount(2) }}
         </span>
         <span class="limit-item">
-          <span class="rate-unit">{{ t('common.trx') }}</span> ≥ 10
+          <span class="rate-unit">{{ t('common.trx') }}</span> ≥ {{ formatCryptoAmount(10) }}
         </span>
       </div>
     </div>
@@ -35,7 +35,7 @@
     <!-- 剩余库存 -->
     <div class="stock-section">
       <span class="stock-label">{{ t('contract.remainingStock') }}</span>
-      <span class="stock-value">{{ stock }}</span>
+      <span class="stock-value">{{ displayStock }}</span>
       <span class="rate-unit">{{
         coin.toUpperCase() === 'USDT' ? t('common.trx') : t('common.usdt')
       }}</span>
@@ -44,7 +44,9 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { formatCryptoAmount } from '@/utils/number'
 
 const { t } = useI18n()
 
@@ -56,18 +58,23 @@ interface Props {
   stock?: string
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   coin: 'USDT',
   rate: '6.34',
   stock: '34430.21964',
 })
+
+const displayRate = computed(() => formatCryptoAmount(props.rate))
+const displayStock = computed(() => formatCryptoAmount(props.stock))
 </script>
 
 <style scoped lang="scss">
 .rate-card {
-  padding: 16px;
-  background: var(--theme-card-bg-light);
-  border-radius: 4px;
+  padding: 16px 18px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-md, 6px);
+  box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
   color: var(--theme-text-mute);
   font-size: 14px;
   display: flex;
@@ -87,33 +94,35 @@ withDefaults(defineProps<Props>(), {
 
       .rate-label-inline {
         font-size: 13px;
-        color: var(--theme-text-mute);
-        font-weight: 500;
+        color: var(--theme-text-muted);
+        font-weight: 600;
         white-space: nowrap;
       }
 
       .rate-text {
         display: flex;
         align-items: center;
-        gap: 4px;
+        gap: 5px;
         font-size: 14px;
         color: var(--theme-text-black);
-        font-weight: 500;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
       }
 
       .rate-unit {
-        color: var(--theme-text-mute);
-        font-weight: 400;
+        color: var(--theme-text-muted);
+        font-weight: 500;
       }
 
       .rate-symbol {
         margin: 0 4px;
-        color: var(--theme-text-mute);
+        color: var(--theme-text-muted);
       }
 
       .rate-value {
-        color: var(--theme-bg-blue);
-        font-weight: 600;
+        color: #10b981;
+        font-weight: 800;
+        font-size: 15px;
       }
     }
   }
@@ -123,10 +132,12 @@ withDefaults(defineProps<Props>(), {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-top: 4px;
+    border-top: 1px dashed rgba(226, 232, 240, 0.9);
 
     .note-text {
-      font-size: 13px;
-      color: var(--theme-text-mute);
+      font-size: 12px;
+      color: var(--theme-text-muted);
       line-height: 1.5;
     }
 
@@ -138,11 +149,13 @@ withDefaults(defineProps<Props>(), {
         display: inline-flex;
         align-items: center;
         gap: 4px;
-        font-size: 13px;
-        color: var(--theme-text-mute);
+        font-size: 12px;
+        color: var(--theme-text-muted);
+        font-variant-numeric: tabular-nums;
 
         .rate-unit {
-          font-weight: 500;
+          font-weight: 600;
+          color: var(--theme-text-black);
         }
       }
     }
@@ -153,20 +166,25 @@ withDefaults(defineProps<Props>(), {
     display: flex;
     align-items: center;
     gap: 6px;
-    font-size: 13px;
-    color: var(--theme-text-mute);
+    font-size: 12px;
+    color: var(--theme-text-muted);
+    padding-top: 4px;
+    border-top: 1px dashed rgba(226, 232, 240, 0.9);
 
     .stock-label {
-      color: var(--theme-text-mute);
+      color: var(--theme-text-muted);
+      font-weight: 500;
     }
 
     .stock-value {
       color: var(--theme-text-black);
-      font-weight: 500;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
     }
 
     .rate-unit {
-      font-weight: 500;
+      font-weight: 600;
+      color: var(--theme-text-muted);
     }
   }
 }

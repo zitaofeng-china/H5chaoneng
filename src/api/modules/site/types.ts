@@ -14,4 +14,5 @@ export interface SiteInfo {
   tg_admin: string // Telegram 管理员/客服
   describe: string // 描述
   bot_name: string // Telegram 机器人名字
+  weal_price: string // 福利价格
 }

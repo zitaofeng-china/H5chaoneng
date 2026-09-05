@@ -1,13 +1,10 @@
 <template>
   <nav class="navbar">
+    <span class="navbar-grid" aria-hidden="true"></span>
     <div class="navbar-container">
       <div class="logo-section" @click.stop="handleToRouter('/')">
-        <div class="logo-icon">
-          <img src="@/assets/images/logo.png" alt="Logo" />
-        </div>
-        <div class="m-logo-icon">
-          <img src="@/assets/images/m-logo.png" alt="Logo" />
-        </div>
+        <img :src="gasLogoMark" alt="GAS711" class="logo-mark" />
+        <span class="logo-wordmark">GAS711</span>
       </div>
 
       <div class="nav-links">
@@ -16,7 +13,7 @@
           <el-dropdown 
             trigger="click"
             :hide-on-click="true"
-            placement="bottom-start"
+            placement="bottom"
             popper-class="energy-rental-popper-unique"
           >
             <span class="nav-link">
@@ -31,15 +28,17 @@
                   :class="{ 'is-active': isActive('/') }"
                   @click="handleToRouter('/')"
                 >
-                  {{ $t('home.title') }}
+                  {{ $t('nav.quickRent') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!isLite"
                   :class="{ 'is-active': isActive('/lease-time') }"
                   @click="handleToRouter('/lease-time')"
                 >
                   {{ $t('nav.rentByTime') }}
                 </el-dropdown-item>
                 <el-dropdown-item
+                  v-if="!isLite"
                   :class="{ 'is-active': isActive('/lease-count') }"
                   @click="handleToRouter('/lease-count')"
                 >
@@ -58,6 +57,7 @@
           {{ $t('nav.contractFlash') }}
         </div>
         <div
+          v-if="!isLite"
           class="nav-link"
           :class="{ 'is-active': isActive('/hosting') }"
           @click="handleToRouter('/hosting')"
@@ -65,6 +65,7 @@
           {{ $t('nav.smartHosting') }}
         </div>
         <div
+          v-if="!isLite"
           class="nav-link"
           :class="{ 'is-active': isActive('/activation') }"
           @click="handleToRouter('/activation')"
@@ -72,12 +73,22 @@
           {{ $t('nav.batchActivation') }}
         </div>
 
+        <!-- 福利订单独立菜单项 -->
+        <div
+          v-if="showWelfare"
+          class="nav-link"
+          :class="{ 'is-active': isActive('/welfare') }"
+          @click="handleToRouter('/welfare')"
+        >
+          {{ $t('nav.welfareOrder') }}
+        </div>
+
         <!-- 常见问题下拉菜单 -->
         <div class="dropdown-popper-box faq-dropdown" :class="{ 'is-active': isActiveFaq }">
           <el-dropdown 
             trigger="click"
             :hide-on-click="true"
-            placement="bottom-start"
+            placement="bottom"
             popper-class="faq-popper-unique"
           >
             <span class="nav-link">
@@ -87,16 +98,10 @@
             <template #dropdown>
               <el-dropdown-menu class="faq-menu-unique">
                 <el-dropdown-item
-                  :class="{ 'is-active': isHashActive('#question') }"
-                  @click.stop="handleToRouter('/', '#question')"
+                  :class="{ 'is-active': isHashActive('#fee') }"
+                  @click.stop="handleToRouter('/', '#fee')"
                 >
-                  {{ $t('nav.faq') }}
-                </el-dropdown-item>
-                <el-dropdown-item
-                  :class="{ 'is-active': isHashActive('#feature') }"
-                  @click.stop="handleToRouter('/', '#feature')"
-                >
-                  {{ $t('nav.features') }}
+                  {{ $t('nav.fee') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#howItWorks') }"
@@ -105,10 +110,16 @@
                   {{ $t('nav.howItWorks') }}
                 </el-dropdown-item>
                 <el-dropdown-item
-                  :class="{ 'is-active': isHashActive('#fee') }"
-                  @click.stop="handleToRouter('/', '#fee')"
+                  :class="{ 'is-active': isHashActive('#feature') }"
+                  @click.stop="handleToRouter('/', '#feature')"
                 >
-                  {{ $t('nav.fee') }}
+                  {{ $t('nav.features') }}
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :class="{ 'is-active': isHashActive('#question') }"
+                  @click.stop="handleToRouter('/', '#question')"
+                >
+                  {{ $t('nav.faq') }}
                 </el-dropdown-item>
                 <el-dropdown-item
                   :class="{ 'is-active': isHashActive('#contact') }"
@@ -122,18 +133,19 @@
         </div>
       </div>
       <div class="right-section">
-        <div class="info-wrap">
-          <SvgIcon
-            name="header-tg"
-            width="24"
-            height="24"
-            @click="handleOpenToTelegram(botName)"
-          />
-        </div>
+        <button
+          v-if="tgAdmin"
+          type="button"
+          class="header-action"
+          :aria-label="$t('nav.contactUs')"
+          @click="handleOpenToTelegram(tgAdmin)"
+        >
+          <img :src="telegramIcon" alt="" class="action-icon" />
+        </button>
         <div class="dropdown-popper-box lang-dropdown">
-          <el-dropdown trigger="hover" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
+          <el-dropdown trigger="click" :teleported="true" popper-class="lang-popper" @command="handleLanguageChange">
             <div class="info-wrap">
-              <SvgIcon name="header-lang" class="icon-svg" width="24" height="24" />
+              <img :src="langIcon" alt="" class="action-icon" />
             </div>
             <template #dropdown>
               <el-dropdown-menu class="lang-menu">
@@ -150,50 +162,60 @@
           </el-dropdown>
         </div>
 
-        <div class="balance-display">
-          <div class="balance-info">
-            <SvgIcon name="trx" width="24" height="24" />
-            <div class="balance-amount">{{ trxBalance }}</div>
-          </div>
-          <div class="recharge-btn" @click="handleRechange">
-            <div class="text">{{ $t('common.recharge') }}</div>
-          </div>
-        </div>
+        <button
+          v-if="isLogin"
+          type="button"
+          class="balance-recharge"
+          @click="handleRechange"
+        >
+          <SvgIcon name="header-USDT" width="16" height="16" class="balance-token-icon" />
+          <span class="balance-amount">{{ trxBalance }}</span>
+          <span class="recharge-text">{{ $t('common.recharge') }}</span>
+        </button>
 
         <div class="dropdown-popper-box user-dropdown" v-if="isLogin">
           <el-dropdown trigger="hover" :teleported="true" popper-class="user-popper">
             <div class="user-icon">
-              <img :src="Avatar" alt="" class="user-avatar" />
+              <img :src="userAvatar" alt="" class="user-avatar" />
             </div>
             <template #dropdown>
               <el-dropdown-menu class="user-menu">
+                <el-dropdown-item @click.stop="handleRechange">
+                  {{ $t('common.recharge') }}
+                </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleUserInfo">
                   {{ $t('nav.userInfo') }}
                 </el-dropdown-item>
-                <el-dropdown-item @click.stop="handleModifyPassword">
+                <el-dropdown-item v-if="!isTgEnv" @click.stop="handleModifyPassword">
                   {{ $t('revisePassword.title') }}
                 </el-dropdown-item>
                 <el-dropdown-item @click.stop="handleLogout">
-                  {{ $t('login.logout') }}
+                  {{ isTgEnv ? $t('login.relogin') : $t('login.logout') }}
                 </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
         </div>
         <div class="no-login" v-else>
-          <div class="login-btn btn" @click="handleLogin">
+          <button v-if="!isLite" type="button" class="login-btn btn" @click="handleLogin">
             {{ $t('login.title') }}
-          </div>
-          /
-          <div class="register-btn btn" @click="handleRegister">
-            {{ $t('register.title') }}
-          </div>
+          </button>
         </div>
-        <div class="info-wrap" ref="menuBtn" v-if="isMobile()" @click="handleMenu('menu')">
-          <div class="dropdown-popper-box">
-            <SvgIcon name="menu" width="24" height="24" />
-          </div>
-        </div>
+        <button
+          v-if="isMobileView"
+          ref="menuBtn"
+          type="button"
+          class="header-action is-menu"
+          aria-label="menu"
+          :aria-expanded="isMenu"
+          @click="handleMenu('menu')"
+        >
+          <span class="menu-icon" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </button>
       </div>
     </div>
   </nav>
@@ -203,7 +225,7 @@
       <el-collapse-item
         :title="$t('nav.energyRental')"
         name="1"
-        :class="{ 'is-active': isActive('') }"
+        :class="{ 'route-active': isActiveHome }"
       >
         <div class="menu-wrap">
           <div
@@ -214,6 +236,7 @@
             {{ $t('nav.quickRent') }}
           </div>
           <div
+            v-if="!isLite"
             class="menu-item"
             :class="{ 'is-active': isActive('/lease-time') }"
             @click="handleToRouter('/lease-time')"
@@ -221,6 +244,7 @@
             {{ $t('nav.rentByTime') }}
           </div>
           <div
+            v-if="!isLite"
             class="menu-item"
             :class="{ 'is-active': isActive('/lease-count') }"
             @click="handleToRouter('/lease-count')"
@@ -233,41 +257,45 @@
         :title="$t('nav.contractFlash')"
         name="2"
         disabled
-        :class="{ 'is-active': isActive('/contract') }"
+        :class="{ 'route-active': isActive('/contract') }"
         @click="handleToRouter('/contract')"
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="!isLite"
         :title="$t('nav.smartHosting')"
         name="3"
         disabled
-        :class="{ 'is-active': isActive('/hosting') }"
+        :class="{ 'route-active': isActive('/hosting') }"
         @click="handleToRouter('/hosting')"
       >
       </el-collapse-item>
       <el-collapse-item
+        v-if="!isLite"
         :title="$t('nav.batchActivation')"
         name="4"
         disabled
-        :class="{ 'is-active': isActive('/activation') }"
+        :class="{ 'route-active': isActive('/activation') }"
         @click="handleToRouter('/activation')"
+      >
+      </el-collapse-item>
+      <el-collapse-item
+        v-if="showWelfare"
+        :title="$t('nav.welfareOrder')"
+        name="0"
+        disabled
+        :class="{ 'route-active': isActive('/welfare') }"
+        @click="handleToRouter('/welfare')"
       >
       </el-collapse-item>
       <el-collapse-item :title="$t('nav.faq')" name="5">
         <div class="menu-wrap">
           <div
             class="menu-item"
-            :class="{ 'is-active': isHashActive('#question') }"
-            @click.stop="handleToRouter('/', '#question')"
+            :class="{ 'is-active': isHashActive('#fee') }"
+            @click.stop="handleToRouter('/', '#fee')"
           >
-            {{ $t('nav.faq') }}
-          </div>
-          <div
-            class="menu-item"
-            :class="{ 'is-active': isHashActive('#feature') }"
-            @click.stop="handleToRouter('/', '#feature')"
-          >
-            {{ $t('nav.features') }}
+            {{ $t('nav.fee') }}
           </div>
           <div
             class="menu-item"
@@ -278,10 +306,17 @@
           </div>
           <div
             class="menu-item"
-            :class="{ 'is-active': isHashActive('#fee') }"
-            @click.stop="handleToRouter('/', '#fee')"
+            :class="{ 'is-active': isHashActive('#feature') }"
+            @click.stop="handleToRouter('/', '#feature')"
           >
-            {{ $t('nav.fee') }}
+            {{ $t('nav.features') }}
+          </div>
+          <div
+            class="menu-item"
+            :class="{ 'is-active': isHashActive('#question') }"
+            @click.stop="handleToRouter('/', '#question')"
+          >
+            {{ $t('nav.faq') }}
           </div>
           <div
             class="menu-item"
@@ -297,207 +332,58 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, getCurrentInstance, onMounted, onUnmounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { type CollapseModelValue, ClickOutside as vClickOutside } from 'element-plus'
-import Avatar from '@/assets/icons/header/avatar.svg'
-import { useUserStore } from '@/stores/useUserStore'
-import { useLangStore } from '@/stores/useLangStore'
-import { useSiteStore } from '@/stores/useSiteStore'
-import { storeToRefs } from 'pinia'
-import { handleOpenToTelegram, isMobile } from '@/utils'
-import { setLocale } from '@/lang'
-import type { Locale } from '@/lang/types'
-import { getSite } from '@/utils/site'
+import vClickOutside from 'element-plus/es/directives/click-outside/index.mjs'
+import gasLogoMark from '@/assets/images/gas-logo-mark.png'
+import telegramIcon from '@/assets/images/header/telegram.png'
+import langIcon from '@/assets/images/header/lang.png'
+import userAvatar from '@/assets/images/header/avatar.png'
+import { useHeaderNav } from './useHeaderNav'
+import { SHOW_WELFARE } from '@/constants/features'
 
 defineOptions({
   name: 'LayoutHeader',
 })
 
-const instance = getCurrentInstance()
-const proxy = instance?.proxy as any // 使用 any 避免类型检查问题
+const showWelfare = SHOW_WELFARE
 
-const siteStore = useSiteStore()
-const { tgAdmin, botName } = storeToRefs(siteStore)
-
-const localLang = ref(useLangStore().currentLocale)
-const activeNames = ref(['1'])
-const isMenu = ref(false)
-const menuBtn = ref(null)
-
-const lang = reactive({
-  en: 'English',
-  'zh-CN': '中文',
-  ja: '日本語',
-  ko: '한국어',
-  ru: 'Русский',
-  ar: 'العربية',
-  es: 'Español',
-  tr: 'Türkçe',
-  'zh-TW': '繁體中文',
-})
-
-// 判断是否在能量租赁相关页面（首页、按时间租用、按笔数租用）
-const isActiveHome = computed(() => {
-  const site = getSite()
-  const energyRentalPaths = [`/${site}/`, `/${site}/lease-time`, `/${site}/lease-count`]
-  // 只有在这些页面且没有hash时才激活能量租赁下拉菜单
-  // 如果有hash，说明用户在查看FAQ部分，不应该激活能量租赁
-  return energyRentalPaths.includes(route.path as string) && !route.hash
-})
-
-// 判断是否应该激活常见问题下拉菜单
-const isActiveFaq = computed(() => {
-  const site = getSite()
-  // 只有在首页且有hash时才激活常见问题下拉菜单
-  return route.path === `/${site}/` && !!route.hash
-})
-
-const userStore = useUserStore()
-const isLogin = computed(() => userStore.isLogin)
-
-// 获取用户 TRX 余额
-const trxBalance = computed(() => {
-  if (!userStore.userInfo) return '0'
-  return userStore.userInfo.trx_balance || '0'
-})
-
-const route = useRoute()
-const router = useRouter()
-const { logout } = userStore
-
-const isActive = (path: string) => {
-  const site = getSite()
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  const fullPath = `/${site}${normalizedPath}`
-  return route.path === fullPath
-}
-
-const isHashActive = (hash: string) => {
-  return route.hash === hash
-}
-
-const handleToRouter = (path: string, hash?: string) => {
-  const site = getSite()
-  
-  // 构建完整路径：/:site/path
-  // 确保 path 以 / 开头
-  const normalizedPath = path.startsWith('/') ? path : `/${path}`
-  const fullPath = `/${site}${normalizedPath}`
-  
-  console.log('[Header] 跳转路由:', { site, path, normalizedPath, fullPath, hash })
-  
-  router.push({ path: fullPath, hash })
-
-  if (isMobile()) {
-    handleMenu('router')
-  }
-}
-
-const handleLanguageChange = (local: Locale) => {
-  localLang.value = local
-  console.log(local)
-  setLocale(local)
-
-  // TODO 处理阿拉伯语言时，页面版式
-  // if (local.startsWith('ar')) {
-  //   document.documentElement.setAttribute('dir', 'rtl')
-  // } else {
-  //   document.documentElement.removeAttribute('dir')
-  // }
-}
-
-const handleLogin = () => {
-  proxy?.$loginPopup?.open()
-}
-
-const handleRegister = () => {
-  proxy?.$registerPopup?.open()
-}
-
-const handleRechange = () => {
-  proxy?.$rechargePopup?.open()
-}
-
-const handleModifyPassword = () => {
-  proxy?.$revisePasswordPopup?.open()
-}
-
-const handleUserInfo = () => {
-  proxy?.$userInfoPopup?.open()
-}
-
-const handleLogout = async () => {
-  try {
-    await logout()
-    
-    // 保存需要保留的数据
-    const locale = localStorage.getItem('locale')
-    
-    // 清除所有可能的Cookie
-    document.cookie.split(';').forEach((c) => {
-      document.cookie = c
-        .replace(/^ +/, '')
-        .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
-    })
-    
-    // 恢复语言设置
-    if (locale) {
-      localStorage.setItem('locale', locale)
-    }
-    
-    // 保留当前URL的站点信息并重定向到首页
-    const currentPath = window.location.pathname
-    const segments = currentPath.split('/').filter(Boolean)
-    const site = segments[0] || ''
-    
-    // 跳转到首页，保留站点信息
-    window.location.href = site ? `/${site}/` : '/'
-  } catch (error) {
-    console.error('退出登录失败:', error)
-    // 即使失败也要刷新页面
-    const currentPath = window.location.pathname
-    const segments = currentPath.split('/').filter(Boolean)
-    const site = segments[0] || ''
-    window.location.href = site ? `/${site}/` : '/'
-  }
-}
-
-const handleChange = (val: CollapseModelValue) => {
-  console.log(val)
-}
-
-const handleCollapseDestroy = () => {
-  isMenu.value = false
-  activeNames.value = ['1']
-}
-
-const handleMenu = (type: 'menu' | 'router' = 'menu') => {
-  isMenu.value = type !== 'menu' ? false : !isMenu.value
-}
-
-// 监听窗口大小变化，当从移动端切换到PC端时自动关闭菜单
-const handleResize = () => {
-  if (!isMobile() && isMenu.value) {
-    isMenu.value = false
-    activeNames.value = ['1']
-  }
-}
-
-onMounted(() => {
-  window.addEventListener('resize', handleResize)
-})
-
-onUnmounted(() => {
-  window.removeEventListener('resize', handleResize)
-})
+const {
+  isMobileView,
+  tgAdmin,
+  localLang,
+  activeNames,
+  isMenu,
+  menuBtn,
+  isLite,
+  isTgEnv,
+  lang,
+  isActiveHome,
+  isActiveFaq,
+  isLogin,
+  trxBalance,
+  isActive,
+  isHashActive,
+  handleToRouter,
+  handleLanguageChange,
+  handleLogin,
+  handleRechange,
+  handleModifyPassword,
+  handleUserInfo,
+  handleLogout,
+  handleChange,
+  handleCollapseDestroy,
+  handleMenu,
+  handleOpenToTelegram,
+} = useHeaderNav()
 </script>
 
 <style lang="scss" scoped>
 .navbar {
-  background: var(--theme-bg);
-  padding: 0 20px;
-  height: 66px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 0 24px;
+  height: var(--layout-header-height, 50px);
+  min-height: var(--layout-header-height, 50px);
   display: flex;
   align-items: center;
   position: fixed;
@@ -505,120 +391,175 @@ onUnmounted(() => {
   right: 0;
   top: 0;
   z-index: 1000;
+  border-bottom: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.7));
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.navbar-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-color: rgba(255, 255, 255, 0.75);
+  background-image:
+    var(--theme-home-band-1-color),
+    var(--theme-home-grid-vertical);
+  background-size:
+    100% var(--theme-home-band-height, 50px),
+    auto 300px;
+  background-position: 0 0, 0 0;
+  background-repeat: no-repeat, repeat;
+  -webkit-mask-image: var(--theme-home-grid-mask);
+  mask-image: var(--theme-home-grid-mask);
+  -webkit-mask-size: 100% calc(6 * var(--theme-home-band-height, 50px));
+  mask-size: 100% calc(6 * var(--theme-home-band-height, 50px));
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
 }
 
 .navbar-container {
   max-width: 1600px;
   margin: 0 auto;
   width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 24px;
+  position: relative;
+  z-index: 1;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 10px;
+  flex: 0 0 auto;
+  gap: 8px;
+  min-width: 140px;
   cursor: pointer;
 }
 
-.logo-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.logo-mark {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
-.m-logo-icon {
-  display: none;
-}
-
-.logo-text {
-  color: #ffd700;
-  font-size: 18px;
-  font-weight: bold;
-  letter-spacing: 1px;
+.logo-wordmark {
+  color: #334155;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
 }
 
 .nav-links {
   display: flex;
   align-items: center;
-  gap: 30px;
+  justify-content: center;
+  flex: 1;
+  gap: 28px;
+  height: 100%;
 
   .nav-link {
-    color: #fff;
+    color: #475467;
     text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 500;
     display: flex;
     align-items: center;
-    gap: 5px;
-    transition: color 0.3s ease;
-    padding: 5px 0;
+    gap: 4px;
+    height: 100%;
+    padding: 0;
     cursor: pointer;
+    white-space: nowrap;
+    position: relative;
+    transition: color 0.2s ease;
+
+    &::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 3px;
+      border-radius: 3px 3px 0 0;
+      background: #2f6df6;
+      opacity: 0;
+      transform: scaleX(0.35);
+      transform-origin: center;
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
 
     &:active,
     &:focus {
       outline: none;
     }
 
-    &.is-active {
-      position: relative;
-      color: var(--theme-text-green);
+    &:hover {
+      color: #1766f5;
+    }
 
-      .el-icon--right {
-        color: var(--theme-text-green);
-      }
+    &.is-active {
+      color: #1766f5;
 
       &::after {
-        display: inline;
-        content: '';
-        position: absolute;
-        bottom: -3px;
-        left: 0;
-        height: 2px;
-        width: 100%;
-        background-color: var(--theme-text-green);
-        transition: width 0.3s ease;
+        opacity: 1;
+        transform: scaleX(1);
       }
-      color: var(--theme-text-green);
+
+      .el-icon--right {
+        color: #1766f5;
+      }
     }
   }
 
   .dropdown-popper-box {
     position: relative;
+    height: 100%;
 
-    .user-avatar {
-      width: 40px;
-      height: 40px;
-      overflow: hidden;
-      border-radius: 50%;
+    :deep(.el-dropdown) {
+      height: 100%;
+      display: flex;
+      align-items: center;
     }
 
     &:hover,
     &.is-active {
-      color: var(--theme-text-green);
+      color: #1766f5;
 
       .el-icon--right {
-        color: var(--theme-text-green);
+        color: #1766f5;
       }
 
-      .nav-link-text {
-        position: relative;
+      .nav-link {
+        color: #1766f5;
 
         &::after {
-          display: inline;
-          content: '';
-          position: absolute;
-          bottom: -8px;
-          left: 0;
-          height: 2px;
-          width: 100%;
-          background-color: var(--theme-text-green);
-          transition: width 0.3s ease;
+          opacity: 1;
+          transform: scaleX(1);
         }
-        color: var(--theme-text-green);
       }
+    }
+  }
+}
+
+.energy-rental-dropdown {
+  .nav-link::after {
+    right: auto;
+    left: 50%;
+    width: 56px;
+    transform: translateX(-50%) scaleX(0.35);
+  }
+
+  &:hover,
+  &.is-active {
+    .nav-link::after {
+      transform: translateX(-50%) scaleX(1) !important;
     }
   }
 }
@@ -631,139 +572,148 @@ onUnmounted(() => {
   }
 }
 
-/* 能量租赁下拉菜单样式 */
-.energy-rental-popper-unique {
-  z-index: 2000 !important;
-}
-
-/* 常见问题下拉菜单样式 */
-.faq-popper-unique {
-  z-index: 2001 !important;
-}
-
-:deep(.el-dropdown-menu) {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
-}
-
-:deep(.el-dropdown-menu__item) {
-  transition: all 0.3s ease !important;
-  justify-content: center;
-
-  &:hover,
-  &.is-active {
-    background: var(--theme-bg-dark) !important;
-    color: var(--theme-text-gray) !important;
-    border-radius: 2px;
-  }
-}
-
-:deep(.el-dropdown-menu__item--divided) {
-  border-top-color: #444 !important;
-}
-
-:deep(.el-popper.is-dark .el-popper__arrow::before) {
-  background-color: #2a2a3e !important;
-  border: 1px solid #444 !important;
-}
-
 :deep(.el-tooltip__trigger:focus),
 :deep(.el-tooltip__trigger:focus-visible),
 :deep(.el-dropdown-link:focus) {
   outline: none !important;
 }
 
-@media (max-width: 768px) {
-  :deep(.el-dropdown-menu) {
-    min-width: 100px !important;
-    max-width: 140px !important;
-    padding: 4px 2px !important;
-    max-height: 180px !important;
-    overflow-y: auto !important;
-    
-    /* 美化滚动条 */
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.05);
-      border-radius: 2px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: rgba(0, 0, 0, 0.2);
-      border-radius: 2px;
-
-      &:hover {
-        background: rgba(0, 0, 0, 0.3);
-      }
-    }
-  }
-
-  :deep(.el-dropdown-menu__item) {
-    font-size: 12px !important;
-    padding: 6px 10px !important;
-    min-height: 32px !important;
-    line-height: 1.3 !important;
-  }
-}
-
 .right-section {
   display: flex;
   align-items: center;
-  gap: 12px;
+  flex: 0 0 auto;
+  gap: 10px;
 
+  .header-action,
   .info-wrap {
-    min-width: 40px;
-    height: 40px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    padding: 0;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--theme-bg-gray);
-    border-radius: 4px;
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-sm, 6px);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+    color: var(--theme-primary-blue, #165dff);
+    font: inherit;
     cursor: pointer;
-    transition: opacity 0.3s ease;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
     &:hover {
-      opacity: 0.8;
+      background: #f8fafc;
+      border-color: rgba(22, 93, 255, 0.4);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+
+  .header-action.is-menu {
+    border-radius: var(--theme-radius-sm, 6px);
+    background: var(--theme-primary-blue, #165dff);
+    border-color: var(--theme-primary-blue, #165dff);
+    box-shadow: 0 2px 8px rgba(22, 93, 255, 0.25);
+
+    &:hover {
+      background: #0f5de7;
+      border-color: #0f5de7;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.96);
+    }
+  }
+
+  .action-icon {
+    width: 18px;
+    height: 18px;
+    display: block;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .menu-icon {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 16px;
+    height: 11px;
+
+    span {
+      display: block;
+      height: 2px;
+      border-radius: 1px;
+      background: #fff;
     }
   }
 }
 
-.balance-display {
-  padding: 0 5px;
-  min-width: 40px;
-  height: 40px;
-  display: flex;
+/* 蓝底余额区 + 独立白色充值按钮（克制利落的 6px 微圆角） */
+.balance-recharge {
+  display: inline-flex;
   align-items: center;
-  justify-content: space-between;
-  background: var(--theme-bg-gray);
-  border-radius: 4px;
-  color: var(--theme-text-white);
-  font-size: 14px;
-
-  .balance-info {
-    padding: 0 20px 0 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-}
-
-.recharge-btn {
-  padding: 0 5px;
-  min-width: 70px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--theme-bg-blue);
-  border-radius: 4px;
+  gap: 8px;
+  height: 34px;
+  padding: 2px 4px 2px 10px;
+  border: 1px solid rgba(22, 93, 255, 0.2);
+  border-radius: var(--theme-radius-md, 6px);
+  background: linear-gradient(135deg, #165dff 0%, #0052d9 100%);
+  box-shadow: 0 2px 10px rgba(22, 93, 255, 0.25);
+  color: #fff;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
   &:hover {
-    opacity: 0.8;
+    box-shadow: 0 4px 14px rgba(22, 93, 255, 0.35);
+    transform: translateY(-1px);
+
+    .recharge-text {
+      background: #ffffff;
+      color: #0052d9;
+    }
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .balance-token-icon {
+    width: 15px;
+    height: 15px;
+    flex: 0 0 15px;
+  }
+
+  .balance-amount {
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .recharge-text {
+    min-width: 48px;
+    height: 24px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--theme-radius-sm, 4px);
+    background: #ffffff;
+    color: #165dff;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -772,45 +722,80 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 
   &:hover {
-    opacity: 0.7;
+    opacity: 0.88;
   }
 
   &:active,
   &:focus {
     outline: none;
   }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    box-sizing: border-box;
+    object-fit: cover;
+    border-radius: 50%;
+    background: #e8f1ff;
+  }
 }
 
 .no-login {
   display: flex;
   align-items: center;
-  gap: 10px;
-  color: var(--theme-text-white);
+}
 
-  .btn {
-    cursor: pointer;
+.login-btn {
+  height: 32px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #1766f5;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 
-    &:hover {
-      color: var(--theme-text-green);
-    }
+  &:hover {
+    background: #0f5de7;
+    color: #fff;
   }
 }
 
 .collapse-container {
-  max-height: calc(100vh - 44px);
+  max-height: calc(100vh - var(--layout-header-height, 50px));
   position: fixed;
-  top: 44px;
+  top: var(--layout-header-height, 50px);
   left: 0;
   right: 0;
-  z-index: 99;
-  background: var(--theme-bg-white);
-  border-radius: 0 0 12px 12px;
-  box-shadow: 0px 4px 16px 0px rgba(0, 0, 0, 0.12);
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+  border-radius: 0 0 var(--theme-radius-lg, 8px) var(--theme-radius-lg, 8px);
+  box-shadow: var(--theme-shadow-xl, 0 20px 30px -10px rgba(15, 23, 42, 0.15));
   overflow: hidden;
   overflow-y: auto;
+  animation: drawer-fade-slide 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes drawer-fade-slide {
+    from {
+      opacity: 0;
+      transform: translateY(-8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   /* 美化滚动条 */
   &::-webkit-scrollbar {
@@ -818,26 +803,28 @@ onUnmounted(() => {
   }
 
   &::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.02);
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.1);
+    background: rgba(15, 23, 42, 0.1);
     border-radius: 2px;
 
     &:hover {
-      background: rgba(0, 0, 0, 0.15);
+      background: rgba(15, 23, 42, 0.2);
     }
   }
 
   :deep(.el-collapse) {
-    padding: 10px 14px 14px;
-    border-radius: 0 0 12px 12px;
+    padding: 12px 14px 18px;
+    border-radius: 0 0 var(--theme-radius-lg, 8px) var(--theme-radius-lg, 8px);
+    border: none;
+    background: transparent;
   }
 
   :deep(.el-collapse-item__arrow) {
     transform: rotateZ(90deg);
-    transition: transform 0.3s ease;
+    transition: transform 0.25s ease;
 
     &.is-active {
       transform: rotateZ(-90deg);
@@ -845,16 +832,22 @@ onUnmounted(() => {
   }
 
   :deep(.el-collapse-item__header) {
-    height: 44px;
-    line-height: 44px;
-    border-radius: 6px;
-    border-bottom-color: transparent;
-    background: rgba(2, 15, 45, 0.03);
-    transition: all 0.3s ease;
-    margin-bottom: 2px;
+    height: 48px;
+    line-height: 48px;
+    border-radius: var(--theme-radius-md, 8px);
+    border: 1px solid transparent;
+    background: rgba(15, 23, 42, 0.03);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-bottom: 6px;
 
     &:hover {
-      background: rgba(2, 15, 45, 0.05);
+      background: #ffffff;
+      border-color: rgba(226, 232, 240, 0.9);
+      box-shadow: var(--theme-shadow-xs);
+    }
+
+    &:active {
+      transform: scale(0.985);
     }
   }
 
@@ -864,17 +857,30 @@ onUnmounted(() => {
   }
 
   :deep(.el-collapse-item) {
+    border: none;
+    background: transparent;
+
     &:not(:last-child) {
       margin-bottom: 6px;
     }
 
     &.is-active {
       .el-collapse-item__header {
-        background: rgba(54, 211, 153, 0.08);
+        background: #ffffff;
+        border-color: rgba(226, 232, 240, 0.9);
+        box-shadow: var(--theme-shadow-xs);
+      }
+    }
+
+    &.route-active {
+      .el-collapse-item__header {
+        background: rgba(22, 93, 255, 0.06);
+        border-color: rgba(22, 93, 255, 0.25);
       }
 
       .el-collapse-item__title {
-        color: var(--theme-text-green);
+        color: var(--theme-primary-blue, #165dff);
+        font-weight: 700;
       }
     }
 
@@ -887,7 +893,7 @@ onUnmounted(() => {
         cursor: pointer;
         
         &:active {
-          background: rgba(2, 15, 45, 0.08);
+          background: rgba(22, 93, 255, 0.06);
         }
       }
     }
@@ -902,6 +908,7 @@ onUnmounted(() => {
 
   :deep(.el-collapse-item__wrap) {
     border: none;
+    background: transparent;
   }
 
   .menu-wrap {
@@ -909,43 +916,46 @@ onUnmounted(() => {
     padding: 0 6px;
 
     .menu-item {
-      padding: 0 14px;
-      height: 40px;
+      padding: 0 16px;
+      height: 42px;
       display: flex;
       align-items: center;
       font-size: 13px;
       font-weight: 500;
-      border-radius: 5px;
+      border-radius: var(--theme-radius-sm, 6px);
       cursor: pointer;
-      transition: all 0.3s ease;
+      margin: 3px 0;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
       position: relative;
 
       &::before {
         content: '';
         position: absolute;
-        left: 7px;
+        left: 8px;
         top: 50%;
         transform: translateY(-50%);
-        width: 3px;
-        height: 3px;
-        background: var(--theme-text-green);
+        width: 4px;
+        height: 4px;
+        background: var(--theme-primary-blue, #165dff);
         border-radius: 50%;
         opacity: 0;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
       }
 
       &:hover {
-        background: rgba(2, 15, 45, 0.03);
+        background: rgba(15, 23, 42, 0.04);
+        color: #0f172a;
       }
 
       &:active {
-        background: rgba(2, 15, 45, 0.06);
+        transform: scale(0.985);
       }
 
       &.is-active {
-        color: var(--theme-text-green);
-        background: rgba(54, 211, 153, 0.08);
-        font-weight: 600;
+        color: var(--theme-primary-blue, #165dff);
+        background: rgba(22, 93, 255, 0.08);
+        font-weight: 700;
+        padding-left: 20px;
 
         &::before {
           opacity: 1;
@@ -955,9 +965,10 @@ onUnmounted(() => {
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .navbar {
-    height: 54px;
+    height: var(--layout-header-height, 50px);
+    min-height: var(--layout-header-height, 50px);
     padding: 0 10px;
   }
 
@@ -965,22 +976,19 @@ onUnmounted(() => {
     gap: 6px;
   }
 
-  .no-login {
-    gap: 4px;
-    font-size: 12px;
-  }
-  
-  .logo-icon {
-    display: none;
+  .logo-section {
+    min-width: 0;
+    flex: 0 1 auto;
+    gap: 6px;
   }
 
-  .m-logo-icon {
-    display: flex;
-    
-    img {
-      height: 30px;
-      width: auto;
-    }
+  .logo-mark {
+    width: 24px;
+    height: 24px;
+  }
+
+  .logo-wordmark {
+    font-size: 14px;
   }
   
   .nav-links {
@@ -989,80 +997,129 @@ onUnmounted(() => {
 
   .right-section {
     gap: 5px;
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
     justify-content: flex-end;
 
+    .header-action,
     .info-wrap {
-      min-width: 34px;
-      height: 34px;
-      
-      svg {
-        width: 19px;
-        height: 19px;
-      }
+      min-width: 32px;
+      width: 32px;
+      height: 32px;
+      flex: 0 0 auto;
+    }
+
+    .action-icon {
+      width: 18px;
+      height: 18px;
     }
   }
 
-  .balance-display {
-    min-width: auto;
-    height: 34px;
-    padding: 0 3px;
-    font-size: 12px;
+  .balance-recharge {
+    height: 32px;
+    padding: 2px 4px 2px 6px;
+    gap: 4px;
+    font-size: 11px;
 
-    .balance-info {
-      padding: 0 6px 0 5px;
-      gap: 4px;
-      
-      svg {
-        width: 18px;
-        height: 18px;
-      }
+    .balance-token-icon {
+      width: 14px;
+      height: 14px;
+      flex-basis: 14px;
     }
-    
+
     .balance-amount {
-      font-size: 12px;
-      max-width: 55px;
+      max-width: 64px;
       overflow: hidden;
       text-overflow: ellipsis;
-      white-space: nowrap;
     }
-  }
 
-  .recharge-btn {
-    min-width: 56px;
-    height: 26px;
-    padding: 0 6px;
-    
-    .text {
-      font-size: 11px;
-      white-space: nowrap;
+    .recharge-text {
+      min-width: 36px;
+      height: 24px;
+      padding: 0 6px;
+      font-size: 10px;
     }
   }
 
   .user-icon {
     .user-avatar {
-      width: 34px;
-      height: 34px;
+      width: 32px;
+      height: 32px;
     }
   }
 
-  .no-login {
-    .btn {
-      font-size: 12px;
-      white-space: nowrap;
-    }
+  .login-btn {
+    height: 32px;
+    padding: 0 16px;
+    font-size: 14px;
   }
   
   .collapse-container {
-    top: 54px;
-    max-height: calc(100vh - 54px);
+    top: var(--layout-header-height, 50px);
+    max-height: calc(100vh - var(--layout-header-height, 50px));
+  }
+}
+
+@media (max-width: 768px) {
+  .right-section {
+    gap: 4px;
+
+    .header-action,
+    .info-wrap {
+      min-width: 28px;
+      width: 28px;
+      height: 28px;
+    }
+
+    .action-icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .menu-icon {
+      width: 14px;
+      height: 10px;
+    }
+  }
+
+  .login-btn {
+    height: 28px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .balance-recharge {
+    height: 28px;
+    padding: 1px 3px 1px 5px;
+    gap: 3px;
+    min-width: 0;
+    flex: 0 1 auto;
+
+    .balance-token-icon {
+      width: 12px;
+      height: 12px;
+      flex-basis: 12px;
+    }
+
+    .recharge-text {
+      min-width: 32px;
+      height: 22px;
+      padding: 0 5px;
+      font-size: 10px;
+    }
+  }
+
+  .user-icon .user-avatar {
+    width: 28px;
+    height: 28px;
   }
 }
 
 /* 适配 300px 超小屏幕 */
 @media (max-width: 360px) {
   .navbar {
-    height: 50px;
+    height: var(--layout-header-height, 50px);
+    min-height: var(--layout-header-height, 50px);
     padding: 0 6px;
   }
 
@@ -1070,76 +1127,76 @@ onUnmounted(() => {
     gap: 4px;
   }
 
-  .m-logo-icon {
-    img {
-      height: 26px;
-    }
+  .logo-section {
+    min-width: 92px;
+    gap: 5px;
+  }
+
+  .logo-mark {
+    width: 22px;
+    height: 22px;
+  }
+
+  .logo-wordmark {
+    font-size: 13px;
   }
 
   .right-section {
     gap: 3px;
 
+    .header-action,
     .info-wrap {
-      min-width: 30px;
-      height: 30px;
-      
-      svg {
-        width: 17px;
-        height: 17px;
-      }
+      min-width: 26px;
+      width: 26px;
+      height: 26px;
+    }
+
+    .action-icon {
+      width: 14px;
+      height: 14px;
     }
   }
 
-  .balance-display {
-    height: 30px;
-    padding: 0 2px;
-    font-size: 11px;
+  .balance-recharge {
+    height: 28px;
+    padding: 2px 3px 2px 5px;
+    gap: 3px;
+    font-size: 10px;
 
-    .balance-info {
-      padding: 0 4px 0 3px;
-      gap: 3px;
-      
-      svg {
-        width: 16px;
-        height: 16px;
-      }
+    .balance-token-icon {
+      width: 13px;
+      height: 13px;
+      flex-basis: 13px;
     }
-    
+
     .balance-amount {
-      font-size: 11px;
-      max-width: 45px;
+      max-width: 48px;
     }
-  }
 
-  .recharge-btn {
-    min-width: 48px;
-    height: 24px;
-    padding: 0 4px;
-    
-    .text {
-      font-size: 10px;
+    .recharge-text {
+      min-width: 34px;
+      height: 22px;
+      padding: 0 5px;
+      font-size: 9px;
     }
   }
 
   .user-icon {
     .user-avatar {
-      width: 30px;
-      height: 30px;
+      width: 26px;
+      height: 26px;
     }
   }
 
-  .no-login {
-    gap: 3px;
-    font-size: 11px;
-
-    .btn {
-      font-size: 11px;
-    }
+  .login-btn {
+    height: 26px;
+    padding: 0 10px;
+    font-size: 12px;
   }
   
   .collapse-container {
-    top: 50px;
-    max-height: calc(100vh - 50px);
+    top: var(--layout-header-height, 50px);
+    max-height: calc(100vh - var(--layout-header-height, 50px));
 
     :deep(.el-collapse) {
       padding: 8px 10px 10px;
@@ -1183,6 +1240,76 @@ onUnmounted(() => {
           height: 2.5px;
         }
       }
+    }
+  }
+}
+</style>
+
+<!-- teleported 下拉挂载到 body，需全局样式 -->
+<style lang="scss">
+.energy-rental-popper-unique,
+.faq-popper-unique {
+  z-index: 2001 !important;
+
+  .el-dropdown-menu {
+    min-width: 104px !important;
+    padding: 6px !important;
+    border: 1px solid #e8edf5 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 28px rgba(24, 45, 78, 0.12) !important;
+  }
+
+  .el-dropdown-menu__item {
+    min-height: 32px;
+    margin: 0;
+    padding: 0 12px !important;
+    border-radius: 6px !important;
+    color: #475467 !important;
+    font-size: 13px !important;
+    line-height: 32px !important;
+    justify-content: center;
+    transition: background-color 0.15s ease, color 0.15s ease;
+
+    &:hover {
+      background: #f0f5ff !important;
+      color: #1766f5 !important;
+    }
+
+    &.is-active {
+      color: #fff !important;
+      background: #1766f5 !important;
+      font-weight: 600;
+    }
+  }
+}
+
+/* 能量租赁菜单的当前路由只保留文字状态，避免整项蓝底抢占导航下划线 */
+.energy-rental-popper-unique .el-dropdown-menu__item.is-active {
+  color: #475467 !important;
+  background: transparent !important;
+  font-weight: 400 !important;
+
+  &:hover {
+    color: #1766f5 !important;
+    background: #f0f5ff !important;
+  }
+}
+
+.lang-popper,
+.user-popper {
+  .el-dropdown-menu {
+    border: 1px solid #e8edf5 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 10px 28px rgba(24, 45, 78, 0.12) !important;
+  }
+
+  .el-dropdown-menu__item {
+    color: #475467 !important;
+
+    &:hover,
+    &.is-active {
+      background: #f0f5ff !important;
+      color: #1766f5 !important;
     }
   }
 }

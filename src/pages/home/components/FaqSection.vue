@@ -1,41 +1,55 @@
 <template>
-  <div id="question" class="faq-section">
+  <section id="question" class="faq-section">
     <div class="faq-container">
-      <div class="faq-header">
-        <div class="faq-title">{{ $t('faq.title') }}</div>
-        <div class="faq-subtitle">{{ $t('faq.subtitle') }}</div>
-      </div>
+      <header class="faq-header">
+        <h2 class="faq-title">{{ $t('faq.title') }}</h2>
+        <p class="faq-subtitle">{{ $t('faq.subtitle') }}</p>
+      </header>
 
       <div class="faq-list">
-        <div
+        <article
           v-for="(item, index) in faqItems"
-          :key="index"
+          :key="item.questionKey"
           class="faq-item"
           :class="{ active: activeIndex === index }"
-          @click.stop="toggleItem(index)"
         >
-          <div class="faq-question">
+          <button
+            type="button"
+            class="faq-question tactile-btn"
+            :aria-expanded="activeIndex === index"
+            @click.stop="toggleItem(index)"
+          >
             <span>{{ $t(item.questionKey) }}</span>
-            <div class="faq-icon">
-              <SvgIcon name="faq-arrow" width="24" height="24" />
+            <SvgIcon name="faq-arrow" width="18" height="18" />
+          </button>
+          <div class="faq-collapse" :class="{ open: activeIndex === index }">
+            <div class="faq-collapse-inner" :aria-hidden="activeIndex !== index">
+              <div class="faq-answer">
+                <template v-if="item.questionKey === 'faq.problemsSupport'">
+                  {{ formatAnswerWithTgAdmin($t(item.answerKey)) }}
+                </template>
+                <template v-else>
+                  {{ $t(item.answerKey) }}
+                </template>
+              </div>
             </div>
           </div>
-          <div class="faq-answer" v-show="activeIndex === index" @click.stop="() => {}">
-            {{ $t(item.answerKey) }}
-          </div>
-        </div>
+        </article>
       </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { tmaHapticSelection } from '@/utils/telegram'
 
 defineOptions({
   name: 'FaqSection',
 })
 
+const siteStore = useSiteStore()
 const activeIndex = ref(0)
 
 type FaqItem = {
@@ -43,7 +57,7 @@ type FaqItem = {
   answerKey: string
 }
 
-const faqItems = ref<FaqItem[]>([
+const faqItems: FaqItem[] = [
   {
     questionKey: 'faq.whatIsEnergyRental',
     answerKey: 'faq.whatIsEnergyRentalAns',
@@ -64,41 +78,49 @@ const faqItems = ref<FaqItem[]>([
     questionKey: 'faq.problemsSupport',
     answerKey: 'faq.problemsSupportAns',
   },
-])
+]
 
 const toggleItem = (index: number) => {
+  tmaHapticSelection()
   activeIndex.value = activeIndex.value === index ? -1 : index
+}
+
+const formatAnswerWithTgAdmin = (answer: string) => {
+  const tgAdmin = siteStore.tgAdmin || '@GasVipBot'
+  return answer.replace(/@GasVipBot/g, tgAdmin)
 }
 </script>
 
 <style lang="scss" scoped>
 .faq-section {
-  padding: 100px 0;
-  background: var(--theme-bg-white);
+  padding: 64px 0 72px;
+  background: #f7f9fd;
 }
 
 .faq-container {
-  max-width: 800px;
+  width: min(100%, 820px);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 .faq-header {
+  margin-bottom: 34px;
   text-align: center;
-  margin-bottom: 60px;
 }
 
 .faq-title {
-  font-size: 40px;
+  margin: 0;
+  color: #182230;
+  font-size: 36px;
   font-weight: 700;
-  color: var(--theme-text-black);
-  margin-bottom: 10px;
+  line-height: 1.3;
 }
 
 .faq-subtitle {
-  font-size: 14px;
-  color: var(--theme-text-black);
-  opacity: 0.8;
+  margin: 11px auto 0;
+  color: rgba(71, 84, 103, 0.72);
+  font-size: 13px;
   line-height: 1.6;
 }
 
@@ -109,118 +131,146 @@ const toggleItem = (index: number) => {
 }
 
 .faq-item {
-  background: var(--theme-text-white);
-  border: 1px solid rgba(30, 41, 59, 0.2);
-  border-radius: 12px;
   overflow: hidden;
-  transition: all 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.08);
-  }
-
-  &.active {
-    .faq-icon {
-      transform: rotate(180deg);
-    }
-  }
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-lg, 8px);
+  background: #ffffff;
+  box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
 .faq-question {
+  width: 100%;
+  min-height: 60px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 24px 32px;
-  font-size: 18px;
+  gap: 18px;
+  padding: 18px 20px;
+  border: 0;
+  color: var(--theme-text-black, #182230);
+  background: #ffffff;
+  font: inherit;
+  font-size: 13px;
   font-weight: 600;
-  transition: color 0.3s ease;
-}
+  line-height: 1.5;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.25s ease, padding 0.32s ease;
 
-.faq-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--theme-text-black);
-  transition: all 0.3s ease;
+  &:hover {
+    color: var(--theme-primary-blue, #165dff);
+  }
 
   svg {
-    transition: transform 0.3s ease;
+    flex: 0 0 auto;
+    color: #7f8da3;
+    transition: transform 0.32s ease, color 0.25s ease;
   }
+}
+
+.faq-item.active {
+  border-color: rgba(22, 93, 255, 0.35);
+  box-shadow: var(--theme-shadow-md, 0 4px 14px -2px rgba(15, 23, 42, 0.06));
+}
+
+.faq-item.active .faq-question {
+  padding-bottom: 16px;
+}
+
+.faq-item.active .faq-question svg {
+  color: var(--theme-primary-blue, #165dff);
+  transform: rotate(180deg);
+}
+
+.faq-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.faq-collapse.open {
+  grid-template-rows: 1fr;
+}
+
+.faq-collapse-inner {
+  min-height: 0;
+  overflow: hidden;
 }
 
 .faq-answer {
-  padding: 10px 32px 24px;
-  font-size: 16px;
-  opacity: 0.8;
-  line-height: 1.8;
+  padding: 16px 20px 18px;
+  border-top: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.7));
+  color: var(--theme-text-gray, rgba(71, 84, 103, 0.74));
+  font-size: 12px;
+  line-height: 1.75;
   white-space: pre-line;
-  border-top: 1px solid rgba(30, 41, 59, 0.2);
-  animation: slideDown 0.3s ease;
+  opacity: 0;
+  transform: translateY(-6px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 0.8;
-    transform: translateY(0);
+.faq-collapse.open .faq-answer {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.28s ease 0.05s,
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1) 0.04s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-question,
+  .faq-question svg,
+  .faq-collapse,
+  .faq-answer,
+  .faq-collapse.open .faq-answer {
+    transition: none;
   }
 }
 
 @media (max-width: 768px) {
-  .faq-container {
-    max-width: initial;
-    padding: 0 10px;
+  .faq-section {
+    padding: 38px 0 40px;
   }
 
-  .faq-section {
-    padding: 40px 0;
+  .faq-container {
+    padding: 0 14px;
   }
 
   .faq-header {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
   }
 
   .faq-title {
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 8px;
+    font-size: 24px;
   }
 
   .faq-subtitle {
-    font-size: 13px;
-    line-height: 1.5;
+    margin-top: 8px;
+    font-size: 12px;
   }
 
   .faq-list {
-    gap: 12px;
-  }
-
-  .faq-item {
-    border-radius: 10px;
+    gap: 5px;
   }
 
   .faq-question {
-    padding: 16px 18px;
-    font-size: 14px;
-    font-weight: 600;
-    gap: 12px;
+    min-height: 40px;
+    padding: 8px 12px;
+    font-size: 12px;
   }
 
-  .faq-icon {
-    svg {
-      width: 20px;
-      height: 20px;
-    }
+  .faq-question svg {
+    width: 16px;
+    height: 16px;
   }
 
   .faq-answer {
-    padding: 8px 18px 16px;
-    font-size: 13px;
-    line-height: 1.6;
+    padding: 10px 12px 12px;
+    font-size: 11px;
+    line-height: 1.65;
   }
 }
 </style>

@@ -1,195 +1,267 @@
 <template>
   <div class="address-card">
-    <div class="card-info">
-      <div class="card-label"><span>*</span>{{ $t('hosting.managedAddress') }}</div>
-      <!-- <div class="card-btn"> -->
-      <div class="delete-btn" @click="onDelete?.()" v-if="isMobile">
-        {{ $t('hosting.deleteHosting') }}
-      </div>
-      <!-- </div> -->
+    <div class="address-header">
+      <span class="status-badge">
+        <span class="status-dot"></span>
+        <span>托管中</span>
+      </span>
+      <button
+        type="button"
+        class="copy-btn tactile-btn"
+        :title="$t('transferRental.copyAddress') || '复制地址'"
+        @click="handleCopy"
+      >
+        <SvgIcon name="transfer-copy" width="13" height="13" />
+        <span>复制</span>
+      </button>
     </div>
 
-    <div class="card-content">
-      <div class="card-id">
-        <span class="label">{{ $t('hosting.address') }}：</span>{{ item?.address }}
-      </div>
-      <div class="card-stats">
-        <span>
-          {{ $t('hosting.orderId') }}：{{ item?.order_id }}
-        </span>
-        <span class="today">
-          {{ $t('hosting.createdAt') }}：{{ formatDate(item?.created_at) }}
-        </span>
-      </div>
+    <div class="address-box" :title="item.address">
+      <template v-if="item.address && item.address.length >= 20">
+        <span class="address-prefix">{{ item.address.slice(0, 8) }}</span>
+        <span class="address-mid">{{ item.address.slice(8, -8) }}</span>
+        <span class="address-suffix">{{ item.address.slice(-8) }}</span>
+      </template>
+      <span v-else class="address-text">{{ item.address }}</span>
     </div>
-    <div class="delete-btn" @click="onDelete?.()" v-if="!isMobile">
-      {{ $t('hosting.deleteHosting') }}
+
+    <div class="address-footer">
+      <div class="address-stats">
+        <span class="stat-pill">
+          <span class="stat-label">{{ $t('hosting.todayUsed') }}:</span>
+          <strong class="stat-val">{{ todayUsed }} {{ $t('common.purchase') }}</strong>
+        </span>
+        <span class="stat-pill">
+          <span class="stat-label">{{ $t('hosting.historyUsed') }}:</span>
+          <strong class="stat-val">{{ historyUsed }} {{ $t('common.purchase') }}</strong>
+        </span>
+      </div>
+      <button type="button" class="delete-btn tactile-btn" @click="handleDelete">
+        {{ $t('hosting.deleteHosting') }}
+      </button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useCommonStore } from '@/stores/useCommonStore'
-import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import type { HostingAddressItem } from '@/api/modules/address/types'
 
-defineProps<{
+const props = defineProps<{
   item: HostingAddressItem
   onDelete?: () => void
 }>()
 
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
+const { copyText } = useCopyToClipboard()
+const { tmaHapticSelection, tmaHapticImpact } = useTelegramHaptics()
 
-/**
- * 格式化日期时间
- * @param timestamp Unix时间戳（秒）
- */
-function formatDate(timestamp: number | undefined): string {
-  if (!timestamp) return '-'
-  
-  try {
-    // 将秒级时间戳转换为毫秒级
-    const date = new Date(timestamp * 1000)
-    
-    // 检查日期是否有效
-    if (isNaN(date.getTime())) {
-      return '-'
-    }
-    
-    const year = date.getFullYear()
-    const month = String(date.getMonth() + 1).padStart(2, '0')
-    const day = String(date.getDate()).padStart(2, '0')
-    const hours = String(date.getHours()).padStart(2, '0')
-    const minutes = String(date.getMinutes()).padStart(2, '0')
-    
-    return `${year}-${month}-${day} ${hours}:${minutes}`
-  } catch {
-    return '-'
-  }
+const historyUsed = computed(() => Number(props.item.count ?? 0))
+const todayUsed = computed(() => Number(props.item.today_count ?? 0))
+
+const handleCopy = () => {
+  tmaHapticSelection()
+  copyText(props.item.address)
+}
+
+const handleDelete = () => {
+  tmaHapticImpact('light')
+  props.onDelete?.()
 }
 </script>
 
 <style scoped lang="scss">
 .address-card {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  background: #ffffff;
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-sm, 6px);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: rgba(22, 93, 255, 0.3);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+  }
+}
+
+.address-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-radius: 8px;
-  margin-bottom: 12px;
-  gap: 10px;
+  margin-bottom: 8px;
 }
 
-.card-label {
-  width: 120px;
-  text-align: right;
-  color: var(--theme-text-muted);
-  font-size: 14px;
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: #ecfdf5;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+  color: #059669;
+  font-size: 11px;
   font-weight: 600;
+  line-height: 1.2;
 
-  span {
-    padding-right: 5px;
-    color: var(--el-color-danger);
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
   }
 }
 
-.card-content {
-  width: 610px;
-  padding: 12px;
-  font-size: 14px;
-  background: var(--theme-card-bg-light);
-}
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  background: #f8fafc;
+  color: var(--theme-text-gray, #64748b);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
 
-.card-id {
-  color: var(--theme-text-black);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 520px;
-  margin-bottom: 12px;
+  &:hover {
+    background: #ffffff;
+    color: var(--theme-primary-blue, #165dff);
+    border-color: rgba(22, 93, 255, 0.3);
+  }
 
-  .label {
-    font-weight: 600;
-    color: var(--theme-text-muted);
+  &:active {
+    transform: scale(0.96);
   }
 }
 
-.card-stats {
+.address-box {
+  height: 38px;
+  padding: 0 10px;
   display: flex;
-  justify-content: space-between;
-  color: var(--theme-text-light-gray-muted);
+  align-items: center;
+  border-radius: 4px;
+  background: #f8fafc;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1;
+  overflow: hidden;
 
-  .today {
-    margin-left: auto;
+  .address-prefix,
+  .address-suffix {
+    color: var(--theme-text-black, #182230);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .address-mid {
+    color: var(--theme-text-gray, #64748b);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 16px;
+  }
+
+  .address-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.address-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.address-stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+
+  .stat-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #f1f5f9;
+    font-size: 11px;
+    line-height: 1.2;
+
+    .stat-label {
+      color: var(--theme-text-gray, #64748b);
+      font-weight: 500;
+    }
+
+    .stat-val {
+      color: var(--theme-text-black, #182230);
+      font-weight: 700;
+    }
   }
 }
 
 .delete-btn {
-  width: 100px;
-  height: 64px;
-  background: var(--theme-bg-red);
-  color: var(--theme-text-white);
+  flex-shrink: 0;
+  height: 30px;
+  padding: 0 12px;
+  border: 1px solid rgba(239, 68, 68, 0.28);
   border-radius: 4px;
+  background: #ffffff;
+  color: #ef4444;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 16px;
-  font-weight: 400;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &:hover {
+    background: #ef4444;
+    color: #ffffff;
+    border-color: #ef4444;
+    box-shadow: 0 2px 6px rgba(239, 68, 68, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.96);
+  }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .address-card {
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 10px;
+    padding: 12px 12px;
   }
 
-  .card-info {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .card-label {
-    width: auto;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    font-size: 13px;
-  }
-
-  .card-content {
-    width: 100%;
-    padding: 10px 12px;
-    font-size: 13px;
-  }
-
-  .card-id {
-    max-width: 100%;
-    margin-bottom: 10px;
-    font-size: 13px;
-    word-break: break-all;
-    white-space: normal;
-  }
-
-  .card-stats {
-    flex-direction: column;
-    gap: 6px;
+  .address-box {
+    height: 34px;
     font-size: 12px;
+  }
 
-    .today {
-      margin-left: 0;
-    }
+  .address-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .address-stats {
+    justify-content: flex-start;
   }
 
   .delete-btn {
-    width: 80px;
-    height: 30px;
-    font-size: 12px;
-    border-radius: 4px;
+    width: 100%;
+    height: 32px;
   }
 }
 </style>

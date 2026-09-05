@@ -1,40 +1,59 @@
 <template>
   <div class="contract-flash">
     <el-card class="rental-card">
-      <el-tabs v-model="activeTab" class="rental-tabs">
-        <el-tab-pane :label="t('contract.usdtToTrx')" name="USDT" />
-        <el-tab-pane :label="t('contract.trxToUsdt')" name="TRX" />
-        <el-form
+      <div class="section-label">{{ t('contract.title') }}</div>
+      <div class="swap-split" role="tablist">
+        <button
+          type="button"
+          role="tab"
+          :class="{ 'is-active': activeTab === 'USDT' }"
+          :aria-selected="activeTab === 'USDT'"
+          @click="activeTab = 'USDT'"
+        >
+          {{ t('contract.usdtToTrx') }}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          :class="{ 'is-active': activeTab === 'TRX' }"
+          :aria-selected="activeTab === 'TRX'"
+          @click="activeTab = 'TRX'"
+        >
+          {{ t('contract.trxToUsdt') }}
+        </button>
+      </div>
+      <el-form
           ref="formRef"
           :model="formData"
-          label-position="right"
-          label-suffix=":"
+          label-position="top"
           class="rental-form"
         >
           <div class="form-wrap">
+            <div class="field-label">{{ t('contract.enterAmount') }}</div>
             <el-form-item prop="unitPrice">
               <el-input
                 v-model="formData.unitPrice"
                 type="number"
                 :min="minValue"
                 :max="maxValue"
+                step="0.01"
                 :placeholder="t('contract.enterAmountPlaceholder')"
+                @input="handleAmountInput"
                 @blur="handleBlur"
               >
-                <template #prefix>{{ t('contract.enterAmount') }}</template>
                 <template #suffix>{{
                   activeTab === 'USDT' ? t('common.usdt') : t('common.trx')
                 }}</template>
               </el-input>
             </el-form-item>
 
+            <div class="field-label">{{ t('contract.estimatedGet') }}</div>
             <el-form-item>
               <el-input
                 v-model="formData.coinAmount"
                 :placeholder="t('contract.estimatedPlaceholder')"
                 disabled
               >
-                <template #prefix>{{ t('contract.estimatedGet') }}</template>
                 <template #suffix>{{
                   activeTab === 'USDT' ? t('common.trx') : t('common.usdt')
                 }}</template>
@@ -50,7 +69,6 @@
           :max-trx="maxLimits.trx"
           @retry="handleRetryFetchAddress" 
         />
-      </el-tabs>
     </el-card>
   </div>
 </template>
@@ -63,12 +81,20 @@ import type { ExchangeRateData } from '@/api/modules/exchange/types'
 import { AddressKind } from '@/api/modules/address/types'
 import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { logger } from '@/utils/logger'
+import { formatCryptoAmount } from '@/utils/number'
+import { tmaHapticSelection } from '@/utils/telegram'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
 const { t } = useI18n()
 
 const activeTab = ref('USDT')
+
+watch(activeTab, (newTab, oldTab) => {
+  if (oldTab !== undefined && newTab !== oldTab) {
+    tmaHapticSelection()
+  }
+})
 
 // 使用统一的地址管理 hook
 const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymentAddress(AddressKind.FLASH_EXCHANGE)
@@ -77,7 +103,7 @@ const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymen
 const exchangeRateData = ref<ExchangeRateData | null>(null)
 
 const formData = reactive({
-  unitPrice: '2',
+  unitPrice: '2.00',
   coinAmount: '',
 })
 
@@ -135,27 +161,27 @@ const maxLimits = computed(() => {
 const minValue = computed(() => activeTab.value === 'USDT' ? 2 : 10)
 const maxValue = computed(() => activeTab.value === 'USDT' ? maxLimits.value.usdt : maxLimits.value.trx)
 
-// 计算显示的汇率（使用最小值，保留5位小数）
+// 计算显示的汇率（统一保留两位小数）
 const displayRate = computed(() => {
   if (activeTab.value === 'USDT') {
     // USDT→TRX: 2 USDT 能兑换多少 TRX
-    return (2 * exchangeRate.value.usdtToTrx).toFixed(5)
+    return formatCryptoAmount(2 * exchangeRate.value.usdtToTrx)
   } else {
     // TRX→USDT: 10 TRX 能兑换多少 USDT
-    return (10 * exchangeRate.value.trxToUsdt).toFixed(5)
+    return formatCryptoAmount(10 * exchangeRate.value.trxToUsdt)
   }
 })
 
 // 显示库存（使用接口返回的库存数据）
 const displayStock = computed(() => {
-  if (!exchangeRateData.value) return '0'
+  if (!exchangeRateData.value) return '0.00'
   
   if (activeTab.value === 'USDT') {
     // USDT→TRX，显示 TRX 库存
-    return exchangeRateData.value.stock_trx
+    return formatCryptoAmount(exchangeRateData.value.stock_trx)
   } else {
     // TRX→USDT，显示 USDT 库存
-    return exchangeRateData.value.stock_usdt
+    return formatCryptoAmount(exchangeRateData.value.stock_usdt)
   }
 })
 
@@ -184,7 +210,7 @@ watch(() => formData.unitPrice, (newValue) => {
     // USDT→TRX
     const rate = exchangeRate.value.usdtToTrx
     if (rate > 0) {
-      formData.coinAmount = (amount * rate).toFixed(2)
+      formData.coinAmount = formatCryptoAmount(amount * rate)
     } else {
       formData.coinAmount = '0.00'
     }
@@ -192,7 +218,7 @@ watch(() => formData.unitPrice, (newValue) => {
     // TRX→USDT
     const rate = exchangeRate.value.trxToUsdt
     if (rate > 0) {
-      formData.coinAmount = (amount * rate).toFixed(2)
+      formData.coinAmount = formatCryptoAmount(amount * rate)
     } else {
       formData.coinAmount = '0.00'
     }
@@ -201,7 +227,7 @@ watch(() => formData.unitPrice, (newValue) => {
 
 // 监听切换标签，重置表单并重新获取汇率
 watch(activeTab, (newTab) => {
-  formData.unitPrice = newTab === 'USDT' ? '2' : '10'
+  formData.unitPrice = formatCryptoAmount(newTab === 'USDT' ? 2 : 10)
   formData.coinAmount = ''
   // 切换标签时重新获取汇率
   fetchExchangeRate()
@@ -233,13 +259,24 @@ watch(() => exchangeRateData.value, (newData) => {
   }
 }, { immediate: true })
 
+const handleAmountInput = (value: string | number) => {
+  const rawValue = String(value).replace(/[^\d.]/g, '')
+  const [integerPart = '', decimalPart = ''] = rawValue.split('.')
+  const decimal = rawValue.includes('.') ? `.${decimalPart.slice(0, 2)}` : ''
+
+  formData.unitPrice = `${integerPart}${decimal}`
+}
+
 // 失焦时检查并恢复最小值
 const handleBlur = () => {
   const amount = Number.parseFloat(formData.unitPrice)
   
   if (formData.unitPrice === '' || Number.isNaN(amount) || amount < minValue.value) {
-    formData.unitPrice = String(minValue.value)
+    formData.unitPrice = formatCryptoAmount(minValue.value)
+    return
   }
+
+  formData.unitPrice = formatCryptoAmount(Math.min(amount, maxValue.value))
 }
 
 // 初始化时获取汇率和付款地址
@@ -251,128 +288,278 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .contract-flash {
-  padding: 0 0 80px;
+  padding: 0 0 40px;
 
-  .header {
-    text-align: center;
-    padding-bottom: 40px;
+  .section-label,
+  .field-label {
+    display: flex;
+    align-items: center;
+    min-height: 17px;
+    border-left: 3px solid var(--theme-bg-blue);
+    padding-left: 8px;
+    color: var(--theme-text-black);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
   }
 
-  .title {
-    font-size: 40px;
+  .section-label {
+    margin-bottom: 14px;
+    font-size: 13px;
     font-weight: 700;
-    color: var(--theme-text-black);
   }
 
   .rental-card {
-    max-width: 896px;
+    width: min(760px, calc(100% - 48px));
+    max-width: 760px;
     margin: 0 auto;
-    border-radius: 8px;
-    border: none;
-    box-shadow: 0px 14px 30px 0px rgba(0, 0, 0, 0.08);
+    border-radius: var(--theme-radius-lg, 8px);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    box-shadow: var(--theme-shadow-lg, 0 10px 25px -4px rgba(15, 23, 42, 0.07));
+    background: #ffffff;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 
     :deep(.el-card__body) {
-      padding: 24px;
+      padding: 24px 28px 28px;
     }
   }
 
-  .rental-tabs {
-    :deep(.el-tabs__header) {
-      margin: 0 0 22px;
-    }
+  .swap-split {
+    display: flex;
+    align-items: stretch;
+    gap: 6px;
+    box-sizing: border-box;
+    width: 100%;
+    margin: 0 0 20px;
+    padding: 4px;
+    border-radius: var(--theme-radius-md, 6px);
+    background: rgba(15, 23, 42, 0.04);
+    border: 1px solid rgba(226, 232, 240, 0.8);
 
-    :deep(.el-tabs__content) {
-      overflow: initial;
-    }
-
-    :deep(.el-tabs__nav-wrap::after) {
-      display: none;
-    }
-
-    :deep(.el-tabs__nav-scroll) {
-      overflow: visible;
-    }
-
-    :deep(.el-tabs__nav) {
-      width: 100%;
-      display: flex;
-      background: rgba(2, 15, 45, 0.03);
-      border-radius: 4px;
-      padding: 3px;
-      box-sizing: border-box;
-    }
-
-    :deep(.el-tabs__item) {
+    button {
       flex: 1;
-      height: 44px;
-      line-height: 44px;
-      padding: 0;
-      text-align: center;
-      font-weight: 700;
+      min-width: 0;
+      height: 40px;
+      line-height: 38px;
+      padding: 0 12px;
+      border: 1px solid transparent;
+      border-radius: var(--theme-radius-sm, 4px);
+      background: transparent;
+      color: #64748b;
+      font-family: inherit;
       font-size: 14px;
-      color: rgba(30, 41, 59, 0.6);
-      border-radius: 4px;
-      transition:
-        background-color 0.2s ease,
-        color 0.2s ease;
+      font-weight: 600;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      appearance: none;
+      box-shadow: none;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+      &:hover:not(.is-active) {
+        color: #0f172a;
+        background: rgba(255, 255, 255, 0.5);
+      }
 
       &.is-active {
-        color: var(--theme-text-white);
-        background: var(--theme-bg-blue);
-        box-shadow: 0px 4px 10px 0px rgba(22, 93, 255, 0.25);
+        color: #0f172a;
+        background: #ffffff;
+        border-color: rgba(226, 232, 240, 0.9);
+        box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05)), 0 1px 2px rgba(15, 23, 42, 0.03);
+        font-weight: 700;
       }
-    }
-
-    :deep(.el-tabs__active-bar) {
-      display: none;
     }
   }
 
   .form-wrap {
+    .field-label {
+      margin-bottom: 10px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
     :deep(.el-form-item) {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
 
       .el-form-item__content {
         justify-content: center;
       }
 
       .el-input {
-        font-size: 14px;
+        width: 100%;
+
         .el-input__wrapper {
-          background: rgba(2, 15, 45, 0.03);
-          border-radius: 4px;
-          box-shadow: none;
-          border: 1px solid rgba(2, 15, 45, 0.08);
-          padding: 0 12px;
-        }
+          min-height: 48px;
+          height: 48px;
+          background: #ffffff;
+          border-radius: var(--theme-radius-sm, 4px);
+          box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+          border: 1.5px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+          padding: 0 14px;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
-        .el-input__inner {
-          text-align: right;
-          height: 44px;
-          line-height: 44px;
-          color: var(--theme-text-black);
-        }
-
-        .el-input__prefix,
-        .el-input__suffix-inner {
-          font-weight: 600;
-          color: var(--theme-text-black);
-        }
-
-        .el-input__inner {
-          cursor: auto;
-
-          &::placeholder {
-            color: var(--theme-text-light-gray);
-            -webkit-text-fill-color: var(--theme-text-light-gray);
+          &:hover {
+            border-color: rgba(22, 93, 255, 0.4);
           }
+
+          &.is-focus {
+            border-color: var(--theme-primary-blue, #165dff);
+            box-shadow: 0 0 0 3px rgba(22, 93, 255, 0.12);
+          }
+        }
+
+        .el-input__inner {
+          text-align: left;
+          height: 46px;
+          line-height: 46px;
+          font-size: 16px;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+          color: var(--theme-text-black);
+        }
+
+        .el-input__suffix {
+          color: #64748b;
+        }
+
+        .el-input__suffix-inner {
+          display: inline-flex;
+          align-items: center;
+          height: 22px;
+          padding: 0 0 0 12px;
+          margin-left: 2px;
+          border: 0;
+          border-left: 1px solid rgba(148, 163, 184, 0.32);
+          border-radius: 0;
+          background: transparent;
+          box-shadow: none;
+          color: #64748b;
+          font-size: 13px;
+          font-weight: 600;
+          line-height: 1;
         }
 
         &.is-disabled {
+          .el-input__wrapper {
+            background: #f8fafc;
+            border-color: rgba(226, 232, 240, 0.8);
+          }
+
           .el-input__inner {
-            padding-right: 15px;
+            color: var(--theme-primary-blue, #165dff);
+            font-weight: 800;
+            -webkit-text-fill-color: initial;
+          }
+
+          .el-input__suffix-inner {
+            background: transparent;
+            color: #94a3b8;
+            border-left-color: rgba(148, 163, 184, 0.28);
           }
         }
+      }
+    }
+  }
+
+  :deep(.rate-card) {
+    margin: 16px 0 0;
+  }
+
+  :deep(.qr-section) {
+    padding: 32px 0 0;
+
+    .section-title {
+      margin-bottom: 16px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+
+    .qr-code,
+    .status-container {
+      width: 168px;
+      height: 168px;
+    }
+
+    .wallet-address {
+      max-width: 100%;
+      margin-top: 16px;
+      gap: 6px;
+      font-size: 11px;
+
+      .address-text {
+        max-width: 560px;
+        font-size: 11px;
+      }
+
+      .copy-button {
+        width: 18px !important;
+        min-width: 18px !important;
+        height: 18px !important;
+      }
+    }
+
+    .tips-info {
+      display: none;
+    }
+  }
+
+  :deep(.tips-section) {
+    margin: 14px 0 0;
+    padding: 14px 16px;
+    border-radius: 4px;
+    background: #f7faff;
+
+    .tips-title {
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .tips-list {
+      gap: 6px;
+    }
+
+    .tip-item {
+      gap: 6px;
+      line-height: 1.4;
+    }
+
+    .tip-text {
+      font-size: 11px;
+      line-height: 1.4;
+    }
+  }
+
+  :deep(.loading-section),
+  :deep(.error-section) {
+    margin: 0;
+    padding: 24px 0;
+    border-radius: 4px;
+
+    .loading-title,
+    .error-title {
+      margin-bottom: 16px;
+      font-size: 14px;
+    }
+
+    .loading-placeholder,
+    .error-placeholder {
+      gap: 10px;
+      padding: 24px 0;
+
+      .loading-text,
+      .error-text {
+        font-size: 13px;
+      }
+
+      .error-hint {
+        font-size: 12px;
+      }
+
+      .retry-button {
+        padding: 8px 18px;
+        font-size: 13px;
       }
     }
   }
@@ -380,54 +567,68 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .contract-flash {
-    padding: 0 0 60px;
+    padding: 0 0 24px;
 
     .rental-card {
-      border-radius: 6px;
-      box-shadow: 0px 8px 20px 0px rgba(0, 0, 0, 0.06);
+      width: 100%;
+      max-width: none;
+      border-radius: 4px;
+      box-shadow: 0 5px 15px rgba(15, 23, 42, 0.08);
 
       :deep(.el-card__body) {
-        padding: 10px;
+        padding: 12px;
       }
     }
 
-    .rental-tabs {
-      :deep(.el-tabs__header) {
-        margin: 0 0 18px;
-      }
+    .section-label,
+    .field-label {
+      min-height: 14px;
+      font-size: 11px;
+    }
 
-      :deep(.el-tabs__nav) {
-        padding: 2px;
-      }
+    .swap-split {
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 4px;
+      border-radius: 8px;
 
-      :deep(.el-tabs__item) {
-        height: 40px;
-        line-height: 40px;
-        font-size: 13px;
+      button {
+        height: 38px;
+        line-height: 36px;
+        font-size: 12px;
+        border-radius: 6px;
       }
     }
 
     .form-wrap {
+      .field-label {
+        margin-bottom: 5px;
+      }
+
       :deep(.el-form-item) {
-        margin-bottom: 14px;
+        margin-bottom: 11px;
 
         .el-input {
           font-size: 13px;
 
           .el-input__wrapper {
             padding: 0 10px;
+            min-height: 38px;
+            height: 38px;
           }
 
           .el-input__inner {
-            height: 40px;
-            line-height: 40px;
+            height: 36px;
+            line-height: 36px;
             font-size: 13px;
           }
 
-          .el-input__prefix,
           .el-input__suffix-inner {
-            font-size: 13px;
+            height: 18px;
+            padding: 0 0 0 10px;
+            font-size: 12px;
             font-weight: 600;
+            background: transparent;
           }
 
           &.is-disabled {
@@ -439,7 +640,127 @@ onMounted(() => {
               padding-right: 10px;
               color: var(--theme-text-gray);
             }
+
+            .el-input__suffix-inner {
+              background: transparent;
+            }
           }
+        }
+      }
+    }
+
+    :deep(.rate-card) {
+      padding: 12px;
+      gap: 8px;
+
+      .rate-section {
+        .rate-main {
+          gap: 5px;
+
+          .rate-label-inline,
+          .rate-text {
+            font-size: 11px;
+          }
+        }
+      }
+
+      .note-section {
+        gap: 4px;
+
+        .note-text,
+        .limits-row .limit-item {
+          font-size: 11px;
+        }
+
+        .limits-row {
+          gap: 14px;
+        }
+      }
+
+      .stock-section {
+        font-size: 11px;
+      }
+    }
+
+    :deep(.qr-section) {
+      padding: 16px 0 10px;
+
+      .section-title {
+        font-size: 14px;
+      }
+
+      .qr-code,
+      .status-container {
+        width: 150px;
+        height: 150px;
+      }
+
+      .wallet-address {
+        font-size: 11px;
+
+        .address-text {
+          max-width: 270px;
+          font-size: 10px;
+        }
+
+        .copy-button {
+          width: 18px !important;
+          min-width: 18px !important;
+          height: 18px !important;
+        }
+      }
+
+      .tips-info {
+        font-size: 10px;
+      }
+    }
+
+    :deep(.tips-section) {
+      margin-top: 10px;
+      padding: 12px;
+
+      .tips-title {
+        margin-bottom: 8px;
+        font-size: 12px;
+      }
+
+      .tips-list {
+        gap: 6px;
+      }
+
+      .tip-text {
+        font-size: 11px;
+      }
+    }
+
+    :deep(.loading-section),
+    :deep(.error-section) {
+      padding: 24px 12px;
+      border-radius: 4px;
+
+      .loading-title,
+      .error-title {
+        margin-bottom: 16px;
+        font-size: 14px;
+      }
+
+      .loading-placeholder,
+      .error-placeholder {
+        padding: 24px 0;
+        gap: 10px;
+
+        .loading-text,
+        .error-text {
+          font-size: 13px;
+        }
+
+        .error-hint {
+          font-size: 12px;
+        }
+
+        .retry-button {
+          padding: 8px 18px;
+          font-size: 13px;
         }
       }
     }

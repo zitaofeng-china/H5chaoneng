@@ -1,21 +1,52 @@
 <template>
-  <section id="feature" class="why-choose-us">
-    <div class="container">
-      <div class="header">
-        <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
-        <p class="subtitle">
-          {{ t('home.subtitle') }}
-        </p>
+  <section
+    id="feature"
+    class="why-choose-us"
+    :class="{ 'is-ready': isReady, 'is-settled': isSettled }"
+  >
+    <header ref="headerRef" class="feature-header">
+      <div class="header-token" aria-hidden="true">
+        <img class="header-token-badge" :src="featureHeaderBadge" alt="" />
       </div>
+      <div class="header-copy">
+        <h2 class="title">{{ t('home.whyChooseUs') }}</h2>
+        <p class="subtitle">{{ t('home.subtitle') }}</p>
+      </div>
+    </header>
 
-      <div class="grid">
-        <div v-for="item in items" :key="item.key" class="card">
-          <div class="icon">
-            <SvgIcon :name="`choose-${item.icon}`" width="56" height="56" />
+    <div class="feature-container">
+      <div class="feature-showcase">
+        <div class="token-art" aria-hidden="true">
+          <div class="token-art-stage">
+            <img class="token-art-glow" :src="featureGlow" alt="" />
+            <img class="token-art-usdt" :src="featureUsdt" alt="" />
+            <img class="token-art-trx" :src="featureTrx" alt="" />
           </div>
+        </div>
 
-          <div class="card-title">{{ t(item.titleKey) }}</div>
-          <div class="card-desc">{{ t(item.descKey) }}</div>
+        <div class="feature-list" @mouseleave="hoveredIndex = null">
+          <span class="feature-frame" aria-hidden="true"></span>
+          <article
+            v-for="(item, index) in items"
+            :key="item.key"
+            class="feature-item"
+            :class="{ featured: featuredIndex === index }"
+            :style="{ '--delay': `${index * 220}ms` }"
+            @mouseenter="hoveredIndex = index"
+            @focusin="hoveredIndex = index"
+            @click="hoveredIndex = index"
+          >
+            <span class="feature-dot">
+              <img class="feature-dot-icon" :src="featureIcons[index]" alt="" />
+            </span>
+            <div class="feature-copy">
+              <h3>{{ t(item.titleKey) }}</h3>
+              <p>
+                <span class="desc-desktop">{{ t(item.descKey) }}</span>
+                <span class="desc-mobile">{{ t(item.descKeyMobile ?? item.descKey) }}</span>
+              </p>
+            </div>
+          </article>
         </div>
       </div>
     </div>
@@ -23,9 +54,75 @@
 </template>
 
 <script setup lang="ts">
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import featureHeaderBadge from '@/assets/images/home/lanhu/feature-header-badge.png'
+import featureGlow from '@/assets/images/home/lanhu/feature-bg.png'
+import featureUsdt from '@/assets/images/home/lanhu/feature-inner-bg.png'
+import featureTrx from '@/assets/images/home/lanhu/feature-coin.png'
+import featureContractIcon from '@/assets/images/home/lanhu/feature-icon-contract.png'
+import featureFastIcon from '@/assets/images/home/lanhu/feature-icon-fast.png'
+import featureLowCostIcon from '@/assets/images/home/lanhu/feature-icon-low-cost.png'
+import featureSafeIcon from '@/assets/images/home/lanhu/feature-icon-safe.png'
+import featureSupportIcon from '@/assets/images/home/lanhu/feature-icon-support.png'
+import featureTransparentIcon from '@/assets/images/home/lanhu/feature-icon-transparent.png'
 
 const { t } = useI18n()
+const headerRef = ref<HTMLElement | null>(null)
+const isReady = ref(false)
+const isSettled = ref(false)
+const hoveredIndex = ref<number | null>(null)
+const featuredIndex = computed(() => hoveredIndex.value ?? 0)
+
+let io: IntersectionObserver | null = null
+let settleTimer = 0
+let started = false
+
+const markReady = () => {
+  if (started) return
+  started = true
+  void nextTick(() => {
+    requestAnimationFrame(() => {
+      isReady.value = true
+      settleTimer = window.setTimeout(() => {
+        isSettled.value = true
+      }, 1500)
+    })
+  })
+}
+
+onMounted(() => {
+  const el = headerRef.value
+  if (!el || typeof IntersectionObserver === 'undefined') {
+    markReady()
+    return
+  }
+
+  io = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry?.isIntersecting) return
+      markReady()
+      io?.disconnect()
+    },
+    { threshold: 0.2, rootMargin: '0px' },
+  )
+  io.observe(el)
+})
+
+onUnmounted(() => {
+  window.clearTimeout(settleTimer)
+  io?.disconnect()
+  io = null
+})
+
+const featureIcons = [
+  featureSafeIcon,
+  featureFastIcon,
+  featureLowCostIcon,
+  featureContractIcon,
+  featureTransparentIcon,
+  featureSupportIcon,
+]
 
 defineOptions({
   name: 'WhyChooseUs',
@@ -35,7 +132,7 @@ type Item = {
   key: string
   titleKey: string
   descKey: string
-  icon: 'shield' | 'bolt' | 'coins' | 'code' | 'eye' | 'headset'
+  descKeyMobile?: string
 }
 
 const items: Item[] = [
@@ -43,208 +140,571 @@ const items: Item[] = [
     key: 'safe',
     titleKey: 'home.safeAndReliable',
     descKey: 'home.safeAndReliableDesc',
-    icon: 'shield',
+    descKeyMobile: 'home.safeAndReliableDescMobile',
   },
   {
     key: 'fast',
     titleKey: 'home.fastExchange',
     descKey: 'home.fastExchangeDesc',
-    icon: 'bolt',
   },
   {
     key: 'low',
     titleKey: 'home.lowCost',
     descKey: 'home.lowCostDesc',
-    icon: 'coins',
   },
   {
     key: 'contract',
     titleKey: 'home.smartContract',
     descKey: 'home.smartContractDesc',
-    icon: 'code',
   },
   {
     key: 'transparent',
     titleKey: 'home.transparent',
     descKey: 'home.transparentDesc',
-    icon: 'eye',
   },
   {
     key: 'support',
     titleKey: 'home.support247',
     descKey: 'home.support247Desc',
-    icon: 'headset',
   },
 ]
 </script>
 
 <style lang="scss" scoped>
 .why-choose-us {
-  background: var(--theme-bg-light);
-  padding: 20px 0 100px;
+  overflow: hidden;
+  background: #fff;
+  padding: 64px 0 67px;
+  scroll-margin-top: 80px;
 }
 
-.container {
-  max-width: 1200px;
+.feature-container {
+  width: min(100%, 1440px);
   margin: 0 auto;
-  padding: 0 40px;
+  padding: 0 17.3% 0 0;
+  box-sizing: border-box;
 }
 
-.header {
+.feature-header {
+  width: min(100%, 1440px);
+  margin: 0 auto 20px;
+  padding: 0 24px;
   text-align: center;
+  box-sizing: border-box;
 }
 
 .title {
-  font-size: 40px;
-  font-weight: 700;
-  color: var(--theme-text-black);
   margin: 0;
+  color: #182230;
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 
 .subtitle {
-  margin: 14px auto 0;
-  max-width: 820px;
-  font-size: 14px;
-  color: var(--theme-text-muted);
+  max-width: 640px;
+  margin: 8px auto 0;
+  color: rgba(71, 84, 103, 0.58);
+  font-size: 12px;
+  line-height: 1.6;
 }
 
-.grid {
-  margin-top: 56px;
+.header-token {
+  display: none;
+}
+
+.desc-mobile {
+  display: none;
+}
+
+.feature-showcase {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 28px;
+  grid-template-columns: 60.5% 39.5%;
+  align-items: end;
+  min-height: 560px;
 }
 
-.card {
-  background: var(--theme-text-white);
-  border-radius: 14px;
-  padding: 26px;
-  box-shadow: 0px 13px 22px 0px var(--theme-shadow-strong);
-  border: 1px solid var(--theme-border-light);
-  transition:
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0px 18px 28px 0px var(--theme-shadow-strong-hover);
-  }
-}
-
-.icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 50%;
+.token-art {
+  position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-start;
+  min-height: 560px;
+  padding-top: 12px;
+  overflow: visible;
 }
 
-.card-title {
-  margin-top: 18px;
-  font-size: 18px;
+.token-art-stage {
+  position: relative;
+  width: 88%;
+  max-width: none;
+  margin-left: -2%;
+  aspect-ratio: 896 / 891;
+}
+
+.token-art-stage img {
+  position: absolute;
+  display: block;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+
+.token-art-glow {
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100% !important;
+  object-fit: fill;
+}
+
+.token-art-usdt {
+  z-index: 2;
+  top: 3.25%;
+  left: 46.65%;
+  width: 39.62%;
+}
+
+.token-art-trx {
+  z-index: 3;
+  top: 30.3%;
+  left: 70.42%;
+  width: 25.56%;
+  transform: translateY(-10px);
+}
+
+.feature-header {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 1.5s ease-in-out,
+    transform 1.5s ease-in-out;
+}
+
+.token-art {
+  opacity: 0;
+  transform: translateX(-24px);
+  transition:
+    opacity 1.5s ease-in-out,
+    transform 1.5s ease-in-out;
+}
+
+.is-ready .feature-header,
+.is-ready .token-art {
+  opacity: 1;
+  transform: none;
+}
+
+.is-ready .token-art-glow {
+  animation: feature-glow-pulse 6s ease-in-out infinite;
+}
+
+.is-ready .token-art-usdt {
+  animation: feature-usdt-float 5.2s ease-in-out infinite;
+}
+
+.is-ready .token-art-trx {
+  animation: feature-trx-float 4.6s ease-in-out 0.35s infinite;
+}
+
+.feature-list {
+  --frame: #8eb4ff;
+  --rail: 8px;
+  position: relative;
+  overflow: visible;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 560px;
+  padding: 0 32px 0 var(--rail);
+  background: transparent;
+  border: 0;
+  box-sizing: border-box;
+}
+
+.feature-frame {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.feature-frame::before,
+.feature-frame::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 8px;
+  height: 1px;
+}
+
+.feature-frame::before {
+  top: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 45%,
+    color-mix(in srgb, var(--frame) 35%, transparent) 54%,
+    var(--frame) 68%,
+    var(--frame) 100%
+  );
+}
+
+.feature-frame::after {
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    transparent 30%,
+    color-mix(in srgb, var(--frame) 35%, transparent) 40%,
+    var(--frame) 54%,
+    var(--frame) 100%
+  );
+}
+
+.feature-list::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 9px;
+  border: 1px solid var(--frame);
+  border-left: 0;
+  border-radius: 0 8px 8px 0;
+  pointer-events: none;
+}
+
+.feature-list::after {
+  content: '';
+  position: absolute;
+  left: var(--rail);
+  top: 15%;
+  bottom: 15%;
+  width: 1px;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    var(--frame) 22%,
+    var(--frame) 78%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.feature-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0 minmax(0, 1fr);
+  column-gap: 26px;
+  padding: 30px 0;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 1.5s ease-in-out var(--delay, 0ms),
+    transform 1.5s ease-in-out var(--delay, 0ms);
+}
+
+.is-ready .feature-item {
+  opacity: 1;
+  transform: none;
+}
+
+.feature-dot {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  margin-top: -6px;
+  margin-left: -16px;
+  border-radius: 50%;
+  place-items: center;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  background: transparent;
+  transition:
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.28s ease;
+}
+
+.feature-item.featured .feature-dot {
+  transform: scale(1.08);
+  box-shadow: 0 4px 12px rgba(74, 125, 255, 0.18);
+}
+
+.feature-dot-icon {
+  display: block;
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
+.feature-copy {
+  max-width: 300px;
+}
+
+.feature-copy h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
   font-weight: 700;
-  color: var(--theme-text-black);
+  line-height: 1.4;
+  transition: color 0.28s ease;
 }
 
-.card-desc {
-  margin-top: 10px;
-  font-size: 13px;
-  line-height: 1.7;
-  color: var(--theme-text-muted);
+.feature-copy p {
+  margin: 4px 0 0;
+  color: rgba(71, 84, 103, 0.55);
+  font-size: 12px;
+  line-height: 1.65;
+  transition: color 0.28s ease;
 }
 
-.icon-blue {
-  background: var(--theme-choose-blue-bg);
-  color: var(--theme-choose-blue);
+.feature-item.featured .feature-copy h3,
+.feature-item.featured .feature-copy p {
+  color: #4a7dff;
 }
 
-.icon-green {
-  background: var(--theme-choose-green-bg);
-  color: var(--theme-choose-green);
-}
-
-.icon-orange {
-  background: var(--theme-choose-orange-bg);
-  color: var(--theme-choose-orange);
-}
-
-.icon-purple {
-  background: var(--theme-choose-purple-bg);
-  color: var(--theme-choose-purple);
-}
-
-.icon-red {
-  background: var(--theme-choose-red-bg);
-  color: var(--theme-choose-red);
-}
-
-.icon-yellow {
-  background: var(--theme-choose-yellow-bg);
-  color: var(--theme-choose-yellow);
-}
-
-@media (max-width: 992px) {
-  .container {
-    padding: 0 20px;
+@keyframes feature-glow-pulse {
+  0%,
+  100% {
+    opacity: 1;
   }
-
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
+  50% {
+    opacity: 0.78;
   }
 }
 
-@media (max-width: 600px) {
+@keyframes feature-usdt-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(-1.4deg);
+  }
+}
+
+@keyframes feature-trx-float {
+  0%,
+  100% {
+    transform: translateY(-10px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(1.6deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .feature-header,
+  .token-art,
+  .feature-item,
+  .feature-dot,
+  .feature-copy h3,
+  .feature-copy p {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .is-ready .token-art-glow,
+  .is-ready .token-art-usdt,
+  .is-ready .token-art-trx {
+    animation: none;
+  }
+
+  .token-art-trx {
+    transform: translateY(-10px);
+  }
+}
+
+@media (max-width: 1200px) and (min-width: 769px) {
+  .feature-container {
+    padding: 0 48px 0 24px;
+  }
+
+  .feature-showcase {
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 42%);
+  }
+
+  .token-art {
+    padding-top: 0;
+  }
+
+  .token-art-stage {
+    width: 100%;
+    margin-left: 0;
+  }
+
+  .feature-list {
+    min-height: 500px;
+    padding: 28px 22px 32px var(--rail);
+  }
+}
+
+@media (max-width: 768px) {
+  /* 蓝湖 375 稿：币标 71×70，文案 291×58 从 x=42 叠入，底对齐。 */
+  .feature-header,
+  .feature-item {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
   .why-choose-us {
-    padding: 32px 0 40px;
+    overflow: visible;
+    padding: 28px 0 32px;
   }
 
-  .container {
-    padding: 0 16px;
+  .feature-container {
+    padding: 0 12px;
+  }
+
+  /* 蓝湖 375：image32 71×70 @x=0；文案框 291×58 @x=42 底对齐，标题/副标题在框内居中。 */
+  .feature-header {
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+    gap: 0;
+    width: 100%;
+    height: 70px;
+    margin: 0 0 18px;
+    padding: 0 12px 0 0;
+    box-sizing: border-box;
+    text-align: left;
+  }
+
+  .header-token {
+    display: block;
+    flex: 0 0 71px;
+    width: 71px;
+    height: 70px;
+    margin-right: -29px;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .header-token-badge {
+    display: block;
+    width: 71px;
+    height: 70px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .header-copy {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 291px;
+    max-width: 291px;
+    min-width: 0;
+    height: 58px;
+    z-index: 1;
   }
 
   .title {
-    font-size: 20px;
-    font-weight: 600;
+    margin: 0;
+    color: rgb(30, 41, 59);
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 24px;
+    text-align: center;
+    white-space: nowrap;
   }
 
   .subtitle {
-    font-size: 13px;
-    margin-top: 10px;
-    line-height: 1.5;
+    max-width: none;
+    margin: 0;
+    color: rgba(96, 96, 96, 0.8);
+    font-size: 10px;
+    font-weight: 500;
+    line-height: 14px;
+    text-align: center;
   }
 
-  .grid {
-    margin-top: 20px;
-    grid-template-columns: 1fr;
-    gap: 16px;
+  .feature-showcase {
+    display: block;
+    min-height: 0;
   }
 
-  .card {
-    padding: 18px;
-    border-radius: 12px;
+  .token-art {
+    display: none;
   }
 
-  .icon {
-    width: 40px;
-    height: 40px;
-
-    svg {
-      width: 48px;
-      height: 48px;
-    }
+  .feature-list {
+    --rail: 0px;
+    min-height: 0;
+    margin-top: 0;
+    padding: 0;
+    gap: 28px;
+    justify-content: flex-start;
   }
 
-  .card-title {
-    margin-top: 14px;
+  .feature-frame,
+  .feature-list::before,
+  .feature-list::after {
+    content: none;
+    display: none;
+  }
+
+  .feature-item {
+    padding: 0;
+    grid-template-columns: 32px minmax(0, 1fr);
+    column-gap: 12px;
+  }
+
+  .feature-dot {
+    width: 32px;
+    height: 32px;
+    margin: 0;
+  }
+
+  .feature-item.featured .feature-dot {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .feature-dot-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .feature-copy {
+    max-width: none;
+  }
+
+  .feature-copy h3 {
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 700;
+    line-height: 22px;
+    color: #1e293b;
   }
 
-  .card-desc {
-    margin-top: 8px;
+  .feature-copy p {
+    margin-top: 4px;
+    color: #667085;
     font-size: 12px;
-    line-height: 1.6;
+    line-height: 18px;
+  }
+
+  .feature-item.featured .feature-copy h3 {
+    color: #1e293b;
+  }
+
+  .feature-item.featured .feature-copy p {
+    color: #165dff;
+  }
+
+  .desc-desktop {
+    display: none;
+  }
+
+  .desc-mobile {
+    display: inline;
   }
 }
 </style>

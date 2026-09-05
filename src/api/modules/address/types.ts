@@ -10,8 +10,16 @@ export enum AddressKind {
   FLASH_EXCHANGE = 3, // 闪兑（USDT/TRX互换）
   FLASH_ENERGY_TRANSFER = 4, // 闪租能量-转账租赁
   COUNT_RENTAL = 5, // 按笔数租用（USDT购买）
+  WELFARE_ORDER = 6, // 福利订单
   FLASH_ENERGY_BALANCE = 7, // 闪租能量-余额支付
   // 可以根据需要添加其他类别
+}
+
+/**
+ * 托管地址类型
+ */
+export enum HostingKind {
+  DEFAULT = 20, // 托管地址
 }
 
 /**
@@ -43,14 +51,20 @@ export interface HostingAddressItem {
   address: string // 托管地址
   agent_id: number // 代理ID
   bot_id: number // 机器人ID
-  created_at: number // 创建时间（Unix时间戳，秒）
+  count: number // 历史已用笔数
+  created_at: string | number // 创建时间
   id: number // 托管记录ID
+  kind: number // 类型
+  maximum: number // 最大值
+  minimum: number // 最小值
   order_id: string // 订单ID
   origin: number // 来源
-  updated_at: number // 更新时间（Unix时间戳，秒）
+  status: number // 状态
+  threshold: number // 阈值
+  total: number // 总量/额度
+  updated_at: string | number // 更新时间
   user_id: number // 用户ID
-  total?: number // 总使用次数（可选）
-  today_total?: number // 今日使用次数（可选）
+  today_count?: number // 今天已用笔数
 }
 
 /**
@@ -74,14 +88,39 @@ export interface HostingListData {
  * 获取托管列表请求参数
  */
 export interface GetHostingListParams {
-  limit: number // 查询条数
+  address?: string // 地址
+  agent_id?: number // 代理ID
+  bot_id?: number // 机器人ID
+  current_page?: number // 当前页码
+  kind?: HostingKind | number // 托管类型
+  keyword?: string // 关键词
+  order?: string // 排序，示例：column ASC 或 column DESC
+  origin?: number // 来源
+  page_size?: number // 每页条数
+  status?: number // 状态
+  user_id?: number // 用户ID
 }
 
 /**
  * 添加托管地址请求参数
  */
 export interface AddHostingAddressParams {
-  address: string[] // 托管地址数组
+  address: string // 托管地址
+  agent_id?: number // 代理ID
+  bot_id?: number // 机器人ID
+  count?: number // 数量
+  created_at?: string // 创建时间
+  id?: number // 托管记录ID
+  kind?: HostingKind | number // 托管类型，默认20
+  maximum?: number // 最大值
+  minimum?: number // 最小值
+  order_id?: string // 订单ID
+  origin?: number // 来源
+  status?: number // 状态
+  threshold?: number // 阈值
+  total?: number // 总使用次数
+  updated_at?: string // 更新时间
+  user_id?: number // 用户ID
 }
 
 /**
