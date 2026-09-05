@@ -864,20 +864,37 @@ const rentNow = async () => {
     .el-input__wrapper {
       background: #f8fafc !important;
       box-shadow: 0 0 0 1px #cbd5e1 inset !important;
+      display: flex !important;
+      align-items: center !important;
     }
 
     .el-input__inner {
+      height: 38px !important;
+      line-height: 38px !important;
       color: #0f172a !important;
       font-size: 15px !important;
       font-weight: 700 !important;
-      font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif !important;
+      font-family: inherit !important;
       -webkit-text-fill-color: #0f172a !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
     }
 
     .el-input__suffix {
       color: #ea580c !important;
       font-size: 13px !important;
       font-weight: 700 !important;
+      font-family: inherit !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      height: 100% !important;
+      margin-left: 6px !important;
+    }
+
+    .el-input__suffix-inner {
+      display: inline-flex !important;
+      align-items: center !important;
+      height: 100% !important;
     }
   }
 }
@@ -1171,20 +1188,38 @@ const rentNow = async () => {
       .el-input__wrapper {
         background: #f8fafc !important;
         box-shadow: 0 0 0 1px #cbd5e1 !important;
+        display: flex !important;
+        align-items: center !important;
       }
 
       .el-input__inner {
+        height: 44px !important;
+        line-height: 44px !important;
         color: #0f172a !important;
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: 700 !important;
-        font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif !important;
+        font-family: inherit !important;
         -webkit-text-fill-color: #0f172a !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
       }
 
       .el-input__suffix {
         color: #ea580c !important;
         font-size: 13px !important;
         font-weight: 700 !important;
+        font-family: inherit !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        height: 44px !important;
+        line-height: 44px !important;
+        margin-left: 6px !important;
+      }
+
+      .el-input__suffix-inner {
+        display: inline-flex !important;
+        align-items: center !important;
+        height: 100% !important;
       }
     }
   }
