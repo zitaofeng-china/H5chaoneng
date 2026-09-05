@@ -1,167 +1,89 @@
 <template>
   <el-card class="content-main" shadow="never">
-    <!-- 顶部全网系统微状态条 -->
-    <div class="workspace-status-bar">
-      <div class="status-indicator">
-        <span class="pulse-dot"></span>
-        <span class="status-text">全网毫秒级智能防烧监听已就绪</span>
+    <!-- 费用说明卡片 -->
+    <section class="hosting-section">
+      <h2 class="section-title">
+        <span>{{ t('feeCard.title') }}</span>
+      </h2>
+      <div class="fee-grid">
+        <div
+          v-for="(item, idx) in feeItems"
+          :key="item.desc"
+          class="fee-item"
+          :class="{ 'is-premium': idx === 1 }"
+        >
+          <div class="fee-header">
+            <span class="fee-badge">
+              <SvgIcon name="choose-bolt" width="12" height="12" class="badge-icon" />
+              <span>{{ item.energy }} 能量</span>
+            </span>
+          </div>
+          <div class="fee-price-row">
+            <span class="fee-num">{{ item.price }}</span>
+            <span class="fee-unit">TRX / {{ t('common.purchase') }}</span>
+          </div>
+          <div class="fee-desc">
+            <span>{{ item.desc }}</span>
+          </div>
+        </div>
       </div>
-      <div class="status-stats">
-        <span class="stat-badge">
-          <SvgIcon name="choose-bolt" width="12" height="12" class="badge-bolt" />
-          <span>全网能量推荐</span>
-        </span>
-        <span v-if="userStore.isLogin" class="balance-badge">
-          可用: <strong>{{ availableBalance }} TRX</strong>
+    </section>
+
+    <!-- 需要托管的地址 -->
+    <section class="hosting-section">
+      <div class="section-header-row">
+        <h2 class="section-title">
+          <span>{{ t('hosting.address') }}</span>
+          <span class="required-star" aria-hidden="true">*</span>
+        </h2>
+        <span v-if="parsedAddressCount > 0" class="address-count-badge">
+          已识别 {{ parsedAddressCount }} 个地址
         </span>
       </div>
-    </div>
-
-    <!-- 移动端分段视图控制器 -->
-    <div v-if="isMobile" class="mobile-segmented-tabs">
-      <button
-        type="button"
-        class="segment-tab"
-        :class="{ 'is-active': activeTab === 'add' }"
-        @click="switchTab('add')"
+      <el-form
+        ref="formRef"
+        :model="formData"
+        :rules="formRules"
+        label-width="0"
+        class="details-form"
       >
-        <SvgIcon name="choose-bolt" width="13" height="13" />
-        <span>添加托管</span>
-      </button>
-      <button
-        type="button"
-        class="segment-tab"
-        :class="{ 'is-active': activeTab === 'list' }"
-        @click="switchTab('list')"
-      >
-        <SvgIcon name="choose-shield" width="13" height="13" />
-        <span>已托管列表</span>
-        <span v-if="hostedCount > 0" class="tab-badge">{{ hostedCount }}</span>
-      </button>
-    </div>
-
-    <!-- 双栏联动工作台网格 -->
-    <div class="hosting-workspace-grid">
-      <!-- 左栏：控制与计费面板 -->
-      <div
-        class="workspace-pane workspace-pane-left"
-        v-show="!isMobile || activeTab === 'add'"
-      >
-        <!-- 费用说明卡片 -->
-        <section class="hosting-section">
-          <h2 class="section-title">
-            <span>{{ t('feeCard.title') }}</span>
-          </h2>
-          <div class="fee-grid">
-            <div
-              v-for="(item, idx) in feeItems"
-              :key="item.desc"
-              class="fee-item"
-              :class="{ 'is-premium': idx === 1 }"
-            >
-              <div class="fee-header">
-                <span class="fee-badge">
-                  <SvgIcon name="choose-bolt" width="12" height="12" class="badge-icon" />
-                  <span>{{ item.energy }} 能量</span>
-                </span>
-              </div>
-              <div class="fee-price-row">
-                <span class="fee-num">{{ item.price }}</span>
-                <span class="fee-unit">TRX / {{ t('common.purchase') }}</span>
-              </div>
-              <div class="fee-desc">
-                <span>{{ item.desc }}</span>
-              </div>
+        <el-form-item class="textarea-item" prop="address">
+          <div class="textarea-wrapper">
+            <el-input
+              type="textarea"
+              :rows="isMobile ? 5 : 4"
+              v-model="formData.address"
+              :placeholder="t('hosting.enterAddresses')"
+              class="custom-textarea"
+            />
+            <div v-if="formData.address" class="textarea-helper-bar">
+              <button
+                type="button"
+                class="clear-btn tactile-btn"
+                @click="formData.address = ''"
+              >
+                清空内容
+              </button>
             </div>
           </div>
-        </section>
+        </el-form-item>
+        <el-button type="primary" class="host-btn tactile-btn" @click="handleSaveAddress">
+          <SvgIcon name="choose-bolt" width="16" height="16" class="btn-icon" />
+          <span>{{ t('hosting.hostNow') }}</span>
+        </el-button>
+      </el-form>
+    </section>
 
-        <!-- 需要托管的地址 -->
-        <section class="hosting-section">
-          <div class="section-header-row">
-            <h2 class="section-title">
-              <span>{{ t('hosting.address') }}</span>
-              <span class="required-star" aria-hidden="true">*</span>
-            </h2>
-            <span v-if="parsedAddressCount > 0" class="address-count-badge">
-              已识别 {{ parsedAddressCount }} 个地址
-            </span>
-          </div>
-          <el-form
-            ref="formRef"
-            :model="formData"
-            :rules="formRules"
-            label-width="0"
-            class="details-form"
-          >
-            <el-form-item class="textarea-item" prop="address">
-              <div class="textarea-wrapper">
-                <el-input
-                  type="textarea"
-                  :rows="isMobile ? 5 : 4"
-                  v-model="formData.address"
-                  :placeholder="t('hosting.enterAddresses')"
-                  class="custom-textarea"
-                />
-                <div class="textarea-toolbar">
-                  <button
-                    type="button"
-                    class="paste-btn tactile-btn"
-                    @click="handlePasteClipboard"
-                  >
-                    <SvgIcon name="transfer-copy" width="12" height="12" />
-                    <span>粘贴剪贴板</span>
-                  </button>
-                  <button
-                    v-if="formData.address"
-                    type="button"
-                    class="clear-btn tactile-btn"
-                    @click="formData.address = ''"
-                  >
-                    清空内容
-                  </button>
-                </div>
-              </div>
-            </el-form-item>
-            <el-button
-              type="primary"
-              class="host-btn tactile-btn"
-              :loading="submitting"
-              @click="handleSaveAddress"
-            >
-              <SvgIcon name="choose-bolt" width="16" height="16" class="btn-icon" />
-              <span>{{ t('hosting.hostNow') }}</span>
-            </el-button>
-          </el-form>
-        </section>
+    <!-- 已托管地址 -->
+    <section class="hosting-section">
+      <h2 class="section-title">
+        <span>{{ t('hosting.managedAddress') }}</span>
+      </h2>
+      <AddressList />
+    </section>
 
-        <!-- 温馨提示卡片 -->
-        <section class="hosting-section tips-section">
-          <KindTips :tips="tips" class="hosting-tips" />
-        </section>
-      </div>
-
-      <!-- 右栏：监控与已托管列表面板 -->
-      <div
-        class="workspace-pane workspace-pane-right"
-        v-show="!isMobile || activeTab === 'list'"
-      >
-        <section class="hosting-section list-section">
-          <div class="section-header-row">
-            <h2 class="section-title">
-              <span>{{ t('hosting.managedAddress') }}</span>
-            </h2>
-            <span v-if="hostedCount > 0" class="total-badge">
-              <span class="active-dot"></span>
-              <span>{{ hostedCount }} 个正在守护</span>
-            </span>
-          </div>
-          <div class="right-list-container">
-            <AddressList @update:count="onUpdateCount" />
-          </div>
-        </section>
-      </div>
-    </div>
+    <!-- 温馨提示 -->
+    <KindTips :tips="tips" class="hosting-tips" />
   </el-card>
 </template>
 
@@ -189,27 +111,10 @@ const commonStore = useCommonStore()
 const priceStore = usePriceStore()
 const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
-const { tmaHapticImpact, tmaHapticSelection } = useTelegramHaptics()
-
-const activeTab = ref<'add' | 'list'>('add')
-const hostedCount = ref(0)
-const submitting = ref(false)
-
-const onUpdateCount = (count: number) => {
-  hostedCount.value = count
-}
-
-const switchTab = (tab: 'add' | 'list') => {
-  activeTab.value = tab
-  tmaHapticSelection()
-}
+const { tmaHapticImpact } = useTelegramHaptics()
 
 const formatFeePrice = (value: string | number) =>
   formatCryptoAmount(value).replace(/\.00$/, '')
-
-const availableBalance = computed(() => {
-  return formatFeePrice(userStore.userInfo?.balance || 0)
-})
 
 const feeItems = computed(() => {
   const price65k = priceStore.priceData?.hosting_65k || '3'
@@ -258,25 +163,6 @@ const formRules: FormRules = {
   ],
 }
 
-const handlePasteClipboard = async () => {
-  tmaHapticSelection()
-  try {
-    if (navigator?.clipboard?.readText) {
-      const text = await navigator.clipboard.readText()
-      if (text && text.trim()) {
-        formData.address = formData.address
-          ? `${formData.address.trim()}\n${text.trim()}`
-          : text.trim()
-        ElMessage.success('已从剪贴板粘贴')
-        return
-      }
-    }
-    ElMessage.info('未能读取剪贴板内容，请手动粘贴')
-  } catch {
-    ElMessage.info('请使用快捷键手动粘贴地址')
-  }
-}
-
 const handleSaveAddress = async () => {
   tmaHapticImpact('medium')
   if (!formRef.value) return
@@ -297,16 +183,14 @@ const handleSaveAddress = async () => {
 
     // 解析地址列表（支持逗号或换行分隔）
     const addressList: string[] = formData.address
-      .split(/[,，\n\r]+/)
-      .map((addr) => addr.trim())
-      .filter((addr) => addr.length > 0) as string[]
+      .split(/[,，\n\r]+/) // 支持中英文逗号和换行符
+      .map((addr) => addr.trim()) // 去除首尾空格
+      .filter((addr) => addr.length > 0) as string[] // 过滤空字符串
 
     if (addressList.length === 0) {
       ElMessage.warning(t('hosting.enterValidAddress'))
       return
     }
-
-    submitting.value = true
 
     // 统计结果
     let successCount = 0
@@ -317,9 +201,12 @@ const handleSaveAddress = async () => {
       // 循环逐个添加托管地址
       for (let i = 0; i < addressList.length; i++) {
         const address = addressList[i]
+
+        // 跳过空地址
         if (!address) continue
 
         try {
+          // 调用接口添加单个地址
           const response = await addressApi.addHostingAddress({
             address,
             kind: HostingKind.DEFAULT,
@@ -335,10 +222,10 @@ const handleSaveAddress = async () => {
               response.code === '100004'
             ) {
               ElMessage.error(t('auth.tokenExpired'))
-              return
+              return // 停止继续添加
             }
 
-            // 检查是否是余额不足错误
+            // 检查是否是余额不足错误（通过 code 或 msg 判断）
             const errorMsg = response.msg || ''
             if (
               response.code === '000009' ||
@@ -346,39 +233,39 @@ const handleSaveAddress = async () => {
               (response.code === '000007' && errorMsg.includes('余额不足'))
             ) {
               ElMessage.error(t('hosting.insufficientBalance'))
-              return
+              return // 停止继续添加
             }
 
             failedCount++
             failedAddresses.push(address)
 
-            // 检查是否是未激活地址错误
-            if (response.code === '004001') {
+            // 检查是否是地址未激活的错误
+            if (errorMsg.includes('未激活') || errorMsg.includes('not activated')) {
+              // 弹窗询问是否跳转到激活页面
               handleUnactivatedAddresses([address])
-              return
+              return // 停止继续添加
             }
-
-            ElMessage.error(response.msg || t('hosting.addFailed'))
           }
         } catch (error: any) {
+          console.error(`[添加托管地址] 地址 ${address} 添加失败:`, error)
           failedCount++
           failedAddresses.push(address)
-          console.error(`[添加托管地址] 地址 ${address} 失败:`, error)
+        }
 
-          if (error.message === 'NOT_LOGGED_IN') {
-            throw error
-          }
+        // 添加短暂延迟，避免请求过快
+        if (i < addressList.length - 1) {
+          await new Promise((resolve) => setTimeout(resolve, 200))
         }
       }
 
-      // 显示操作结果
-      if (successCount > 0 && failedCount === 0) {
+      // 显示结果
+      if (successCount === addressList.length) {
         ElMessage.success(t('hosting.addSuccess', { count: successCount }))
-      } else if (successCount > 0 && failedCount > 0) {
+      } else if (successCount > 0) {
         ElMessage.warning(
           t('hosting.addPartialSuccess', { success: successCount, fail: failedCount }),
         )
-      } else if (failedCount > 0 && successCount === 0) {
+      } else {
         ElMessage.error(t('hosting.addFailed'))
       }
 
@@ -387,31 +274,26 @@ const handleSaveAddress = async () => {
         formData.address = ''
         window.dispatchEvent(new CustomEvent('refresh-hosting-list'))
 
-        // 移动端自动切到已托管列表面板
-        if (isMobile.value) {
-          activeTab.value = 'list'
-        }
-
         // 刷新用户信息以更新余额
         if (userStore.isLogin) {
           await userStore.fetchUserInfo()
         }
       }
 
+      // 如果有失败的，显示失败的地址
       if (failedAddresses.length > 0) {
         console.log('[添加托管地址] 失败的地址:', failedAddresses)
       }
     } catch (error: any) {
       console.error('[添加托管地址] 错误:', error)
 
+      // 特殊处理未登录错误
       if (error.message === 'NOT_LOGGED_IN') {
         ElMessage.warning(t('common.pleaseLogin'))
         return
       }
 
       ElMessage.error(error.message || t('hosting.addFailed'))
-    } finally {
-      submitting.value = false
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
@@ -422,6 +304,7 @@ const handleSaveAddress = async () => {
  * 处理未激活的地址
  */
 const handleUnactivatedAddresses = (addresses: string[]) => {
+  // 使用 ElMessageBox 确认对话框
   ElMessageBox.confirm(addresses.join('\n'), t('hosting.addressNotActivated'), {
     confirmButtonText: t('hosting.goToActivate'),
     cancelButtonText: t('common.cancel'),
@@ -430,20 +313,32 @@ const handleUnactivatedAddresses = (addresses: string[]) => {
     customClass: 'unactivated-address-dialog',
   })
     .then(() => {
+      // 用户选择前往激活
+      console.log('[跳转激活] 保存地址到 sessionStorage:', addresses)
+
+      // 将地址存储到 sessionStorage，以便激活页面读取
       sessionStorage.setItem('pendingActivationAddresses', addresses.join('\n'))
+
+      // 跳转到激活页面
+      const targetPath = withSitePrefix('/activation')
+      console.log('[跳转激活] 目标路径:', targetPath)
+
       router
-        .push({
-          path: withSitePrefix('/activation'),
+        .push(targetPath)
+        .then(() => {
+          console.log('[跳转激活] 跳转成功')
         })
         .catch((err) => {
           console.error('[跳转激活] 跳转失败:', err)
         })
     })
     .catch(() => {
+      // 用户选择取消或关闭对话框，不做任何操作
       console.log('[跳转激活] 用户取消跳转')
     })
 }
 
+// 初始化时刷新价格（store 内已有缓存则短路）；用户信息由 App 统一拉取
 onMounted(() => {
   priceStore.fetchPrice()
 })
@@ -451,177 +346,28 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .content-main {
-  max-width: 1140px;
+  max-width: 780px;
   width: 100%;
   margin: 0 auto;
-  border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
-  border-radius: var(--theme-radius-lg, 10px);
+  border: 1.5px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  border-radius: var(--theme-radius-lg, 8px);
   background: #ffffff;
-  box-shadow: 0 4px 24px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05), 0 1px 3px rgba(15, 23, 42, 0.03);
 
   :deep(.el-card__body) {
-    padding: 24px 28px 28px;
+    padding: 28px 32px 24px;
   }
 }
 
-/* 顶部状态监控条 */
-.workspace-status-bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 14px;
-  margin-bottom: 22px;
-  background: linear-gradient(90deg, rgba(22, 93, 255, 0.04) 0%, rgba(124, 58, 237, 0.03) 100%);
-  border: 1px solid rgba(22, 93, 255, 0.12);
-  border-radius: var(--theme-radius-sm, 6px);
-
-  .status-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-
-    .pulse-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #10b981;
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.22);
-      animation: pulse-glow 2s infinite ease-in-out;
-    }
-
-    .status-text {
-      color: #1e293b;
-      font-size: 12px;
-      font-weight: 600;
-    }
-  }
-
-  .status-stats {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-
-    .stat-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      color: var(--theme-text-gray, #64748b);
-      font-size: 11px;
-      font-weight: 500;
-
-      .badge-bolt {
-        color: #f59e0b;
-      }
-    }
-
-    .balance-badge {
-      color: var(--theme-text-gray, #64748b);
-      font-size: 11px;
-
-      strong {
-        color: var(--theme-primary-blue, #165dff);
-        font-weight: 700;
-      }
-    }
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
-  }
-  50% {
-    box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.4);
-  }
-}
-
-/* 移动端分段视图切换 */
-.mobile-segmented-tabs {
-  display: flex;
-  align-items: center;
-  padding: 4px;
-  margin-bottom: 18px;
-  background: #f1f5f9;
-  border-radius: 8px;
-
-  .segment-tab {
-    flex: 1;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    height: 36px;
-    border: none;
-    border-radius: 6px;
-    background: transparent;
-    color: var(--theme-text-gray, #64748b);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-
-    &.is-active {
-      background: #ffffff;
-      color: var(--theme-primary-blue, #165dff);
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
-    }
-
-    .tab-badge {
-      padding: 1px 6px;
-      border-radius: 10px;
-      background: var(--theme-primary-blue, #165dff);
-      color: #ffffff;
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-  }
-}
-
-/* 双栏工作台网格 */
-.hosting-workspace-grid {
-  display: grid;
-  grid-template-columns: 460px 1fr;
-  gap: 32px;
-  align-items: start;
-}
-
-.workspace-pane {
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-}
-
-.workspace-pane-left {
-  .hosting-section + .hosting-section {
-    margin-top: 22px;
-  }
-}
-
-.workspace-pane-right {
-  height: 100%;
-
-  .list-section {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-  }
-
-  .right-list-container {
-    background: #fafbfc;
-    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.85));
-    border-radius: var(--theme-radius-sm, 8px);
-    padding: 14px;
-    height: 100%;
-    min-height: 480px;
-  }
+.hosting-section + .hosting-section {
+  margin-top: 24px;
 }
 
 .section-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 
   .section-title {
     margin-bottom: 0;
@@ -631,7 +377,7 @@ onMounted(() => {
 .section-title {
   display: flex;
   align-items: center;
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   padding-left: 10px;
   position: relative;
   color: var(--theme-text-black, #182230);
@@ -670,40 +416,21 @@ onMounted(() => {
   color: var(--theme-primary-blue, #165dff);
   font-size: 11px;
   font-weight: 600;
-}
-
-.total-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  padding: 2px 8px;
-  border-radius: 4px;
-  background: #ecfdf5;
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  color: #059669;
-  font-size: 11px;
-  font-weight: 600;
-
-  .active-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #10b981;
-  }
+  letter-spacing: 0.01em;
 }
 
 /* 费用说明卡片网格 */
 .fee-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 14px;
 }
 
 .fee-item {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 12px 14px;
+  padding: 14px 16px;
   border: 1.5px solid rgba(22, 93, 255, 0.12);
   border-radius: var(--theme-radius-sm, 6px);
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
@@ -740,14 +467,14 @@ onMounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
 
   .fee-badge {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 7px;
+    padding: 2px 8px;
     border-radius: 4px;
     background: rgba(22, 93, 255, 0.08);
     color: var(--theme-primary-blue, #165dff);
@@ -764,11 +491,11 @@ onMounted(() => {
     display: flex;
     align-items: baseline;
     gap: 4px;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 
     .fee-num {
       color: var(--theme-primary-blue, #165dff);
-      font-size: 20px;
+      font-size: 22px;
       font-weight: 800;
       line-height: 1;
       letter-spacing: -0.02em;
@@ -777,7 +504,7 @@ onMounted(() => {
 
     .fee-unit {
       color: var(--theme-text-gray, #64748b);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 600;
       line-height: 1;
     }
@@ -785,8 +512,8 @@ onMounted(() => {
 
   .fee-desc {
     color: var(--theme-text-gray, #64748b);
-    font-size: 11px;
-    line-height: 1.35;
+    font-size: 12px;
+    line-height: 1.3;
     font-weight: 500;
   }
 }
@@ -840,30 +567,13 @@ onMounted(() => {
     }
   }
 
-  .textarea-toolbar {
+  .textarea-helper-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 2px;
-
-    .paste-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      border: none;
-      background: transparent;
-      color: var(--theme-primary-blue, #165dff);
-      font-size: 12px;
-      font-weight: 500;
-      cursor: pointer;
-      padding: 2px 6px;
-      border-radius: 4px;
-      transition: all 0.15s ease;
-
-      &:hover {
-        background: rgba(22, 93, 255, 0.08);
-      }
-    }
+    font-size: 12px;
+    color: var(--theme-text-muted-gray, #94a3b8);
 
     .clear-btn {
       border: none;
@@ -924,67 +634,50 @@ onMounted(() => {
 }
 
 /* 温馨提示卡片 */
-.tips-section {
-  margin-top: 18px;
-}
-
-:deep(.hosting-tips) {
-  padding: 14px 16px;
+:deep(.hosting-tips.tips-section) {
+  margin-top: 24px;
+  padding: 16px 18px;
   border-radius: var(--theme-radius-sm, 6px);
   background: #f8fafc;
   border: 1px solid rgba(226, 232, 240, 0.85);
+}
 
-  .tips-title {
-    margin-bottom: 10px;
+.hosting-tips {
+  :deep(.tips-title) {
+    margin-bottom: 12px;
     color: var(--theme-text-black, #182230);
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
   }
 
-  .tips-list {
-    gap: 6px;
+  :deep(.tips-list) {
+    gap: 8px;
+    font-size: 12px;
   }
 
-  .tip-text {
+  :deep(.tip-text) {
     color: rgba(71, 84, 103, 0.82);
-    font-size: 11px;
-    line-height: 1.5;
+    font-size: 12px;
+    line-height: 1.55;
   }
 }
 
-/* 响应式适配 */
 @media (max-width: 890px) {
   .content-main {
     border-radius: 8px;
     box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
 
     :deep(.el-card__body) {
-      padding: 16px 14px 18px;
+      padding: 18px 14px 16px;
     }
   }
 
-  .workspace-status-bar {
-    padding: 8px 10px;
-    margin-bottom: 14px;
-
-    .status-stats {
-      gap: 8px;
-    }
-  }
-
-  .hosting-workspace-grid {
-    display: block;
-  }
-
-  .workspace-pane-right {
-    .right-list-container {
-      padding: 10px;
-      min-height: 360px;
-    }
+  .hosting-section + .hosting-section {
+    margin-top: 18px;
   }
 
   .fee-grid {
-    gap: 8px;
+    gap: 10px;
   }
 
   .fee-item {
@@ -992,6 +685,10 @@ onMounted(() => {
 
     .fee-price-row .fee-num {
       font-size: 18px;
+    }
+
+    .fee-desc {
+      font-size: 11px;
     }
   }
 
