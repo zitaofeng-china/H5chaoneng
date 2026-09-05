@@ -13,9 +13,12 @@
       </el-button>
     </div>
     
-    <div v-else-if="hostingList.length === 0" class="empty-state">
-      <el-icon :size="32"><IEpBox /></el-icon>
-      <span>{{ $t('hosting.noAddresses') }}</span>
+    <div v-else-if="hostingList.length === 0" class="empty-state-wrap">
+      <div class="empty-icon-circle">
+        <SvgIcon name="choose-shield" width="26" height="26" class="empty-icon" />
+      </div>
+      <div class="empty-title">{{ $t('hosting.noAddresses') }}</div>
+      <div class="empty-subtitle">在上方输入 TRON 地址并点击立即托管即可开启全自动托管</div>
     </div>
     
     <template v-else>
@@ -262,8 +265,7 @@ onUnmounted(() => {
 }
 
 .loading-state,
-.error-state,
-.empty-state {
+.error-state {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -278,8 +280,41 @@ onUnmounted(() => {
   color: var(--el-color-danger);
 }
 
-.empty-state {
-  color: var(--theme-text-light-gray-muted);
+.empty-state-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  background: #f8fafc;
+  border: 1.5px dashed rgba(203, 213, 225, 0.85);
+  border-radius: var(--theme-radius-sm, 6px);
+  text-align: center;
+  transition: all 0.2s ease;
+
+  .empty-icon-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(22, 93, 255, 0.08);
+    color: var(--theme-primary-blue, #165dff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .empty-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--theme-text-black, #182230);
+    margin-bottom: 4px;
+  }
+
+  .empty-subtitle {
+    font-size: 12px;
+    color: var(--theme-text-muted-gray, #94a3b8);
+  }
 }
 
 @media (max-width: 890px) {
@@ -290,10 +325,27 @@ onUnmounted(() => {
   }
 
   .loading-state,
-  .error-state,
-  .empty-state {
+  .error-state {
     padding: 32px 16px;
     font-size: 13px;
+  }
+
+  .empty-state-wrap {
+    padding: 28px 14px;
+
+    .empty-icon-circle {
+      width: 44px;
+      height: 44px;
+      margin-bottom: 10px;
+    }
+
+    .empty-title {
+      font-size: 13px;
+    }
+
+    .empty-subtitle {
+      font-size: 11px;
+    }
   }
 }
 </style>
