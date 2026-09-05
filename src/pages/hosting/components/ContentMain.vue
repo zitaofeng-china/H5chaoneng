@@ -36,8 +36,17 @@
           <span>{{ t('hosting.address') }}</span>
           <span class="required-star" aria-hidden="true">*</span>
         </h2>
-        <span v-if="parsedAddressCount > 0" class="address-count-badge">
-          已识别 {{ parsedAddressCount }} 个地址
+        <span
+          v-if="parsedAddresses.length > 0"
+          class="address-count-badge"
+          :class="{ 'has-warning': invalidAddressCount > 0 }"
+        >
+          <template v-if="invalidAddressCount === 0">
+            ✔ 已识别 {{ validAddressCount }} 个有效地址
+          </template>
+          <template v-else>
+            ⚠ {{ validAddressCount }} 个有效 / {{ invalidAddressCount }} 个格式异常
+          </template>
         </span>
       </div>
       <el-form
@@ -112,6 +121,11 @@ const userStore = useUserStore()
 const { isMobile } = storeToRefs(commonStore)
 const { tmaHapticImpact } = useTelegramHaptics()
 
+/** Tron 地址合法性正则：以大写 T 开头且为 34 位 Base58 格式 */
+const isValidTronAddress = (address: string): boolean => {
+  return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address)
+}
+
 const formatFeePrice = (value: string | number) =>
   formatCryptoAmount(value).replace(/\.00$/, '')
 
@@ -147,12 +161,20 @@ const formData = reactive({
   address: '',
 })
 
-const parsedAddressCount = computed(() => {
-  if (!formData.address) return 0
+const parsedAddresses = computed(() => {
+  if (!formData.address) return []
   return formData.address
     .split(/[,，\n\r]+/)
     .map((addr) => addr.trim())
-    .filter((addr) => addr.length > 0).length
+    .filter((addr) => addr.length > 0)
+})
+
+const validAddressCount = computed(() => {
+  return parsedAddresses.value.filter(isValidTronAddress).length
+})
+
+const invalidAddressCount = computed(() => {
+  return parsedAddresses.value.length - validAddressCount.value
 })
 
 const formRules: FormRules = {
@@ -181,13 +203,17 @@ const handleSaveAddress = async () => {
     }
 
     // 解析地址列表（支持逗号或换行分隔）
-    const addressList: string[] = formData.address
-      .split(/[,，\n\r]+/) // 支持中英文逗号和换行符
-      .map((addr) => addr.trim()) // 去除首尾空格
-      .filter((addr) => addr.length > 0) as string[] // 过滤空字符串
+    const addressList: string[] = parsedAddresses.value
 
     if (addressList.length === 0) {
       ElMessage.warning(t('hosting.enterValidAddress'))
+      return
+    }
+
+    // 格式合法性预检拦截（若所有地址均不符合 Tron 格式，直接报错提示，防止空刷接口）
+    const allInvalid = addressList.every((addr) => !isValidTronAddress(addr))
+    if (allInvalid) {
+      ElMessage.error('所输入的地址均不是合法的 TRON 地址（需以大写 T 开头且为 34 位）')
       return
     }
 
@@ -366,6 +392,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-bottom: 10px;
 
   .section-title {
@@ -416,6 +444,12 @@ onMounted(() => {
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.01em;
+
+  &.has-warning {
+    background: #fffbeb;
+    border-color: rgba(245, 158, 11, 0.35);
+    color: #b45309;
+  }
 }
 
 /* 费用说明卡片网格 */
