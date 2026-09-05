@@ -70,8 +70,8 @@
           class="details-form"
           :class="{ 'derail-form-m': isMobile }"
         >
-          <el-form-item :label="t('lease.totalPrice')" prop="total">
-            <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile }">
+          <el-form-item :label="t('lease.totalPrice')" prop="total" class="total-price-item">
+            <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile, 'total-price-input': true }">
               <template #prefix v-if="isMobile">
                 <span class="inline-label">
                   <span class="label-marker" aria-hidden="true"></span>
@@ -181,10 +181,16 @@
 
           <el-form-item>
             <div class="btn-wrap">
-              <el-button type="primary" class="rent-btn" @click="handleSaveAddress">
+              <el-button type="default" class="rent-btn save-btn" @click="handleSaveAddress">
                 {{ $t('home.saveAddress') }}
               </el-button>
-              <el-button type="primary" class="rent-btn" @click="handleRent">
+              <el-button
+                type="primary"
+                class="rent-btn primary-btn"
+                :loading="orderLoading"
+                :disabled="orderLoading"
+                @click="handleRent"
+              >
                 {{ t('lease.rentNowButton') }}
               </el-button>
               <el-button type="primary" class="rent-btn buy-btn" @click="handleBuy">
@@ -295,6 +301,7 @@ const {
   form,
   rules,
   maxCount,
+  orderLoading,
   handleSaveAddress,
   handleDeleteAddress,
   onSelect,

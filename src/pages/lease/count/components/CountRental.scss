@@ -60,31 +60,42 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  border: 1px solid rgba(22, 93, 255, 0.12);
-  border-radius: 4px;
-  background: #eef4ff;
+  border: 1px solid rgba(22, 93, 255, 0.14);
+  border-radius: 6px;
+  background: #f4f8ff;
   color: var(--theme-text-blue);
   font-family: inherit;
   font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
   cursor: pointer;
-  transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease,
-    box-shadow 0.18s ease;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
-    border-color: rgba(22, 93, 255, 0.3);
-    background: #e5efff;
+    border-color: rgba(22, 93, 255, 0.35);
+    background: #eaf1ff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(22, 93, 255, 0.08);
+  }
+
+  &:active {
+    transform: scale(0.98);
   }
 
   &.active {
-    border-color: var(--theme-bg-blue);
-    background: var(--theme-bg-blue);
-    color: var(--theme-text-white);
-    box-shadow: 0 2px 5px rgba(22, 93, 255, 0.12);
+    border-color: transparent;
+    background: linear-gradient(135deg, #165dff 0%, #0e42d2 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 12px rgba(22, 93, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+
+    .option-price {
+      color: #ffffff;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+    }
 
     .option-count {
-      color: rgba(255, 255, 255, 0.86);
+      color: rgba(255, 255, 255, 0.9);
     }
   }
 
@@ -92,20 +103,22 @@
     color: var(--theme-text-blue);
 
     &.active {
-      color: var(--theme-text-white);
+      color: #ffffff;
     }
   }
 }
 
 .option-price {
   white-space: nowrap;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
+  font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif;
+  letter-spacing: -0.2px;
 }
 
 .option-count {
-  color: rgba(30, 41, 59, 0.55);
-  font-size: 10px;
+  color: rgba(30, 41, 59, 0.6);
+  font-size: 11px;
   font-weight: 500;
   white-space: nowrap;
 }
@@ -299,6 +312,27 @@
     color: #f56c6c;
     -webkit-text-fill-color: #f56c6c;
   }
+
+  :deep(.total-price-item) {
+    .el-input__wrapper {
+      background: #f8fafc;
+      box-shadow: 0 0 0 1px #e2e8f0 inset;
+    }
+
+    .el-input__inner {
+      color: #0f172a;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif;
+      -webkit-text-fill-color: #0f172a;
+    }
+
+    .el-input__suffix {
+      color: #ea580c;
+      font-size: 13px;
+      font-weight: 700;
+    }
+  }
 }
 
 .wallet-error-hint {
@@ -381,26 +415,69 @@
   height: 38px;
   margin: 0;
   padding: 0 12px;
-  border: none;
-  border-radius: 3px;
-  background: var(--theme-bg-orange);
-  color: var(--theme-text-white);
+  border-radius: 4px;
   font-size: 13px;
   font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
-  &:hover,
-  &:focus {
-    border-color: transparent;
-    background: #f45d0f;
-    color: var(--theme-text-white);
-  }
-
-  &.buy-btn {
-    background: var(--theme-bg-blue);
+  // 主按钮：立即租用（Web3 能量橙主色调微质感）
+  &.primary-btn {
+    border: none;
+    background: linear-gradient(135deg, #ff7a18 0%, #ea580c 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
 
     &:hover,
     &:focus {
-      background: #0f55e6;
+      border-color: transparent;
+      background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(234, 88, 12, 0.35);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  // 次高频支付通道：USDT购买（清新薄荷绿微立体）
+  &.buy-btn {
+    border: none;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(16, 185, 129, 0.2);
+
+    &:hover,
+    &:focus {
+      border-color: transparent;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+  }
+
+  // 辅助低频操作：保存地址（次级线框幽灵按钮）
+  &.save-btn {
+    border: 1px solid #d0d7de;
+    background: #ffffff;
+    color: #334155;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+
+    &:hover,
+    &:focus {
+      border-color: #94a3b8;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    &:active {
+      transform: scale(0.98);
+      background: #f1f5f9;
     }
   }
 }
@@ -506,17 +583,27 @@
     height: 54px;
     padding: 8px 6px;
     border-radius: 6px;
-    color: #64748b;
+    color: #1e293b;
+    border: 1px solid rgba(22, 93, 255, 0.12);
+    background: #f4f8ff;
+    transition: all 0.2s ease;
+
+    &:active {
+      transform: scale(0.97);
+    }
 
     .option-count {
-      color: #94a3b8;
+      color: #64748b;
     }
 
     &.active {
+      border-color: transparent;
+      background: linear-gradient(135deg, #165dff 0%, #0e42d2 100%);
       color: var(--theme-text-white);
+      box-shadow: 0 3px 8px rgba(22, 93, 255, 0.24);
 
       .option-count {
-        color: rgba(255, 255, 255, 0.86);
+        color: rgba(255, 255, 255, 0.9);
       }
     }
 
@@ -535,6 +622,8 @@
 
   .option-price {
     font-size: 14px;
+    font-weight: 700;
+    font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif;
   }
 
   .option-count {
@@ -659,6 +748,27 @@
       padding-left: 0;
       padding-right: 8px;
     }
+
+    :deep(.total-price-item) {
+      .el-input__wrapper {
+        background: #f8fafc !important;
+        box-shadow: 0 0 0 1px #cbd5e1 !important;
+      }
+
+      .el-input__inner {
+        color: #0f172a !important;
+        font-size: 16px !important;
+        font-weight: 700 !important;
+        font-family: 'DIN Alternate', 'SF Pro Text', -apple-system, sans-serif !important;
+        -webkit-text-fill-color: #0f172a !important;
+      }
+
+      .el-input__suffix {
+        color: #ea580c !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+      }
+    }
   }
 
   .label-marker {
@@ -744,12 +854,18 @@
       flex: 1;
       width: auto;
       min-width: 0;
-      height: 36px;
+      height: 38px;
       margin: 0 !important;
       padding: 0 6px;
       border-radius: 6px;
       font-size: 13px;
       font-weight: 700;
+
+      &.save-btn {
+        border: 1px solid #d0d7de;
+        background: #ffffff;
+        color: #334155;
+      }
     }
   }
 
