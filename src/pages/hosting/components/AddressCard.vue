@@ -17,7 +17,12 @@
     </div>
 
     <div class="address-box" :title="item.address">
-      <span class="address-text">{{ item.address }}</span>
+      <template v-if="item.address && item.address.length >= 20">
+        <span class="address-prefix">{{ item.address.slice(0, 8) }}</span>
+        <span class="address-mid">{{ item.address.slice(8, -8) }}</span>
+        <span class="address-suffix">{{ item.address.slice(-8) }}</span>
+      </template>
+      <span v-else class="address-text">{{ item.address }}</span>
     </div>
 
     <div class="address-footer">
@@ -145,11 +150,25 @@ const handleDelete = () => {
   border-radius: 4px;
   background: #f8fafc;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  color: var(--theme-text-black, #182230);
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 13px;
   line-height: 1;
   overflow: hidden;
+
+  .address-prefix,
+  .address-suffix {
+    color: var(--theme-text-black, #182230);
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  .address-mid {
+    color: var(--theme-text-gray, #64748b);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 16px;
+  }
 
   .address-text {
     overflow: hidden;
