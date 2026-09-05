@@ -420,15 +420,25 @@ onMounted(() => {
           color: var(--theme-text-black);
         }
 
+        .el-input__suffix {
+          color: #64748b;
+        }
+
         .el-input__suffix-inner {
           display: inline-flex;
           align-items: center;
-          padding: 3px 10px;
-          border-radius: var(--theme-radius-xs, 3px);
-          background: rgba(15, 23, 42, 0.05);
-          color: #1e293b;
+          height: 22px;
+          padding: 0 0 0 12px;
+          margin-left: 2px;
+          border: 0;
+          border-left: 1px solid rgba(148, 163, 184, 0.32);
+          border-radius: 0;
+          background: transparent;
+          box-shadow: none;
+          color: #64748b;
           font-size: 13px;
-          font-weight: 700;
+          font-weight: 600;
+          line-height: 1;
         }
 
         &.is-disabled {
@@ -441,6 +451,12 @@ onMounted(() => {
             color: var(--theme-primary-blue, #165dff);
             font-weight: 800;
             -webkit-text-fill-color: initial;
+          }
+
+          .el-input__suffix-inner {
+            background: transparent;
+            color: #94a3b8;
+            border-left-color: rgba(148, 163, 184, 0.28);
           }
         }
       }
@@ -608,8 +624,11 @@ onMounted(() => {
           }
 
           .el-input__suffix-inner {
-            font-size: 13px;
+            height: 18px;
+            padding: 0 0 0 10px;
+            font-size: 12px;
             font-weight: 600;
+            background: transparent;
           }
 
           &.is-disabled {
@@ -620,6 +639,10 @@ onMounted(() => {
             .el-input__inner {
               padding-right: 10px;
               color: var(--theme-text-gray);
+            }
+
+            .el-input__suffix-inner {
+              background: transparent;
             }
           }
         }
