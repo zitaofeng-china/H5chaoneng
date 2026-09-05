@@ -76,8 +76,22 @@
             </div>
           </div>
         </el-form-item>
-        <el-button type="primary" class="host-btn tactile-btn" @click="handleSaveAddress">
-          <span>{{ t('hosting.hostNow') }}</span>
+        <el-button
+          type="primary"
+          class="host-btn tactile-btn"
+          :loading="submitting"
+          :disabled="submitting"
+          @click="handleSaveAddress"
+        >
+          <span>
+            {{
+              submitting
+                ? submitProgress.total > 1
+                  ? `正在托管 (${submitProgress.current}/${submitProgress.total})...`
+                  : '正在提交托管...'
+                : t('hosting.hostNow')
+            }}
+          </span>
         </el-button>
       </el-form>
     </section>
@@ -125,6 +139,12 @@ const { tmaHapticImpact } = useTelegramHaptics()
 const isValidTronAddress = (address: string): boolean => {
   return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address)
 }
+
+const submitting = ref(false)
+const submitProgress = reactive({
+  current: 0,
+  total: 0,
+})
 
 const formatFeePrice = (value: string | number) =>
   formatCryptoAmount(value).replace(/\.00$/, '')
@@ -186,7 +206,7 @@ const formRules: FormRules = {
 
 const handleSaveAddress = async () => {
   tmaHapticImpact('medium')
-  if (!formRef.value) return
+  if (!formRef.value || submitting.value) return
 
   // 检查是否登录
   if (!userStore.isLogin) {
@@ -217,6 +237,10 @@ const handleSaveAddress = async () => {
       return
     }
 
+    submitting.value = true
+    submitProgress.total = addressList.length
+    submitProgress.current = 0
+
     // 统计结果
     let successCount = 0
     let failedCount = 0
@@ -225,6 +249,7 @@ const handleSaveAddress = async () => {
     try {
       // 循环逐个添加托管地址
       for (let i = 0; i < addressList.length; i++) {
+        submitProgress.current = i + 1
         const address = addressList[i]
 
         // 跳过空地址
@@ -319,9 +344,12 @@ const handleSaveAddress = async () => {
       }
 
       ElMessage.error(error.message || t('hosting.addFailed'))
+    } finally {
+      submitting.value = false
     }
   } catch (error) {
     console.error('【ERROR INFO】:', error)
+    submitting.value = false
   }
 }
 
@@ -400,6 +428,7 @@ onMounted(() => {
     margin-bottom: 0;
   }
 }
+
 
 .section-title {
   display: flex;
