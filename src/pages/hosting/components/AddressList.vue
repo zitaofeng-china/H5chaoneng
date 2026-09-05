@@ -319,9 +319,16 @@ onUnmounted(() => {
 
 @media (max-width: 890px) {
   .activation-list {
-    --hosting-card-height: 80px;
+    --hosting-visible-count: 1;
+    --hosting-card-height: 160px;
     --hosting-list-gap: 12px;
+    max-height: 160px;
     padding-right: 0;
+    scroll-snap-type: y mandatory;
+
+    :deep(.address-card) {
+      scroll-snap-align: start;
+    }
   }
 
   .loading-state,
