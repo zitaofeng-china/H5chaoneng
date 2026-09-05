@@ -13,10 +13,16 @@ import { authApi } from '@/api'
 import type { BindAddressMap } from '@/api/modules/auth/types'
 import { useAddress } from '@/hooks/useAddress'
 import { useOrderCreation } from '@/hooks/useOrderCreation'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import { AddressKind } from '@/api/modules/address/types'
 import { OrderKind } from '@/api/modules/order/types'
 import { formatCryptoAmount } from '@/utils/number'
 import { handleResponse } from '@/utils/response'
+
+const isValidTronAddress = (address: string): boolean => {
+  if (!address || typeof address !== 'string') return false
+  return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address.trim())
+}
 
 interface RentalForm {
   unitPrice: number
@@ -37,6 +43,7 @@ export function useCountRental() {
   const { userInfo } = storeToRefs(userStore)
   const { fetchAddress, addressData } = useAddress()
   const { loading: orderLoading, createOrder } = useOrderCreation()
+  const { tmaHapticImpact, tmaHapticSelection, tmaHapticNotification } = useTelegramHaptics()
 
   const showPaymentDialog = ref(false)
 
@@ -179,6 +186,8 @@ export function useCountRental() {
             callback(new Error(t('formValidation.walletRequired')))
           } else if (value.length < 5) {
             callback(new Error(t('formValidation.walletTooShort')))
+          } else if (!isValidTronAddress(value)) {
+            callback(new Error(t('formValidation.enterValidAddress')))
           } else {
             callback()
           }
@@ -239,13 +248,21 @@ export function useCountRental() {
       await formRef.value.validateField('wallet')
 
       if (!wallet.value) {
+        tmaHapticNotification('warning')
         ElMessage.warning(t('formValidation.enterAddressToSave'))
+        return
+      }
+
+      if (!isValidTronAddress(wallet.value)) {
+        tmaHapticNotification('error')
+        ElMessage.warning(t('formValidation.enterValidAddress'))
         return
       }
 
       const bindAddress = getBindAddressMap()
       const existingAddresses = getSavedAddressesByKind(bindAddressKind)
       if (existingAddresses.includes(wallet.value)) {
+        tmaHapticNotification('warning')
         ElMessage.warning(t('formValidation.addressAlreadyExists'))
         return
       }
@@ -257,9 +274,11 @@ export function useCountRental() {
       })
 
       if (success) {
+        tmaHapticNotification('success')
         await userStore.fetchUserInfo({ force: true })
       }
     } catch (error) {
+      tmaHapticNotification('error')
       if (!wallet.value) {
         applyEmptyWalletFeedback()
         return
@@ -304,11 +323,13 @@ export function useCountRental() {
   }
 
   function onSelect(rowIdx: number, idx: number) {
+    tmaHapticSelection()
     selecteIndex.value = [rowIdx, idx]
     isCustom.value = false
   }
 
   function onCustomClick() {
+    tmaHapticSelection()
     isCustom.value = true
   }
 
@@ -327,6 +348,7 @@ export function useCountRental() {
   const handleRent = async () => {
     if (!formRef.value) return
 
+    tmaHapticImpact('medium')
     if (!wallet.value && !selectedAddress.value) {
       applyEmptyWalletFeedback()
     }
@@ -334,7 +356,7 @@ export function useCountRental() {
     try {
       await formRef.value.validate()
 
-      const targetAddress = wallet.value || selectedAddress.value
+      const targetAddress = (wallet.value || selectedAddress.value).trim()
 
       const success = await createOrder({
         count: count.value,
@@ -346,10 +368,12 @@ export function useCountRental() {
       })
 
       if (success) {
+        tmaHapticNotification('success')
         wallet.value = ''
         selectedAddress.value = ''
       }
     } catch (error) {
+      tmaHapticNotification('error')
       applyEmptyWalletFeedback()
       if (wallet.value || selectedAddress.value) {
         console.error('【ERROR INFO】:', error)
@@ -358,15 +382,18 @@ export function useCountRental() {
   }
 
   const handleBuy = async () => {
+    tmaHapticSelection()
     try {
       const address = await fetchAddress(AddressKind.COUNT_RENTAL)
 
       if (address) {
         showPaymentDialog.value = true
       } else {
+        tmaHapticNotification('error')
         ElMessage.error(t('common.getAddressFailed'))
       }
     } catch (error) {
+      tmaHapticNotification('error')
       console.error('【USDT购买错误】:', error)
     }
   }
