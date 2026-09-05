@@ -15,7 +15,7 @@
           <div class="fee-header">
             <span class="fee-badge">
               <SvgIcon name="choose-bolt" width="12" height="12" class="badge-icon" />
-              <span>{{ item.energy }} 能量</span>
+              <span>{{ item.energy }} {{ t('lease.energy') }}</span>
             </span>
           </div>
           <div class="fee-price-row">
@@ -68,7 +68,6 @@
           </div>
         </el-form-item>
         <el-button type="primary" class="host-btn tactile-btn" @click="handleSaveAddress">
-          <SvgIcon name="choose-bolt" width="16" height="16" class="btn-icon" />
           <span>{{ t('hosting.hostNow') }}</span>
         </el-button>
       </el-form>
