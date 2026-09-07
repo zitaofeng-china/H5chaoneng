@@ -548,21 +548,6 @@ const {
   }
 }
 
-.energy-rental-dropdown {
-  .nav-link::after {
-    right: auto;
-    left: 50%;
-    width: 56px;
-    transform: translateX(-50%) scaleX(0.35);
-  }
-
-  &:hover,
-  &.is-active {
-    .nav-link::after {
-      transform: translateX(-50%) scaleX(1) !important;
-    }
-  }
-}
 
 :deep(.el-dropdown) {
   color: inherit;
