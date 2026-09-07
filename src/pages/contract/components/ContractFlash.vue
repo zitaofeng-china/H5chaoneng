@@ -99,6 +99,34 @@
           </div>
         </el-form>
         <RateCard :coin="activeTab" :rate="displayRate" :stock="displayStock" />
+
+        <!-- 极简 3 步操作向导 -->
+        <div class="steps-guide-row">
+          <div class="step-item">
+            <span class="step-idx">1</span>
+            <span class="step-text">{{ t('contract.step1') }}</span>
+          </div>
+          <span class="step-arrow">➔</span>
+          <div class="step-item">
+            <span class="step-idx">2</span>
+            <span class="step-text">{{ t('contract.step2') }}</span>
+          </div>
+          <span class="step-arrow">➔</span>
+          <div class="step-item">
+            <span class="step-idx">3</span>
+            <span class="step-text">{{ t('contract.step3') }}</span>
+          </div>
+        </div>
+
+        <!-- 核心风控：严禁交易所充币防呆警示横幅 -->
+        <div class="risk-warning-banner">
+          <el-icon class="warning-icon"><WarningFilled /></el-icon>
+          <div class="warning-body">
+            <div class="warning-title">{{ t('contract.warningTitle') }}</div>
+            <div class="warning-desc">{{ t('contract.warningDesc') }}</div>
+          </div>
+        </div>
+
         <WalletQrcode 
           :coin="activeTab" 
           :payment-address="paymentAddress" 
@@ -113,7 +141,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Sort } from '@element-plus/icons-vue'
+import { Sort, WarningFilled } from '@element-plus/icons-vue'
 import { exchangeApi } from '@/api'
 import type { ExchangeRateData } from '@/api/modules/exchange/types'
 import { AddressKind } from '@/api/modules/address/types'
@@ -659,6 +687,89 @@ onMounted(() => {
     margin: 16px 0 0;
   }
 
+  .steps-guide-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin: 16px 0 12px;
+    padding: 10px 14px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--theme-radius-md, 6px);
+    gap: 6px;
+
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+
+      .step-idx {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: #165dff;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        flex-shrink: 0;
+      }
+
+      .step-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: #334155;
+        white-space: nowrap;
+      }
+    }
+
+    .step-arrow {
+      color: #94a3b8;
+      font-size: 11px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+  }
+
+  .risk-warning-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 0 0 8px;
+    padding: 12px 14px;
+    background: rgba(245, 158, 11, 0.07);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: var(--theme-radius-md, 6px);
+
+    .warning-icon {
+      font-size: 18px;
+      color: #d97706;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .warning-body {
+      flex: 1;
+      min-width: 0;
+
+      .warning-title {
+        font-size: 13px;
+        font-weight: 700;
+        color: #b45309;
+        margin-bottom: 3px;
+        line-height: 1.3;
+      }
+
+      .warning-desc {
+        font-size: 11px;
+        line-height: 1.5;
+        color: #92400e;
+      }
+    }
+  }
+
   :deep(.qr-section) {
     padding: 32px 0 0;
 
@@ -937,6 +1048,51 @@ onMounted(() => {
 
       .stock-section {
         font-size: 11px;
+      }
+    }
+
+    .steps-guide-row {
+      padding: 8px 10px;
+      margin: 12px 0 10px;
+      gap: 4px;
+
+      .step-item {
+        gap: 4px;
+
+        .step-idx {
+          width: 16px;
+          height: 16px;
+          font-size: 10px;
+        }
+
+        .step-text {
+          font-size: 10px;
+        }
+      }
+
+      .step-arrow {
+        font-size: 10px;
+      }
+    }
+
+    .risk-warning-banner {
+      padding: 10px 12px;
+      gap: 8px;
+      margin-bottom: 10px;
+
+      .warning-icon {
+        font-size: 16px;
+      }
+
+      .warning-body {
+        .warning-title {
+          font-size: 12px;
+        }
+
+        .warning-desc {
+          font-size: 10px;
+          line-height: 1.4;
+        }
       }
     }
 
