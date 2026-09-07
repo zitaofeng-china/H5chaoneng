@@ -118,15 +118,6 @@
           </div>
         </div>
 
-        <!-- 核心风控：严禁交易所充币防呆警示横幅 -->
-        <div class="risk-warning-banner">
-          <el-icon class="warning-icon"><WarningFilled /></el-icon>
-          <div class="warning-body">
-            <div class="warning-title">{{ t('contract.warningTitle') }}</div>
-            <div class="warning-desc">{{ t('contract.warningDesc') }}</div>
-          </div>
-        </div>
-
         <WalletQrcode 
           :coin="activeTab" 
           :payment-address="paymentAddress" 
@@ -141,7 +132,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { Sort, WarningFilled } from '@element-plus/icons-vue'
+import { Sort } from '@element-plus/icons-vue'
 import { exchangeApi } from '@/api'
 import type { ExchangeRateData } from '@/api/modules/exchange/types'
 import { AddressKind } from '@/api/modules/address/types'
@@ -733,45 +724,8 @@ onMounted(() => {
     }
   }
 
-  .risk-warning-banner {
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    margin: 0 0 8px;
-    padding: 12px 14px;
-    background: rgba(245, 158, 11, 0.07);
-    border: 1px solid rgba(245, 158, 11, 0.3);
-    border-radius: var(--theme-radius-md, 6px);
-
-    .warning-icon {
-      font-size: 18px;
-      color: #d97706;
-      flex-shrink: 0;
-      margin-top: 1px;
-    }
-
-    .warning-body {
-      flex: 1;
-      min-width: 0;
-
-      .warning-title {
-        font-size: 13px;
-        font-weight: 700;
-        color: #b45309;
-        margin-bottom: 3px;
-        line-height: 1.3;
-      }
-
-      .warning-desc {
-        font-size: 11px;
-        line-height: 1.5;
-        color: #92400e;
-      }
-    }
-  }
-
   :deep(.qr-section) {
-    padding: 32px 0 0;
+    padding: 24px 0 0;
 
     .section-title {
       margin-bottom: 16px;
@@ -1072,27 +1026,6 @@ onMounted(() => {
 
       .step-arrow {
         font-size: 10px;
-      }
-    }
-
-    .risk-warning-banner {
-      padding: 10px 12px;
-      gap: 8px;
-      margin-bottom: 10px;
-
-      .warning-icon {
-        font-size: 16px;
-      }
-
-      .warning-body {
-        .warning-title {
-          font-size: 12px;
-        }
-
-        .warning-desc {
-          font-size: 10px;
-          line-height: 1.4;
-        }
       }
     }
 
