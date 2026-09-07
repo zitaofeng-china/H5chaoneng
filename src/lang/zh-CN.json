@@ -1,5 +1,7 @@
 {
   "common": {
+    "65000": "65000",
+    "131000": "131000",
     "confirm": "确定",
     "cancel": "取消",
     "save": "保存",
@@ -24,8 +26,6 @@
     "hour": "小时",
     "purchase": "笔",
     "w": "W",
-    "65000": "65000",
-    "131000": "131000",
     "recharge": "充值",
     "loadFailed": "加载失败",
     "getAddressFailed": "获取付款地址失败",
@@ -364,7 +364,17 @@
     "flashNotice2": "请务必转入正确的金额，低于最小额度将原路退回并扣除手续费",
     "flashNotice3": "切勿使用交易所钱包进行转账",
     "flashNotice4": "交易时会有小于0.01的滑点，以实际交易为准",
-    "flashNotice5": "转账前请仔细核对收款地址，转错地址无法退款"
+    "flashNotice5": "转账前请仔细核对收款地址，转错地址无法退款",
+    "switchDirection": "切换兑换方向",
+    "quickAmount": "快捷",
+    "step1": "输入金额预估",
+    "step2": "扫码/转账付款",
+    "step3": "合约秒级回款",
+    "warningTitle": "严禁使用中心化交易所提币转账",
+    "warningDesc": "合约闪兑采用原路自动返回机制。请务必使用去中心化私钥钱包（如 TronLink、imToken）转账；若从币安、OKX 等交易所直接提币，资金将退回交易所公共热钱包而无法到账！",
+    "liveRateTag": "实时撮合",
+    "lowSlippage": "极速极低滑点",
+    "poolDepth": "资金池储备充足"
   },
   "activation": {
     "title": "激活入口",

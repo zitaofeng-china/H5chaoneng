@@ -29,34 +29,71 @@
           class="rental-form"
         >
           <div class="form-wrap">
-            <div class="field-label">{{ t('contract.enterAmount') }}</div>
-            <el-form-item prop="unitPrice">
+            <div class="field-header">
+              <div class="field-label">{{ t('contract.enterAmount') }}</div>
+              <div class="quick-presets">
+                <span class="preset-title">{{ t('contract.quickAmount') }}</span>
+                <button
+                  v-for="preset in quickAmounts"
+                  :key="preset.label"
+                  type="button"
+                  class="preset-pill tactile-btn"
+                  :class="{ 'is-active': formData.unitPrice === preset.value }"
+                  @click="applyQuickAmount(preset.value)"
+                >
+                  {{ preset.label }}
+                </button>
+              </div>
+            </div>
+            <el-form-item prop="unitPrice" class="pay-form-item">
               <el-input
                 v-model="formData.unitPrice"
-                type="number"
-                :min="minValue"
-                :max="maxValue"
-                step="0.01"
+                type="text"
+                inputmode="decimal"
                 :placeholder="t('contract.enterAmountPlaceholder')"
                 @input="handleAmountInput"
                 @blur="handleBlur"
               >
-                <template #suffix>{{
-                  activeTab === 'USDT' ? t('common.usdt') : t('common.trx')
-                }}</template>
+                <template #suffix>
+                  <div class="token-badge">
+                    <SvgIcon :name="activeTab === 'USDT' ? 'header-USDT' : 'trx'" width="18" height="18" class="token-icon" />
+                    <span class="token-name">{{ activeTab === 'USDT' ? t('common.usdt') : t('common.trx') }}</span>
+                  </div>
+                </template>
               </el-input>
             </el-form-item>
 
-            <div class="field-label">{{ t('contract.estimatedGet') }}</div>
-            <el-form-item>
+            <div class="swap-divider">
+              <button
+                type="button"
+                class="swap-switch-btn tactile-btn"
+                :class="{ 'is-flipping': isFlipping }"
+                :title="t('contract.switchDirection')"
+                :aria-label="t('contract.switchDirection')"
+                @click="handleToggleTab"
+              >
+                <el-icon class="switch-icon"><Sort /></el-icon>
+              </button>
+            </div>
+
+            <div class="field-header">
+              <div class="field-label">{{ t('contract.estimatedGet') }}</div>
+              <span class="estimate-rate-tip">
+                1 {{ activeTab === 'USDT' ? 'USDT' : 'TRX' }} ≈ {{ baseUnitRate }} {{ activeTab === 'USDT' ? 'TRX' : 'USDT' }}
+              </span>
+            </div>
+            <el-form-item class="receive-form-item">
               <el-input
                 v-model="formData.coinAmount"
                 :placeholder="t('contract.estimatedPlaceholder')"
                 disabled
               >
-                <template #suffix>{{
-                  activeTab === 'USDT' ? t('common.trx') : t('common.usdt')
-                }}</template>
+                <template #suffix>
+                  <div class="token-badge is-receive">
+                    <SvgIcon :name="activeTab === 'USDT' ? 'trx' : 'header-USDT'" width="18" height="18" class="token-icon" />
+                    <span class="token-name">{{ activeTab === 'USDT' ? t('common.trx') : t('common.usdt') }}</span>
+                  </div>
+                </template>
               </el-input>
             </el-form-item>
           </div>
@@ -76,13 +113,14 @@
 <script setup lang="ts">
 import { ref, reactive, computed, watch, onMounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { Sort } from '@element-plus/icons-vue'
 import { exchangeApi } from '@/api'
 import type { ExchangeRateData } from '@/api/modules/exchange/types'
 import { AddressKind } from '@/api/modules/address/types'
 import { usePaymentAddress } from '@/hooks/usePaymentAddress'
 import { logger } from '@/utils/logger'
 import { formatCryptoAmount } from '@/utils/number'
-import { tmaHapticSelection } from '@/utils/telegram'
+import { tmaHapticSelection, tmaHapticImpact, tmaHapticNotification } from '@/utils/telegram'
 import WalletQrcode from './WalletQrcode.vue'
 import RateCard from './RateCard.vue'
 
@@ -90,11 +128,16 @@ const { t } = useI18n()
 
 const activeTab = ref('USDT')
 
-watch(activeTab, (newTab, oldTab) => {
-  if (oldTab !== undefined && newTab !== oldTab) {
-    tmaHapticSelection()
-  }
-})
+// 切换按钮旋转动效与触感
+const isFlipping = ref(false)
+const handleToggleTab = () => {
+  tmaHapticImpact('medium')
+  isFlipping.value = true
+  activeTab.value = activeTab.value === 'USDT' ? 'TRX' : 'USDT'
+  setTimeout(() => {
+    isFlipping.value = false
+  }, 400)
+}
 
 // 使用统一的地址管理 hook
 const { address: paymentAddress, fetchAddress: fetchPaymentAddress } = usePaymentAddress(AddressKind.FLASH_EXCHANGE)
@@ -172,6 +215,14 @@ const displayRate = computed(() => {
   }
 })
 
+// 基准单价计算（1 单位换算）
+const baseUnitRate = computed(() => {
+  if (activeTab.value === 'USDT') {
+    return formatCryptoAmount(exchangeRate.value.usdtToTrx || 0)
+  }
+  return formatCryptoAmount(exchangeRate.value.trxToUsdt || 0)
+})
+
 // 显示库存（使用接口返回的库存数据）
 const displayStock = computed(() => {
   if (!exchangeRateData.value) return '0.00'
@@ -185,7 +236,32 @@ const displayStock = computed(() => {
   }
 })
 
-// 监听输入金额，计算预估获得
+// 快捷预设金额胶囊
+const quickAmounts = computed(() => {
+  if (activeTab.value === 'USDT') {
+    return [
+      { label: 'Min', value: '2.00' },
+      { label: '50', value: '50.00' },
+      { label: '100', value: '100.00' },
+      { label: '500', value: '500.00' },
+      { label: 'Max', value: formatCryptoAmount(maxValue.value) },
+    ]
+  }
+  return [
+    { label: 'Min', value: '10.00' },
+    { label: '500', value: '500.00' },
+    { label: '1000', value: '1000.00' },
+    { label: '5000', value: '5000.00' },
+    { label: 'Max', value: formatCryptoAmount(maxValue.value) },
+  ]
+})
+
+const applyQuickAmount = (val: string) => {
+  tmaHapticImpact('light')
+  formData.unitPrice = val
+}
+
+// 监听输入金额，计算预估获得（非阻塞平滑输入）
 watch(() => formData.unitPrice, (newValue) => {
   const amount = Number.parseFloat(newValue)
   
@@ -195,38 +271,22 @@ watch(() => formData.unitPrice, (newValue) => {
     return
   }
 
-  // 限制最小值和最大值
-  if (amount < minValue.value) {
-    formData.unitPrice = String(minValue.value)
-    return
-  }
-  
-  if (amount > maxValue.value) {
-    formData.unitPrice = String(maxValue.value)
-    return
-  }
-
   if (activeTab.value === 'USDT') {
     // USDT→TRX
     const rate = exchangeRate.value.usdtToTrx
-    if (rate > 0) {
-      formData.coinAmount = formatCryptoAmount(amount * rate)
-    } else {
-      formData.coinAmount = '0.00'
-    }
+    formData.coinAmount = rate > 0 ? formatCryptoAmount(amount * rate) : '0.00'
   } else {
     // TRX→USDT
     const rate = exchangeRate.value.trxToUsdt
-    if (rate > 0) {
-      formData.coinAmount = formatCryptoAmount(amount * rate)
-    } else {
-      formData.coinAmount = '0.00'
-    }
+    formData.coinAmount = rate > 0 ? formatCryptoAmount(amount * rate) : '0.00'
   }
-}, { immediate: true }) // 添加 immediate: true，初始化时立即执行
+}, { immediate: true })
 
 // 监听切换标签，重置表单并重新获取汇率
-watch(activeTab, (newTab) => {
+watch(activeTab, (newTab, oldTab) => {
+  if (oldTab !== undefined && newTab !== oldTab) {
+    tmaHapticSelection()
+  }
   formData.unitPrice = formatCryptoAmount(newTab === 'USDT' ? 2 : 10)
   formData.coinAmount = ''
   // 切换标签时重新获取汇率
@@ -267,16 +327,23 @@ const handleAmountInput = (value: string | number) => {
   formData.unitPrice = `${integerPart}${decimal}`
 }
 
-// 失焦时检查并恢复最小值
+// 失焦时检查并恢复合规范围
 const handleBlur = () => {
   const amount = Number.parseFloat(formData.unitPrice)
   
   if (formData.unitPrice === '' || Number.isNaN(amount) || amount < minValue.value) {
     formData.unitPrice = formatCryptoAmount(minValue.value)
+    tmaHapticNotification('warning')
     return
   }
 
-  formData.unitPrice = formatCryptoAmount(Math.min(amount, maxValue.value))
+  if (amount > maxValue.value) {
+    formData.unitPrice = formatCryptoAmount(maxValue.value)
+    tmaHapticNotification('warning')
+    return
+  }
+
+  formData.unitPrice = formatCryptoAmount(amount)
 }
 
 // 初始化时获取汇率和付款地址
@@ -374,14 +441,126 @@ onMounted(() => {
   }
 
   .form-wrap {
-    .field-label {
-      margin-bottom: 10px;
-      font-size: 13px;
-      font-weight: 700;
+    .field-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 8px;
+      flex-wrap: wrap;
+
+      .field-label {
+        margin-bottom: 0;
+      }
+
+      .estimate-rate-tip {
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748b;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .quick-presets {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+
+        .preset-title {
+          font-size: 11px;
+          color: #94a3b8;
+          font-weight: 500;
+          margin-right: 2px;
+        }
+
+        .preset-pill {
+          border: 1px solid #e2e8f0;
+          background: #f8fafc;
+          color: #64748b;
+          font-size: 11px;
+          font-weight: 600;
+          font-family: inherit;
+          padding: 2px 8px;
+          border-radius: 4px;
+          cursor: pointer;
+          transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+          line-height: 1.3;
+
+          &:hover {
+            color: #0f172a;
+            border-color: #cbd5e1;
+            background: #ffffff;
+          }
+
+          &.is-active {
+            color: #165dff;
+            border-color: rgba(22, 93, 255, 0.35);
+            background: rgba(22, 93, 255, 0.08);
+            font-weight: 700;
+          }
+        }
+      }
+    }
+
+    .swap-divider {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 2px 0 12px;
+      z-index: 2;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent, rgba(226, 232, 240, 0.8) 20%, rgba(226, 232, 240, 0.8) 80%, transparent);
+        z-index: 1;
+      }
+
+      .swap-switch-btn {
+        position: relative;
+        z-index: 2;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 1.5px solid #cbd5e1;
+        box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+        color: #165dff;
+        cursor: pointer;
+        padding: 0;
+        transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+
+        &:hover {
+          background: #f8fafc;
+          border-color: #165dff;
+          color: #0047eb;
+          transform: scale(1.08);
+          box-shadow: 0 4px 12px rgba(22, 93, 255, 0.18);
+        }
+
+        &:active {
+          transform: scale(0.95);
+        }
+
+        &.is-flipping .switch-icon {
+          transform: rotate(180deg);
+        }
+
+        .switch-icon {
+          font-size: 16px;
+          transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+      }
     }
 
     :deep(.el-form-item) {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
 
       .el-form-item__content {
         justify-content: center;
@@ -397,7 +576,7 @@ onMounted(() => {
           border-radius: var(--theme-radius-sm, 4px);
           box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
           border: 1.5px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
-          padding: 0 14px;
+          padding: 0 12px;
           transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 
           &:hover {
@@ -420,43 +599,56 @@ onMounted(() => {
           color: var(--theme-text-black);
         }
 
-        .el-input__suffix {
-          color: #64748b;
+        .token-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          padding: 4px 10px;
+          border-radius: 4px;
+          background: #f8fafc;
+          border: 1px solid #e2e8f0;
+
+          .token-icon {
+            flex-shrink: 0;
+          }
+
+          .token-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: 0.2px;
+          }
+
+          &.is-receive {
+            background: rgba(22, 93, 255, 0.06);
+            border-color: rgba(22, 93, 255, 0.2);
+
+            .token-name {
+              color: #165dff;
+            }
+          }
         }
 
         .el-input__suffix-inner {
           display: inline-flex;
           align-items: center;
-          height: 22px;
-          padding: 0 0 0 12px;
-          margin-left: 2px;
+          height: 100%;
+          padding: 0;
           border: 0;
-          border-left: 1px solid rgba(148, 163, 184, 0.32);
-          border-radius: 0;
           background: transparent;
           box-shadow: none;
-          color: #64748b;
-          font-size: 13px;
-          font-weight: 600;
-          line-height: 1;
         }
 
         &.is-disabled {
           .el-input__wrapper {
-            background: #f8fafc;
-            border-color: rgba(226, 232, 240, 0.8);
+            background: #f8faff;
+            border-color: rgba(22, 93, 255, 0.22);
           }
 
           .el-input__inner {
             color: var(--theme-primary-blue, #165dff);
             font-weight: 800;
-            -webkit-text-fill-color: initial;
-          }
-
-          .el-input__suffix-inner {
-            background: transparent;
-            color: #94a3b8;
-            border-left-color: rgba(148, 163, 184, 0.28);
+            -webkit-text-fill-color: var(--theme-primary-blue, #165dff);
           }
         }
       }
@@ -601,48 +793,114 @@ onMounted(() => {
     }
 
     .form-wrap {
-      .field-label {
-        margin-bottom: 5px;
+      .field-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        gap: 6px;
+
+        .field-label {
+          margin-bottom: 0;
+        }
+
+        .estimate-rate-tip {
+          font-size: 11px;
+          color: #64748b;
+          font-weight: 600;
+        }
+
+        .quick-presets {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          .preset-title {
+            display: none;
+          }
+
+          .preset-pill {
+            padding: 1px 6px;
+            font-size: 10px;
+            border-radius: 4px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #64748b;
+            font-family: inherit;
+            line-height: 1.3;
+
+            &.is-active {
+              color: #165dff;
+              border-color: rgba(22, 93, 255, 0.35);
+              background: rgba(22, 93, 255, 0.08);
+              font-weight: 700;
+            }
+          }
+        }
+      }
+
+      .swap-divider {
+        margin: 2px 0 10px;
+
+        .swap-switch-btn {
+          width: 32px;
+          height: 32px;
+
+          .switch-icon {
+            font-size: 14px;
+          }
+        }
       }
 
       :deep(.el-form-item) {
-        margin-bottom: 11px;
+        margin-bottom: 10px;
 
         .el-input {
           font-size: 13px;
 
           .el-input__wrapper {
             padding: 0 10px;
-            min-height: 38px;
-            height: 38px;
+            min-height: 42px;
+            height: 42px;
           }
 
           .el-input__inner {
-            height: 36px;
-            line-height: 36px;
-            font-size: 13px;
+            height: 40px;
+            line-height: 40px;
+            font-size: 14px;
+          }
+
+          .token-badge {
+            padding: 2px 6px;
+            gap: 4px;
+
+            .token-icon {
+              width: 16px;
+              height: 16px;
+            }
+
+            .token-name {
+              font-size: 12px;
+            }
           }
 
           .el-input__suffix-inner {
-            height: 18px;
-            padding: 0 0 0 10px;
-            font-size: 12px;
-            font-weight: 600;
+            height: 100%;
+            padding: 0;
+            border: 0;
             background: transparent;
           }
 
           &.is-disabled {
             .el-input__wrapper {
-              background: rgba(2, 15, 45, 0.02);
+              background: #f8faff;
+              border-color: rgba(22, 93, 255, 0.2);
             }
 
             .el-input__inner {
-              padding-right: 10px;
-              color: var(--theme-text-gray);
-            }
-
-            .el-input__suffix-inner {
-              background: transparent;
+              color: #165dff;
+              font-weight: 800;
+              -webkit-text-fill-color: #165dff;
             }
           }
         }

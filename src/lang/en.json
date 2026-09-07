@@ -1,5 +1,7 @@
 {
   "common": {
+    "65000": "65000",
+    "131000": "131000",
     "confirm": "Confirm",
     "cancel": "Cancel",
     "save": "Save",
@@ -24,8 +26,6 @@
     "hour": "Hour",
     "purchase": "Count",
     "w": "W",
-    "65000": "65000",
-    "131000": "131000",
     "recharge": "Recharge",
     "loadFailed": "Load Failed",
     "loadFailedHint": "Please check your network connection or try again later",
@@ -342,7 +342,17 @@
     "minExchange": "Minimum {min} to exchange",
     "maxExchange": "Maximum not exceed {max}",
     "usdtMinTip": "Minimum 2 USDT, maximum 70000 USDT",
-    "trxMinTip": "Minimum 10 TRX, maximum 100000 TRX"
+    "trxMinTip": "Minimum 10 TRX, maximum 100000 TRX",
+    "switchDirection": "Switch Direction",
+    "quickAmount": "Quick",
+    "step1": "Enter Amount",
+    "step2": "Transfer Funds",
+    "step3": "Instant Return",
+    "warningTitle": "Do NOT transfer from centralized exchanges",
+    "warningDesc": "Instant swap automatically returns converted tokens to the sender address. You MUST use a decentralized private-key wallet (e.g. TronLink, imToken). Transfers directly from exchanges (Binance, OKX, etc.) will return to the exchange pool and be lost!",
+    "liveRateTag": "Live Match",
+    "lowSlippage": "Ultra-low Slippage",
+    "poolDepth": "Sufficient Liquidity"
   },
   "activation": {
     "title": "Activation Entry",

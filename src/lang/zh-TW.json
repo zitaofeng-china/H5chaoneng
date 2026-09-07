@@ -1,5 +1,7 @@
 {
   "common": {
+    "65000": "65000",
+    "131000": "131000",
     "confirm": "確認",
     "cancel": "取消",
     "save": "儲存",
@@ -23,8 +25,6 @@
     "day": "天",
     "purchase": "筆",
     "w": "W",
-    "65000": "65000",
-    "131000": "131000",
     "recharge": "充值",
     "loadFailed": "載入失敗",
     "loadFailedHint": "請檢查網絡連接或稍後重試",
@@ -338,7 +338,17 @@
     "minExchange": "最小 {min} 起兌",
     "maxExchange": "最大不超過 {max}",
     "usdtMinTip": "2 USDT 起兌，最大不超過70000 USDT",
-    "trxMinTip": "10 TRX 起兌，最大不超過100000 TRX"
+    "trxMinTip": "10 TRX 起兌，最大不超過100000 TRX",
+    "switchDirection": "切換兌換方向",
+    "quickAmount": "快捷",
+    "step1": "輸入金額預估",
+    "step2": "掃碼/轉賬付款",
+    "step3": "合約秒級回款",
+    "warningTitle": "嚴禁使用中心化交易所提幣轉賬",
+    "warningDesc": "合約閃兌採用原路自動返回機制。請務必使用去中心化私鑰錢包（如 TronLink、imToken）轉賬；若從幣安、OKX 等交易所直接提幣，資金將退回交易所公共熱錢包而無法到賬！",
+    "liveRateTag": "實時撮合",
+    "lowSlippage": "極速極低滑點",
+    "poolDepth": "資金池儲備充足"
   },
   "activation": {
     "title": "激活入口",

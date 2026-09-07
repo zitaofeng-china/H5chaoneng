@@ -1,5 +1,7 @@
 {
   "common": {
+    "65000": "65000",
+    "131000": "131000",
     "confirm": "Onayla",
     "cancel": "İptal",
     "save": "Kaydet",
@@ -24,8 +26,6 @@
     "hour": "Saat",
     "purchase": "Adet",
     "w": "W",
-    "65000": "65000",
-    "131000": "131000",
     "recharge": "Şarj",
     "loadFailed": "Yükleme Başarısız",
     "loadFailedHint": "Lütfen ağ bağlantınızı kontrol edin veya daha sonra tekrar deneyin",
@@ -340,7 +340,17 @@
     "minExchange": "Minimum {min} değişim",
     "maxExchange": "Maksimum {max}",
     "usdtMinTip": "Minimum 2 USDT, maksimum 70000 USDT",
-    "trxMinTip": "Minimum 10 TRX, maksimum 100000 TRX"
+    "trxMinTip": "Minimum 10 TRX, maksimum 100000 TRX",
+    "switchDirection": "Yönü Değiştir",
+    "quickAmount": "Hızlı",
+    "step1": "Miktarı Girin",
+    "step2": "Fonları Aktarın",
+    "step3": "Anında İade",
+    "warningTitle": "Merkezi borsalardan transfer YAPMAYIN",
+    "warningDesc": "Anında takas, dönüştürülen tokenleri otomatik olarak gönderen adrese iade eder. Merkeziyetsiz bir cüzdan (TronLink, imToken) KULLANMALISINIZ. Borsalardan yapılan transferler kaybolabilir!",
+    "liveRateTag": "Canlı Eşleşme",
+    "lowSlippage": "Çok Düşük Kayma",
+    "poolDepth": "Yeterli Havuz Derinliği"
   },
   "activation": {
     "title": "Aktivasyon Girişi",

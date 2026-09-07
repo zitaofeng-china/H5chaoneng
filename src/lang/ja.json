@@ -1,5 +1,7 @@
 {
   "common": {
+    "65000": "65000",
+    "131000": "131000",
     "confirm": "確認",
     "cancel": "キャンセル",
     "save": "保存",
@@ -24,8 +26,6 @@
     "hour": "時間",
     "purchase": "件",
     "w": "W",
-    "65000": "65000",
-    "131000": "131000",
     "recharge": "チャージ",
     "loadFailed": "読み込み失敗",
     "loadFailedHint": "ネットワーク接続を確認するか、後でもう一度お試しください",
@@ -339,7 +339,17 @@
     "minExchange": "最小 {min}から交換",
     "maxExchange": "最大 {max}",
     "usdtMinTip": "最小 2 USDT、最大 70000 USDT",
-    "trxMinTip": "最小 10 TRX、最大 100000 TRX"
+    "trxMinTip": "最小 10 TRX、最大 100000 TRX",
+    "switchDirection": "交換方向を切り替え",
+    "quickAmount": "クイック",
+    "step1": "金額を入力",
+    "step2": "送金支払い",
+    "step3": "即時受取",
+    "warningTitle": "中央集権取引所からの送金は厳禁",
+    "warningDesc": "即時交換は送信元アドレスに自動的にトークンを返却します。必ず分散型プライベートキーウォレット（TronLink、imTokenなど）をご使用ください。取引所（Binance、OKXなど）から直接出金すると資金が失われます！",
+    "liveRateTag": "リアルタイム約定",
+    "lowSlippage": "極小スリッページ",
+    "poolDepth": "十分なプール深度"
   },
   "activation": {
     "title": "活性化入口",
