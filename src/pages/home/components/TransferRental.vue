@@ -1,17 +1,32 @@
 <template>
   <div class="transfer-rental">
-    <div class="top-banner">
-      <div class="banner-item" v-for="banner in priceBanners" :key="banner.count">
-        <SvgIcon name="transfer-info" width="12" height="12" />
-        <div class="text">
-          {{ t('transferRental.transferTemplate', { price: banner.price, count: banner.count }) }}
+    <div class="transfer-explain">
+      <div class="explain-label">
+        <span>{{ t('transferRental.explain') }}</span>
+        <span class="explain-subhint">转账对应 TRX 即可自动到账能量</span>
+      </div>
+      <div class="explain-grid">
+        <div
+          v-for="item in transferPackages"
+          :key="item.count"
+          class="explain-card tactile-btn"
+          role="button"
+          tabindex="0"
+          @click="handlePackageClick"
+        >
+          <div class="explain-price tabular-nums">
+            {{ item.price }} <span class="price-unit">{{ t('common.trx') }}</span>
+          </div>
+          <div class="explain-count">
+            {{ t('transferRental.buyCount', { count: item.count }) }}
+          </div>
         </div>
       </div>
     </div>
 
     <div class="instruction-note">
-      <span>*</span>
-      {{ t('transferRental.note') }}
+      <SvgIcon name="transfer-info" width="14" height="14" />
+      <span>{{ t('transferRental.note') }}</span>
     </div>
 
     <!-- 二维码区域 -->
@@ -19,7 +34,6 @@
       <QrCodeWithAddress
         :address="props.paymentAddress"
         :title="t('transferRental.walletQrcode')"
-        :tip="t('common.checkWalletAddress')"
       />
     </div>
     <div v-else-if="loadingTimeout" class="error-section">
@@ -52,13 +66,18 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { Loading, RefreshRight, CircleClose } from '@element-plus/icons-vue'
-import { usePriceStore } from '@/stores/usePriceStore'
 import { useAddressLoading } from '@/hooks/useAddressLoading'
+import { useCommonStore } from '@/stores/useCommonStore'
+import { usePriceStore } from '@/stores/usePriceStore'
+import { formatCryptoAmount } from '@/utils/number'
+import { tmaHapticSelection, tmaHapticImpact } from '@/utils/telegram'
 import KindTips from '@/components/kindTips/index.vue'
 import QrCodeWithAddress from '@/components/qrCodeWithAddress/index.vue'
+
+const TRANSFER_COUNTS = [1, 2, 4, 20]
 
 interface Props {
   paymentAddress?: string
@@ -69,8 +88,18 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const { t } = useI18n()
+const commonStore = useCommonStore()
+const { isMobile } = storeToRefs(commonStore)
 const priceStore = usePriceStore()
 const { priceData } = storeToRefs(priceStore)
+
+const transferPackages = computed(() => {
+  const unit = Number.parseFloat(priceData.value?.stroke || '3.5')
+  return TRANSFER_COUNTS.map((count) => ({
+    count,
+    price: formatCryptoAmount(unit * count),
+  }))
+})
 
 const { loadingTimeout, resetTimer } = useAddressLoading({
   address: () => props.paymentAddress,
@@ -80,26 +109,15 @@ const emit = defineEmits<{
   retry: []
 }>()
 
+const handlePackageClick = () => {
+  tmaHapticSelection()
+}
+
 const handleRetry = () => {
+  tmaHapticImpact('light')
   resetTimer()
   emit('retry')
 }
-
-// 动态计算按1小时价格购买的价格
-const hourlyPrice = computed(() => {
-  return Number.parseFloat(priceData.value?.time_1h || '5')
-})
-
-// 动态生成价格横幅（基于1小时价格）
-const priceBanners = computed(() => {
-  const price = hourlyPrice.value
-  return [
-    { count: 1, price: (price * 1).toFixed(1) },
-    { count: 2, price: (price * 2).toFixed(1) },
-    { count: 4, price: (price * 4).toFixed(1) },
-    { count: 20, price: (price * 20).toFixed(1) },
-  ]
-})
 
 const tips = computed(() => [
   t('transferRental.walletTips'),
@@ -108,55 +126,163 @@ const tips = computed(() => [
   t('transferRental.amountTip'),
   t('transferRental.addressTip'),
 ])
+
 </script>
 
 <style lang="scss" scoped>
 .transfer-rental {
   padding: 0;
 
-  .instruction-note {
-    margin: 24px 0 16px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--theme-text-muted);
+  .transfer-explain {
+    margin: 16px 0 0;
+  }
 
-    span {
-      color: rgba(193, 53, 53, 1);
+  .explain-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 20px;
+    padding-left: 10px;
+    position: relative;
+    color: var(--theme-text-black, #182230);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 14px;
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 0;
+      width: 3px;
+      height: 14px;
+      border-radius: 1.5px;
+      background: var(--theme-primary-blue, #165dff);
+    }
+
+    .explain-subhint {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--theme-text-light-gray-muted);
     }
   }
 
-  .top-banner {
+  .explain-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .explain-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 62px;
+    padding: 8px 6px;
+    box-sizing: border-box;
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-md, 6px);
+    background: var(--theme-card-bg-gradient, linear-gradient(180deg, #ffffff 0%, #f8fafc 100%));
+    box-shadow: var(--theme-shadow-xs, 0 1px 2px rgba(15, 23, 42, 0.04));
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+
+    &:hover {
+      border-color: var(--theme-primary-blue, #165dff);
+      box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.05));
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: scale(0.975);
+    }
+  }
+
+  .explain-price {
+    color: var(--theme-primary-blue, #165dff);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.2;
+
+    .price-unit {
+      font-size: 11px;
+      font-weight: 600;
+      color: rgba(22, 93, 255, 0.7);
+    }
+  }
+
+  .explain-count {
+    color: var(--theme-text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .instruction-note {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    flex-wrap: wrap;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 4px;
-    background: rgba(22, 93, 255, 0.08);
-    color: var(--theme-bg-blue);
-    font-size: 14px;
+    gap: 8px;
+    min-height: 32px;
+    margin: 14px 0 10px;
+    padding: 6px 12px;
+    box-sizing: border-box;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: var(--theme-radius-sm, 4px);
+    background: rgba(245, 158, 11, 0.08);
+    color: #b45309;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.4;
+
+    :deep(svg) {
+      flex-shrink: 0;
+      color: #f59e0b;
+    }
+  }
+
+  .qr-section-wrapper {
+    margin: 4px 0;
+  }
+
+  :deep(.tips-section) {
+    margin: 10px 0 16px;
+    padding: 14px 16px;
+    border-radius: var(--theme-radius-md, 6px);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+  }
+
+  :deep(.tips-section .tips-title) {
+    margin-bottom: 10px;
+    font-size: 13px;
     font-weight: 700;
   }
 
-  .banner-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
+  :deep(.tips-section .tips-list) {
+    gap: 8px;
+  }
+
+  :deep(.tips-section .tip-text) {
+    font-size: 12px;
+    line-height: 1.5;
   }
 
   .loading-section {
     text-align: center;
     padding: 32px 0;
-    background: rgba(2, 15, 45, 0.02);
-    border-radius: 8px;
+    background: rgba(22, 93, 255, 0.02);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    border-radius: var(--theme-radius-md, 12px);
     margin: 16px 0;
 
     .loading-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--theme-text-black);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .loading-placeholder {
@@ -164,7 +290,7 @@ const tips = computed(() => [
       flex-direction: column;
       align-items: center;
       gap: 16px;
-      padding: 40px 0;
+      padding: 32px 0;
 
       .el-icon {
         color: var(--theme-bg-blue);
@@ -180,16 +306,16 @@ const tips = computed(() => [
   .error-section {
     text-align: center;
     padding: 32px 0;
-    background: rgba(245, 108, 108, 0.05);
-    border-radius: 8px;
+    background: rgba(245, 108, 108, 0.04);
+    border-radius: var(--theme-radius-md, 12px);
     border: 1px dashed rgba(245, 108, 108, 0.3);
     margin: 16px 0;
 
     .error-title {
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 700;
       color: var(--theme-text-black);
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     .error-placeholder {
@@ -197,7 +323,7 @@ const tips = computed(() => [
       flex-direction: column;
       align-items: center;
       gap: 12px;
-      padding: 40px 0;
+      padding: 32px 0;
 
       .error-icon {
         color: #F56C6C;
@@ -230,38 +356,37 @@ const tips = computed(() => [
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   .transfer-rental {
-    .top-banner {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 12px;
+    .explain-label {
       font-size: 13px;
     }
 
-    .banner-item {
-      gap: 6px;
-      width: 100%;
+    .explain-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 
-      svg {
-        flex-shrink: 0;
-      }
-
-      .text {
-        flex: 1;
-        line-height: 1.4;
+    @media (min-width: 560px) {
+      .explain-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
       }
     }
 
     .instruction-note {
-      margin: 16px 0 12px;
-      font-size: 13px;
+      min-height: 32px;
+      margin: 12px 0 10px;
+      padding: 6px 10px;
+      font-size: 11px;
       line-height: 1.5;
     }
 
     .qr-section-wrapper {
-      margin: 12px 0;
+      margin: 0;
+    }
+
+    :deep(.tips-section) {
+      margin: 8px 0 12px;
+      padding: 12px;
     }
 
     .loading-section {

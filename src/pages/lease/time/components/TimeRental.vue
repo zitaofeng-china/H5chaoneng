@@ -12,6 +12,7 @@
             <button
               v-for="(opt, idx) in row.options"
               :key="idx"
+              type="button"
               :class="['pill', selecteIndex[0] === rIdx && selecteIndex[1] === idx ? 'active' : '']"
               @click="onSelect(rIdx, idx, opt)"
             >
@@ -19,18 +20,31 @@
             </button>
           </div>
         </div>
+        <div v-if="isCustomActive" class="custom-input-wrap">
+          <el-input
+            :model-value="customCountInput"
+            type="number"
+            min="1"
+            max="1000"
+            class="custom-count-input"
+            @input="handleCustomInput"
+          >
+            <template #prefix>{{ t('lease.customCount') }}</template>
+            <template #suffix>{{ t('common.purchase') }}</template>
+          </el-input>
+        </div>
       </div>
 
       <!-- 移动端：下拉选择时长 + 按钮选择数量 -->
       <div class="mobile-selection" v-else>
         <div class="selection-item">
           <label class="selection-label">
-            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            <span class="label-marker" aria-hidden="true"></span>
             {{ t('lease.selectDuration') }}
           </label>
           <el-select
             v-model="mobileSelectedDuration"
-            :placeholder="t('lease.selectDuration')"
+            :placeholder="t('lease.selectDurationPlaceholder')"
             @change="onMobileDurationChange"
             class="duration-select"
           >
@@ -45,18 +59,34 @@
 
         <div class="selection-item">
           <label class="selection-label">
-            <SvgIcon name="fee-info" width="12" height="12" fill="#1E293B" />
+            <span class="label-marker" aria-hidden="true"></span>
             {{ t('lease.selectQuantity') }}
           </label>
-          <div class="row-options">
-            <button
-              v-for="(opt, idx) in mobileCountOptions"
-              :key="idx"
-              :class="['pill', mobileSelectedCount === idx ? 'active' : '']"
-              @click="onMobileCountChange(idx, opt)"
-            >
-              {{ opt }}
-            </button>
+          <div class="count-package-panel">
+            <div class="row-options">
+              <button
+                v-for="(opt, idx) in mobileCountOptions"
+                :key="idx"
+                type="button"
+                :class="['pill', mobileSelectedCount === idx ? 'active' : '']"
+                @click="onMobileCountChange(idx, opt)"
+              >
+                {{ opt }}
+              </button>
+            </div>
+            <div v-if="isCustomActive" class="custom-input-wrap">
+              <el-input
+                :model-value="customCountInput"
+                type="number"
+                min="1"
+                max="1000"
+                class="custom-count-input"
+                @input="handleCustomInput"
+              >
+                <template #prefix>{{ t('lease.customCount') }}</template>
+                <template #suffix>{{ t('common.purchase') }}</template>
+              </el-input>
+            </div>
           </div>
         </div>
       </div>
@@ -68,111 +98,141 @@
           ref="formRef"
           :model="form"
           :rules="rules"
-          label-width="115px"
+          label-position="top"
           label-suffix=":"
           class="details-form"
           :class="{ 'derail-form-m': isMobile }"
         >
           <el-form-item :label="t('lease.unitPrice')" prop="unitPrice">
-            <el-input v-model="unitPrice" disabled class="m-input" v-if="isMobile">
-              <template #prefix>{{ t('lease.unitPrice') }}</template>
-              <template #suffix> {{ t('common.trx') }} </template>
+            <el-input :model-value="unitPriceDisplay" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.unitPrice') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ t('common.trx') }}</template>
             </el-input>
-            <el-input :model-value="unitPrice + ' ' + t('common.trx')" disabled v-else />
           </el-form-item>
 
           <el-form-item :label="t('lease.count')" prop="count">
-            <el-input v-model="count" disabled class="m-input" v-if="isMobile">
-              <template #prefix>{{ t('lease.count') }}</template>
-              <template #suffix> {{ t('common.purchase') }} </template>
+            <el-input :model-value="count" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.count') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ t('common.purchase') }}</template>
             </el-input>
-            <el-input :model-value="count + ' ' + t('common.purchase')" disabled v-else />
           </el-form-item>
 
-          <el-form-item :label="t('lease.totalPrice')" prop="total">
-            <el-input :model-value="totalDisplay" class="m-input" disabled>
-              <template #prefix v-if="isMobile">{{ t('lease.totalPrice') }}</template>
-              <template #suffix> {{ t('common.trx') }} </template>
+          <el-form-item :label="t('lease.totalPrice')" prop="total" class="total-price-item">
+            <el-input :model-value="totalDisplay" disabled :class="{ 'm-input': isMobile, 'total-price-input': true }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.totalPrice') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ t('common.trx') }}</template>
             </el-input>
           </el-form-item>
 
           <el-form-item :label="t('lease.validity')" prop="validity">
-            <el-input v-model="validity" disabled class="m-input" v-if="isMobile">
-              <template #prefix>{{ t('lease.validity') }}</template>
-              <template #suffix> {{ validityUnit }} </template>
+            <el-input :model-value="validity" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.validity') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ validityUnit }}</template>
             </el-input>
-            <el-input :model-value="validity + ' ' + validityUnit" disabled v-else />
           </el-form-item>
 
           <el-form-item :label="t('lease.singleEnergy')" prop="energy">
-            <el-input v-model="energy" disabled class="m-input" v-if="isMobile">
-              <template #prefix v-if="isMobile">{{ t('lease.singleEnergy') }}</template>
-              <template #suffix> {{ t('common.w') }} </template>
+            <el-input :model-value="energy" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.singleEnergy') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ t('common.w') }}</template>
             </el-input>
-            <el-input :model-value="energy + ' ' + t('common.w')" disabled v-else />
           </el-form-item>
 
-          <el-form-item :label="t('lease.walletAddress')" prop="wallet">
-            <el-input v-model="wallet" :placeholder="t('lease.enterAddress')" />
+          <el-form-item :label="t('lease.totalEnergy')" prop="totalEnergy">
+            <el-input :model-value="totalEnergy" disabled :class="{ 'm-input': isMobile }">
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.totalEnergy') }}<span class="req-star">*</span>
+                </span>
+              </template>
+              <template #suffix>{{ t('common.w') }}</template>
+            </el-input>
+          </el-form-item>
+
+          <el-form-item :label="t('lease.walletAddress')" prop="wallet" class="wallet-field">
+            <el-input
+              v-model="wallet"
+              :placeholder="walletPlaceholder"
+              :class="{ 'm-input': isMobile }"
+            >
+              <template #prefix v-if="isMobile">
+                <span class="inline-label">
+                  <span class="label-marker" aria-hidden="true"></span>
+                  {{ t('lease.walletAddress') }}<span class="req-star">*</span>
+                </span>
+              </template>
+            </el-input>
           </el-form-item>
 
           <el-form-item>
-            <el-button type="primary" class="rent-btn" @click="rentNow">
-              {{ t('lease.rentNowButton') }}({{ totalDisplay }}TRX)
+            <el-button
+              type="primary"
+              class="rent-btn primary-btn"
+              :loading="orderLoading"
+              :disabled="orderLoading"
+              @click="rentNow"
+            >
+              {{ t('lease.rentNowButton') }} ({{ totalDisplay }} {{ t('common.trx') }})
             </el-button>
           </el-form-item>
         </el-form>
       </div>
     </div>
-
-    <!-- 自定义数量对话框 -->
-    <el-dialog
-      v-model="customDialogVisible"
-      :title="t('lease.customCount')"
-      width="400px"
-      :close-on-click-modal="false"
-      align-center
-    >
-      <el-form :model="customForm" :rules="customRules" ref="customFormRef" label-width="80px">
-        <el-form-item :label="t('lease.count')" prop="count">
-          <el-input
-            v-model.number="customForm.count"
-            type="number"
-            :placeholder="t('lease.enterCustomCount')"
-            min="1"
-            clearable
-            @keyup.enter="confirmCustomCount"
-          >
-            <template #suffix>{{ t('common.purchase') }}</template>
-          </el-input>
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <el-button @click="customDialogVisible = false">{{ t('common.cancel') }}</el-button>
-        <el-button type="primary" @click="confirmCustomCount">{{ t('common.confirm') }}</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
 import { reactive, ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { type FormInstance, type FormRules } from 'element-plus'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { usePriceStore } from '@/stores/usePriceStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { useOrderCreation } from '@/hooks/useOrderCreation'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import { OrderKind } from '@/api/modules/order/types'
 import { storeToRefs } from 'pinia'
+import { formatCryptoAmount } from '@/utils/number'
 
 defineOptions({ name: 'TimeRental' })
+
+const isValidTronAddress = (address: string): boolean => {
+  if (!address || typeof address !== 'string') return false
+  return /^T[1-9A-HJ-NP-Za-km-z]{33}$/.test(address.trim())
+}
 
 interface RentalForm {
   unitPrice: number
   count: number
   total: number
   energy: number
+  totalEnergy: number
   validity: number
   wallet: string
 }
@@ -186,6 +246,10 @@ const { isMobile } = storeToRefs(commonStore)
 const { priceData } = storeToRefs(priceStore)
 const { userInfo } = storeToRefs(userStore)
 const { loading: orderLoading, createOrder } = useOrderCreation()
+const { tmaHapticImpact, tmaHapticSelection, tmaHapticNotification } = useTelegramHaptics()
+
+const CUSTOM_COL = 4
+const CUSTOM_MAX = 1000
 
 const rows = computed(() => [
   {
@@ -197,7 +261,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[0] ? `${customCounts.value[0]}${t('common.purchase')}` : t('lease.custom'),
+      t('lease.custom'),
     ],
   },
   {
@@ -209,7 +273,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[1] ? `${customCounts.value[1]}${t('common.purchase')}` : t('lease.custom'),
+      t('lease.custom'),
     ],
   },
   {
@@ -221,7 +285,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[2] ? `${customCounts.value[2]}${t('common.purchase')}` : t('lease.custom'),
+      t('lease.custom'),
     ],
   },
   {
@@ -233,7 +297,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[3] ? `${customCounts.value[3]}${t('common.purchase')}` : t('lease.custom'),
+      t('lease.custom'),
     ],
   },
   {
@@ -245,7 +309,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[4] ? `${customCounts.value[4]}${t('common.purchase')}` : t('lease.custom'),
+      t('lease.custom'),
     ],
   },
   {
@@ -257,7 +321,7 @@ const rows = computed(() => [
       `2${t('common.purchase')}`,
       `5${t('common.purchase')}`,
       `10${t('common.purchase')}`,
-      customCounts.value[5] ? `${customCounts.value[5]}${t('common.purchase')}` : t('lease.custom'),
+      t('lease.custom'),
     ],
   },
 ])
@@ -273,16 +337,37 @@ const mobileCountOptions = computed(() => {
   return rows.value[mobileSelectedDuration.value]?.options || []
 })
 
-// 自定义对话框状态
-const customDialogVisible = ref(false)
-const customFormRef = ref<FormInstance>()
-const customForm = reactive({
-  count: 1,
-})
-const customRowIndex = ref<number>(0)
-
-// 存储自定义数量
 const customCounts = ref<Record<number, number>>({})
+
+const isCustomActive = computed(() => selecteIndex.value[1] === CUSTOM_COL)
+
+const customCountInput = computed({
+  get: () => customCounts.value[selecteIndex.value[0]] ?? 1,
+  set: (val: number | string | null) => {
+    applyCustomCount(selecteIndex.value[0], val)
+  },
+})
+
+function applyCustomCount(rowIdx: number, val: number | string | null) {
+  const n = parseInt(String(val), 10)
+  customCounts.value[rowIdx] = Number.isFinite(n)
+    ? Math.min(CUSTOM_MAX, Math.max(1, Math.trunc(n)))
+    : 1
+}
+
+function handleCustomInput(val: string | number | Event) {
+  const raw =
+    val && typeof val === 'object' && 'target' in val
+      ? (val.target as HTMLInputElement).value
+      : val
+  applyCustomCount(selecteIndex.value[0], raw as string | number)
+}
+
+function ensureCustomCount(rowIdx: number) {
+  if (!customCounts.value[rowIdx]) {
+    customCounts.value[rowIdx] = 1
+  }
+}
 
 // 根据选中的行（时长）动态获取单价
 const unitPrice = computed(() => {
@@ -301,16 +386,21 @@ const unitPrice = computed(() => {
   
   return parseFloat(priceMap[rowIdx] || priceData.value.time_1h)
 })
+const unitPriceDisplay = computed(() => formatCryptoAmount(unitPrice.value))
 const count = computed(() => {
   const [rowIdx, colIdx] = selecteIndex.value
+  if (colIdx === CUSTOM_COL) {
+    return customCounts.value[rowIdx] || 1
+  }
   const opt = rows.value[rowIdx]?.options[colIdx] || `1${t('common.purchase')}`
-
-  // 从选项文本中提取数字
-  const num = parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
-  return num
+  return parseInt(String(opt).replace(/[^0-9]/g, '')) || 1
 })
 
-const energy = ref(13.1)
+const energy = ref(6.5)
+const totalEnergy = computed(() => {
+  // 单笔能量 × 笔数，保留1位小数
+  return +(energy.value * count.value).toFixed(1)
+})
 const validity = computed(() => {
   const [rowIdx] = selecteIndex.value
   return rows.value[rowIdx]?.validity || 1
@@ -321,9 +411,12 @@ const validityUnit = computed(() => {
   return unit === 'hour' ? t('common.hour') : t('common.day')
 })
 const wallet = ref('')
+const walletPlaceholder = computed(() =>
+  isMobile.value ? t('countRental.enterAddress') : t('lease.enterAddress'),
+)
 
 const total = computed(() => +(unitPrice.value * count.value).toFixed(4))
-const totalDisplay = computed(() => `${total.value}`)
+const totalDisplay = computed(() => formatCryptoAmount(total.value))
 
 const formRef = ref<FormInstance>()
 const form = reactive<RentalForm>({
@@ -331,6 +424,7 @@ const form = reactive<RentalForm>({
   count: count.value,
   total: total.value,
   energy: energy.value,
+  totalEnergy: totalEnergy.value,
   validity: validity.value,
   wallet: wallet.value,
 })
@@ -388,6 +482,19 @@ const rules = computed<FormRules<RentalForm>>(() => ({
       trigger: 'blur',
     },
   ],
+  totalEnergy: [
+    {
+      required: true,
+      validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
+        if (Number(value) <= 0) {
+          callback(new Error(t('formValidation.totalEnergyMustBePositive')))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur',
+    },
+  ],
   validity: [
     {
       required: true,
@@ -404,20 +511,10 @@ const rules = computed<FormRules<RentalForm>>(() => ({
   wallet: [
     { required: true, message: t('formValidation.walletRequired'), trigger: 'blur' },
     { min: 5, message: t('formValidation.walletTooShort'), trigger: 'blur' },
-  ],
-}))
-
-// 自定义表单验证规则
-const customRules = computed<FormRules>(() => ({
-  count: [
-    { required: true, message: t('formValidation.countRequired'), trigger: 'blur' },
-    { type: 'number', message: t('formValidation.countMustBeNumber'), trigger: 'blur' },
     {
-      validator: (_rule: unknown, value: number, callback: (error?: string | Error) => void) => {
-        if (value < 1) {
-          callback(new Error(t('formValidation.countMustBePositive')))
-        } else if (value > 1000) {
-          callback(new Error(t('formValidation.countTooLarge')))
+      validator: (_rule: unknown, value: string, callback: (error?: string | Error) => void) => {
+        if (!isValidTronAddress(value)) {
+          callback(new Error(t('formValidation.enterValidAddress')))
         } else {
           callback()
         }
@@ -427,29 +524,28 @@ const customRules = computed<FormRules>(() => ({
   ],
 }))
 
-watch([unitPrice, count, total, energy, validity], () => {
+watch([unitPrice, count, total, energy, totalEnergy, validity], () => {
   form.unitPrice = unitPrice.value
   form.count = count.value
   form.total = total.value
   form.energy = energy.value
+  form.totalEnergy = totalEnergy.value
   form.validity = validity.value
 })
 
 watch(wallet, (v) => (form.wallet = v))
 
 function onSelect(rowIdx: number, idx: number, opt: string) {
+  tmaHapticSelection()
   selecteIndex.value = [rowIdx, idx]
-
-  // 判断是否点击了"自定义"或者是最后一个按钮（自定义按钮的位置）
-  if (opt === t('lease.custom') || idx === 4) {
-    customRowIndex.value = rowIdx
-    customForm.count = customCounts.value[rowIdx] || 1
-    customDialogVisible.value = true
+  if (opt === t('lease.custom') || idx === CUSTOM_COL) {
+    ensureCustomCount(rowIdx)
   }
 }
 
 // 移动端时长选择变化
 const onMobileDurationChange = (durationIdx: number) => {
+  tmaHapticSelection()
   mobileSelectedDuration.value = durationIdx
   mobileSelectedCount.value = 0 // 重置数量选择
   selecteIndex.value = [durationIdx, 0]
@@ -457,35 +553,18 @@ const onMobileDurationChange = (durationIdx: number) => {
 
 // 移动端数量选择变化
 const onMobileCountChange = (countIdx: number, opt: string) => {
+  tmaHapticSelection()
   mobileSelectedCount.value = countIdx
   selecteIndex.value = [mobileSelectedDuration.value, countIdx]
-  
-  // 判断是否选择了"自定义"或者是最后一个选项（自定义按钮的位置）
-  if (opt === t('lease.custom') || countIdx === 4) {
-    customRowIndex.value = mobileSelectedDuration.value
-    customForm.count = customCounts.value[mobileSelectedDuration.value] || 1
-    customDialogVisible.value = true
-  }
-}
-
-// 确认自定义数量
-const confirmCustomCount = async () => {
-  if (!customFormRef.value) return
-
-  try {
-    await customFormRef.value.validate()
-    // 保存自定义数量
-    customCounts.value[customRowIndex.value] = customForm.count
-    customDialogVisible.value = false
-    ElMessage.success(t('formValidation.customCountSet'))
-  } catch (error) {
-    console.error('Validation failed:', error)
+  if (opt === t('lease.custom') || countIdx === CUSTOM_COL) {
+    ensureCustomCount(mobileSelectedDuration.value)
   }
 }
 
 const rentNow = async () => {
   if (!formRef.value) return
   
+  tmaHapticImpact('medium')
   try {
     await formRef.value.validate()
 
@@ -504,15 +583,17 @@ const rentNow = async () => {
       count: count.value,
       duration: durationInSeconds,
       kind: OrderKind.KindTimeEnergy,
-      target: [wallet.value],
+      target: [wallet.value.trim()],
       userId: userInfo.value?.id || 0,
       context: 'lease_time',
     })
     
     if (success) {
+      tmaHapticNotification('success')
       wallet.value = ''
     }
   } catch (error) {
+    tmaHapticNotification('error')
     console.error('【ERROR INFO】:', error)
   }
 }
@@ -522,62 +603,342 @@ const rentNow = async () => {
 @use '@/assets/styles/detail-form.scss';
 
 .time-rental-page {
-  padding: 18px;
   display: flex;
   justify-content: center;
+  padding: 2px 0 32px;
 }
 
 .rental-wrapper {
   @include rental-card;
-}
 
-.title {
-  font-size: 16px;
-  font-weight: 700;
-  color: #1f2937;
-  margin: 6px 0 12px;
+  box-sizing: border-box;
+  width: min(680px, 100%);
+  max-width: 100%;
+  padding: 18px;
 }
 
 .selection-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 10px;
+  margin-bottom: 18px;
 }
 
 .grid-row {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 8px;
-  padding: 6px 0;
+  gap: 7px;
+  padding: 8px;
+  border: 1px solid #eef1f5;
+  border-radius: 4px;
+  background: #fbfcfe;
 }
 
 .row-label {
+  display: flex;
+  align-items: center;
+  min-height: 14px;
   width: 100%;
-  color: #6b7280;
-  font-size: 13px;
+  color: #667085;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+
+  :deep(svg) {
+    flex: 0 0 auto;
+    margin-right: 4px;
+  }
 }
 
 .row-options {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 5px;
   width: 100%;
 }
 
 .pill {
-  @include pill-button;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 3px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgba(22, 93, 255, 0.14);
+  border-radius: 4px;
+  background: #f4f8ff;
+  color: var(--theme-text-blue);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    border-color: rgba(22, 93, 255, 0.35);
+    background: #eaf1ff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(22, 93, 255, 0.08);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &.active {
+    border-color: transparent;
+    background: linear-gradient(135deg, #165dff 0%, #0e42d2 100%);
+    color: #ffffff;
+    box-shadow: 0 3px 8px rgba(22, 93, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  }
 }
 
-@media (max-width: 768px) {
+.custom-input-wrap {
+  grid-column: 1 / -1;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.custom-count-input {
+  width: 100%;
+
+  :deep(.el-input__wrapper) {
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 0 0 1px #e1e6ee inset;
+  }
+
+  :deep(.el-input__inner) {
+    height: 38px;
+    color: #344054;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: left;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input__prefix) {
+    margin-right: 10px;
+    color: #98a2b3;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  :deep(.el-input__suffix) {
+    color: #98a2b3;
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  :deep(input[type='number']) {
+    appearance: textfield;
+
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button {
+      margin: 0;
+      appearance: none;
+    }
+  }
+}
+
+.inline-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  color: var(--theme-text-black);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.req-star {
+  margin-left: 1px;
+  color: #f56c6c;
+  font-weight: 700;
+}
+
+.details-card {
+  margin-top: 0;
+
+  .card-title {
+    margin: 0 0 14px;
+    color: var(--theme-text-dark);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+  }
+}
+
+.details-form {
+  :deep(.el-form-item) {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    margin-bottom: 8px;
+  }
+
+  :deep(.el-form-item__label) {
+    box-sizing: border-box;
+    width: 100% !important;
+    height: auto;
+    min-height: 14px;
+    padding: 0 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    color: #344054;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.2;
+    text-align: left;
+  }
+
+  :deep(.el-form-item__content) {
+    min-height: 0;
+    margin-left: 0 !important;
+    line-height: 1;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  :deep(.el-form-item__error) {
+    position: static;
+    padding-top: 4px;
+    line-height: 1.3;
+  }
+
+  :deep(.el-input) {
+    width: 100%;
+  }
+
+  :deep(.el-input__wrapper) {
+    min-height: 38px;
+    padding: 1px 10px;
+    border-radius: 3px;
+    background: #fff;
+    box-shadow: 0 0 0 1px #e1e6ee inset;
+  }
+
+  :deep(.el-input.is-disabled .el-input__wrapper) {
+    background: #f1f3f5;
+    box-shadow: none;
+  }
+
+  :deep(.el-input__inner) {
+    height: 36px;
+    color: #344054;
+    font-size: 12px;
+    font-weight: 600;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input.is-disabled .el-input__inner) {
+    color: #344054;
+    -webkit-text-fill-color: initial;
+  }
+
+  :deep(.el-input__suffix),
+  :deep(.el-input__prefix) {
+    color: #667085;
+    font-size: 11px;
+  }
+
+  :deep(.el-form-item.is-error .el-input__wrapper) {
+    box-shadow: 0 0 0 1px var(--el-color-danger) inset;
+  }
+
+  :deep(.total-price-item) {
+    .el-input__wrapper {
+      background: #f8fafc !important;
+      box-shadow: 0 0 0 1px #cbd5e1 inset !important;
+      display: flex !important;
+      align-items: center !important;
+    }
+
+    .el-input__inner {
+      height: 38px !important;
+      line-height: 38px !important;
+      color: #0f172a !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+      font-family: inherit !important;
+      -webkit-text-fill-color: #0f172a !important;
+      padding-top: 0 !important;
+      padding-bottom: 0 !important;
+    }
+
+    .el-input__suffix {
+      color: #ea580c !important;
+      font-size: 13px !important;
+      font-weight: 700 !important;
+      font-family: inherit !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      height: 100% !important;
+      margin-left: 6px !important;
+    }
+
+    .el-input__suffix-inner {
+      display: inline-flex !important;
+      align-items: center !important;
+      height: 100% !important;
+    }
+  }
+}
+
+:deep(.rent-btn) {
+  box-sizing: border-box;
+  width: 100%;
+  height: 38px;
+  min-height: 38px;
+  margin-top: 4px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #ff7a18 0%, #ea580c 100%);
+  color: var(--theme-text-white);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --el-button-size: 38px;
+
+  &:hover,
+  &:focus {
+    border-color: transparent;
+    background: linear-gradient(135deg, #f97316 0%, #c2410c 100%);
+    color: var(--theme-text-white);
+    box-shadow: 0 4px 10px rgba(234, 88, 12, 0.35);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@media (max-width: 890px) {
   .time-rental-page {
-    padding: 6px;
+    padding: 2px 6px 24px;
   }
 
   .rental-wrapper {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
   }
 
   .selection-grid {
@@ -594,133 +955,283 @@ const rentNow = async () => {
       display: flex;
       flex-direction: column;
       gap: 8px;
+    }
 
-      .selection-label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #374151;
-        display: flex;
-        align-items: center;
-        gap: 4px;
+    .selection-label {
+      display: flex;
+      align-items: center;
+      min-height: 16px;
+      padding-left: 0;
+      color: #1e293b;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .label-marker {
+      width: 3px;
+      height: 14px;
+      margin-right: 8px;
+      border-radius: 1px;
+      background: var(--theme-bg-blue);
+    }
+
+    :deep(.el-select) {
+      width: 100%;
+    }
+
+    :deep(.el-select .el-input__wrapper),
+    :deep(.el-select__wrapper),
+    :deep(.el-select__wrapper:hover),
+    :deep(.el-select__wrapper.is-hovering),
+    :deep(.el-select__wrapper.is-focused) {
+      min-height: 44px;
+      padding: 0 14px;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 0 0 1px #dcdfe6;
+    }
+
+    :deep(.el-select .el-input__inner) {
+      height: 44px;
+      color: #344054;
+      font-size: 14px;
+    }
+
+    :deep(.el-select__placeholder),
+    :deep(.el-select__selected-item) {
+      color: #344054;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .count-package-panel {
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      background: #fff;
+    }
+
+    .row-options {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 4px;
+    }
+
+    .pill {
+      flex-direction: row;
+      height: 34px;
+      padding: 0 4px;
+      border: 1px solid rgba(22, 93, 255, 0.12);
+      border-radius: 4px;
+      background: #f4f8ff;
+      color: #1e293b;
+      font-size: 12px;
+      font-weight: 600;
+      box-shadow: none;
+      transition: all 0.2s ease;
+
+      &:active {
+        transform: scale(0.97);
       }
 
-      :deep(.el-select) {
-        width: 100%;
-
-        .el-input__wrapper {
-          background: rgba(2, 15, 45, 0.03);
-          border-radius: 4px;
-          box-shadow: none;
-          border: 1px solid rgba(2, 15, 45, 0.08);
-          padding: 0 12px;
-          min-height: 42px;
-        }
-
-        .el-input__inner {
-          height: 42px;
-          font-size: 14px;
-          color: var(--theme-text-black);
-        }
+      &:hover {
+        background: #eaf1ff;
+        color: var(--theme-text-blue);
       }
 
-      .row-options {
-        display: flex;
-        gap: 6px;
-        flex-wrap: wrap;
-        width: 100%;
+      &.active {
+        border-color: transparent;
+        background: linear-gradient(135deg, #165dff 0%, #0e42d2 100%);
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(22, 93, 255, 0.2);
       }
 
-      .pill {
-        height: 36px;
-        font-size: 13px;
-        padding: 0 8px;
-        min-width: 0;
-        flex: 1 1 calc(50% - 3px);
-        font-weight: 500;
-        background: rgba(2, 15, 45, 0.03);
-        border: 1px solid rgba(2, 15, 45, 0.08);
+      &:last-child {
+        grid-column: auto;
+      }
+    }
+
+    .custom-input-wrap {
+      margin-top: 10px;
+    }
+
+    .custom-count-input {
+      :deep(.el-input__wrapper) {
+        min-height: 40px;
+        padding: 0 12px;
         border-radius: 4px;
-        color: #374151;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        background: #f2f4f7;
+        box-shadow: 0 0 0 1px #dcdfe6;
+      }
 
-        &:hover {
-          background: rgba(2, 15, 45, 0.05);
-        }
+      :deep(.el-input__inner) {
+        height: 38px;
+        color: #1f2937;
+        font-size: 14px;
+        font-weight: 600;
+      }
 
-        &.active {
-          background: var(--theme-bg-blue);
-          color: white;
-          border-color: var(--theme-bg-blue);
-        }
-
-        &:last-child {
-          flex: 1 1 100%;
-        }
+      :deep(.el-input__prefix),
+      :deep(.el-input__suffix) {
+        color: #98a2b3;
+        font-size: 13px;
+        font-weight: 500;
       }
     }
   }
 
   .details-card {
     .card-title {
-      font-size: 15px;
       margin-bottom: 14px;
+      font-size: 15px;
     }
   }
 
-  :deep(.el-form-item) {
-    margin-bottom: 8px;
-  }
-
-  :deep(.el-form-item__label) {
-    font-size: 13px;
-    padding-bottom: 0;
-  }
-
-  :deep(.el-input__inner) {
-    font-size: 15px;
-    height: 36px;
-    font-weight: 500;
-  }
-
-  :deep(.el-input__prefix),
-  :deep(.el-input__suffix) {
+  .inline-label {
     font-size: 14px;
+    font-weight: 600;
   }
 
-  :deep(.el-input__wrapper) {
-    min-height: 36px;
+  .label-marker {
+    width: 3px;
+    height: 14px;
+    margin-right: 8px;
+    margin-left: 0;
+    border-radius: 2px;
+    background: var(--theme-bg-blue);
+  }
+
+  .details-form {
+    :deep(.el-form-item) {
+      margin-bottom: 8px;
+    }
+
+    :deep(.el-form-item__label) {
+      display: none !important;
+    }
+
+    :deep(.el-form-item__content) {
+      margin-left: 0 !important;
+    }
+
+    :deep(.el-input__wrapper) {
+      min-height: 44px;
+      padding: 0 14px 0 0;
+      border-radius: 4px;
+      background: #f2f4f7;
+      box-shadow: 0 0 0 1px #dcdfe6;
+    }
+
+    :deep(.el-input.is-disabled .el-input__wrapper) {
+      background: #f2f4f7;
+      box-shadow: 0 0 0 1px #dcdfe6;
+      cursor: default;
+    }
+
+    :deep(.el-form-item.is-error .el-input__wrapper),
+    :deep(.el-input.is-error .el-input__wrapper) {
+      background: #f2f4f7;
+      box-shadow: 0 0 0 1px #dcdfe6 !important;
+    }
+
+    :deep(.wallet-field .el-input__wrapper),
+    :deep(.wallet-field .el-input__wrapper:hover),
+    :deep(.wallet-field .el-input.is-focus .el-input__wrapper) {
+      background: #fff;
+    }
+
+    :deep(.wallet-field.is-error .el-input__wrapper) {
+      background: #fff;
+      box-shadow: 0 0 0 1px var(--el-color-danger) inset !important;
+    }
+
+    :deep(.el-input__inner) {
+      height: 44px;
+      text-align: right;
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+      --el-input-placeholder-color: #94a3b8;
+    }
+
+    :deep(.el-input.is-disabled .el-input__inner) {
+      color: #64748b;
+      -webkit-text-fill-color: #64748b;
+      cursor: default;
+    }
+
+    :deep(.el-input__inner::placeholder) {
+      color: #94a3b8;
+      -webkit-text-fill-color: #94a3b8;
+    }
+
+    :deep(.el-input__prefix) {
+      padding-left: 0;
+      margin-left: 0;
+      color: var(--theme-text-black);
+    }
+
+    :deep(.el-input__suffix) {
+      color: #64748b;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    :deep(.el-input__prefix-inner) {
+      padding-left: 0;
+      padding-right: 8px;
+    }
+
+    :deep(.total-price-item) {
+      .el-input__wrapper {
+        background: #f8fafc !important;
+        box-shadow: 0 0 0 1px #cbd5e1 !important;
+        display: flex !important;
+        align-items: center !important;
+      }
+
+      .el-input__inner {
+        height: 44px !important;
+        line-height: 44px !important;
+        color: #0f172a !important;
+        font-size: 15px !important;
+        font-weight: 700 !important;
+        font-family: inherit !important;
+        -webkit-text-fill-color: #0f172a !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+      }
+
+      .el-input__suffix {
+        color: #ea580c !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        font-family: inherit !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        height: 44px !important;
+        line-height: 44px !important;
+        margin-left: 6px !important;
+      }
+
+      .el-input__suffix-inner {
+        display: inline-flex !important;
+        align-items: center !important;
+        height: 100% !important;
+      }
+    }
   }
 
   :deep(.rent-btn) {
-    width: 100%;
-    height: 42px;
-    font-size: 14px;
+    height: 44px;
+    min-height: 44px;
     margin-top: 6px;
-  }
-
-  :deep(.el-dialog) {
-    width: 90% !important;
-    max-width: 400px;
-  }
-
-  :deep(.el-dialog__body) {
-    padding: 16px;
-  }
-
-  :deep(.el-dialog__header) {
-    padding: 14px 16px;
-  }
-
-  :deep(.el-dialog__title) {
-    font-size: 15px;
-  }
-
-  :deep(.el-dialog__footer) {
-    padding: 12px 16px;
+    padding: 0 12px;
+    font-size: 14px;
+    border-radius: 6px;
+    --el-button-size: 44px;
   }
 }
 </style>

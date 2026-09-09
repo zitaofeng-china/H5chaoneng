@@ -14,15 +14,46 @@
           <div class="arrow-left-icon" @click.stop="handleClose">
             <iEpArrowLeft />
           </div>
-          {{ t('nav.userInfo') }}
+          <span class="user-info-title-text">{{ t('nav.userInfo') }}</span>
         </div>
       </template>
       
       <div class="user-info-content">
+        <img class="user-info-deco" :src="userInfoDecoImage" alt="" draggable="false" />
         <div class="desc-wrap">
           <div class="desc-item" v-for="row in userInfoData" :key="row.label">
             <div class="desc-label">{{ row.label }}</div>
-            <div class="desc-value">
+            <div v-if="row.type === 'secretKey'" class="desc-value key-value">
+              <button
+                type="button"
+                class="key-text-button"
+                :class="{ 'has-key': Boolean(secretKey) }"
+                :disabled="secretKeyLoading"
+                @click="handleSecretKeyClick"
+              >
+                <el-icon v-if="secretKeyLoading" class="is-loading">
+                  <Loading />
+                </el-icon>
+                <span>{{ secretKeyDisplay }}</span>
+              </button>
+              <button
+                v-if="secretKey"
+                type="button"
+                class="key-refresh-button"
+                :disabled="secretKeyLoading"
+                title="刷新"
+                aria-label="刷新 Key"
+                @click.stop="refreshSecretKey"
+              >
+                <el-icon :class="{ 'is-loading': secretKeyLoading }">
+                  <RefreshRight />
+                </el-icon>
+              </button>
+              <span v-if="secretKey" class="key-refresh-countdown">
+                {{ secretKeyCountdown }}s
+              </span>
+            </div>
+            <div v-else class="desc-value">
               <span>{{ row.value }}</span>
             </div>
           </div>
@@ -33,12 +64,19 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useCommonStore } from '@/stores/useCommonStore'
 import { useUserStore } from '@/stores/useUserStore'
+import { useSiteStore } from '@/stores/useSiteStore'
+import { formatBalance } from '@/utils/number'
+import { authApi } from '@/api'
+import { useCopyToClipboard } from '@/hooks/useCopyToClipboard'
 import { useI18n } from 'vue-i18n'
+import { ElMessage } from '@/utils/element'
+import { Loading, RefreshRight } from '@element-plus/icons-vue'
 import type { UserInfoRow } from './types'
+import userInfoDecoImage from '@/assets/images/user-info/side-deco.png'
 
 defineOptions({
   name: 'UserInfoPopup',
@@ -47,9 +85,107 @@ defineOptions({
 const { t } = useI18n()
 const commonStore = useCommonStore()
 const userStore = useUserStore()
+const siteStore = useSiteStore()
 const { isMobile } = storeToRefs(commonStore)
+const { copyText } = useCopyToClipboard()
 
 const visible = defineModel<boolean>({ default: false })
+const secretKey = ref('')
+const secretKeyLoading = ref(false)
+const secretKeyCountdown = ref(60)
+let secretKeyTimer: ReturnType<typeof window.setInterval> | null = null
+
+const secretKeyDisplay = computed(() => secretKey.value || t('recharge.clickToGet'))
+
+const formatTgUsername = (name?: string) => {
+  if (!name) return '-'
+  return name.startsWith('@') ? name : `@${name}`
+}
+
+const clearSecretKeyTimer = () => {
+  if (secretKeyTimer) {
+    window.clearInterval(secretKeyTimer)
+    secretKeyTimer = null
+  }
+}
+
+const resetSecretKey = () => {
+  secretKey.value = ''
+  secretKeyCountdown.value = 60
+  clearSecretKeyTimer()
+}
+
+const startSecretKeyTimer = () => {
+  clearSecretKeyTimer()
+  secretKeyCountdown.value = 60
+  secretKeyTimer = window.setInterval(() => {
+    secretKeyCountdown.value -= 1
+
+    if (secretKeyCountdown.value <= 0) {
+      resetSecretKey()
+    }
+  }, 1000)
+}
+
+const applySecretKey = (key: string) => {
+  secretKey.value = key
+  startSecretKeyTimer()
+}
+
+const refreshSecretKey = async () => {
+  if (secretKeyLoading.value) return
+
+  secretKeyLoading.value = true
+  try {
+    const response = await authApi.refreshSecretKey()
+    if (response.code === '000000' && response.data) {
+      applySecretKey(response.data)
+      return
+    }
+
+    resetSecretKey()
+    ElMessage.error(response.msg || '刷新 Key 失败')
+  } catch (error) {
+    resetSecretKey()
+    ElMessage.error(error instanceof Error ? error.message : '刷新 Key 失败')
+  } finally {
+    secretKeyLoading.value = false
+  }
+}
+
+const fetchSecretKey = async () => {
+  if (secretKeyLoading.value) return
+
+  secretKeyLoading.value = true
+  try {
+    const getResponse = await authApi.getSecretKey()
+    const response = getResponse.code === '000000' && !getResponse.data
+      ? await authApi.refreshSecretKey()
+      : getResponse
+
+    if (response.code === '000000' && response.data) {
+      applySecretKey(response.data)
+      return
+    }
+
+    resetSecretKey()
+    ElMessage.error(response.msg || '获取 Key 失败')
+  } catch (error) {
+    resetSecretKey()
+    ElMessage.error(error instanceof Error ? error.message : '获取 Key 失败')
+  } finally {
+    secretKeyLoading.value = false
+  }
+}
+
+const handleSecretKeyClick = async () => {
+  if (secretKey.value) {
+    await copyText(secretKey.value, 'Key 已复制')
+    return
+  }
+
+  await fetchSecretKey()
+}
 
 /**
  * 用户信息数据
@@ -60,27 +196,33 @@ const userInfoData = computed<UserInfoRow[]>(() => {
     return [
       { label: t('recharge.account'), value: '-' },
       { label: t('recharge.email'), value: '-' },
-      { label: t('recharge.tgOfficial'), value: '-' },
-      { label: t('recharge.trxBalance'), value: '0 TRX' },
+      { label: t('recharge.tgUsername'), value: '-' },
+      { label: t('recharge.trxBalance'), value: '0.00 TRX' },
+      { label: 'Key', value: '', type: 'secretKey' },
     ]
   }
 
   return [
     { label: t('recharge.account'), value: userInfo.username || '-' },
     { label: t('recharge.email'), value: userInfo.email || '-' },
-    { label: t('recharge.tgOfficial'), value: userInfo.tg_user_name || '-' },
-    { label: t('recharge.trxBalance'), value: `${userInfo.trx_balance || '0'} TRX` },
+    { label: t('recharge.tgUsername'), value: formatTgUsername(userInfo.tg_user_name) },
+    { label: t('recharge.trxBalance'), value: `${formatBalance(userInfo.trx_balance)} TRX` },
+    { label: 'Key', value: '', type: 'secretKey' },
   ]
 })
 
 const open = async () => {
   visible.value = true
-  // 打开弹窗时刷新用户信息
-  await userStore.fetchUserInfo()
+  // 打开弹窗时刷新用户信息和站点信息
+  await Promise.all([
+    userStore.fetchUserInfo(),
+    siteStore.fetchSiteInfo()
+  ])
 }
 
 const close = () => {
   visible.value = false
+  resetSecretKey()
 }
 
 const handleClose = () => {
@@ -91,6 +233,10 @@ defineExpose({
   open,
   close,
   visible,
+})
+
+onBeforeUnmount(() => {
+  clearSecretKeyTimer()
 })
 </script>
 
@@ -142,7 +288,12 @@ defineExpose({
 }
 
 .user-info-content {
+  position: relative;
   padding: 20px 0;
+}
+
+.user-info-deco {
+  display: none;
 }
 
 .desc-wrap {
@@ -154,14 +305,14 @@ defineExpose({
   font-weight: 500;
   color: var(--theme-text-black);
 
-  .desc-item {
-    height: 50px;
-    display: flex;
-    align-items: center;
+    .desc-item {
+      height: 50px;
+      display: flex;
+      align-items: center;
 
     .desc-label {
       height: 50px;
-      flex-basis: 180px;
+      flex: 0 0 120px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -184,6 +335,70 @@ defineExpose({
   }
 }
 
+.key-value {
+  gap: 8px;
+  min-width: 0;
+}
+
+.key-refresh-countdown {
+  flex: 0 0 28px;
+  color: var(--theme-text-gray);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.key-text-button,
+.key-refresh-button {
+  border: 0;
+  background: transparent;
+  color: var(--theme-text-black);
+  cursor: pointer;
+  transition: color 0.2s ease, opacity 0.2s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.key-text-button {
+  min-width: 0;
+  max-width: calc(100% - 72px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  font: inherit;
+
+  span {
+    min-width: 0;
+    white-space: nowrap;
+  }
+
+  &:not(:disabled):hover,
+  &.has-key {
+    color: var(--theme-bg-blue);
+  }
+}
+
+.key-refresh-button {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 16px;
+
+  &:not(:disabled):hover {
+    background: var(--theme-card-bg-light);
+    color: var(--theme-bg-blue);
+  }
+}
+
 // 移动端适配
 @media (max-width: 768px) {
   .user-info-dialog {
@@ -196,6 +411,12 @@ defineExpose({
       padding: 0;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    :deep(.el-overlay-dialog) {
+      overflow: hidden;
     }
 
     :deep(.el-dialog__header) {
@@ -205,37 +426,71 @@ defineExpose({
     }
 
     :deep(.el-dialog__body) {
+      position: relative;
       flex: 1;
       padding: 60px 16px 20px;
       overflow-y: auto;
+      background: #fff;
     }
 
     .user-info-title {
-      height: 54px;
+      height: 44px;
       margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--theme-text-white);
-      font-size: 17px;
+      color: #182230;
+      font-size: 16px;
       font-weight: 600;
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
-      background: var(--theme-bg);
       z-index: 99;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      isolation: isolate;
+      background: #fff;
+      box-shadow: none;
+
+      .user-info-title-text {
+        position: relative;
+        z-index: 1;
+      }
+
+      &::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-color: #fff;
+        background-image:
+          var(--theme-home-band-1-color),
+          var(--theme-home-grid-vertical);
+        background-size:
+          100% 44px,
+          auto 300px;
+        background-position: 0 0, 0 0;
+        background-repeat: no-repeat, repeat;
+        -webkit-mask-image: var(--theme-home-grid-mask);
+        mask-image: var(--theme-home-grid-mask);
+        -webkit-mask-size: 100% calc(6 * var(--theme-home-band-height, 30px));
+        mask-size: 100% calc(6 * var(--theme-home-band-height, 30px));
+        -webkit-mask-position: 0 0;
+        mask-position: 0 0;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+      }
 
       .arrow-left-icon {
         position: absolute;
-        left: 16px;
+        left: 8px;
+        z-index: 1;
         display: flex;
         align-items: center;
         justify-content: center;
         width: 32px;
         height: 32px;
-        color: var(--theme-text-white);
+        color: #182230;
         cursor: pointer;
         transition: opacity 0.3s ease;
 
@@ -255,8 +510,23 @@ defineExpose({
     padding: 0;
   }
 
+  .user-info-deco {
+    display: block;
+    position: absolute;
+    z-index: 0;
+    top: 248px;
+    right: 0;
+    width: 165px;
+    height: 187px;
+    pointer-events: none;
+    object-fit: contain;
+  }
+
   .desc-wrap {
-    border-radius: 6px;
+    position: relative;
+    z-index: 1;
+    border-radius: 8px;
+    background: #fff;
     font-size: 13px;
 
     .desc-item {
@@ -276,6 +546,21 @@ defineExpose({
         font-weight: 500;
       }
     }
+  }
+
+  .key-text-button {
+    max-width: calc(100% - 68px);
+    color: var(--theme-primary-blue);
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .key-refresh-button {
+    width: 26px;
+    height: 26px;
   }
 }
 </style>

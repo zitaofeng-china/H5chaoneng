@@ -1,10 +1,10 @@
 import { fileURLToPath, URL } from 'node:url'
 import path from 'node:path'
 
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
+import type { Plugin } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -14,25 +14,122 @@ import Icons from 'unplugin-icons/vite'
 import { FileSystemIconLoader } from 'unplugin-icons/loaders'
 import IconsResolver from 'unplugin-icons/resolver'
 import { visualizer } from 'rollup-plugin-visualizer'
+import { codeInspectorPlugin } from 'code-inspector-plugin'
 // import viteCompression from 'vite-plugin-compression'
+
+const DEV_BASE_COOKIE = 'energy_h5_public_base'
+
+function normalizeBase(base: string): string {
+  const normalized = base.replace(/^\/+|\/+$/g, '')
+  return normalized ? `/${normalized}/` : '/'
+}
+
+function getCookieValue(cookieHeader: string | undefined, name: string): string | undefined {
+  const cookie = cookieHeader
+    ?.split(';')
+    .map((item) => item.trim())
+    .find((item) => item.startsWith(`${name}=`))
+
+  if (!cookie) return undefined
+
+  try {
+    return decodeURIComponent(cookie.slice(name.length + 1))
+  } catch {
+    return undefined
+  }
+}
+
+function isPathUnderBase(pathname: string, base: string): boolean {
+  return base === '/' || pathname === base.slice(0, -1) || pathname.startsWith(base)
+}
+
+function devBaseMigrationPlugin(base: string): Plugin {
+  return {
+    name: 'dev-base-migration',
+    configureServer(server) {
+      server.middlewares.use((req, res, next) => {
+        if (req.method !== 'GET' || !req.headers.accept?.includes('text/html')) {
+          next()
+          return
+        }
+
+        const previousBase = getCookieValue(req.headers.cookie as string | undefined, DEV_BASE_COOKIE)
+        if (!previousBase) {
+          next()
+          return
+        }
+
+        const normalizedPreviousBase = normalizeBase(previousBase)
+        if (normalizedPreviousBase === base) {
+          next()
+          return
+        }
+
+        const requestUrl = new URL(req.url || '/', 'http://localhost')
+        // 根路径会匹配所有 URL，切换到根部署时仍需移除旧的非根 base。
+        if (base !== '/' && isPathUnderBase(requestUrl.pathname, base)) {
+          next()
+          return
+        }
+
+        if (!isPathUnderBase(requestUrl.pathname, normalizedPreviousBase)) {
+          next()
+          return
+        }
+
+        const pathAfterPreviousBase =
+          normalizedPreviousBase === '/'
+            ? requestUrl.pathname
+            : requestUrl.pathname.slice(normalizedPreviousBase.length - 1)
+        const targetPath = `${base === '/' ? '' : base.slice(0, -1)}${pathAfterPreviousBase}`
+
+        res.statusCode = 302
+        res.setHeader('Location', `${targetPath}${requestUrl.search}${requestUrl.hash}`)
+        res.setHeader('Set-Cookie', `${DEV_BASE_COOKIE}=${encodeURIComponent(base)}; Path=/; SameSite=Lax`)
+        res.end()
+      })
+    },
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const isProduction = mode === 'production'
+  const env = loadEnv(mode, process.cwd(), '')
+  const configuredBase = env.VITE_PUBLIC_BASE || '/'
+  const base =
+    configuredBase === '/'
+      ? '/'
+      : `/${configuredBase.replace(/^\/+|\/+$/g, '')}/`
+  const isProduction = mode !== 'development'
   const shouldAnalyze = process.env.ANALYZE === 'true'
 
+  const elementPlusResolver = ElementPlusResolver({
+    importStyle: 'css',
+  })
+
   return {
+  base,
   plugins: [
+    !isProduction && devBaseMigrationPlugin(base),
     vue(),
     vueJsx(),
-    vueDevTools(),
+    !isProduction &&
+      codeInspectorPlugin({
+        bundler: 'vite',
+        hotKeys: ['altKey', 'shiftKey'],
+        showSwitch: true,
+        autoToggle: true,
+        editor: 'code',
+      }),
     AutoImport({
-      resolvers: [ElementPlusResolver(), IconsResolver({ prefix: 'Icon' })],
+      // 不在 AutoImport 中解析 Element Plus，避免从桶入口引入 ElMessage 等
+      // Message/MessageBox 统一走 @/utils/element 子路径
+      resolvers: [IconsResolver({ prefix: 'Icon' })],
       dts: 'auto-imports.d.ts',
     }),
     Components({
       resolvers: [
-        ElementPlusResolver(),
+        elementPlusResolver,
         // 关键：自动注册图标组件，使用 'ep' 集合 (代表 element-plus)
         IconsResolver({ enabledCollections: ['ep'] }),
       ],
@@ -69,14 +166,14 @@ export default defineConfig(({ mode }) => {
       jpg: { quality: 75 },
       webp: { lossless: true, quality: 75 },
     }),
-    visualizer({ 
-      open: false, 
-      filename: 'stats.html', 
-      gzipSize: true, 
-      brotliSize: true,
-      // 只在需要分析时生成，加快构建速度
-      template: 'treemap', // 使用更快的模板
-    }),
+    (shouldAnalyze || isProduction) &&
+      visualizer({
+        open: false,
+        filename: 'stats.html',
+        gzipSize: true,
+        brotliSize: true,
+        template: 'treemap',
+      }),
     // Gzip 压缩（生产环境启用）
     // viteCompression({
     //   verbose: true, // 是否在控制台输出压缩结果
@@ -86,7 +183,7 @@ export default defineConfig(({ mode }) => {
     //   ext: '.gz', // 生成的压缩包后缀
     //   deleteOriginFile: false, // 不删除源文件
     // }),
-  ],
+  ].filter(Boolean),
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -116,83 +213,105 @@ export default defineConfig(({ mode }) => {
     },
     proxy: {
       '/v3': {
-        target: 'http://47.84.135.181:8888',
+        target: 'https://test-chaoneng.gaod2o.shop/',
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000, // 增加超时时间到 60 秒
-        // 配置代理请求头
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.error('[Proxy Error]', err.message)
           })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[Proxy]', req.method, req.url)
           })
-          proxy.on('proxyRes', (proxyRes, req, res) => {
+          proxy.on('proxyRes', (proxyRes, req) => {
             console.log('[Proxy Response]', proxyRes.statusCode, req.url)
           })
         },
       },
       '/v2': {
-        target: 'http://47.84.135.181:8888',
+        target: 'https://test-chaoneng.gaod2o.shop/',
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.error('[Proxy Error v2]', err.message)
           })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[Proxy v2]', req.method, req.url)
           })
         },
       },
       '/v1': {
-        target: 'http://47.84.135.181:8888',
+        target: 'https://test-chaoneng.gaod2o.shop/',
         changeOrigin: true,
         rewrite: (path) => path,
         timeout: 60000,
-        configure: (proxy, options) => {
-          proxy.on('error', (err, req, res) => {
+        configure: (proxy) => {
+          proxy.on('error', (err) => {
             console.error('[Proxy Error v1]', err.message)
           })
-          proxy.on('proxyReq', (proxyReq, req, res) => {
+          proxy.on('proxyReq', (_proxyReq, req) => {
             console.log('[Proxy v1]', req.method, req.url)
           })
         },
       },
     },
   },
+  // 生产环境打包时移除 console 和 debugger
+  esbuild: isProduction ? { drop: ['console', 'debugger'] } : {},
   build: {
     target: 'es2015', // 目标浏览器
-    assetsInlineLimit: 0, // 调到 4kb
+    assetsInlineLimit: 4096, // 小资源内联，减少请求数
     chunkSizeWarningLimit: 1000, // 1. 提高警告阈值到 1000k（如果有些库压缩后确实很大，500k 的默认警告太严格了）
     sourcemap: false, // 生产环境不生成 sourcemap
     cssCodeSplit: true, // CSS 代码分割
     minify: 'esbuild', // 使用 esbuild 压缩（比 terser 快很多）
-    // terserOptions 在使用 esbuild 时不需要
     rollupOptions: {
       output: {
         manualChunks(id) {
-          // 将 node_modules 中的模块打包到 vendor 文件夹
-          // 将所有来自 assets 目录的 svg 提取到一个独立的 chunk 中
-          // 插件内部生成的虚拟模块通常包含 'virtual:svg-icons'
           if (id.includes('virtual:svg-icons-register')) {
             return 'svg-icons-placeholder'
           }
 
           if (id.includes('node_modules')) {
-            // return id.toString().split('node_modules/')[1].split('/')[0].toString()
-
-            // 将超大库独立拆包
-            if (id.includes('element-plus')) return 'element'
-            if (id.includes('lodash')) return 'lodash'
-
-            // pnpm 路径通常包含 .pnpm，这里统一提取包名
-            const name = id.toString().split('node_modules/')[1].split('/')[0].toString()
-            if (name.includes('.pnpm')) {
-              return name.split('+')[1] || 'vendor' // 提取 pnpm 具体的包名
+            // Vue 生态
+            if (
+              id.includes('/vue/') ||
+              id.includes('/vue-router/') ||
+              id.includes('/pinia/') ||
+              id.includes('/vue-i18n/') ||
+              id.includes('\\vue\\') ||
+              id.includes('\\vue-router\\') ||
+              id.includes('\\pinia\\') ||
+              id.includes('\\vue-i18n\\') ||
+              id.includes('@vue/')
+            ) {
+              return 'vue-vendor'
             }
+
+            // Element Plus：组件自然拆分；仅把 EP 内部工具层合并，避免把 lodash/dayjs 全塞进 ep-shared
+            if (id.includes('element-plus')) {
+              if (
+                id.includes('/es/components/') ||
+                id.includes('\\es\\components\\')
+              ) {
+                return undefined
+              }
+              // locale 按需：不要和 utils 绑死成超大 shared
+              if (id.includes('/locale/') || id.includes('\\locale\\')) {
+                return 'ep-locale'
+              }
+              return 'ep-shared'
+            }
+
+            // 常用 peer 各自/并入 vendor，避免放大 ep-shared
+            if (id.includes('@element-plus/icons')) {
+              return 'ep-icons'
+            }
+
+            return 'vendor'
           }
         },
         // 1. 用于从入口点创建的 chunk (如 index.js)

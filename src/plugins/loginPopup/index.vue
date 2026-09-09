@@ -1,25 +1,24 @@
 <template>
-  <div class="login-dialog">
+  <div class="login-dialog" :class="layoutClass">
     <el-dialog
       v-model="visible"
-      :show-close="isMobile"
-      :width="864"
-      :height="600"
+      :class="layoutClass"
+      :show-close="true"
+      :fullscreen="isMobile"
+      :width="isMobile ? '100%' : 864"
       header-class="login-header"
-      align-center
+      :align-center="!isMobile"
       @close="handleClose"
     >
-      <div class="login-container">
-        <div class="login-left">
-          <LoginBackground />
-        </div>
-
-        <div class="login-right">
-          <div class="login-header">
-            <div class="login-title">{{ $t('login.title') }}</div>
-          </div>
-
-          <el-form :model="loginForm" :rules="rules" ref="loginFormRef" class="login-form">
+      <AuthDialogFrame mode="login" @switch="onAuthSwitch" @close="handleClose">
+          <el-form
+            :model="loginForm"
+            :rules="rules"
+            ref="loginFormRef"
+            class="login-form"
+            :class="layoutClass"
+            autocomplete="on"
+          >
             <el-form-item prop="username">
               <div class="input-wrapper">
                 <el-input
@@ -27,7 +26,10 @@
                   :placeholder="$t('login.placeholder')"
                   size="large"
                   class="custom-input"
+                  name="username"
                   autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-user" width="24" height="24" />
@@ -44,8 +46,11 @@
                   :placeholder="$t('login.passwordPlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="password"
                   show-password
                   autocomplete="current-password"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -63,11 +68,11 @@
               </el-link>
             </div>
 
-            <el-form-item>
+            <el-form-item class="login-submit">
               <el-button
                 type="primary"
                 size="large"
-                class="login-btn"
+                class="login-btn tactile-btn"
                 @click="onLogin"
                 :loading="loading"
               >
@@ -76,21 +81,28 @@
             </el-form-item>
 
             <div class="register-link">
-              <el-link type="primary" @click="switchToRegister">{{ $t('login.register') }}</el-link>
+              <el-button
+                type="primary"
+                plain
+                class="register-btn tactile-btn"
+                @click="switchToRegister"
+              >
+                {{ $t('login.register') }}
+              </el-button>
             </div>
           </el-form>
-        </div>
-      </div>
+      </AuthDialogFrame>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance } from 'vue'
+import { computed, getCurrentInstance } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useCommonStore } from '@/stores/useCommonStore'
 import { useLoginForm } from '@/hooks/useLoginForm'
-import LoginBackground from '@/components/logo/LoginBackground.vue'
+import AuthDialogFrame from '@/components/auth/AuthDialogFrame.vue'
+import { useCommonStore } from '@/stores/useCommonStore'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import type { LoginEmits } from './types'
 
 defineOptions({
@@ -99,16 +111,20 @@ defineOptions({
 
 const emit = defineEmits<LoginEmits>()
 const { proxy } = getCurrentInstance()!
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
+const { isMobile } = storeToRefs(useCommonStore())
+const { tmaHapticImpact, tmaHapticSelection } = useTelegramHaptics()
+const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
 
 const {
   visible,
   loading,
   loginForm,
   loginFormRef,
+  rememberedPreview,
   rules,
   handleLogin,
+  saveRememberedDemo,
+  clearRememberedDemo,
   open,
   close,
 } = useLoginForm()
@@ -119,6 +135,7 @@ const handleClose = async () => {
 }
 
 const onLogin = async () => {
+  tmaHapticImpact('light')
   const success = await handleLogin()
   if (success) {
     await handleClose()
@@ -126,6 +143,7 @@ const onLogin = async () => {
 }
 
 const switchToReset = () => {
+  tmaHapticSelection()
   if (proxy?.$resetPopup) {
     proxy.$resetPopup.open()
     setTimeout(() => {
@@ -136,6 +154,7 @@ const switchToReset = () => {
 }
 
 const switchToRegister = () => {
+  tmaHapticSelection()
   if (proxy?.$registerPopup) {
     proxy.$registerPopup.open()
     setTimeout(() => {
@@ -143,6 +162,12 @@ const switchToRegister = () => {
     }, 50)
   }
   emit('switchToRegister')
+}
+
+const onAuthSwitch = (mode: 'login' | 'register') => {
+  if (mode === 'register') {
+    switchToRegister()
+  }
 }
 
 defineExpose({

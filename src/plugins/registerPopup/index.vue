@@ -1,25 +1,24 @@
 <template>
-  <div class="register-dialog">
+  <div class="register-dialog" :class="layoutClass">
     <el-dialog
       v-model="visible"
-      :show-close="isMobile"
-      :width="864"
-      :height="552"
+      :class="layoutClass"
+      :show-close="true"
+      :fullscreen="isMobile"
+      :width="isMobile ? '100%' : 864"
       header-class="register-header"
-      align-center
+      :align-center="!isMobile"
       @close="handleClose"
     >
-      <div class="register-container">
-        <div class="register-left">
-          <LoginBackground />
-        </div>
-
-        <div class="register-right">
-          <div class="register-header">
-            <div class="register-title">{{ $t('register.title') }}</div>
-          </div>
-
-          <el-form :model="registerForm" :rules="rules" ref="registerFormRef" class="register-form">
+      <AuthDialogFrame mode="register" @switch="onAuthSwitch" @close="handleClose">
+          <el-form
+            :model="registerForm"
+            :rules="rules"
+            ref="registerFormRef"
+            class="register-form"
+            :class="layoutClass"
+            autocomplete="on"
+          >
             <el-form-item prop="username">
               <div class="input-wrapper">
                 <el-input
@@ -27,7 +26,10 @@
                   :placeholder="$t('register.usernamePlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="username"
                   autocomplete="username"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-user" width="24" height="24" />
@@ -42,7 +44,10 @@
                   :placeholder="$t('register.emailPlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="email"
                   autocomplete="email"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-email" width="24" height="24" />
@@ -59,8 +64,11 @@
                   :placeholder="$t('register.passwordPlaceholder')"
                   size="large"
                   class="custom-input"
+                  name="new-password"
                   show-password
                   autocomplete="new-password"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -77,8 +85,11 @@
                   :placeholder="$t('register.confirmPassword')"
                   size="large"
                   class="custom-input"
+                  name="confirm-password"
                   show-password
                   autocomplete="new-password"
+                  autocapitalize="none"
+                  spellcheck="false"
                 >
                   <template #prefix>
                     <SvgIcon name="login-password" width="24" height="24" />
@@ -87,29 +98,42 @@
               </div>
             </el-form-item>
 
-            <el-form-item>
+            <el-form-item class="register-submit">
               <el-button
                 type="primary"
                 size="large"
-                class="register-btn"
+                class="register-btn tactile-btn"
                 @click="onRegister"
                 :loading="loading"
               >
                 {{ $t('register.registerButton') }}
               </el-button>
             </el-form-item>
+
+            <div class="login-link">
+              <el-button
+                type="primary"
+                plain
+                class="login-btn tactile-btn"
+                @click="switchToLogin"
+              >
+                {{ $t('login.loginButton') }}
+              </el-button>
+            </div>
           </el-form>
-        </div>
-      </div>
+      </AuthDialogFrame>
     </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
-import { useCommonStore } from '@/stores/useCommonStore'
 import { useRegisterForm } from '@/hooks/useRegisterForm'
-import LoginBackground from '@/components/logo/LoginBackground.vue'
+import AuthDialogFrame from '@/components/auth/AuthDialogFrame.vue'
+import { getPopup } from '@/plugins/popupRegistry'
+import { useCommonStore } from '@/stores/useCommonStore'
+import { useTelegramHaptics } from '@/hooks/useTelegramHaptics'
 import type { RegisterEmits } from './types'
 
 defineOptions({
@@ -117,8 +141,9 @@ defineOptions({
 })
 
 const emit = defineEmits<RegisterEmits>()
-const commonStore = useCommonStore()
-const { isMobile } = storeToRefs(commonStore)
+const { isMobile } = storeToRefs(useCommonStore())
+const { tmaHapticImpact, tmaHapticSelection } = useTelegramHaptics()
+const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
 
 const {
   visible,
@@ -137,9 +162,25 @@ const handleClose = async () => {
 }
 
 const onRegister = async () => {
+  tmaHapticImpact('light')
   const success = await handleRegister()
   if (success) {
     await handleClose()
+  }
+}
+
+const switchToLogin = () => {
+  tmaHapticSelection()
+  getPopup('loginPopup')?.open()
+  setTimeout(() => {
+    handleClose()
+  }, 50)
+  emit('switchToLogin')
+}
+
+const onAuthSwitch = (mode: 'login' | 'register') => {
+  if (mode === 'login') {
+    switchToLogin()
   }
 }
 

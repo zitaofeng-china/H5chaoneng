@@ -2,7 +2,7 @@
  * 统一错误处理 Hook
  */
 
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import { useI18n } from 'vue-i18n'
 import { createLogger } from '@/utils/logger'
 

@@ -2,9 +2,11 @@
  * 统一响应处理工具
  */
 
-import { ElMessage } from 'element-plus'
+import { ElMessage } from '@/utils/element'
 import type { ApiResponse } from '@/api/types'
 import { getErrorMessage, getSuccessMessage } from './errorCode'
+import i18n from '@/lang'
+import { clearAuthSession } from './session'
 
 /**
  * 成功状态码
@@ -34,32 +36,8 @@ export function isTokenExpired(code: string | number): boolean {
  * 处理token过期
  */
 export function handleTokenExpired(): void {
-  // 保存需要保留的数据
-  const locale = localStorage.getItem('locale')
-  
-  // 清除认证相关存储
-  localStorage.removeItem('tokens')
-  localStorage.removeItem('refresh_tokens')
-  localStorage.removeItem('user_infos')
-  localStorage.removeItem('remember_password')
-  localStorage.removeItem('saved_username')
-  localStorage.removeItem('saved_password')
-  
-  // 恢复语言设置
-  if (locale) {
-    localStorage.setItem('locale', locale)
-  }
-  
-  // 清除sessionStorage
-  sessionStorage.clear()
-  
-  // 清除所有Cookie
-  document.cookie.split(';').forEach((c) => {
-    document.cookie = c
-      .replace(/^ +/, '')
-      .replace(/=.*/, `=;expires=${new Date().toUTCString()};path=/`)
-  })
-  
+  void clearAuthSession()
+
   // 不跳转，只清除认证信息
 }
 
@@ -110,10 +88,16 @@ export function handleResponse<T = any>(
     }
   } else {
     if (showError) {
-      const message =
+      let message =
         errorMessage ||
         (useBackendMsg ? response.msg : null) ||
         getErrorMessage(response.code, context, response.msg)
+
+      // 处理国际化标记：如果消息以 'i18n:' 开头，则使用 i18n 翻译
+      if (message.startsWith('i18n:')) {
+        const i18nKey = message.substring(5) // 移除 'i18n:' 前缀
+        message = i18n.global.t(i18nKey)
+      }
 
       ElMessage.error(message)
     }

@@ -3,7 +3,8 @@
  */
 
 import { ref, reactive, computed } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage } from '@/utils/element'
+import { type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { authApi } from '@/api'
 import { useCountdown } from './useCountdown'
@@ -67,7 +68,13 @@ export function useResetForm() {
         startCountdown(60)
         ElMessage.success(t('reset.codeSent'))
       } else {
-        ElMessage.error(response.msg || t('login.sendCodeFailed'))
+        // 特殊处理：网站不存在错误
+        let errorMessage = response.msg || t('login.sendCodeFailed')
+        const trimmedMsg = (response.msg || '').trim()
+        if (response.code === '000007' && (trimmedMsg === '网站不存在' || trimmedMsg.includes('网站不存在'))) {
+          errorMessage = t('error.siteNotExist')
+        }
+        ElMessage.error(errorMessage)
       }
     } catch (error: any) {
       console.error('发送验证码失败:', error)
@@ -113,7 +120,13 @@ export function useResetForm() {
         ElMessage.success(t('reset.resetSuccess'))
         return true
       } else {
-        // 错误已在 errorHandler 中处理，直接返回
+        // 特殊处理：网站不存在错误
+        let errorMessage = response.msg || t('reset.resetFailed')
+        const trimmedMsg = (response.msg || '').trim()
+        if (response.code === '000007' && (trimmedMsg === '网站不存在' || trimmedMsg.includes('网站不存在'))) {
+          errorMessage = t('error.siteNotExist')
+        }
+        ElMessage.error(errorMessage)
         return false
       }
     } catch (error: any) {

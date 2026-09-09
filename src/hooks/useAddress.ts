@@ -4,7 +4,6 @@
 import { ref } from 'vue'
 import { addressApi } from '@/api'
 import type { AddressData, AddressKind } from '@/api/modules/address/types'
-import { ElMessage } from 'element-plus'
 
 export function useAddress() {
   const loading = ref(false)
