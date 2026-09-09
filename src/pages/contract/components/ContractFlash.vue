@@ -622,10 +622,10 @@ onMounted(() => {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          padding: 4px 10px;
-          border-radius: 4px;
-          background: #f8fafc;
-          border: 1px solid #e2e8f0;
+          padding: 0 4px;
+          border-radius: 0;
+          background: transparent;
+          border: none;
 
           .token-icon {
             flex-shrink: 0;
@@ -639,8 +639,8 @@ onMounted(() => {
           }
 
           &.is-receive {
-            background: rgba(22, 93, 255, 0.06);
-            border-color: rgba(22, 93, 255, 0.2);
+            background: transparent;
+            border: none;
 
             .token-name {
               color: #165dff;
@@ -936,7 +936,7 @@ onMounted(() => {
           }
 
           .token-badge {
-            padding: 2px 6px;
+            padding: 0 2px;
             gap: 4px;
 
             .token-icon {
