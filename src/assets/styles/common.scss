@@ -2,19 +2,74 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+html,
+body,
+#app {
+  width: 100%;
+  max-width: 100%;
+}
+
 body {
-  min-width: 1200px;
+  min-width: 320px;
   font-size: 14px;
   background: var(--theme-bg-light);
-  font-family: 'Inter, v-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol';
+  overflow-x: hidden;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'SF Pro Display',
+    'Segoe UI',
+    Roboto,
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    sans-serif,
+    'Apple Color Emoji',
+    'Segoe UI Emoji',
+    'Segoe UI Symbol';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* 金融级等宽数字规范（防止金额、倒计时、汇率数值抖动） */
+.tabular-nums,
+.mono-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* 钱包地址等宽与可读性 */
+.mono-address {
+  font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* 触感按压微缩放 */
+.tactile-btn {
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.15s ease, background-color 0.15s ease;
+  &:active {
+    transform: scale(0.975);
+  }
+}
+
+html.is-miniapp,
+html.is-miniapp body,
+html.is-miniapp #app {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
 }
 
 .common-page {
-  margin: 50px 0;
+  margin: 24px 0;
 
   .common-head {
     .common-title {
-      margin-bottom: 30px;
+      margin-bottom: 16px;
       display: flex;
       justify-content: center;
       color: var(--theme-text-black);
@@ -26,19 +81,20 @@ body {
 
 }
 
-@media (max-width: 768px) {
+@media (max-width: 890px) {
   body {
     min-width: 300px;
-    max-width: 768px;
+    max-width: none;
   }
 
   .common-page {
     margin: 0;
+    padding: 0 12px 24px;
 
     .common-head {
       .common-title {
-        margin-bottom: 10px;
-        font-size: 20px;
+        margin-bottom: 12px;
+        font-size: 28px;
         font-weight: 600;
       }
     }
@@ -73,14 +129,31 @@ body {
   }
 }
 
-/* 全局 Message 提示框位置调整 - 向下移动避免遮挡标题 */
-.el-message {
-  top: 80px !important;
+/* Message 纵向位置由 utils/element.ts 的 offset 控制
+ * 禁止再用 top: xx !important，否则多条 ElMessage 会叠在同一高度 */
+
+/* TMA 原生触感与视口手势加固 */
+html.is-miniapp,
+body.is-miniapp {
+  touch-action: pan-y;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-/* 移动端 Message 提示框位置调整 */
-@media (max-width: 768px) {
-  .el-message {
-    top: 70px !important;
-  }
+/* 允许文本/输入框内自由选中文本 */
+input,
+textarea,
+.mono-address,
+.explain-price {
+  user-select: text;
+}
+
+/* 触感按键手势与微动反馈 */
+.tactile-btn,
+.el-button,
+button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }

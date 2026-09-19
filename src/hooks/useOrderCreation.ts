@@ -1,6 +1,4 @@
 import { ref } from 'vue'
-import { ElMessage } from 'element-plus'
-import { useI18n } from 'vue-i18n'
 import { orderApi } from '@/api'
 import { handleResponse } from '@/utils/response'
 import { OrderKind } from '@/api/modules/order/types'
@@ -14,12 +12,12 @@ interface CreateOrderOptions {
   duration?: number | string
   kind: OrderKind
   target: string[]
+  txid?: string
   userId: number
   context?: string
 }
 
 export function useOrderCreation() {
-  const { t } = useI18n()
   const loading = ref(false)
   const userStore = useUserStore()
 
@@ -32,6 +30,7 @@ export function useOrderCreation() {
         duration: options.duration,
         kind: options.kind,
         target: options.target,
+        txid: options.txid,
         user_id: options.userId,
       }
 
@@ -48,11 +47,11 @@ export function useOrderCreation() {
 
       if (success) {
         logger.info('订单创建成功')
-        
+
         // 订单创建成功后，刷新用户信息以更新余额
         if (userStore.isLogin) {
           logger.debug('刷新用户信息以更新余额')
-          await userStore.fetchUserInfo()
+          await userStore.fetchUserInfo({ force: true })
         }
       }
 
@@ -60,9 +59,9 @@ export function useOrderCreation() {
     } catch (error: any) {
       logger.error('订单创建失败', error)
       console.error('【订单创建】错误:', error)
-      
+
       // 未登录错误已在拦截器中处理，这里不需要再次提示
-      
+
       return false
     } finally {
       loading.value = false

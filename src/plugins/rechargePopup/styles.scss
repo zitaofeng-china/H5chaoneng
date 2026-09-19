@@ -8,28 +8,45 @@
     display: none;
   }
 
+  :deep(.el-dialog__header) {
+    position: relative;
+    padding: 0;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+  }
+
   .recharge-title {
-    margin-top: 5px;
-    margin-bottom: 10px;
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--theme-text-black);
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--theme-text-black, #182230);
+    text-align: center;
+  }
+
+  :deep(.el-overlay) {
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
   }
 
   :deep(.el-dialog) {
-    border-radius: 8px;
-    padding: 24px;
+    border-radius: var(--theme-radius-lg, 8px) !important;
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+    box-shadow: var(--theme-shadow-lg, 0 10px 25px -5px rgba(15, 23, 42, 0.1));
+    padding: 20px 24px 24px;
+    background: #ffffff;
+    overflow: hidden;
+    max-width: 480px;
+    width: 92% !important;
+    margin: auto !important;
   }
 
   :deep(.el-dialog__title) {
     font-size: 18px;
-    font-weight: 600;
-    color: var(--theme-text-black);
-  }
-
-  :deep(.el-dialog__close) {
-    font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
     color: var(--theme-text-black);
   }
 
@@ -38,12 +55,40 @@
   }
 
   :deep(.el-dialog__headerbtn) {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    top: 24px;
-    right: 24px;
-    background: var(--theme-gray-bg-light);
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: var(--theme-radius-sm, 4px);
+    background: rgba(15, 23, 42, 0.03);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+
+    &:hover {
+      background: rgba(15, 23, 42, 0.08);
+      border-color: rgba(22, 93, 255, 0.25);
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.94);
+    }
+
+    .el-dialog__close {
+      font-size: 13px;
+      color: var(--theme-text-gray, #64748b);
+      font-weight: 700;
+      transition: color 0.2s ease;
+    }
+
+    &:hover .el-dialog__close {
+      color: var(--theme-text-black, #0f172a);
+    }
   }
 }
 
@@ -237,18 +282,18 @@
 // 移动端适配
 @media (max-width: 768px) {
   .recharge-dialog {
-    @include dialog-style;
-
     :deep(.el-dialog) {
-      padding: 16px 12px 14px;
-      width: 90% !important;
+      padding: 16px 14px 18px !important;
+      width: min(92vw, 400px) !important;
       max-width: 400px;
-      border-radius: 12px;
+      border-radius: var(--theme-radius-lg, 8px) !important;
       margin: auto !important;
+      border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+      box-shadow: var(--theme-shadow-lg, 0 10px 25px -5px rgba(15, 23, 42, 0.12));
     }
 
     :deep(.el-dialog--center) {
-      width: 90%;
+      width: 92%;
       max-width: 400px;
       height: auto;
       max-height: 85vh;
@@ -256,9 +301,14 @@
     }
 
     :deep(.el-dialog__header) {
-      padding: 0 0 12px 0;
-      margin: 0;
+      padding: 0;
+      margin: 0 0 8px 0;
       text-align: center;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
     }
 
     :deep(.el-overlay) {
@@ -269,22 +319,41 @@
 
     .recharge-title {
       font-size: 16px;
-      margin-top: 0;
-      margin-bottom: 0;
-      font-weight: 600;
+      margin: 0;
+      font-weight: 700;
       text-align: center;
       width: 100%;
     }
 
     :deep(.el-dialog__headerbtn) {
-      top: 16px;
-      right: 12px;
+      display: flex !important;
+      align-items: center;
+      justify-content: center;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
       width: 26px;
       height: 26px;
-    }
+      border-radius: var(--theme-radius-sm, 4px);
+      background: rgba(15, 23, 42, 0.03);
+      border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+      transition: all 0.2s ease;
 
-    :deep(.el-dialog__close) {
-      font-size: 15px;
+      &:active {
+        background: rgba(15, 23, 42, 0.08);
+        transform: translateY(-50%) scale(0.94);
+      }
+
+      .el-dialog__close {
+        font-size: 13px;
+        color: var(--theme-text-gray, #64748b) !important;
+        font-weight: 700;
+        transition: color 0.2s ease;
+      }
+
+      &:hover .el-dialog__close {
+        color: var(--theme-text-black, #0f172a);
+      }
     }
 
     :deep(.el-dialog__body) {
@@ -373,102 +442,212 @@
 
 // 第一步：选择充值金额
 .step-one {
-  padding: 40px 60px 30px;
+  padding: 16px 20px 20px;
+
+  .coin-tabs {
+    margin-bottom: 18px;
+
+    :deep(.el-tabs__header) {
+      margin-bottom: 0;
+    }
+
+    :deep(.el-tabs__nav-wrap::after) {
+      display: none;
+    }
+
+    :deep(.el-tabs__active-bar) {
+      display: none;
+    }
+
+    :deep(.el-tabs__nav) {
+      display: flex;
+      width: 100%;
+      background: rgba(2, 15, 45, 0.04);
+      border-radius: var(--theme-radius-md, 6px);
+      padding: 3px;
+      box-sizing: border-box;
+    }
+
+    :deep(.el-tabs__item) {
+      flex: 1;
+      height: 40px;
+      line-height: 40px;
+      font-size: 15px;
+      font-weight: 700;
+      text-align: center;
+      color: var(--theme-text-gray, #64748b);
+      border-radius: var(--theme-radius-sm, 4px);
+      transition: all 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+
+      &:hover {
+        color: var(--theme-primary-blue, #165dff);
+      }
+
+      &.is-active {
+        background: #ffffff;
+        color: var(--theme-primary-blue, #165dff);
+        box-shadow: var(--theme-shadow-sm, 0 1px 3px rgba(15, 23, 42, 0.08));
+      }
+    }
+  }
 
   .amount-selection {
     .preset-amounts {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
+      gap: 10px;
+      margin-bottom: 18px;
 
       .amount-btn {
-        height: 60px;
+        height: 48px;
         display: flex;
         align-items: center;
         justify-content: center;
-        background: rgba(2, 15, 45, 0.03);
-        border: 2px solid rgba(2, 15, 45, 0.08);
-        border-radius: 8px;
-        font-size: 18px;
+        background: #ffffff;
+        border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+        border-radius: var(--theme-radius-md, 6px);
+        font-size: 15px;
         font-weight: 700;
-        color: var(--theme-text-black);
+        color: var(--theme-text-black, #182230);
         cursor: pointer;
-        transition: all 0.3s ease;
+        box-shadow: var(--theme-shadow-sm, 0 1px 2px rgba(15, 23, 42, 0.04));
+        transition: all 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 
         &:hover {
-          background: rgba(22, 93, 255, 0.05);
-          border-color: rgba(22, 93, 255, 0.3);
+          background: rgba(22, 93, 255, 0.03);
+          border-color: rgba(22, 93, 255, 0.35);
+          box-shadow: var(--theme-shadow-md, 0 4px 14px -2px rgba(15, 23, 42, 0.06));
+          transform: translateY(-1px);
         }
 
         &.active {
-          background: var(--theme-bg-blue);
-          border-color: var(--theme-bg-blue);
-          color: #fff;
-          box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+          background: rgba(22, 93, 255, 0.06);
+          border-color: var(--theme-primary-blue, #165dff);
+          color: var(--theme-primary-blue, #165dff);
+          box-shadow: 0 0 0 1px var(--theme-primary-blue, #165dff);
         }
       }
     }
 
     .custom-amount-section {
-      margin-bottom: 20px;
+      margin-bottom: 18px;
 
       .custom-amount-label {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 12px;
-        font-size: 16px;
+        margin-bottom: 8px;
+        font-size: 14px;
         font-weight: 700;
-        color: var(--theme-text-black);
+        color: var(--theme-text-black, #182230);
       }
 
       .custom-amount-input {
         :deep(.el-input__wrapper) {
-          height: 54px;
-          font-size: 16px;
+          height: 44px;
+          font-size: 15px;
+          border-radius: var(--theme-radius-sm, 4px) !important;
+          border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.9));
+          box-shadow: none !important;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+          &.is-focus {
+            border-color: var(--theme-primary-blue, #165dff);
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.12) !important;
+          }
         }
+      }
+    }
+
+    .usdt-rate-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin: -2px 0 18px;
+      padding: 12px 14px;
+      border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+      border-radius: var(--theme-radius-md, 6px);
+      background: rgba(22, 93, 255, 0.03);
+      color: var(--theme-text-gray, #64748b);
+      font-size: 13px;
+
+      .rate-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        line-height: 1.4;
+      }
+
+      .rate-value {
+        color: var(--theme-primary-blue, #165dff);
+        font-weight: 700;
+      }
+
+      .rate-muted {
+        color: var(--theme-text-light-gray-muted, #94a3b8);
+      }
+
+      .estimated-row {
+        padding-top: 8px;
+        border-top: 1px solid rgba(22, 93, 255, 0.08);
       }
     }
 
     .confirm-amount-btn {
       width: 100%;
-      height: 54px;
-      font-size: 17px;
+      height: 46px;
+      font-size: 16px;
       font-weight: 700;
+      border-radius: var(--theme-radius-md, 6px);
+      background: var(--theme-primary-blue, #165dff);
+      border: 0;
+      box-shadow: 0 4px 14px rgba(22, 93, 255, 0.25);
+      transition: all 0.22s ease;
+
+      &:hover:not(:disabled) {
+        opacity: 0.92;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(22, 93, 255, 0.32);
+      }
     }
   }
 }
 
 // 第二步：显示地址和二维码
 .step-two {
+  padding: 16px 20px 24px;
+
   .selected-amount-display {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    padding: 20px;
-    background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(54, 211, 153, 0.08) 100%);
-    border-radius: 12px;
-    margin-bottom: 24px;
+    padding: 18px;
+    background: linear-gradient(135deg, rgba(22, 93, 255, 0.05) 0%, rgba(54, 211, 153, 0.05) 100%);
+    border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+    border-radius: var(--theme-radius-lg, 8px);
+    margin-bottom: 20px;
 
     .amount-label {
-      font-size: 14px;
-      color: var(--theme-text-muted);
+      font-size: 13px;
+      color: var(--theme-text-gray, #64748b);
     }
 
     .amount-value {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--theme-bg-blue);
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--theme-primary-blue, #165dff);
+      letter-spacing: -0.02em;
 
       .copy-amount-btn {
-        padding: 4px;
+        padding: 4px 6px;
         font-size: 14px;
+        border-radius: var(--theme-radius-sm, 4px);
         
         &:hover {
           opacity: 0.8;
@@ -478,8 +657,27 @@
 
     .amount-note {
       font-size: 12px;
-      color: #DC2626;
+      color: var(--theme-primary-blue, #165dff);
       font-weight: 500;
+      opacity: 0.85;
+    }
+
+    .deadline-note {
+      display: inline-block;
+      margin-top: 4px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #d97706;
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--theme-radius-sm, 4px);
+    }
+
+    .estimated-trx-note {
+      font-size: 13px;
+      color: var(--theme-primary-blue, #165dff);
+      font-weight: 600;
     }
 
     .change-amount-btn {
@@ -492,6 +690,15 @@
 @media (max-width: 768px) {
   .step-one {
     padding: 14px 12px 12px;
+
+    .coin-tabs {
+      margin-bottom: 14px;
+
+      :deep(.el-tabs__item) {
+        height: 38px;
+        font-size: 14px;
+      }
+    }
 
     .amount-selection {
       .preset-amounts {
@@ -532,6 +739,17 @@
         }
       }
 
+      .usdt-rate-panel {
+        margin: -2px 0 14px;
+        padding: 10px 12px;
+        font-size: 12px;
+
+        .rate-row {
+          gap: 8px;
+        }
+
+      }
+
       .confirm-amount-btn {
         height: 44px;
         font-size: 14px;
@@ -541,24 +759,32 @@
   }
 
   .step-two {
+    padding: 10px 12px 14px;
+
     .selected-amount-display {
       gap: 5px;
       padding: 14px 12px;
       margin-bottom: 16px;
-      border-radius: 10px;
+      border-radius: var(--theme-radius-md, 6px);
+      border: 1px solid var(--theme-card-border, rgba(226, 232, 240, 0.8));
+      background: linear-gradient(135deg, rgba(22, 93, 255, 0.05) 0%, rgba(54, 211, 153, 0.05) 100%);
 
       .amount-label {
         font-size: 12px;
       }
 
       .amount-value {
-        font-size: 18px;
+        font-size: 20px;
+        font-weight: 800;
+        color: var(--theme-primary-blue, #165dff);
         flex-wrap: wrap;
         justify-content: center;
         gap: 6px;
         
         .copy-amount-btn {
           font-size: 12px;
+          padding: 2px 4px;
+          border-radius: var(--theme-radius-sm, 4px);
           
           :deep(.el-icon) {
             font-size: 14px;
@@ -567,18 +793,28 @@
       }
 
       .amount-note {
-        font-size: 10px;
+        font-size: 11px;
         text-align: center;
         line-height: 1.3;
       }
 
+      .estimated-trx-note {
+        font-size: 12px;
+        color: var(--theme-primary-blue, #165dff);
+        font-weight: 600;
+      }
+
       .deadline-note {
-        font-size: 10px;
+        font-size: 11px;
         text-align: center;
         line-height: 1.3;
-        color: #DC2626;
-        font-weight: 500;
-        margin-top: 2px;
+        color: #d97706;
+        font-weight: 600;
+        margin-top: 4px;
+        padding: 3px 8px;
+        border-radius: var(--theme-radius-sm, 4px);
+        background: rgba(245, 158, 11, 0.08);
+        border: 1px solid rgba(245, 158, 11, 0.2);
       }
 
       .change-amount-btn {

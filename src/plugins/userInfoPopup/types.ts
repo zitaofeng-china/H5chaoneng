@@ -5,4 +5,5 @@
 export interface UserInfoRow {
   label: string
   value: string
+  type?: 'secretKey'
 }

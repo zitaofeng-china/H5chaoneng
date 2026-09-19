@@ -1,14 +1,31 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { LoginResponse } from '@/api/modules/auth/types'
-import { getToken, setToken, removeToken, setRefreshToken, removeRefreshToken, getUserInfo as getStoredUserInfo, setUserInfo, removeUserInfo, setTokenExpiredAt, removeTokenExpiredAt } from '@/utils/token'
+import type { LoginResponse, UserInfo } from '@/api/modules/auth/types'
+import {
+  getToken,
+  setToken,
+  removeToken,
+  setRefreshToken,
+  removeRefreshToken,
+  getUserInfo as getStoredUserInfo,
+  setUserInfo,
+  removeUserInfo,
+  setTokenExpiredAt,
+  removeTokenExpiredAt,
+} from '@/utils/token'
 import { logout as logoutApi, getUserInfo as getUserInfoApi } from '@/api/modules/auth'
+
+/** 非强制刷新时，复用最近一次成功结果的最短间隔 */
+const USER_INFO_THROTTLE_MS = 30_000
 
 export const useUserStore = defineStore('user', () => {
   const token = ref('')
   const userInfo = ref<LoginResponse['userInfo'] | null>(null)
 
   const isLogin = computed(() => !!token.value)
+
+  let lastFetchedAt = 0
+  let inflight: Promise<UserInfo | null> | null = null
 
   // 初始化：从当前 Site 的存储中加载
   function init() {
@@ -19,17 +36,17 @@ export const useUserStore = defineStore('user', () => {
   function login(response: LoginResponse) {
     token.value = response.token
     userInfo.value = response.userInfo || null
-    
+
     setToken(response.token)
-    
+
     if (response.userInfo) {
       setUserInfo(response.userInfo)
     }
-    
+
     if (response.refreshToken) {
       setRefreshToken(response.refreshToken)
     }
-    
+
     // 保存 Token 过期时间
     if (response.expiredAt) {
       setTokenExpiredAt(response.expiredAt)
@@ -47,7 +64,9 @@ export const useUserStore = defineStore('user', () => {
       // 清除本地存储
       token.value = ''
       userInfo.value = null
-      
+      lastFetchedAt = 0
+      inflight = null
+
       removeToken()
       removeRefreshToken()
       removeUserInfo()
@@ -60,25 +79,48 @@ export const useUserStore = defineStore('user', () => {
     userInfo.value = info || null
     if (info) {
       setUserInfo(info)
+      lastFetchedAt = Date.now()
     }
   }
 
-  // 从服务器获取用户信息
-  async function fetchUserInfo() {
-    try {
-      const response = await getUserInfoApi()
-      console.log('[User Store] 获取用户信息响应:', response)
-      if (response.code === '000000' && response.data) {
-        updateUserInfo(response.data)
-        console.log('[User Store] 用户信息已更新:', response.data)
-        return response.data
-      } else {
-        console.warn('[User Store] 获取用户信息失败:', response)
-      }
-    } catch (error) {
-      console.error('[User Store] 获取用户信息失败:', error)
-      return null
+  /**
+   * 从服务器获取用户信息
+   * @param options.force 为 true 时跳过节流（下单/充值/改地址后）
+   */
+  async function fetchUserInfo(options: { force?: boolean } = {}): Promise<UserInfo | null> {
+    const force = options.force ?? false
+
+    if (!token.value) return null
+
+    if (
+      !force &&
+      userInfo.value &&
+      lastFetchedAt > 0 &&
+      Date.now() - lastFetchedAt < USER_INFO_THROTTLE_MS
+    ) {
+      return userInfo.value
     }
+
+    if (inflight) return inflight
+
+    inflight = (async () => {
+      try {
+        const response = await getUserInfoApi()
+        if (response.code === '000000' && response.data) {
+          updateUserInfo(response.data)
+          return response.data
+        }
+        console.warn('[User Store] 获取用户信息失败:', response)
+        return null
+      } catch (error) {
+        console.error('[User Store] 获取用户信息失败:', error)
+        return null
+      } finally {
+        inflight = null
+      }
+    })()
+
+    return inflight
   }
 
   return {

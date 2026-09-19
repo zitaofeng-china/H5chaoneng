@@ -7,15 +7,23 @@ export const usePriceStore = defineStore('price', () => {
   const priceData = ref<PriceData | null>(null)
   const loading = ref(false)
 
-  async function fetchPrice() {
+  function setPrice(data: PriceData | null) {
+    priceData.value = data
+  }
+
+  async function fetchPrice(force = false) {
+    if (!force && priceData.value) return priceData.value
+
     loading.value = true
     try {
       const response = await priceApi.getPrice()
       if (response.code === '000000' && response.data) {
         priceData.value = response.data
       }
+      return priceData.value
     } catch (error) {
       console.error('[Price Store] 获取价格失败:', error)
+      return null
     } finally {
       loading.value = false
     }
@@ -24,6 +32,7 @@ export const usePriceStore = defineStore('price', () => {
   return {
     priceData,
     loading,
+    setPrice,
     fetchPrice,
   }
 })
