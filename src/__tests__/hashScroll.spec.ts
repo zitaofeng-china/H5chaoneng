@@ -77,13 +77,10 @@ describe('hashScroll helpers', () => {
     )
   })
 
-  it('dispatches energy-reveal-sections event when scrolling to bottom sections', async () => {
+  it('scrolls accurately to bottom sections taking layout and header offset into account', async () => {
     const scrollTo = vi.fn()
     vi.stubGlobal('scrollTo', scrollTo)
     window.scrollTo = scrollTo as unknown as typeof window.scrollTo
-
-    const revealListener = vi.fn()
-    window.addEventListener('energy-reveal-sections', revealListener)
 
     const pending = scrollToRouteHash('#question', { behavior: 'auto' })
 
@@ -106,12 +103,11 @@ describe('hashScroll helpers', () => {
     }
 
     await expect(pending).resolves.toBe(true)
-    expect(revealListener).toHaveBeenCalled()
-    const callArg = revealListener.mock.calls[0][0] as CustomEvent
-    expect(callArg.detail).toMatchObject({
-      hash: '#question',
-      targetId: 'question',
-    })
-    window.removeEventListener('energy-reveal-sections', revealListener)
+    expect(scrollTo).toHaveBeenCalledWith(
+      expect.objectContaining({
+        top: 1200 - HASH_HEADER_OFFSET,
+        behavior: 'auto',
+      }),
+    )
   })
 })

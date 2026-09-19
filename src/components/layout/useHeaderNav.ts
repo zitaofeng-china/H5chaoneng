@@ -18,6 +18,7 @@ import { isTelegramMiniApp, tmaHapticSelection, tmaHapticImpact } from '@/utils/
 import { clearAuthSession } from '@/utils/session'
 import { ElMessage } from '@/utils/element'
 import { useI18n } from 'vue-i18n'
+import { scrollToRouteHash } from '@/utils/hashScroll'
 
 export function useHeaderNav() {
   const instance = getCurrentInstance()
@@ -100,7 +101,13 @@ export function useHeaderNav() {
   const handleToRouter = (path: string, hash?: string) => {
     tmaHapticSelection()
     const normalizedPath = path.startsWith('/') ? path : `/${path}`
-    router.push({ path: withSitePrefix(normalizedPath), hash })
+    const targetPath = withSitePrefix(normalizedPath)
+
+    if (hash && (route.path === targetPath || route.path === '/') && route.hash === hash) {
+      void scrollToRouteHash(hash, { behavior: 'smooth' })
+    } else {
+      router.push({ path: targetPath, hash })
+    }
 
     if (isMobileView.value) {
       handleMenu('router')

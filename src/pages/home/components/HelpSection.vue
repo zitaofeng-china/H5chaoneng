@@ -62,6 +62,7 @@ const handleViewProblems = () => {
   height: clamp(200px, 15.625vw, 300px);
   background: #e8f1ff;
   isolation: isolate;
+  scroll-margin-top: 80px;
 }
 
 .help-side {

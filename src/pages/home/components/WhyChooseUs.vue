@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import featureHeaderBadge from '@/assets/images/home/lanhu/feature-header-badge.png'
 import featureGlow from '@/assets/images/home/lanhu/feature-bg.png'
@@ -67,15 +67,6 @@ import featureLowCostIcon from '@/assets/images/home/lanhu/feature-icon-low-cost
 import featureSafeIcon from '@/assets/images/home/lanhu/feature-icon-safe.png'
 import featureSupportIcon from '@/assets/images/home/lanhu/feature-icon-support.png'
 import featureTransparentIcon from '@/assets/images/home/lanhu/feature-icon-transparent.png'
-
-const props = withDefaults(
-  defineProps<{
-    forceReady?: boolean
-  }>(),
-  {
-    forceReady: false,
-  },
-)
 
 const { t } = useI18n()
 const sectionRef = ref<HTMLElement | null>(null)
@@ -96,84 +87,60 @@ const cleanup = () => {
   }
   if (typeof window !== 'undefined') {
     window.removeEventListener('scroll', checkPosition)
-    window.removeEventListener('energy-reveal-sections', onRevealSignal)
   }
 }
 
-const markReady = (immediate = false) => {
+const markReady = () => {
   if (started) return
   started = true
   cleanup()
   void nextTick(() => {
     requestAnimationFrame(() => {
       isReady.value = true
-      if (immediate) {
+      settleTimer = window.setTimeout(() => {
         isSettled.value = true
-      } else {
-        settleTimer = window.setTimeout(() => {
-          isSettled.value = true
-        }, 1500)
-      }
+      }, 1500)
     })
   })
 }
 
+// 触发点计算：
+// 1. 自上而下滑动时：顶部进入屏幕下方阈值时触发动画
+// 2. 自下而上滑动时（以下方计算）：底部进入屏幕上方阈值时触发动画
 const checkPosition = () => {
-  const el = sectionRef.value || headerRef.value
+  if (started) return
+  const el = sectionRef.value
   if (!el || typeof window === 'undefined') return
   const rect = el.getBoundingClientRect()
-  // 若元素已进入视窗或视窗已滚动到该元素下方（如跳转到常见问题等底部视窗）
-  if (rect.top <= window.innerHeight) {
-    const isPast = rect.bottom <= 0
-    markReady(isPast)
+  const vh = window.innerHeight
+  const threshold = 60
+
+  if (rect.top <= vh - threshold && rect.bottom >= threshold) {
+    markReady()
   }
 }
-
-const onRevealSignal = () => {
-  markReady(true)
-}
-
-watch(
-  () => props.forceReady,
-  (val) => {
-    if (val) {
-      markReady(true)
-    }
-  },
-  { immediate: true },
-)
 
 onMounted(() => {
-  if (props.forceReady) {
-    markReady(true)
-    return
-  }
-
-  const el = sectionRef.value || headerRef.value
+  const el = sectionRef.value
   if (!el || typeof IntersectionObserver === 'undefined') {
     markReady()
     return
   }
 
-  // 挂载时立即检测一次位置（应对直达锚点、刷新或已在视窗下方情况）
+  // 挂载时检测当前是否已处于视口触发范围内（如直接刷新或当前位于该区块）
   checkPosition()
   if (started) return
 
   io = new IntersectionObserver(
-    (entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting || entry.boundingClientRect.top <= window.innerHeight) {
-          markReady(entry.boundingClientRect.bottom <= 0)
-          break
-        }
-      }
+    ([entry]) => {
+      if (!entry?.isIntersecting) return
+      markReady()
     },
-    { threshold: [0, 0.15], rootMargin: '100px 0px 100px 0px' },
+    { threshold: 0, rootMargin: '-60px 0px -60px 0px' },
   )
   io.observe(el)
 
   window.addEventListener('scroll', checkPosition, { passive: true })
-  window.addEventListener('energy-reveal-sections', onRevealSignal)
 })
 
 onUnmounted(() => {
@@ -370,12 +337,6 @@ const items: Item[] = [
 
 .is-ready .token-art-trx {
   animation: feature-trx-float 4.6s ease-in-out 0.35s infinite;
-}
-
-.is-settled .feature-header,
-.is-settled .token-art,
-.is-settled .feature-item {
-  transition: none;
 }
 
 .feature-list {
