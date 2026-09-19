@@ -113,6 +113,7 @@ defineOptions({
   /* 背景改由父级 .fee-workflow-ambient 统一绘制的环境光渐变提供，
      避免与“工作原理”区块的背景在拼接处出现断层空白。 */
   background: transparent;
+  scroll-margin-top: var(--layout-header-height, 50px);
 }
 
 .fee-container {

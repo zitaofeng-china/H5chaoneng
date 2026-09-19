@@ -4,7 +4,7 @@
  * 从其他页面跳到首页 hash 时，元素往往还没进 DOM，必须等挂载后再滚。
  */
 
-export const HASH_HEADER_OFFSET = 100
+export const HASH_HEADER_OFFSET = 50
 
 export const HOME_SECTION_IDS = [
   'energy',
@@ -18,6 +18,8 @@ export const HOME_SECTION_IDS = [
 const OFFSET_IDS = new Set<string>(HOME_SECTION_IDS)
 
 let scrollGeneration = 0
+let activeAnchorTarget = ''
+let anchorNavTimer = 0
 
 export type HashScrollOptions = {
   behavior?: ScrollBehavior
@@ -34,7 +36,14 @@ export function hashToId(hash: string): string {
 }
 
 export function getHashHeaderOffset(hash: string): number {
-  return OFFSET_IDS.has(hashToId(hash)) ? HASH_HEADER_OFFSET : 0
+  if (!OFFSET_IDS.has(hashToId(hash))) return 0
+  if (typeof document !== 'undefined') {
+    const navbar = document.querySelector<HTMLElement>('.navbar')
+    if (navbar && navbar.offsetHeight > 0) {
+      return navbar.offsetHeight
+    }
+  }
+  return HASH_HEADER_OFFSET
 }
 
 export function precedingSectionIds(hash: string): string[] {
@@ -44,8 +53,40 @@ export function precedingSectionIds(hash: string): string[] {
   return HOME_SECTION_IDS.slice(0, index + 1).map(String)
 }
 
+export function setAnchorNavigating(targetId: string) {
+  activeAnchorTarget = targetId
+  if (typeof window !== 'undefined') {
+    window.clearTimeout(anchorNavTimer)
+    anchorNavTimer = window.setTimeout(() => {
+      if (activeAnchorTarget === targetId) {
+        activeAnchorTarget = ''
+      }
+    }, 1200)
+  }
+}
+
+export function clearAnchorNavigating() {
+  activeAnchorTarget = ''
+  if (typeof window !== 'undefined') {
+    window.clearTimeout(anchorNavTimer)
+  }
+}
+
+export function getActiveAnchorTarget(): string {
+  return activeAnchorTarget
+}
+
+export function isAnchorNavigatingPast(sectionId: string): boolean {
+  if (!activeAnchorTarget) return false
+  const targetIndex = (HOME_SECTION_IDS as readonly string[]).indexOf(activeAnchorTarget as (typeof HOME_SECTION_IDS)[number])
+  const currentIndex = (HOME_SECTION_IDS as readonly string[]).indexOf(sectionId as (typeof HOME_SECTION_IDS)[number])
+  if (targetIndex === -1 || currentIndex === -1) return false
+  return targetIndex > currentIndex
+}
+
 export function cancelHashScroll() {
   scrollGeneration += 1
+  clearAnchorNavigating()
 }
 
 function getById(id: string): HTMLElement | null {
@@ -149,6 +190,8 @@ export async function scrollToRouteHash(
   if (!id) return false
 
   const gen = ++scrollGeneration
+  setAnchorNavigating(id)
+
   const needed = precedingSectionIds(hash)
   const behavior = options.behavior ?? 'smooth'
   const alreadyReady = allPresent(needed)
@@ -157,20 +200,43 @@ export async function scrollToRouteHash(
     await Promise.all(needed.map((sectionId) => waitForElement(sectionId)))
   }
 
-  if (gen !== scrollGeneration) return false
+  if (gen !== scrollGeneration) {
+    clearAnchorNavigating()
+    return false
+  }
 
   const el = getById(id)
-  if (!el) return false
+  if (!el) {
+    clearAnchorNavigating()
+    return false
+  }
 
   if (!alreadyReady) {
     await waitForLayoutSettle(el)
-    if (gen !== scrollGeneration || !el.isConnected) return false
+    if (gen !== scrollGeneration || !el.isConnected) {
+      clearAnchorNavigating()
+      return false
+    }
   } else {
     await nextFrame()
-    if (gen !== scrollGeneration) return false
+    if (gen !== scrollGeneration) {
+      clearAnchorNavigating()
+      return false
+    }
   }
 
-  const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - getHashHeaderOffset(hash))
+  const offset = getHashHeaderOffset(hash)
+  const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - offset)
   window.scrollTo({ top, left: 0, behavior })
+
+  const settleDuration = behavior === 'smooth' ? 600 : 50
+  if (typeof window !== 'undefined') {
+    window.setTimeout(() => {
+      if (gen === scrollGeneration) {
+        clearAnchorNavigating()
+      }
+    }, settleDuration)
+  }
+
   return true
 }

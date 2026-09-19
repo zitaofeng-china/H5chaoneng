@@ -95,7 +95,7 @@ const formatAnswerWithTgAdmin = (answer: string) => {
 .faq-section {
   padding: 64px 0 72px;
   background: #f7f9fd;
-  scroll-margin-top: 80px;
+  scroll-margin-top: var(--layout-header-height, 50px);
 }
 
 .faq-container {

@@ -110,4 +110,22 @@ describe('hashScroll helpers', () => {
       }),
     )
   })
+
+  it('tracks anchor navigation and identifies if navigating past preceding sections', async () => {
+    const { isAnchorNavigatingPast, setAnchorNavigating, clearAnchorNavigating } = await import(
+      '@/utils/hashScroll'
+    )
+    expect(isAnchorNavigatingPast('howItWorks')).toBe(false)
+    expect(isAnchorNavigatingPast('feature')).toBe(false)
+
+    setAnchorNavigating('question')
+    expect(isAnchorNavigatingPast('howItWorks')).toBe(true)
+    expect(isAnchorNavigatingPast('feature')).toBe(true)
+    expect(isAnchorNavigatingPast('question')).toBe(false)
+    expect(isAnchorNavigatingPast('contact')).toBe(false)
+
+    clearAnchorNavigating()
+    expect(isAnchorNavigatingPast('howItWorks')).toBe(false)
+    expect(isAnchorNavigatingPast('feature')).toBe(false)
+  })
 })

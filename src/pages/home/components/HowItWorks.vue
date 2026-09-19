@@ -71,6 +71,7 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { isAnchorNavigatingPast } from '@/utils/hashScroll'
 import workflowBolt from '@/assets/images/home/lanhu/workflow-bolt.png'
 import workflowBoltMobile from '@/assets/images/home/lanhu/workflow-bolt-mobile.png'
 
@@ -121,18 +122,42 @@ const markReady = () => {
   })
 }
 
+const getHeaderHeight = () => {
+  if (typeof document !== 'undefined') {
+    const navbar = document.querySelector<HTMLElement>('.navbar')
+    if (navbar && navbar.offsetHeight > 0) {
+      return navbar.offsetHeight
+    }
+  }
+  return 50
+}
+
 // 触发点计算：
 // 1. 自上而下滑动时：顶部进入屏幕下方阈值时触发动画
-// 2. 自下而上滑动时（以下方计算）：底部进入屏幕上方阈值时触发动画
+// 2. 自下而上滑动时（以下方计算）：底部深入屏幕上方阈值时触发动画
+// 3. 处于向下锚点跳转过程中时：忽略飞越，避免落地时误触发上方区块
 const checkPosition = () => {
   if (started) return
   const el = sectionRef.value
   if (!el || typeof window === 'undefined') return
+
+  // 若当前正在向下跳转至该区块之后的锚点（如跳转至为什么选择我们、常见问题或联系我们），
+  // 此时视口快速滑过或落地，不触发上方区块，留待用户手动向上滚动时再触发动效
+  if (isAnchorNavigatingPast('howItWorks')) return
+
   const rect = el.getBoundingClientRect()
   const vh = window.innerHeight
-  const threshold = 60
+  const headerHeight = getHeaderHeight()
 
-  if (rect.top <= vh - threshold && rect.bottom >= threshold) {
+  // 1. 自上而下滑动进入视窗：区块顶部从屏幕底部滑入
+  const enterFromBottom = rect.top <= vh - 60 && rect.bottom >= headerHeight + 60
+
+  // 2. 自下而上滑动进入视窗（以区块下方边界计算）：
+  // 落地常见问题等底部区块时 rect.bottom <= headerHeight 不触发；
+  // 只有用户主动手势向上滑动，区块底部深入视窗至少 80px 时才触发入场动效
+  const enterFromTop = rect.bottom >= headerHeight + 80 && rect.top < headerHeight
+
+  if (enterFromBottom || enterFromTop) {
     markReady()
   }
 }
@@ -149,11 +174,10 @@ onMounted(() => {
   if (started) return
 
   io = new IntersectionObserver(
-    ([entry]) => {
-      if (!entry?.isIntersecting) return
-      markReady()
+    () => {
+      checkPosition()
     },
-    { threshold: 0, rootMargin: '-60px 0px -60px 0px' },
+    { threshold: [0, 0.1, 0.2] },
   )
   io.observe(el)
 
@@ -186,7 +210,7 @@ onUnmounted(() => {
   /* 背景改由父级 .fee-workflow-ambient 统一绘制的环境光渐变提供，
      避免与“手续费说明”区块的背景在拼接处出现断层空白。 */
   background: transparent;
-  scroll-margin-top: 80px;
+  scroll-margin-top: var(--layout-header-height, 50px);
 }
 
 .how-container {

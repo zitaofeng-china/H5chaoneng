@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   clearAuthSession,
@@ -8,9 +8,12 @@ import {
 } from '@/utils/session'
 import { DEFAULT_SITE } from '@/utils/site'
 
+import * as siteModule from '@/utils/site'
+
 describe('session utils', () => {
   beforeEach(() => {
     localStorage.clear()
+    vi.spyOn(siteModule, 'getSite').mockReturnValue('test-site')
   })
 
   it('stores remembered username and password', () => {
@@ -25,10 +28,11 @@ describe('session utils', () => {
   })
 
   it('clears auth tokens but preserves remembered login by default', async () => {
-    localStorage.setItem('tokens', JSON.stringify({ [DEFAULT_SITE]: 'token' }))
-    localStorage.setItem('refresh_tokens', JSON.stringify({ [DEFAULT_SITE]: 'refresh' }))
-    localStorage.setItem('user_infos', JSON.stringify({ [DEFAULT_SITE]: { id: 1 } }))
-    localStorage.setItem('token_expired_at', JSON.stringify({ [DEFAULT_SITE]: Date.now() }))
+    const testSite = 'test-site'
+    localStorage.setItem('tokens', JSON.stringify({ [testSite]: 'token' }))
+    localStorage.setItem('refresh_tokens', JSON.stringify({ [testSite]: 'refresh' }))
+    localStorage.setItem('user_infos', JSON.stringify({ [testSite]: { id: 1 } }))
+    localStorage.setItem('token_expired_at', JSON.stringify({ [testSite]: Date.now() }))
     saveRememberedLogin('alice@example.com', 'pass123456')
 
     await clearAuthSession()
