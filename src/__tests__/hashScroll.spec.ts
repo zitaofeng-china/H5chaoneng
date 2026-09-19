@@ -76,4 +76,42 @@ describe('hashScroll helpers', () => {
       }),
     )
   })
+
+  it('dispatches energy-reveal-sections event when scrolling to bottom sections', async () => {
+    const scrollTo = vi.fn()
+    vi.stubGlobal('scrollTo', scrollTo)
+    window.scrollTo = scrollTo as unknown as typeof window.scrollTo
+
+    const revealListener = vi.fn()
+    window.addEventListener('energy-reveal-sections', revealListener)
+
+    const pending = scrollToRouteHash('#question', { behavior: 'auto' })
+
+    for (const id of ['energy', 'fee', 'howItWorks', 'feature', 'question']) {
+      const el = document.createElement('section')
+      el.id = id
+      Object.defineProperty(el, 'offsetHeight', { configurable: true, value: 200 })
+      vi.spyOn(el, 'getBoundingClientRect').mockReturnValue({
+        top: id === 'question' ? 1200 : 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: 0,
+        height: 200,
+        x: 0,
+        y: 0,
+        toJSON: () => ({}),
+      })
+      document.body.appendChild(el)
+    }
+
+    await expect(pending).resolves.toBe(true)
+    expect(revealListener).toHaveBeenCalled()
+    const callArg = revealListener.mock.calls[0][0] as CustomEvent
+    expect(callArg.detail).toMatchObject({
+      hash: '#question',
+      targetId: 'question',
+    })
+    window.removeEventListener('energy-reveal-sections', revealListener)
+  })
 })

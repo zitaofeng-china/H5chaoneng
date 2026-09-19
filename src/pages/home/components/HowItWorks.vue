@@ -1,6 +1,7 @@
 <template>
   <section
     id="howItWorks"
+    ref="sectionRef"
     class="how-it-works"
     :class="{ 'is-ready': isReady, 'is-settled': isSettled }"
   >
@@ -68,10 +69,19 @@
 </template>
 
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import workflowBolt from '@/assets/images/home/lanhu/workflow-bolt.png'
 import workflowBoltMobile from '@/assets/images/home/lanhu/workflow-bolt-mobile.png'
+
+const props = withDefaults(
+  defineProps<{
+    forceReady?: boolean
+  }>(),
+  {
+    forceReady: false,
+  },
+)
 
 const { t } = useI18n()
 
@@ -79,6 +89,7 @@ defineOptions({
   name: 'HowItWorks',
 })
 
+const sectionRef = ref<HTMLElement | null>(null)
 const headerRef = ref<HTMLElement | null>(null)
 const isReady = ref(false)
 const isSettled = ref(false)
@@ -95,41 +106,96 @@ let io: IntersectionObserver | null = null
 let settleTimer = 0
 let started = false
 
-const markReady = () => {
+const cleanup = () => {
+  if (io) {
+    io.disconnect()
+    io = null
+  }
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('scroll', checkPosition)
+    window.removeEventListener('energy-reveal-sections', onRevealSignal)
+  }
+}
+
+const markReady = (immediate = false) => {
   if (started) return
   started = true
+  cleanup()
   void nextTick(() => {
     requestAnimationFrame(() => {
       isReady.value = true
-      settleTimer = window.setTimeout(() => {
+      if (immediate) {
         isSettled.value = true
-      }, 1500)
+      } else {
+        settleTimer = window.setTimeout(() => {
+          isSettled.value = true
+        }, 1500)
+      }
     })
   })
 }
 
+const checkPosition = () => {
+  const el = sectionRef.value || headerRef.value
+  if (!el || typeof window === 'undefined') return
+  const rect = el.getBoundingClientRect()
+  // 若元素已进入视窗或视窗已滚动到该元素下方（如跳转到常见问题等底部视窗）
+  if (rect.top <= window.innerHeight) {
+    const isPast = rect.bottom <= 0
+    markReady(isPast)
+  }
+}
+
+const onRevealSignal = () => {
+  markReady(true)
+}
+
+watch(
+  () => props.forceReady,
+  (val) => {
+    if (val) {
+      markReady(true)
+    }
+  },
+  { immediate: true },
+)
+
 onMounted(() => {
-  const el = headerRef.value
+  if (props.forceReady) {
+    markReady(true)
+    return
+  }
+
+  const el = sectionRef.value || headerRef.value
   if (!el || typeof IntersectionObserver === 'undefined') {
     markReady()
     return
   }
 
+  // 挂载时立即检测一次位置（应对直达锚点、刷新或已在视窗下方情况）
+  checkPosition()
+  if (started) return
+
   io = new IntersectionObserver(
-    ([entry]) => {
-      if (!entry?.isIntersecting) return
-      markReady()
-      io?.disconnect()
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting || entry.boundingClientRect.top <= window.innerHeight) {
+          markReady(entry.boundingClientRect.bottom <= 0)
+          break
+        }
+      }
     },
-    { threshold: 0.2, rootMargin: '0px' },
+    { threshold: [0, 0.15], rootMargin: '100px 0px 100px 0px' },
   )
   io.observe(el)
+
+  window.addEventListener('scroll', checkPosition, { passive: true })
+  window.addEventListener('energy-reveal-sections', onRevealSignal)
 })
 
 onUnmounted(() => {
   window.clearTimeout(settleTimer)
-  io?.disconnect()
-  io = null
+  cleanup()
 })
 </script>
 
@@ -412,6 +478,12 @@ onUnmounted(() => {
 .is-ready .workflow-secondary-detail {
   opacity: 1;
   transform: none;
+}
+
+.is-settled .how-header,
+.is-settled .workflow-secondary,
+.is-settled .workflow-secondary-detail {
+  transition: none;
 }
 
 .is-settled .workflow-primary {

@@ -8,15 +8,16 @@
       aria-hidden="true"
     />
     <FeeDescription />
-    <HowItWorks />
+    <HowItWorks :force-ready="bottomTriggered" />
   </div>
-  <WhyChooseUs />
+  <WhyChooseUs :force-ready="bottomTriggered" />
+  <div ref="bottomSentinelRef" class="home-bottom-sentinel" aria-hidden="true"></div>
   <FaqSection />
   <HelpSection />
 </template>
 
 <script setup lang="ts">
-import { defineAsyncComponent, onUnmounted, watch } from 'vue'
+import { defineAsyncComponent, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import EnergyRental from './components/EnergyRental.vue'
 import { cancelHashScroll, hashToId, scrollToRouteHash } from '@/utils/hashScroll'
@@ -34,20 +35,70 @@ defineOptions({
 })
 
 const route = useRoute()
+const bottomTriggered = ref(false)
+const bottomSentinelRef = ref<HTMLElement | null>(null)
+let bottomIo: IntersectionObserver | null = null
+
+const triggerReveal = () => {
+  if (bottomTriggered.value) return
+  bottomTriggered.value = true
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('energy-reveal-sections'))
+  }
+}
+
+const checkHashReveal = (hash: string) => {
+  if (!hash) return
+  const id = hashToId(hash)
+  // 若跳转到 question (常见问题)、contact (联系我们) 或 feature (为什么选择我们)
+  // 提前激活触发能力，平衡上方所有区块的就绪状态
+  if (id === 'question' || id === 'contact' || id === 'feature') {
+    triggerReveal()
+  }
+}
 
 // 从其他页点导航锚点、或带着 hash 进入首页时，等异步区块进 DOM 再滚。
 watch(
   () => route.hash,
   (hash) => {
     if (!hash) return
+    checkHashReveal(hash)
     const exists = Boolean(document.getElementById(hashToId(hash)))
     void scrollToRouteHash(hash, { behavior: exists ? 'smooth' : 'auto' })
   },
   { immediate: true, flush: 'post' },
 )
 
+onMounted(() => {
+  if (route.hash) {
+    checkHashReveal(route.hash)
+  }
+
+  // 底部视窗进入侦测（平衡机制）：
+  // 当视窗滚动接近或到达底部区域时，激活触发能力确保上方所有区块就绪
+  const sentinel = bottomSentinelRef.value
+  if (sentinel && typeof IntersectionObserver !== 'undefined') {
+    bottomIo = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting || entry.boundingClientRect.top <= window.innerHeight) {
+            triggerReveal()
+            bottomIo?.disconnect()
+            bottomIo = null
+            break
+          }
+        }
+      },
+      { rootMargin: '200px 0px 0px 0px' },
+    )
+    bottomIo.observe(sentinel)
+  }
+})
+
 onUnmounted(() => {
   cancelHashScroll()
+  bottomIo?.disconnect()
+  bottomIo = null
 })
 </script>
 
@@ -93,5 +144,13 @@ onUnmounted(() => {
     height: auto;
     opacity: 0.55;
   }
+}
+
+.home-bottom-sentinel {
+  position: relative;
+  width: 100%;
+  height: 1px;
+  pointer-events: none;
+  visibility: hidden;
 }
 </style>

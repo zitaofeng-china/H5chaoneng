@@ -153,6 +153,15 @@ export async function scrollToRouteHash(
   const behavior = options.behavior ?? 'smooth'
   const alreadyReady = allPresent(needed)
 
+  // 若跳转目标为底部视窗（常见问题/联系我们）或越过工作原理的区块，提前派发协同就绪信号，确保上游区块立即加载就绪且高度测算准确
+  if (typeof window !== 'undefined' && (id === 'question' || id === 'contact' || id === 'feature')) {
+    window.dispatchEvent(
+      new CustomEvent('energy-reveal-sections', {
+        detail: { hash, targetId: id, needed },
+      }),
+    )
+  }
+
   if (!alreadyReady) {
     await Promise.all(needed.map((sectionId) => waitForElement(sectionId)))
   }
