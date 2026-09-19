@@ -256,7 +256,7 @@ import { useCountRental } from './useCountRental'
 
 defineOptions({ name: 'CountRental' })
 
-const savedDropdownPopperOptions = {
+const savedDropdownPopperOptions: any = {
   modifiers: [
     {
       name: 'sameWidth',
@@ -265,12 +265,7 @@ const savedDropdownPopperOptions = {
       requires: ['computeStyles'],
       fn({
         state,
-      }: {
-        state: {
-          styles: { popper: Record<string, string> }
-          rects: { reference: { width: number } }
-        }
-      }) {
+      }: any) {
         const width = `${Math.round(state.rects.reference.width)}px`
         state.styles.popper.width = width
         state.styles.popper.minWidth = width
