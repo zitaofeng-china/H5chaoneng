@@ -162,27 +162,15 @@ export async function scrollToRouteHash(
   const el = getById(id)
   if (!el) return false
 
-  // 确保目标及上方区块完成布局与尺寸稳定，避免跳跃位置偏差
-  await waitForLayoutSettle(el, alreadyReady ? 300 : 1500)
-  if (gen !== scrollGeneration || !el.isConnected) return false
-
-  const getTargetTop = () =>
-    Math.max(0, el.getBoundingClientRect().top + window.scrollY - getHashHeaderOffset(hash))
-
-  const top = getTargetTop()
-  window.scrollTo({ top, left: 0, behavior })
-
-  // 平滑滚动过程中若上方异步资源加载产生位置偏移，进行二次校准确保靶向锚点精确贴合
-  if (behavior === 'smooth' && typeof window !== 'undefined') {
-    window.setTimeout(() => {
-      if (gen !== scrollGeneration || !el.isConnected) return
-      const currentOffset = el.getBoundingClientRect().top
-      const expectedOffset = getHashHeaderOffset(hash)
-      if (Math.abs(currentOffset - expectedOffset) > 8) {
-        window.scrollTo({ top: getTargetTop(), left: 0, behavior: 'smooth' })
-      }
-    }, 450)
+  if (!alreadyReady) {
+    await waitForLayoutSettle(el)
+    if (gen !== scrollGeneration || !el.isConnected) return false
+  } else {
+    await nextFrame()
+    if (gen !== scrollGeneration) return false
   }
 
+  const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - getHashHeaderOffset(hash))
+  window.scrollTo({ top, left: 0, behavior })
   return true
 }
