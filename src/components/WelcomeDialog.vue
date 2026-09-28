@@ -34,11 +34,12 @@
             <div class="sheet-pull-bar" />
           </div>
 
+          <!-- 头部主行：左侧盾牌与标题，右侧语言切换选择器 -->
           <div class="header-main-row">
             <div class="header-branding">
-              <!-- Web3 信任安全徽章 -->
+              <!-- Web3 安全护盾徽章 (适度圆角 8px) -->
               <div class="security-badge-icon" aria-hidden="true">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 2.5L4.5 5.8V11.2C4.5 16.3 7.7 21 12 22.2C16.3 21 19.5 16.3 19.5 11.2V5.8L12 2.5Z"
                     fill="url(#welcome_shield_bg)"
@@ -62,16 +63,11 @@
                 </svg>
               </div>
 
-              <div class="header-text-group">
-                <div class="header-title-row">
-                  <h3 class="header-title">{{ t('welcome.importantNotice') }}</h3>
-                  <span class="security-chip">Safety Protocol</span>
-                </div>
-                <p class="header-desc">{{ headerDescText }}</p>
-              </div>
+              <!-- 主标题（已彻底移除硬编码英文 Safety Protocol） -->
+              <h3 class="header-title">{{ t('welcome.importantNotice') }}</h3>
             </div>
 
-            <!-- 右侧语言切换胶囊 -->
+            <!-- 右侧语言/文字切换选择器（加入地球图标与 8px 现代微圆角） -->
             <div class="header-lang-action">
               <el-select
                 v-model="currentLanguage"
@@ -80,6 +76,13 @@
                 size="small"
                 :popper-append-to-body="true"
               >
+                <template #prefix>
+                  <svg class="lang-globe-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </template>
                 <el-option
                   v-for="option in localeOptions"
                   :key="option.value"
@@ -89,6 +92,9 @@
               </el-select>
             </div>
           </div>
+
+          <!-- 下方完整说明文字：独占整行，彻底解决文字被省略号截断隐藏的问题 -->
+          <p class="header-desc">{{ headerDescText }}</p>
         </div>
       </template>
 
@@ -99,7 +105,7 @@
         @touchend="onTouchEnd"
         @touchcancel="onTouchEnd"
       >
-        <!-- 4 条安全须知：科技卡片流式展示 -->
+        <!-- 4 条安全须知：精炼微圆角（8px）科技卡片流 -->
         <div class="notice-card-list">
           <div
             v-for="(notice, index) in notices"
@@ -121,7 +127,7 @@
           </div>
         </div>
 
-        <!-- 协议勾选与阅读状态条 -->
+        <!-- 协议勾选与阅读状态条（8px 圆角，优化右侧状态避免重复 checkmark） -->
         <div
           class="agreement-box"
           :class="{ 'is-active': userAgreed }"
@@ -147,11 +153,8 @@
                 </svg>
                 <span class="timer-digits">{{ countdown }}s</span>
               </div>
-              <div v-else class="done-pill" key="done">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                  <polyline points="20 6 9 17 4 12" />
-                </svg>
-                <span class="done-text">{{ currentLanguage.startsWith('zh') ? '已阅' : 'Ready' }}</span>
+              <div v-else-if="!userAgreed" class="ready-hint-pill" key="hint">
+                <span class="ready-text">{{ currentLanguage.startsWith('zh') ? '请勾选确认' : 'Please check' }}</span>
               </div>
             </transition>
           </div>
@@ -206,9 +209,9 @@ const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop')
 
 const headerDescText = computed(() => {
   if (currentLanguage.value.startsWith('zh')) {
-    return '为保障您的资金与交易安全，请仔细阅读以下须知'
+    return '为保障您的资金与交易安全，请在交易前仔细阅读以下提示'
   }
-  return 'Please review and acknowledge the safety terms below to continue.'
+  return 'To protect your funds and transactions, please read the following safety guidelines carefully.'
 })
 
 // 语言切换处理
@@ -370,11 +373,12 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog) {
-    border-radius: 20px;
+    /* 整体圆角减少：由 20px 缩减至 12px 现代精炼直角感 */
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.18), 0 0 0 1px rgba(226, 232, 240, 0.8);
+    box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(226, 232, 240, 0.85);
     border: none;
-    background: radial-gradient(100% 120px at 50% 0%, rgba(22, 93, 255, 0.05) 0%, transparent 100%), #FFFFFF;
+    background: radial-gradient(100% 100px at 50% 0%, rgba(22, 93, 255, 0.04) 0%, transparent 100%), #FFFFFF;
     transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
   }
 
@@ -384,8 +388,8 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__body) {
-    padding: 0 28px 18px;
-    max-height: calc(85vh - 180px);
+    padding: 0 24px 16px;
+    max-height: calc(85vh - 170px);
     overflow-y: auto;
     background: transparent;
 
@@ -400,7 +404,7 @@ const handleConfirm = () => {
 
     &::-webkit-scrollbar-thumb {
       background: #E2E8F0;
-      border-radius: 9999px;
+      border-radius: 4px;
 
       &:hover {
         background: #CBD5E1;
@@ -409,7 +413,7 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__footer) {
-    padding: 0 28px 26px;
+    padding: 0 24px 22px;
     background: transparent;
   }
 
@@ -419,95 +423,61 @@ const handleConfirm = () => {
 
   /* 头部设计 */
   .dialog-header {
-    padding: 24px 28px 16px;
+    padding: 20px 24px 14px;
     position: relative;
 
     .header-main-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 12px;
     }
 
     .header-branding {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       flex: 1;
       min-width: 0;
 
       .security-badge-icon {
-        width: 44px;
-        height: 44px;
+        width: 36px;
+        height: 36px;
         flex-shrink: 0;
-        border-radius: 12px;
+        /* 圆角减少至 8px */
+        border-radius: 8px;
         background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(22, 93, 255, 0.02) 100%);
         border: 1px solid rgba(22, 93, 255, 0.14);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 4px 12px rgba(22, 93, 255, 0.06);
-      }
-
-      .header-text-group {
-        display: flex;
-        flex-direction: column;
-        gap: 3px;
-        min-width: 0;
-      }
-
-      .header-title-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        flex-wrap: wrap;
+        box-shadow: 0 2px 8px rgba(22, 93, 255, 0.05);
       }
 
       .header-title {
         margin: 0;
-        font-size: 19px;
+        font-size: 18px;
         font-weight: 700;
         color: #0F172A;
         letter-spacing: -0.01em;
         line-height: 1.3;
       }
-
-      .security-chip {
-        display: inline-flex;
-        align-items: center;
-        padding: 2px 7px;
-        font-size: 11px;
-        font-weight: 600;
-        color: #165DFF;
-        background: rgba(22, 93, 255, 0.08);
-        border: 1px solid rgba(22, 93, 255, 0.16);
-        border-radius: 9999px;
-        line-height: 1;
-      }
-
-      .header-desc {
-        margin: 0;
-        font-size: 12px;
-        color: #64748B;
-        line-height: 1.4;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
     }
 
+    /* 语言/文字选择器容器（圆角减少至 8px） */
     .header-lang-action {
       flex-shrink: 0;
 
       .header-language-select {
-        width: 116px;
+        width: 114px;
 
         :deep(.el-input__wrapper) {
           background: #F8FAFC;
           border: 1px solid #E2E8F0;
           box-shadow: none !important;
-          border-radius: 20px;
-          padding: 0 10px;
+          /* 圆角减少至 8px */
+          border-radius: 8px;
+          padding: 0 8px;
           height: 32px;
           transition: all 0.2s ease;
 
@@ -518,14 +488,14 @@ const handleConfirm = () => {
 
           &.is-focus {
             border-color: #165DFF;
-            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.12) !important;
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1) !important;
             background: #FFFFFF;
           }
         }
 
         :deep(.el-input__inner) {
           color: #334155;
-          font-size: 12px;
+          font-size: 12.5px;
           font-weight: 500;
         }
 
@@ -533,7 +503,25 @@ const handleConfirm = () => {
           color: #94A3B8;
           font-size: 12px;
         }
+
+        .lang-globe-icon {
+          color: #64748B;
+          margin-right: 4px;
+          flex-shrink: 0;
+        }
       }
+    }
+
+    /* 说明文字独占行：彻底取消任何 nowrap 与省略号截断 */
+    .header-desc {
+      margin: 8px 0 0;
+      font-size: 12.5px;
+      color: #64748B;
+      line-height: 1.5;
+      white-space: normal;
+      word-break: break-word;
+      overflow: visible;
+      text-overflow: clip;
     }
   }
 
@@ -542,39 +530,41 @@ const handleConfirm = () => {
     .notice-card-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 14px;
 
       .notice-card-item {
         display: flex;
         align-items: center;
         gap: 12px;
-        padding: 12px 14px;
+        padding: 11px 14px;
         background: #FFFFFF;
         border: 1px solid #EEF2F6;
-        border-radius: 12px;
-        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.02);
+        /* 圆角减少至 8px */
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
         transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:hover {
           background: #F8FAFC;
           border-color: #CBD5E1;
-          box-shadow: 0 4px 12px rgba(15, 23, 42, 0.04);
+          box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
           transform: translateY(-1px);
         }
 
         .notice-index-badge {
-          width: 26px;
-          height: 26px;
+          width: 24px;
+          height: 24px;
           flex-shrink: 0;
-          border-radius: 8px;
+          /* 圆角减少至 6px */
+          border-radius: 6px;
           background: #F1F5F9;
           display: flex;
           align-items: center;
           justify-content: center;
 
           .index-digit {
-            font-size: 12px;
+            font-size: 11.5px;
             font-weight: 700;
             color: #64748B;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -603,16 +593,17 @@ const handleConfirm = () => {
       }
     }
 
-    /* 协议勾选卡片 */
+    /* 协议勾选卡片（圆角减少至 8px） */
     .agreement-box {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 12px 16px;
+      padding: 12px 14px;
       background: #F8FAFC;
       border: 1px solid #E2E8F0;
-      border-radius: 12px;
+      /* 圆角减少至 8px */
+      border-radius: 8px;
       cursor: pointer;
       user-select: none;
       transition: all 0.22s ease;
@@ -640,7 +631,8 @@ const handleConfirm = () => {
         :deep(.el-checkbox__inner) {
           width: 18px;
           height: 18px;
-          border-radius: 5px;
+          /* 圆角减少至 4px */
+          border-radius: 4px;
           border: 1.5px solid #CBD5E1;
           transition: all 0.2s ease;
         }
@@ -671,10 +663,11 @@ const handleConfirm = () => {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          padding: 3px 9px;
+          padding: 3px 8px;
           background: #EFF6FF;
           border: 1px solid #BFDBFE;
-          border-radius: 9999px;
+          /* 圆角减少至 6px */
+          border-radius: 6px;
           color: #1D4ED8;
           font-size: 12px;
           font-weight: 600;
@@ -685,37 +678,37 @@ const handleConfirm = () => {
           }
         }
 
-        .done-pill {
+        .ready-hint-pill {
           display: inline-flex;
           align-items: center;
-          gap: 3px;
-          padding: 3px 8px;
-          background: #F0FDF4;
-          border: 1px solid #BBF7D0;
-          border-radius: 9999px;
-          color: #15803D;
+          padding: 2px 7px;
+          background: #F8FAFC;
+          border: 1px solid #E2E8F0;
+          border-radius: 6px;
+          color: #64748B;
           font-size: 11px;
-          font-weight: 600;
+          font-weight: 500;
         }
       }
     }
   }
 
-  /* 底部按钮 */
+  /* 底部按钮（圆角减少至 8px） */
   .dialog-footer {
     display: flex;
     justify-content: center;
 
     .submit-confirm-btn {
       width: 100%;
-      height: 48px;
+      height: 46px;
       font-size: 15px;
       font-weight: 600;
-      border-radius: 12px;
+      /* 圆角减少至 8px */
+      border-radius: 8px;
       background: linear-gradient(135deg, #165DFF 0%, #0E42D2 100%);
       border: none;
       color: #FFFFFF;
-      box-shadow: 0 6px 18px -2px rgba(22, 93, 255, 0.35);
+      box-shadow: 0 6px 16px -2px rgba(22, 93, 255, 0.35);
       transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-flex;
       align-items: center;
@@ -730,7 +723,7 @@ const handleConfirm = () => {
 
       &:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 10px 24px -2px rgba(22, 93, 255, 0.45);
+        box-shadow: 0 8px 20px -2px rgba(22, 93, 255, 0.45);
         background: linear-gradient(135deg, #1E6BFF 0%, #1048DE 100%);
       }
 
@@ -766,7 +759,7 @@ const handleConfirm = () => {
   transform: scale(0.92);
 }
 
-/* 移动端专有形态：原生级 Bottom Sheet + 下滑手势与下潜退出 */
+/* 移动端形态：原生级 Bottom Sheet */
 @media (max-width: 768px) {
   .welcome-dialog-wrapper {
     :deep(.el-overlay-dialog) {
@@ -779,7 +772,8 @@ const handleConfirm = () => {
       width: 100% !important;
       max-width: 100% !important;
       margin: 0 !important;
-      border-radius: 20px 20px 0 0 !important;
+      /* 移动端顶部圆角由 20px 缩减至 14px */
+      border-radius: 14px 14px 0 0 !important;
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
       max-height: 88vh;
@@ -790,70 +784,61 @@ const handleConfirm = () => {
     }
 
     :deep(.el-dialog__body) {
-      padding: 0 18px 16px;
-      max-height: calc(88vh - 190px);
+      padding: 0 16px 14px;
+      max-height: calc(88vh - 180px);
       flex: 1;
     }
 
     :deep(.el-dialog__footer) {
-      padding: 0 18px calc(16px + env(safe-area-inset-bottom, 0px));
+      padding: 0 16px calc(14px + env(safe-area-inset-bottom, 0px));
       flex-shrink: 0;
     }
 
     .dialog-header {
-      padding: 8px 18px 14px;
+      padding: 8px 16px 12px;
       flex-shrink: 0;
 
       .sheet-pull-bar-wrap {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding-bottom: 10px;
+        padding-bottom: 8px;
         touch-action: pan-y;
 
         .sheet-pull-bar {
-          width: 36px;
-          height: 4px;
-          border-radius: 9999px;
+          width: 32px;
+          height: 3px;
+          border-radius: 2px;
           background: #CBD5E1;
         }
       }
 
       .header-main-row {
-        gap: 10px;
+        gap: 8px;
       }
 
       .header-branding {
-        gap: 10px;
+        gap: 8px;
 
         .security-badge-icon {
-          width: 38px;
-          height: 38px;
-          border-radius: 10px;
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
         }
 
         .header-title {
-          font-size: 17px;
-        }
-
-        .security-chip {
-          font-size: 10px;
-          padding: 1px 6px;
-        }
-
-        .header-desc {
-          font-size: 11.5px;
-          max-width: 170px;
+          font-size: 16.5px;
         }
       }
 
       .header-lang-action {
         .header-language-select {
-          width: 102px;
+          width: 104px;
 
           :deep(.el-input__wrapper) {
             height: 30px;
-            padding: 0 8px;
+            padding: 0 6px;
+            border-radius: 6px;
           }
 
           :deep(.el-input__inner) {
@@ -861,20 +846,27 @@ const handleConfirm = () => {
           }
         }
       }
+
+      .header-desc {
+        font-size: 11.5px;
+        margin-top: 6px;
+      }
     }
 
     .dialog-content {
       .notice-card-list {
-        gap: 8px;
-        margin-bottom: 14px;
+        gap: 6px;
+        margin-bottom: 12px;
 
         .notice-card-item {
-          padding: 10px 12px;
+          padding: 9px 12px;
           gap: 10px;
+          border-radius: 6px;
 
           .notice-index-badge {
-            width: 24px;
-            height: 24px;
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
 
             .index-digit {
               font-size: 11px;
@@ -889,7 +881,8 @@ const handleConfirm = () => {
       }
 
       .agreement-box {
-        padding: 10px 12px;
+        padding: 9px 12px;
+        border-radius: 6px;
 
         .custom-agreement-checkbox .agreement-label-text {
           font-size: 12px;
@@ -898,12 +891,14 @@ const handleConfirm = () => {
         .agreement-status-pill {
           .timer-pill {
             font-size: 11px;
-            padding: 2px 7px;
+            padding: 2px 6px;
+            border-radius: 4px;
           }
 
-          .done-pill {
+          .ready-hint-pill {
             font-size: 10.5px;
-            padding: 2px 6px;
+            padding: 1px 5px;
+            border-radius: 4px;
           }
         }
       }
@@ -911,12 +906,13 @@ const handleConfirm = () => {
 
     .dialog-footer {
       .submit-confirm-btn {
-        height: 46px;
-        font-size: 14.5px;
+        height: 44px;
+        font-size: 14px;
+        border-radius: 6px;
       }
     }
 
-    /* 退出时丝滑下潜消失动画 */
+    /* 退出时下潜消失动画 */
     &.is-sheet-closing {
       :deep(.el-dialog) {
         animation: sheetSlideDown 0.24s cubic-bezier(0.4, 0, 1, 1) forwards !important;
