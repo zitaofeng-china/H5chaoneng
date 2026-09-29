@@ -23,6 +23,9 @@ export * as binanceApi from './modules/binance'
 // 闪兑汇率模块
 export * as exchangeApi from './modules/exchange'
 
+// 用户广告模块
+export * as adApi from './modules/ad'
+
 // 导出请求方法
 export { get, post } from './request'
 

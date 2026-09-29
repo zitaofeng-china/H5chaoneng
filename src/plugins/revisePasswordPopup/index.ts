@@ -1,32 +1,19 @@
-import { createVNode, render } from 'vue'
 import type { App, Plugin } from 'vue'
-import RevisePasswordPopupComponent from './index.vue'
+import { createLazyPopupPlugin } from '../createLazyPopupPlugin'
 
 declare module 'vue' {
   interface ComponentCustomProperties {
-    $revisePasswordPopup: { open: () => void; close: () => void }
+    $revisePasswordPopup: { open: () => void | Promise<void>; close: () => void }
   }
 }
 
 const RevisePasswordPopupPlugin: Plugin = {
   install(app: App) {
-    const container = document.createElement('div')
-    document.body.appendChild(container)
-
-    const vnode = createVNode(RevisePasswordPopupComponent)
-    vnode.appContext = app._context
-    render(vnode, container)
-
-    const open = () => {
-      vnode.component?.exposed?.open()
-    }
-
-    const close = () => {
-      vnode.component?.exposed?.close()
-    }
-
-    app.config.globalProperties.$revisePasswordPopup = { open, close }
-    app.provide('revisePasswordPopup', { open, close })
+    createLazyPopupPlugin({
+      name: 'revisePasswordPopup',
+      globalKey: '$revisePasswordPopup',
+      loader: () => import('./index.vue'),
+    }).install?.(app)
   },
 }
 

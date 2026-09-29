@@ -1,4 +1,5 @@
 import { useCommonStore } from '@/stores/useCommonStore'
+import { MOBILE_BREAKPOINT } from '@/constants/responsive'
 
 /**
  * 打开Telegram链接
@@ -10,7 +11,7 @@ export const handleOpenToTelegram = (username: string) => {
   // 移除开头的 @ 符号（如果有）
   const cleanUsername = username.startsWith('@') ? username.slice(1) : username
   
-  window.open(`https://t.me/${cleanUsername}`, '_blank')
+  window.open(`https://telegram.me/${cleanUsername}`, '_blank')
 }
 
 /**
@@ -27,29 +28,15 @@ export const handleOpenToTelegramBot = (botId: string | number) => {
   if (typeof botId === 'number' || /^\d+$/.test(botId.toString())) {
     // 尝试使用 Telegram Web 的 start 参数格式
     // 这会尝试打开 Telegram 应用，如果没有安装则打开 Telegram Web
-    const telegramUrl = `https://t.me/bot?start=${botId}`
+    const telegramUrl = `https://telegram.me/bot?start=${botId}`
     window.open(telegramUrl, '_blank')
   } else {
     // 如果是用户名，移除 @ 符号
     const cleanUsername = botId.toString().startsWith('@') 
       ? botId.toString().slice(1) 
       : botId.toString()
-    window.open(`https://t.me/${cleanUsername}`, '_blank')
+    window.open(`https://telegram.me/${cleanUsername}`, '_blank')
   }
-}
-
-/**
- * 打开X账号链接
- * @param username - X账号用户名（可以带或不带 @ 符号）
- */
-export const handleOXAccount = (username: string) => {
-  if (!username) return
-  
-  // 移除开头的 @ 符号（如果有）
-  const cleanUsername = username.startsWith('@') ? username.slice(1) : username
-  
-  const url = `https://x.com/${cleanUsername}`
-  window.open(url, '_blank')
 }
 
 export const handleOpenEmail = (mailto: string) => {
@@ -63,8 +50,5 @@ export const handleOpenEmail = (mailto: string) => {
 export const isMobile = () => {
   const commonStore = useCommonStore()
 
-  return (
-    commonStore.isMobile ||
-    /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-  )
+  return window.innerWidth <= MOBILE_BREAKPOINT || commonStore.isMobile
 }

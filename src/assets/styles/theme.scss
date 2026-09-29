@@ -13,6 +13,153 @@
   --theme-bg-light: #f5f5f5; /* 浅灰背景 */
   --theme-bg-gray: #333e51; /* 灰色背景 - 恢复原值 */
 
+  /* 首页 6 条格栅：header 为第 1 条，下面 5 条为第 2～6 条 */
+  --theme-home-band-height: 50px;
+  /* 第 6 条颜色最强，向第 1 条逐条褪淡 */
+  --theme-home-band-opacity-1: 0.04;
+  --theme-home-band-opacity-2: 0.06;
+  --theme-home-band-opacity-3: 0.1;
+  --theme-home-band-opacity-4: 0.16;
+  --theme-home-band-opacity-5: 0.22;
+  --theme-home-band-opacity-6: 0.28;
+  /* 橙色与蓝色接壤处的白化强度：第 6 条 40%，向上递减至第 2 条 0% */
+  --theme-home-junction-white-1: 0;
+  --theme-home-junction-white-2: 0;
+  --theme-home-junction-white-3: 0.1;
+  --theme-home-junction-white-4: 0.2;
+  --theme-home-junction-white-5: 0.3;
+  --theme-home-junction-white-6: 0.4;
+  --theme-home-band-1-color: linear-gradient(
+    90deg,
+    rgba(255, 147, 70, var(--theme-home-band-opacity-1)) 0%,
+    rgba(255, 174, 104, var(--theme-home-band-opacity-1)) 58%,
+    rgba(255, 198, 145, var(--theme-home-band-opacity-1)) 66%,
+    rgba(255, 255, 255, var(--theme-home-junction-white-1)) 70%,
+    rgba(112, 201, 255, var(--theme-home-band-opacity-1)) 71%,
+    rgba(76, 188, 255, var(--theme-home-band-opacity-1)) 73%,
+    rgba(144, 198, 255, var(--theme-home-band-opacity-1)) 75%,
+    rgba(188, 167, 255, var(--theme-home-band-opacity-1)) 82%,
+    rgba(176, 149, 255, var(--theme-home-band-opacity-1)) 100%
+  );
+  --theme-home-band-2-color: linear-gradient(
+    90deg,
+    rgba(255, 147, 70, var(--theme-home-band-opacity-2)) 0%,
+    rgba(255, 174, 104, var(--theme-home-band-opacity-2)) 54%,
+    rgba(255, 198, 145, var(--theme-home-band-opacity-2)) 62%,
+    rgba(255, 255, 255, var(--theme-home-junction-white-2)) 66%,
+    rgba(112, 201, 255, var(--theme-home-band-opacity-2)) 74%,
+    rgba(76, 188, 255, var(--theme-home-band-opacity-2)) 76%,
+    rgba(144, 198, 255, var(--theme-home-band-opacity-2)) 78%,
+    rgba(188, 167, 255, var(--theme-home-band-opacity-2)) 85%,
+    rgba(176, 149, 255, var(--theme-home-band-opacity-2)) 100%
+  );
+  --theme-home-band-3-color: linear-gradient(
+    90deg,
+    rgba(255, 147, 70, var(--theme-home-band-opacity-3)) 0%,
+    rgba(255, 174, 104, var(--theme-home-band-opacity-3)) 50%,
+    rgba(255, 198, 145, var(--theme-home-band-opacity-3)) 58%,
+    rgba(255, 255, 255, var(--theme-home-junction-white-3)) 62%,
+    rgba(112, 201, 255, var(--theme-home-band-opacity-3)) 77%,
+    rgba(76, 188, 255, var(--theme-home-band-opacity-3)) 79%,
+    rgba(144, 198, 255, var(--theme-home-band-opacity-3)) 81%,
+    rgba(188, 167, 255, var(--theme-home-band-opacity-3)) 88%,
+    rgba(176, 149, 255, var(--theme-home-band-opacity-3)) 100%
+  );
+  --theme-home-band-4-color: linear-gradient(
+    90deg,
+    rgba(255, 147, 70, var(--theme-home-band-opacity-4)) 0%,
+    rgba(255, 174, 104, var(--theme-home-band-opacity-4)) 46%,
+    rgba(255, 198, 145, var(--theme-home-band-opacity-4)) 54%,
+    rgba(255, 255, 255, var(--theme-home-junction-white-4)) 58%,
+    rgba(112, 201, 255, var(--theme-home-band-opacity-4)) 80%,
+    rgba(76, 188, 255, var(--theme-home-band-opacity-4)) 82%,
+    rgba(144, 198, 255, var(--theme-home-band-opacity-4)) 84%,
+    rgba(188, 167, 255, var(--theme-home-band-opacity-4)) 91%,
+    rgba(176, 149, 255, var(--theme-home-band-opacity-4)) 100%
+  );
+  --theme-home-band-5-color: linear-gradient(
+    90deg,
+    rgba(255, 147, 70, var(--theme-home-band-opacity-5)) 0%,
+    rgba(255, 174, 104, var(--theme-home-band-opacity-5)) 42%,
+    rgba(255, 198, 145, var(--theme-home-band-opacity-5)) 50%,
+    rgba(255, 255, 255, var(--theme-home-junction-white-5)) 54%,
+    rgba(112, 201, 255, var(--theme-home-band-opacity-5)) 83%,
+    rgba(76, 188, 255, var(--theme-home-band-opacity-5)) 85%,
+    rgba(144, 198, 255, var(--theme-home-band-opacity-5)) 87%,
+    rgba(188, 167, 255, var(--theme-home-band-opacity-5)) 94%,
+    rgba(176, 149, 255, var(--theme-home-band-opacity-5)) 100%
+  );
+  --theme-home-band-6-color: linear-gradient(
+    90deg,
+    rgba(255, 147, 70, var(--theme-home-band-opacity-6)) 0%,
+    rgba(255, 174, 104, var(--theme-home-band-opacity-6)) 38%,
+    rgba(255, 198, 145, var(--theme-home-band-opacity-6)) 46%,
+    rgba(255, 255, 255, var(--theme-home-junction-white-6)) 50%,
+    rgba(112, 201, 255, var(--theme-home-band-opacity-6)) 86%,
+    rgba(76, 188, 255, var(--theme-home-band-opacity-6)) 88%,
+    rgba(144, 198, 255, var(--theme-home-band-opacity-6)) 90%,
+    rgba(188, 167, 255, var(--theme-home-band-opacity-6)) 97%,
+    rgba(176, 149, 255, var(--theme-home-band-opacity-6)) 100%
+  );
+  --theme-home-grid-vertical: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.02) 0,
+    rgba(255, 255, 255, 0.02) 56px,
+    rgba(255, 255, 255, 0.05) 60px,
+    rgba(255, 255, 255, 0.08) 62px,
+    rgba(255, 255, 255, 0.02) 64px
+  );
+  /*
+   * 纵向褪色起点（每条 50px）：
+   * 第 1 条 30%，第 2~5 条按每条递增 4%，第 6 条 50%。
+   * 起点之前保持满色，起点之后连续褪到 100% 无颜色。
+   */
+  --theme-home-grid-mask: linear-gradient(
+    180deg,
+    /* 第 1 条：30% 开始褪色 */
+    rgba(255, 255, 255, 1) 0px,
+    rgba(255, 255, 255, 1) 15px,
+    rgba(255, 255, 255, 0.84) 25px,
+    rgba(255, 255, 255, 0.56) 36px,
+    rgba(255, 255, 255, 0.24) 43px,
+    rgba(255, 255, 255, 0) 50px,
+    rgba(255, 255, 255, 1) 50px,
+    /* 第 2 条：34% 开始褪色 */
+    rgba(255, 255, 255, 1) 67px,
+    rgba(255, 255, 255, 0.84) 74px,
+    rgba(255, 255, 255, 0.56) 85px,
+    rgba(255, 255, 255, 0.24) 94px,
+    rgba(255, 255, 255, 0) 100px,
+    rgba(255, 255, 255, 1) 100px,
+    /* 第 3 条：38% 开始褪色 */
+    rgba(255, 255, 255, 1) 119px,
+    rgba(255, 255, 255, 0.84) 126px,
+    rgba(255, 255, 255, 0.56) 136px,
+    rgba(255, 255, 255, 0.24) 144.5px,
+    rgba(255, 255, 255, 0) 150px,
+    rgba(255, 255, 255, 1) 150px,
+    /* 第 4 条：42% 开始褪色 */
+    rgba(255, 255, 255, 1) 171px,
+    rgba(255, 255, 255, 0.84) 177px,
+    rgba(255, 255, 255, 0.56) 187px,
+    rgba(255, 255, 255, 0.24) 195px,
+    rgba(255, 255, 255, 0) 200px,
+    rgba(255, 255, 255, 1) 200px,
+    /* 第 5 条：46% 开始褪色 */
+    rgba(255, 255, 255, 1) 223px,
+    rgba(255, 255, 255, 0.84) 229px,
+    rgba(255, 255, 255, 0.56) 238px,
+    rgba(255, 255, 255, 0.24) 245.5px,
+    rgba(255, 255, 255, 0) 250px,
+    rgba(255, 255, 255, 1) 250px,
+    /* 第 6 条：50% 开始褪色 */
+    rgba(255, 255, 255, 1) 275px,
+    rgba(255, 255, 255, 0.84) 281px,
+    rgba(255, 255, 255, 0.56) 289px,
+    rgba(255, 255, 255, 0.24) 296px,
+    rgba(255, 255, 255, 0) 300px
+  );
+
   /* 文字颜色 */
   --theme-text-white: #ffffff;
   --theme-text-black: #1e293b;
@@ -63,7 +210,34 @@
   --theme-border-light: rgba(245, 245, 245, 1);
   --theme-border-subtle: rgba(0, 0, 0, 0.03);
 
-  /* 阴影 */
+  /* ========== Web3 现代质感体系（微圆角规范：轻微柔化防刺眼，杜绝膨胀圆角） ========== */
+  /* 圆角规范：轻微带一些不显生硬即可（微标3px / 输入表单4px / 通用控件与按钮6px / 外层主卡片8px） */
+  --theme-radius-xs: 3px;
+  --theme-radius-sm: 4px;
+  --theme-radius-md: 6px;
+  --theme-radius-lg: 8px;
+  --theme-radius-xl: 8px;
+  --theme-radius-pill: 6px;
+
+  /* 现代双层弥散微光阴影 */
+  --theme-shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.04);
+  --theme-shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.05), 0 1px 2px rgba(15, 23, 42, 0.03);
+  --theme-shadow-md: 0 4px 14px -2px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
+  --theme-shadow-lg: 0 10px 25px -4px rgba(15, 23, 42, 0.07), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+  --theme-shadow-xl: 0 20px 35px -6px rgba(15, 23, 42, 0.09), 0 8px 16px -3px rgba(15, 23, 42, 0.05);
+  --theme-shadow-glow-blue: 0 0 0 1px rgba(22, 93, 255, 0.15), 0 8px 24px -4px rgba(22, 93, 255, 0.2);
+  --theme-shadow-glow-green: 0 0 0 1px rgba(54, 211, 153, 0.2), 0 8px 24px -4px rgba(54, 211, 153, 0.25);
+
+  /* 质感微边框 */
+  --theme-card-border: rgba(226, 232, 240, 0.9);
+  --theme-card-border-glow: rgba(22, 93, 255, 0.25);
+  --theme-card-bg-gradient: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  --theme-card-glass: rgba(255, 255, 255, 0.88);
+
+  /* 兼容历史组件拼写别名 */
+  --theme-text-mute: var(--theme-text-muted);
+
+  /* 阴影（兼容历史变量） */
   --theme-shadow-strong: rgba(0, 0, 0, 0.07);
   --theme-shadow-strong-hover: rgba(0, 0, 0, 0.09);
   --theme-shadow-soft: rgba(0, 0, 0, 0.04);
@@ -118,6 +292,49 @@
 
 /* 移动端滚动条优化 */
 @media (max-width: 768px) {
+  :root {
+    --theme-home-band-height: 30px;
+    --theme-home-grid-mask: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 1) 0px,
+      rgba(255, 255, 255, 1) 9px,
+      rgba(255, 255, 255, 0.84) 15px,
+      rgba(255, 255, 255, 0.56) 21.6px,
+      rgba(255, 255, 255, 0.24) 25.8px,
+      rgba(255, 255, 255, 0) 30px,
+      rgba(255, 255, 255, 1) 30px,
+      rgba(255, 255, 255, 1) 40.2px,
+      rgba(255, 255, 255, 0.84) 44.4px,
+      rgba(255, 255, 255, 0.56) 51px,
+      rgba(255, 255, 255, 0.24) 56.4px,
+      rgba(255, 255, 255, 0) 60px,
+      rgba(255, 255, 255, 1) 60px,
+      rgba(255, 255, 255, 1) 71.4px,
+      rgba(255, 255, 255, 0.84) 75.6px,
+      rgba(255, 255, 255, 0.56) 81.6px,
+      rgba(255, 255, 255, 0.24) 86.7px,
+      rgba(255, 255, 255, 0) 90px,
+      rgba(255, 255, 255, 1) 90px,
+      rgba(255, 255, 255, 1) 102.6px,
+      rgba(255, 255, 255, 0.84) 106.2px,
+      rgba(255, 255, 255, 0.56) 112.2px,
+      rgba(255, 255, 255, 0.24) 117px,
+      rgba(255, 255, 255, 0) 120px,
+      rgba(255, 255, 255, 1) 120px,
+      rgba(255, 255, 255, 1) 133.8px,
+      rgba(255, 255, 255, 0.84) 137.4px,
+      rgba(255, 255, 255, 0.56) 142.8px,
+      rgba(255, 255, 255, 0.24) 147.3px,
+      rgba(255, 255, 255, 0) 150px,
+      rgba(255, 255, 255, 1) 150px,
+      rgba(255, 255, 255, 1) 165px,
+      rgba(255, 255, 255, 0.84) 168.6px,
+      rgba(255, 255, 255, 0.56) 173.4px,
+      rgba(255, 255, 255, 0.24) 177.6px,
+      rgba(255, 255, 255, 0) 180px
+    );
+  }
+
   ::-webkit-scrollbar {
     width: 4px;
     height: 4px;

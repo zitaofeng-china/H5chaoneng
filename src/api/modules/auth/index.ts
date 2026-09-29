@@ -9,13 +9,7 @@ import type {
   RegisterParams,
   RegisterResponse,
   ResetPasswordParams,
-  RevisePasswordParams,
-  SendCodeParams,
   SendEmailCodeParams,
-  SendCodeResponse,
-  VerifyTokenResponse,
-  RefreshTokenParams,
-  RefreshTokenResponse,
   LogoutResponse,
   UserInfo,
 } from './types'
@@ -25,13 +19,6 @@ import type {
  */
 export function login(params: LoginParams) {
   return post<LoginResponse>('/v3/login', params)
-}
-
-/**
- * 用户登录（简化版，自动填充 Site）
- */
-export function loginSimple(data: LoginParams) {
-  return login(data)
 }
 
 /**
@@ -56,38 +43,10 @@ export function resetPassword(params: ResetPasswordParams) {
 }
 
 /**
- * 修改密码（旧接口，保留兼容）
- */
-export function revisePassword(params: RevisePasswordParams) {
-  return post<{ success: boolean; message: string }>('/auth/revise-password', params)
-}
-
-/**
- * 发送验证码
- */
-export function sendCode(params: SendCodeParams) {
-  return post<SendCodeResponse>('/auth/send-code', params)
-}
-
-/**
  * 发送邮箱验证码
  */
 export function sendEmailCode(params: SendEmailCodeParams) {
   return post<{}>('/v3/captcha/email', params)
-}
-
-/**
- * 验证 Token
- */
-export function verifyToken() {
-  return get<VerifyTokenResponse>('/auth/verify-token')
-}
-
-/**
- * 刷新 Token
- */
-export function refreshToken(params: RefreshTokenParams) {
-  return post<RefreshTokenResponse>('/auth/refresh-token', params)
 }
 
 /**
@@ -102,6 +61,20 @@ export function logout() {
  */
 export function getUserInfo() {
   return get<UserInfo>('/v3/user')
+}
+
+/**
+ * 获取接口密钥
+ */
+export function getSecretKey() {
+  return get<string>('/v3/key')
+}
+
+/**
+ * 刷新接口密钥
+ */
+export function refreshSecretKey() {
+  return put<string>('/v3/key')
 }
 
 /**

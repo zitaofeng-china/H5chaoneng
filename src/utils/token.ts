@@ -34,6 +34,11 @@ function getAllTokens(): TokenStorage {
 }
 
 function saveAllTokens(tokens: TokenStorage): void {
+  if (Object.keys(tokens).length === 0) {
+    localStorage.removeItem(TOKENS_KEY)
+    return
+  }
+
   localStorage.setItem(TOKENS_KEY, JSON.stringify(tokens))
 }
 
@@ -48,6 +53,11 @@ function getAllRefreshTokens(): TokenStorage {
 }
 
 function saveAllRefreshTokens(tokens: TokenStorage): void {
+  if (Object.keys(tokens).length === 0) {
+    localStorage.removeItem(REFRESH_TOKENS_KEY)
+    return
+  }
+
   localStorage.setItem(REFRESH_TOKENS_KEY, JSON.stringify(tokens))
 }
 
@@ -62,6 +72,11 @@ function getAllUserInfos(): UserInfoStorage {
 }
 
 function saveAllUserInfos(infos: UserInfoStorage): void {
+  if (Object.keys(infos).length === 0) {
+    localStorage.removeItem(USER_INFOS_KEY)
+    return
+  }
+
   localStorage.setItem(USER_INFOS_KEY, JSON.stringify(infos))
 }
 
@@ -76,6 +91,11 @@ function getAllExpiredAt(): ExpiredAtStorage {
 }
 
 function saveAllExpiredAt(expiredAt: ExpiredAtStorage): void {
+  if (Object.keys(expiredAt).length === 0) {
+    localStorage.removeItem(TOKEN_EXPIRED_AT_KEY)
+    return
+  }
+
   localStorage.setItem(TOKEN_EXPIRED_AT_KEY, JSON.stringify(expiredAt))
 }
 
@@ -185,4 +205,3 @@ export function clearAllTokens(): void {
 export function hasToken(): boolean {
   return !!getToken()
 }
-

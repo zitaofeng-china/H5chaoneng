@@ -1,91 +1,222 @@
 <template>
-  <el-dialog
-    v-model="visible"
-    :close-on-click-modal="false"
-    :close-on-press-escape="false"
-    :show-close="false"
-    width="600px"
-    class="welcome-dialog"
-    :lock-scroll="true"
-    :modal="true"
-    align-center
+  <div
+    class="welcome-dialog-wrapper"
+    :class="[
+      layoutClass,
+      {
+        'is-sheet-closing': isClosing,
+        'is-sheet-dragging': isDragging,
+      },
+    ]"
   >
-    <template #header>
-      <div class="dialog-header">
-        <div class="header-content">
-          <el-icon class="warning-icon" :size="28"><WarningFilled /></el-icon>
-          <span class="header-title">{{ t('welcome.importantNotice') }}</span>
-        </div>
-        <el-select
-          v-model="currentLanguage"
-          @change="handleLanguageChange"
-          class="language-selector"
-          size="default"
+    <el-dialog
+      v-model="visible"
+      :close-on-click-modal="false"
+      :close-on-press-escape="false"
+      :show-close="false"
+      :width="isMobile ? '100%' : '470px'"
+      class="welcome-dialog"
+      :style="dialogDynamicStyle"
+      :lock-scroll="true"
+      :modal="true"
+      :align-center="!isMobile"
+    >
+      <template #header>
+        <div
+          class="dialog-header"
+          @touchstart="onTouchStart"
+          @touchmove="onTouchMove"
+          @touchend="onTouchEnd"
+          @touchcancel="onTouchEnd"
         >
-          <el-option
-            v-for="option in localeOptions"
-            :key="option.value"
-            :label="option.label"
-            :value="option.value"
-          />
-        </el-select>
-      </div>
-    </template>
+          <!-- 移动端顶部下拉把手条 -->
+          <div v-if="isMobile" class="sheet-pull-bar-wrap" aria-hidden="true">
+            <div class="sheet-pull-bar" />
+          </div>
 
-    <div class="dialog-content">
-      <div class="notice-list">
-        <div class="notice-item" v-for="(notice, index) in notices" :key="index">
-          <el-icon class="check-icon" :size="20"><Check /></el-icon>
-          <span class="notice-text">{{ notice }}</span>
+          <!-- 头部主行：左侧盾牌与标题，右侧语言切换选择器 -->
+          <div class="header-main-row">
+            <div class="header-branding">
+              <!-- Web3 安全护盾徽章 -->
+              <div class="security-badge-icon" aria-hidden="true">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 2.5L4.5 5.8V11.2C4.5 16.3 7.7 21 12 22.2C16.3 21 19.5 16.3 19.5 11.2V5.8L12 2.5Z"
+                    fill="url(#welcome_shield_bg)"
+                    stroke="#165DFF"
+                    stroke-width="1.6"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M8.5 12L10.8 14.3L15.5 9.5"
+                    stroke="#165DFF"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <defs>
+                    <linearGradient id="welcome_shield_bg" x1="12" y1="2.5" x2="12" y2="22.2" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#EEF2FF" />
+                      <stop offset="1" stop-color="#E0E7FF" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+
+              <!-- 主标题 -->
+              <h3 class="header-title">{{ t('welcome.importantNotice') }}</h3>
+            </div>
+
+            <!-- 右侧语言/文字切换选择器（强化文字与图标清晰度） -->
+            <div class="header-lang-action">
+              <el-select
+                v-model="currentLanguage"
+                @change="handleLanguageChange"
+                class="header-language-select"
+                size="small"
+                :popper-append-to-body="true"
+              >
+                <template #prefix>
+                  <svg class="lang-globe-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
+                  </svg>
+                </template>
+                <el-option
+                  v-for="option in localeOptions"
+                  :key="option.value"
+                  :label="option.label"
+                  :value="option.value"
+                />
+              </el-select>
+            </div>
+          </div>
+
+          <!-- 下方说明文字（加深对比度至 #334155） -->
+          <p class="header-desc">{{ headerDescText }}</p>
+        </div>
+      </template>
+
+      <div
+        class="dialog-content"
+        @touchstart="onTouchStart"
+        @touchmove="onTouchMove"
+        @touchend="onTouchEnd"
+        @touchcancel="onTouchEnd"
+      >
+        <!-- 4 条安全须知：文字加粗 600、高对比深墨黑、序号高亮 -->
+        <div class="notice-card-list">
+          <div
+            v-for="(notice, index) in notices"
+            :key="index"
+            class="notice-card-item"
+          >
+            <div class="notice-index-badge">
+              <span class="index-digit">0{{ index + 1 }}</span>
+            </div>
+            <div class="notice-content-area">
+              <span class="notice-text-main">{{ notice }}</span>
+            </div>
+            <div class="notice-verified-mark" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                <circle cx="10" cy="10" r="8.5" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.2" />
+                <path d="M6.5 10.2L8.8 12.5L13.8 7.5" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 协议勾选与阅读状态条（文字加深至 #0F172A，清晰高亮标签） -->
+        <div
+          class="agreement-box"
+          :class="{ 'is-active': userAgreed }"
+          @click="toggleAgreement"
+        >
+          <div class="agreement-left">
+            <el-checkbox
+              v-model="userAgreed"
+              size="default"
+              class="custom-agreement-checkbox"
+              @click.stop
+            >
+              <span class="agreement-label-text">{{ t('welcome.iAcknowledge') }}</span>
+            </el-checkbox>
+          </div>
+
+          <div class="agreement-status-pill">
+            <transition name="pill-fade" mode="out-in">
+              <div v-if="!canConfirm" class="timer-pill" key="timer">
+                <svg class="timer-clock-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span class="timer-digits">{{ countdown }}s</span>
+              </div>
+              <div v-else-if="!userAgreed" class="ready-hint-pill" key="hint">
+                <span class="ready-text">{{ currentLanguage.startsWith('zh') ? '请勾选确认' : 'Please check' }}</span>
+              </div>
+            </transition>
+          </div>
         </div>
       </div>
 
-      <div class="agreement-wrapper">
-        <el-checkbox v-model="userAgreed" size="large" class="agreement-checkbox">
-          {{ t('welcome.iAcknowledge') }}
-        </el-checkbox>
-        <span v-if="!canConfirm" class="countdown-badge">{{ countdown }}s</span>
-      </div>
-    </div>
-
-    <template #footer>
-      <div class="dialog-footer">
-        <el-button
-          type="primary"
-          size="large"
-          :disabled="!userAgreed || !canConfirm"
-          @click="handleConfirm"
-          class="confirm-button"
-        >
-          {{ t('welcome.confirmAndContinue') }}
-        </el-button>
-      </div>
-    </template>
-  </el-dialog>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button
+            type="primary"
+            size="large"
+            :disabled="!userAgreed || !canConfirm"
+            @click="handleConfirm"
+            class="submit-confirm-btn tactile-btn"
+          >
+            <span>{{ t('welcome.confirmAndContinue') }}</span>
+            <span v-if="!canConfirm" class="btn-countdown-suffix">({{ countdown }}s)</span>
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { WarningFilled, Check } from '@element-plus/icons-vue'
+import { storeToRefs } from 'pinia'
+import { useCommonStore } from '@/stores/useCommonStore'
 import { setLocale, getCurrentLocale } from '@/lang'
 import { localeOptions } from '@/lang/types'
 import type { Locale } from '@/lang/types'
 
 const { t } = useI18n()
+const commonStore = useCommonStore()
+const { isMobile } = storeToRefs(commonStore)
 
 const visible = ref(false)
 const userAgreed = ref(false)
 const currentLanguage = ref<Locale>(getCurrentLocale())
 const countdown = ref(5)
 const canConfirm = ref(false)
+const isClosing = ref(false)
+const isDragging = ref(false)
+const dragOffset = ref(0)
 let countdownTimer: number | null = null
+let touchStartY = 0
 
 const STORAGE_KEY = 'user_login_notice_acknowledged'
 
+const layoutClass = computed(() => (isMobile.value ? 'is-mobile' : 'is-desktop'))
+
+const headerDescText = computed(() => {
+  if (currentLanguage.value.startsWith('zh')) {
+    return '为保障您的资金与交易安全，请在交易前仔细阅读以下提示'
+  }
+  return 'To protect your funds and transactions, please read the following safety guidelines carefully.'
+})
+
 // 语言切换处理
 const handleLanguageChange = (locale: Locale) => {
-  setLocale(locale)
+  void setLocale(locale)
   currentLanguage.value = locale
 }
 
@@ -97,11 +228,20 @@ const notices = computed(() => [
   t('welcome.notice4'),
 ])
 
+// 勾选切换
+const toggleAgreement = () => {
+  userAgreed.value = !userAgreed.value
+}
+
 // 启动倒计时
 const startCountdown = () => {
   countdown.value = 5
   canConfirm.value = false
-  
+
+  if (countdownTimer) {
+    clearInterval(countdownTimer)
+  }
+
   countdownTimer = window.setInterval(() => {
     countdown.value--
     if (countdown.value <= 0) {
@@ -125,27 +265,77 @@ const clearCountdown = () => {
 // 监听弹窗显示状态
 watch(visible, (newVal) => {
   if (newVal) {
+    userAgreed.value = false
     startCountdown()
   } else {
     clearCountdown()
   }
 })
 
+// 移动端手势触控处理（下拉阻尼感）
+const onTouchStart = (e: TouchEvent) => {
+  if (!isMobile.value) return
+  const touch = e.touches[0]
+  if (!touch) return
+  touchStartY = touch.clientY
+  isDragging.value = true
+  dragOffset.value = 0
+}
+
+const onTouchMove = (e: TouchEvent) => {
+  if (!isMobile.value || !isDragging.value) return
+  const touch = e.touches[0]
+  if (!touch) return
+  const currentY = touch.clientY
+  const deltaY = currentY - touchStartY
+  if (deltaY > 0) {
+    // 阻尼下拉跟随
+    dragOffset.value = Math.min(deltaY * 0.45, 90)
+  } else {
+    dragOffset.value = 0
+  }
+}
+
+const onTouchEnd = () => {
+  if (!isMobile.value) return
+  isDragging.value = false
+  dragOffset.value = 0
+}
+
+const dialogDynamicStyle = computed(() => {
+  if (!isMobile.value) return {}
+  if (dragOffset.value > 0) {
+    return {
+      transform: `translate3d(0, ${dragOffset.value}px, 0)`,
+      transition: isDragging.value ? 'none' : 'transform 0.24s cubic-bezier(0.2, 0.8, 0.2, 1)',
+    }
+  }
+  return {}
+})
+
 // 监听登录成功事件
 const handleLoginSuccess = () => {
-  // 检查用户是否已经确认过
   const acknowledged = localStorage.getItem(STORAGE_KEY)
   if (!acknowledged) {
-    // 延迟500ms显示，让登录弹窗先关闭
     setTimeout(() => {
       visible.value = true
-    }, 500)
+    }, 450)
   }
 }
 
 onMounted(() => {
-  // 监听登录成功事件
   window.addEventListener('user-login-success', handleLoginSuccess)
+  window.addEventListener('open-welcome-dialog', () => {
+    visible.value = true
+  })
+
+  // 开发环境/测试辅助挂载
+  if (typeof window !== 'undefined') {
+    (window as unknown as Record<string, unknown>).__showWelcomeDialog = () => {
+      localStorage.removeItem(STORAGE_KEY)
+      visible.value = true
+    }
+  }
 })
 
 onUnmounted(() => {
@@ -153,25 +343,42 @@ onUnmounted(() => {
   window.removeEventListener('user-login-success', handleLoginSuccess)
 })
 
+// 确认关闭逻辑（带移动端丝滑下潜消失动画）
 const handleConfirm = () => {
   if (!userAgreed.value || !canConfirm.value) return
-  
-  // 记录确认时间戳
+
   localStorage.setItem(STORAGE_KEY, Date.now().toString())
-  
-  visible.value = false
-  userAgreed.value = false
+
+  if (isMobile.value) {
+    isClosing.value = true
+    setTimeout(() => {
+      visible.value = false
+      isClosing.value = false
+      userAgreed.value = false
+    }, 240)
+  } else {
+    visible.value = false
+    userAgreed.value = false
+  }
 }
 </script>
 
 <style lang="scss" scoped>
-.welcome-dialog {
+.welcome-dialog-wrapper {
+  :deep(.el-overlay) {
+    background: rgba(15, 23, 42, 0.55);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    transition: all 0.24s ease;
+  }
+
   :deep(.el-dialog) {
-    border-radius: 24px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 25px 70px rgba(220, 38, 38, 0.3), 0 0 0 1px rgba(220, 38, 38, 0.1);
+    box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(226, 232, 240, 0.85);
     border: none;
-    background: linear-gradient(180deg, #FFFFFF 0%, #FEF2F2 50%, #FEE2E2 100%);
+    background: radial-gradient(100% 80px at 50% 0%, rgba(22, 93, 255, 0.04) 0%, transparent 100%), #FFFFFF;
+    transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
   }
 
   :deep(.el-dialog__header) {
@@ -180,544 +387,555 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__body) {
-    padding: 0 36px 32px;
-    max-height: calc(80vh - 200px);
+    padding: 0 18px 10px;
+    max-height: calc(85vh - 150px);
     overflow-y: auto;
     background: transparent;
-    
-    /* 自定义滚动条样式 */
+
+    /* 优雅高质感细滚动条 */
     &::-webkit-scrollbar {
-      width: 6px;
+      width: 5px;
     }
-    
+
     &::-webkit-scrollbar-track {
-      background: rgba(254, 226, 226, 0.2);
-      border-radius: 3px;
+      background: transparent;
     }
-    
+
     &::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #DC2626 0%, #B91C1C 100%);
-      border-radius: 3px;
-      
+      background: #E2E8F0;
+      border-radius: 4px;
+
       &:hover {
-        background: linear-gradient(180deg, #B91C1C 0%, #991B1B 100%);
+        background: #CBD5E1;
       }
     }
   }
 
   :deep(.el-dialog__footer) {
-    padding: 0 36px 36px;
+    padding: 0 18px 18px;
     background: transparent;
   }
 
-  // 隐藏关闭按钮
   :deep(.el-dialog__headerbtn) {
     display: none !important;
   }
 
+  /* 头部设计：边距更紧致，文字更清晰 */
   .dialog-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 32px 36px 28px;
-    background: transparent;
-    border-bottom: none;
+    padding: 18px 18px 10px;
     position: relative;
 
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 36px;
-      right: 36px;
-      height: 1px;
-      background: linear-gradient(90deg, transparent 0%, rgba(220, 38, 38, 0.15) 20%, rgba(220, 38, 38, 0.15) 80%, transparent 100%);
-    }
-
-    .header-content {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      flex: 1;
-
-      .warning-icon {
-        color: #DC2626;
-        animation: pulse 2s ease-in-out infinite;
-        filter: drop-shadow(0 2px 4px rgba(220, 38, 38, 0.3));
-      }
-
-      .header-title {
-        font-size: 22px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-    }
-
-    .language-selector {
-      width: 140px;
-      
-      :deep(.el-input__wrapper) {
-        background: rgba(255, 255, 255, 0.8);
-        border: 1.5px solid rgba(220, 38, 38, 0.3);
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.08);
-        border-radius: 10px;
-        transition: all 0.3s ease;
-        
-        &:hover {
-          border-color: rgba(220, 38, 38, 0.5);
-          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.15);
-          background: rgba(255, 255, 255, 0.95);
-        }
-      }
-
-      :deep(.el-input__inner) {
-        color: #991B1B;
-        font-weight: 600;
-      }
-    }
-  }
-
-  @keyframes pulse {
-    0%, 100% {
-      transform: scale(1);
-      opacity: 1;
-    }
-    50% {
-      transform: scale(1.1);
-      opacity: 0.85;
-    }
-  }
-
-  .dialog-content {
-    .notice-list {
-      background: transparent;
-      border-radius: 0;
-      padding: 24px 0;
-      margin-bottom: 24px;
-      border: none;
-      position: relative;
-
-      .notice-item {
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 16px;
-        font-size: 16px;
-        line-height: 1.7;
-        color: #374151;
-        padding: 12px 16px;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, 0.5);
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.04);
-        transition: all 0.3s ease;
-
-        &:hover {
-          background: rgba(255, 255, 255, 0.8);
-          box-shadow: 0 4px 12px rgba(220, 38, 38, 0.08);
-          transform: translateX(4px);
-        }
-
-        &:last-child {
-          margin-bottom: 0;
-        }
-
-        .check-icon {
-          color: #DC2626;
-          margin-top: 2px;
-          flex-shrink: 0;
-          filter: drop-shadow(0 1px 2px rgba(220, 38, 38, 0.2));
-        }
-
-        .notice-text {
-          flex: 1;
-          font-weight: 500;
-        }
-      }
-    }
-
-    .agreement-wrapper {
+    .header-main-row {
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      padding: 20px 24px;
-      background: rgba(255, 255, 255, 0.7);
-      border-radius: 16px;
-      border: 2px solid rgba(220, 38, 38, 0.2);
-      position: relative;
-      box-shadow: 0 4px 16px rgba(220, 38, 38, 0.08);
-      transition: all 0.3s ease;
-
-      &:hover {
-        border-color: rgba(220, 38, 38, 0.35);
-        box-shadow: 0 6px 20px rgba(220, 38, 38, 0.12);
-        background: rgba(255, 255, 255, 0.85);
-      }
     }
 
-    .agreement-checkbox {
-      flex: 1;
-
-      :deep(.el-checkbox__label) {
-        font-size: 15px;
-        font-weight: 700;
-        background: linear-gradient(135deg, #DC2626 0%, #991B1B 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-      }
-
-      :deep(.el-checkbox__inner) {
-        width: 22px;
-        height: 22px;
-        border-width: 2px;
-        border-color: #DC2626;
-        transition: all 0.3s ease;
-      }
-
-      :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-        background-color: #DC2626;
-        border-color: #DC2626;
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-      }
-    }
-
-    .countdown-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 42px;
-      height: 28px;
-      padding: 0 12px;
-      background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-      color: #FFFFFF;
-      font-size: 14px;
-      font-weight: 700;
-      border-radius: 14px;
-      box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-      animation: pulse-badge 1s ease-in-out infinite;
-      flex-shrink: 0;
-    }
-
-    @keyframes pulse-badge {
-      0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3);
-      }
-      50% {
-        transform: scale(1.05);
-        box-shadow: 0 4px 12px rgba(220, 38, 38, 0.5);
-      }
-    }
-  }
-
-  .dialog-footer {
-    display: flex;
-    justify-content: center;
-
-    .confirm-button {
-      width: 100%;
-      height: 54px;
-      font-size: 17px;
-      font-weight: 700;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-      border: none;
-      box-shadow: 0 8px 20px rgba(220, 38, 38, 0.35);
-      transition: all 0.3s ease;
-      color: #FFFFFF;
-      position: relative;
-      overflow: hidden;
-
-      &::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-
-      &:hover:not(:disabled) {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 28px rgba(220, 38, 38, 0.45);
-        background: linear-gradient(135deg, #B91C1C 0%, #991B1B 100%);
-
-        &::before {
-          opacity: 1;
-        }
-      }
-
-      &:active:not(:disabled) {
-        transform: translateY(0);
-      }
-
-      &:disabled {
-        background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
-        color: #9CA3AF;
-        cursor: not-allowed;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        transform: none;
-        opacity: 0.6;
-      }
-    }
-  }
-}
-
-@media (max-width: 768px) {
-  .welcome-dialog {
-    :deep(.el-dialog) {
-      width: 100% !important;
-      max-width: 100%;
-      margin: 0;
-      border-radius: 0;
-      max-height: 100vh;
+    .header-branding {
       display: flex;
-      flex-direction: column;
-    }
-
-    :deep(.el-dialog__body) {
-      padding: 0 20px 20px;
-      overflow-y: auto;
+      align-items: center;
+      gap: 10px;
       flex: 1;
-      max-height: calc(100vh - 200px);
-      
-      /* 移动端滚动条样式 */
-      &::-webkit-scrollbar {
-        width: 4px;
-      }
-    }
+      min-width: 0;
 
-    :deep(.el-dialog__footer) {
-      padding: 0 20px 24px;
-      flex-shrink: 0;
-    }
-
-    .dialog-header {
-      padding: 20px;
-      flex-direction: column;
-      gap: 12px;
-      align-items: stretch;
-      flex-shrink: 0;
-
-      &::after {
-        left: 20px;
-        right: 20px;
-      }
-
-      .header-content {
+      .security-badge-icon {
+        width: 36px;
+        height: 36px;
+        flex-shrink: 0;
+        border-radius: 8px;
+        background: linear-gradient(135deg, rgba(22, 93, 255, 0.09) 0%, rgba(22, 93, 255, 0.03) 100%);
+        border: 1px solid rgba(22, 93, 255, 0.16);
+        display: flex;
+        align-items: center;
         justify-content: center;
-
-        .warning-icon {
-          font-size: 24px;
-        }
-
-        .header-title {
-          font-size: 18px;
-        }
+        box-shadow: 0 2px 6px rgba(22, 93, 255, 0.06);
       }
 
-      .language-selector {
-        width: 100%;
-        
-        :deep(.el-input__wrapper) {
-          height: 40px;
-        }
+      .header-title {
+        margin: 0;
+        font-size: 18px;
+        font-weight: 700;
+        color: #0F172A;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
       }
     }
 
-    .dialog-content {
-      .notice-list {
-        padding: 18px 0;
-        margin-bottom: 18px;
+    /* 语言/文字选择器容器：文字加粗清晰 */
+    .header-lang-action {
+      flex-shrink: 0;
 
-        .notice-item {
-          font-size: 14px;
-          margin-bottom: 12px;
-          padding: 10px 12px;
-          line-height: 1.6;
-          
-          .check-icon {
-            font-size: 18px;
+      .header-language-select {
+        width: 114px;
+
+        :deep(.el-input__wrapper) {
+          background: #F8FAFC;
+          border: 1px solid #CBD5E1;
+          box-shadow: none !important;
+          border-radius: 8px;
+          padding: 0 8px;
+          height: 32px;
+          transition: all 0.2s ease;
+
+          &:hover {
+            border-color: #165DFF;
+            background: #FFFFFF;
+          }
+
+          &.is-focus {
+            border-color: #165DFF;
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.12) !important;
+            background: #FFFFFF;
           }
         }
-      }
 
-      .agreement-wrapper {
-        padding: 14px 16px;
-      }
-
-      .agreement-checkbox {
-        :deep(.el-checkbox__label) {
+        :deep(.el-input__inner) {
+          color: #0F172A;
           font-size: 13px;
-          line-height: 1.5;
+          font-weight: 600;
         }
+
+        :deep(.el-select__caret) {
+          color: #64748B;
+          font-size: 12px;
+        }
+
+        .lang-globe-icon {
+          color: #475569;
+          margin-right: 4px;
+          flex-shrink: 0;
+        }
+      }
+    }
+
+    /* 说明文字：加深颜色为 #334155，增加粗细至 500 */
+    .header-desc {
+      margin: 6px 0 0;
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
+      line-height: 1.5;
+      white-space: normal;
+      word-break: break-word;
+      overflow: visible;
+      text-overflow: clip;
+    }
+  }
+
+  /* 内容区卡片流：文字加粗 600、对比度拉满 */
+  .dialog-content {
+    .notice-card-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 10px;
+
+      .notice-card-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        background: #FFFFFF;
+        border: 1px solid #E2E8F0;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+
+        &:hover {
+          background: #F8FAFC;
+          border-color: #94A3B8;
+          box-shadow: 0 3px 8px rgba(15, 23, 42, 0.04);
+          transform: translateY(-1px);
+        }
+
+        .notice-index-badge {
+          width: 24px;
+          height: 24px;
+          flex-shrink: 0;
+          border-radius: 6px;
+          background: rgba(22, 93, 255, 0.08);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .index-digit {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: #165DFF;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          }
+        }
+
+        .notice-content-area {
+          flex: 1;
+          min-width: 0;
+
+          /* 须知文字：字号 14px，加粗 600，高深墨色 #0F172A */
+          .notice-text-main {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.45;
+            color: #0F172A;
+            display: block;
+            letter-spacing: 0.005em;
+          }
+        }
+
+        .notice-verified-mark {
+          flex-shrink: 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+    }
+
+    /* 协议勾选卡片：加深文字 #0F172A */
+    .agreement-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background: #F1F5F9;
+        border-color: #94A3B8;
+      }
+
+      &.is-active {
+        background: rgba(22, 93, 255, 0.05);
+        border-color: rgba(22, 93, 255, 0.4);
+      }
+
+      .agreement-left {
+        flex: 1;
+        min-width: 0;
+      }
+
+      .custom-agreement-checkbox {
+        width: 100%;
+        display: flex;
+        align-items: center;
 
         :deep(.el-checkbox__inner) {
           width: 18px;
           height: 18px;
+          border-radius: 4px;
+          border: 1.5px solid #94A3B8;
+          transition: all 0.2s ease;
+        }
+
+        :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
+          background-color: #165DFF;
+          border-color: #165DFF;
+          box-shadow: 0 2px 6px rgba(22, 93, 255, 0.28);
+        }
+
+        :deep(.el-checkbox__label) {
+          padding-left: 9px;
+          white-space: normal;
+        }
+
+        /* 勾选文字：深色 #0F172A，字号 13.5px，加粗 600 */
+        .agreement-label-text {
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #0F172A;
+          line-height: 1.4;
         }
       }
 
-      .countdown-badge {
-        min-width: 36px;
-        height: 24px;
-        font-size: 12px;
-        padding: 0 10px;
+      .agreement-status-pill {
+        flex-shrink: 0;
+
+        .timer-pill {
+          display: inline-flex;
+          align-items: center;
+          gap: 4px;
+          padding: 2px 8px;
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
+          border-radius: 6px;
+          color: #1D4ED8;
+          font-size: 12px;
+          font-weight: 700;
+          font-variant-numeric: tabular-nums;
+
+          .timer-clock-icon {
+            animation: spin-slow 4s linear infinite;
+          }
+        }
+
+        /* 提示请勾选：清晰蓝底深蓝字，告别模糊灰框 */
+        .ready-hint-pill {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 8px;
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
+          border-radius: 6px;
+          color: #165DFF;
+          font-size: 11.5px;
+          font-weight: 600;
+        }
       }
     }
+  }
 
-    .dialog-footer {
-      .confirm-button {
-        height: 48px;
-        font-size: 15px;
+  /* 底部按钮：未激活态高对比度文字 */
+  .dialog-footer {
+    display: flex;
+    justify-content: center;
+
+    .submit-confirm-btn {
+      width: 100%;
+      height: 44px;
+      font-size: 15px;
+      font-weight: 600;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #165DFF 0%, #0E42D2 100%);
+      border: none;
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px -2px rgba(22, 93, 255, 0.35);
+      transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+
+      .btn-countdown-suffix {
+        font-size: 13.5px;
+        opacity: 0.9;
+        font-variant-numeric: tabular-nums;
+      }
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px -2px rgba(22, 93, 255, 0.45);
+        background: linear-gradient(135deg, #1E6BFF 0%, #1048DE 100%);
+      }
+
+      &:active:not(:disabled) {
+        transform: scale(0.99);
+      }
+
+      /* 未激活状态：边框微深、文字改用 #475569（极高可读性，不再发白发灰） */
+      &:disabled {
+        background: #F1F5F9;
+        border: 1px solid #CBD5E1;
+        color: #475569;
+        box-shadow: none;
+        cursor: not-allowed;
       }
     }
   }
 }
 
-@media (max-width: 480px) {
-  .welcome-dialog {
-    .dialog-header {
-      padding: 18px;
+/* 动效 */
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-      &::after {
-        left: 18px;
-        right: 18px;
-      }
+.pill-fade-enter-active,
+.pill-fade-leave-active {
+  transition: all 0.2s ease;
+}
 
-      .header-content {
-        .warning-icon {
-          font-size: 22px;
-        }
+.pill-fade-enter-from,
+.pill-fade-leave-to {
+  opacity: 0;
+  transform: scale(0.92);
+}
 
-        .header-title {
-          font-size: 17px;
-        }
-      }
+/* 移动端形态：原生级 Bottom Sheet */
+@media (max-width: 768px) {
+  .welcome-dialog-wrapper {
+    :deep(.el-overlay-dialog) {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    :deep(.el-dialog) {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      border-radius: 14px 14px 0 0 !important;
+      border-bottom-left-radius: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
+      animation: sheetSlideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 -10px 32px rgba(15, 23, 42, 0.16);
     }
 
     :deep(.el-dialog__body) {
-      padding: 0 18px 18px;
+      padding: 0 14px 10px;
+      max-height: calc(88vh - 160px);
+      flex: 1;
     }
 
     :deep(.el-dialog__footer) {
-      padding: 0 18px 22px;
+      padding: 0 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      flex-shrink: 0;
     }
 
-    .dialog-content {
-      .notice-list {
-        padding: 16px 0;
-
-        .notice-item {
-          font-size: 13px;
-          gap: 10px;
-          padding: 9px 11px;
-        }
-      }
-
-      .agreement-wrapper {
-        padding: 13px 15px;
-      }
-
-      .agreement-checkbox {
-        :deep(.el-checkbox__label) {
-          font-size: 12px;
-        }
-      }
-
-      .countdown-badge {
-        min-width: 34px;
-        height: 22px;
-        font-size: 11px;
-        padding: 0 8px;
-      }
-    }
-
-    .dialog-footer {
-      .confirm-button {
-        height: 46px;
-        font-size: 14px;
-      }
-    }
-  }
-}
-
-/* 超小屏幕优化 */
-@media (max-width: 360px) {
-  .welcome-dialog {
     .dialog-header {
-      padding: 16px;
+      padding: 8px 14px 10px;
+      flex-shrink: 0;
 
-      &::after {
-        left: 16px;
-        right: 16px;
+      .sheet-pull-bar-wrap {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 6px;
+        touch-action: pan-y;
+
+        .sheet-pull-bar {
+          width: 32px;
+          height: 3px;
+          border-radius: 2px;
+          background: #CBD5E1;
+        }
       }
 
-      .header-content {
+      .header-main-row {
+        gap: 8px;
+      }
+
+      .header-branding {
         gap: 8px;
 
-        .warning-icon {
-          font-size: 20px;
+        .security-badge-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
         }
 
         .header-title {
-          font-size: 16px;
+          font-size: 16.5px;
         }
       }
-    }
 
-    :deep(.el-dialog__body) {
-      padding: 0 16px 16px;
-    }
+      .header-lang-action {
+        .header-language-select {
+          width: 104px;
 
-    :deep(.el-dialog__footer) {
-      padding: 0 16px 20px;
+          :deep(.el-input__wrapper) {
+            height: 28px;
+            padding: 0 6px;
+            border-radius: 6px;
+          }
+
+          :deep(.el-input__inner) {
+            font-size: 11.5px;
+          }
+        }
+      }
+
+      .header-desc {
+        font-size: 12px;
+        margin-top: 5px;
+      }
     }
 
     .dialog-content {
-      .notice-list {
-        padding: 14px 0;
+      .notice-card-list {
+        gap: 5px;
+        margin-bottom: 8px;
 
-        .notice-item {
-          font-size: 12px;
-          margin-bottom: 10px;
+        .notice-card-item {
           padding: 8px 10px;
+          gap: 8px;
+          border-radius: 6px;
+
+          .notice-index-badge {
+            width: 22px;
+            height: 22px;
+            border-radius: 4px;
+
+            .index-digit {
+              font-size: 11px;
+            }
+          }
+
+          .notice-content-area .notice-text-main {
+            font-size: 13px;
+            line-height: 1.4;
+          }
         }
       }
 
-      .agreement-wrapper {
-        padding: 12px 14px;
-      }
+      .agreement-box {
+        padding: 8px 10px;
+        border-radius: 6px;
 
-      .agreement-checkbox {
-        :deep(.el-checkbox__label) {
-          font-size: 11px;
+        .custom-agreement-checkbox .agreement-label-text {
+          font-size: 12px;
         }
 
-        :deep(.el-checkbox__inner) {
-          width: 16px;
-          height: 16px;
-        }
-      }
+        .agreement-status-pill {
+          .timer-pill {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 4px;
+          }
 
-      .countdown-badge {
-        min-width: 32px;
-        height: 20px;
-        font-size: 10px;
-        padding: 0 7px;
+          .ready-hint-pill {
+            font-size: 10.5px;
+            padding: 1px 5px;
+            border-radius: 4px;
+          }
+        }
       }
     }
 
     .dialog-footer {
-      .confirm-button {
-        height: 44px;
-        font-size: 13px;
+      .submit-confirm-btn {
+        height: 42px;
+        font-size: 14px;
+        border-radius: 6px;
       }
     }
+
+    /* 退出时下潜消失动画 */
+    &.is-sheet-closing {
+      :deep(.el-dialog) {
+        animation: sheetSlideDown 0.24s cubic-bezier(0.4, 0, 1, 1) forwards !important;
+      }
+    }
+  }
+}
+
+@keyframes sheetSlideUp {
+  0% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes sheetSlideDown {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(0, 100%, 0);
+    opacity: 0;
   }
 }
 </style>

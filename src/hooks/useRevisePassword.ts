@@ -3,7 +3,8 @@
  */
 
 import { ref, reactive, computed, getCurrentInstance } from 'vue'
-import { ElMessage, type FormInstance, type FormRules } from 'element-plus'
+import { ElMessage } from '@/utils/element'
+import { type FormInstance, type FormRules } from 'element-plus'
 import { useI18n } from 'vue-i18n'
 import { useUserStore } from '@/stores/useUserStore'
 import { authApi } from '@/api'
