@@ -67,7 +67,7 @@
               <h3 class="header-title">{{ t('welcome.importantNotice') }}</h3>
             </div>
 
-            <!-- 右侧语言/文字切换选择器 -->
+            <!-- 右侧语言/文字切换选择器（强化文字与图标清晰度） -->
             <div class="header-lang-action">
               <el-select
                 v-model="currentLanguage"
@@ -77,7 +77,7 @@
                 :popper-append-to-body="true"
               >
                 <template #prefix>
-                  <svg class="lang-globe-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                  <svg class="lang-globe-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <circle cx="12" cy="12" r="10" />
                     <line x1="2" y1="12" x2="22" y2="12" />
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
@@ -93,7 +93,7 @@
             </div>
           </div>
 
-          <!-- 下方说明文字 -->
+          <!-- 下方说明文字（加深对比度至 #334155） -->
           <p class="header-desc">{{ headerDescText }}</p>
         </div>
       </template>
@@ -105,7 +105,7 @@
         @touchend="onTouchEnd"
         @touchcancel="onTouchEnd"
       >
-        <!-- 4 条安全须知：卡片流式紧凑布局 -->
+        <!-- 4 条安全须知：文字加粗 600、高对比深墨黑、序号高亮 -->
         <div class="notice-card-list">
           <div
             v-for="(notice, index) in notices"
@@ -121,13 +121,13 @@
             <div class="notice-verified-mark" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
                 <circle cx="10" cy="10" r="8.5" fill="#F0FDF4" stroke="#86EFAC" stroke-width="1.2" />
-                <path d="M6.5 10.2L8.8 12.5L13.8 7.5" stroke="#16A34A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M6.5 10.2L8.8 12.5L13.8 7.5" stroke="#16A34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
               </svg>
             </div>
           </div>
         </div>
 
-        <!-- 协议勾选与阅读状态条 -->
+        <!-- 协议勾选与阅读状态条（文字加深至 #0F172A，清晰高亮标签） -->
         <div
           class="agreement-box"
           :class="{ 'is-active': userAgreed }"
@@ -387,7 +387,6 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__body) {
-    /* 紧凑边距：左右 18px，底部 10px */
     padding: 0 18px 10px;
     max-height: calc(85vh - 150px);
     overflow-y: auto;
@@ -413,7 +412,6 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__footer) {
-    /* 紧凑边距：左右 18px，底部 18px */
     padding: 0 18px 18px;
     background: transparent;
   }
@@ -422,7 +420,7 @@ const handleConfirm = () => {
     display: none !important;
   }
 
-  /* 头部设计：边距更紧致 */
+  /* 头部设计：边距更紧致，文字更清晰 */
   .dialog-header {
     padding: 18px 18px 10px;
     position: relative;
@@ -446,12 +444,12 @@ const handleConfirm = () => {
         height: 36px;
         flex-shrink: 0;
         border-radius: 8px;
-        background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(22, 93, 255, 0.02) 100%);
-        border: 1px solid rgba(22, 93, 255, 0.14);
+        background: linear-gradient(135deg, rgba(22, 93, 255, 0.09) 0%, rgba(22, 93, 255, 0.03) 100%);
+        border: 1px solid rgba(22, 93, 255, 0.16);
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 2px 8px rgba(22, 93, 255, 0.05);
+        box-shadow: 0 2px 6px rgba(22, 93, 255, 0.06);
       }
 
       .header-title {
@@ -464,7 +462,7 @@ const handleConfirm = () => {
       }
     }
 
-    /* 语言/文字选择器容器 */
+    /* 语言/文字选择器容器：文字加粗清晰 */
     .header-lang-action {
       flex-shrink: 0;
 
@@ -473,7 +471,7 @@ const handleConfirm = () => {
 
         :deep(.el-input__wrapper) {
           background: #F8FAFC;
-          border: 1px solid #E2E8F0;
+          border: 1px solid #CBD5E1;
           box-shadow: none !important;
           border-radius: 8px;
           padding: 0 8px;
@@ -487,35 +485,36 @@ const handleConfirm = () => {
 
           &.is-focus {
             border-color: #165DFF;
-            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1) !important;
+            box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.12) !important;
             background: #FFFFFF;
           }
         }
 
         :deep(.el-input__inner) {
-          color: #334155;
-          font-size: 12.5px;
-          font-weight: 500;
+          color: #0F172A;
+          font-size: 13px;
+          font-weight: 600;
         }
 
         :deep(.el-select__caret) {
-          color: #94A3B8;
+          color: #64748B;
           font-size: 12px;
         }
 
         .lang-globe-icon {
-          color: #64748B;
+          color: #475569;
           margin-right: 4px;
           flex-shrink: 0;
         }
       }
     }
 
-    /* 说明文字紧凑上间距 */
+    /* 说明文字：加深颜色为 #334155，增加粗细至 500 */
     .header-desc {
       margin: 6px 0 0;
-      font-size: 12.5px;
-      color: #64748B;
+      font-size: 13px;
+      font-weight: 500;
+      color: #334155;
       line-height: 1.5;
       white-space: normal;
       word-break: break-word;
@@ -524,7 +523,7 @@ const handleConfirm = () => {
     }
   }
 
-  /* 内容区卡片流：边距缩紧 */
+  /* 内容区卡片流：文字加粗 600、对比度拉满 */
   .dialog-content {
     .notice-card-list {
       display: flex;
@@ -538,15 +537,15 @@ const handleConfirm = () => {
         gap: 10px;
         padding: 9px 12px;
         background: #FFFFFF;
-        border: 1px solid #EEF2F6;
+        border: 1px solid #E2E8F0;
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
         transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:hover {
           background: #F8FAFC;
-          border-color: #CBD5E1;
-          box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+          border-color: #94A3B8;
+          box-shadow: 0 3px 8px rgba(15, 23, 42, 0.04);
           transform: translateY(-1px);
         }
 
@@ -555,7 +554,7 @@ const handleConfirm = () => {
           height: 24px;
           flex-shrink: 0;
           border-radius: 6px;
-          background: #F1F5F9;
+          background: rgba(22, 93, 255, 0.08);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -563,7 +562,7 @@ const handleConfirm = () => {
           .index-digit {
             font-size: 11.5px;
             font-weight: 700;
-            color: #64748B;
+            color: #165DFF;
             font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
           }
         }
@@ -572,12 +571,14 @@ const handleConfirm = () => {
           flex: 1;
           min-width: 0;
 
+          /* 须知文字：字号 14px，加粗 600，高深墨色 #0F172A */
           .notice-text-main {
-            font-size: 13.5px;
-            font-weight: 500;
-            line-height: 1.5;
-            color: #1E293B;
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.45;
+            color: #0F172A;
             display: block;
+            letter-spacing: 0.005em;
           }
         }
 
@@ -590,7 +591,7 @@ const handleConfirm = () => {
       }
     }
 
-    /* 协议勾选卡片：紧凑边距 */
+    /* 协议勾选卡片：加深文字 #0F172A */
     .agreement-box {
       display: flex;
       align-items: center;
@@ -606,12 +607,12 @@ const handleConfirm = () => {
 
       &:hover {
         background: #F1F5F9;
-        border-color: #CBD5E1;
+        border-color: #94A3B8;
       }
 
       &.is-active {
-        background: rgba(22, 93, 255, 0.04);
-        border-color: rgba(22, 93, 255, 0.35);
+        background: rgba(22, 93, 255, 0.05);
+        border-color: rgba(22, 93, 255, 0.4);
       }
 
       .agreement-left {
@@ -628,7 +629,7 @@ const handleConfirm = () => {
           width: 18px;
           height: 18px;
           border-radius: 4px;
-          border: 1.5px solid #CBD5E1;
+          border: 1.5px solid #94A3B8;
           transition: all 0.2s ease;
         }
 
@@ -639,14 +640,15 @@ const handleConfirm = () => {
         }
 
         :deep(.el-checkbox__label) {
-          padding-left: 10px;
+          padding-left: 9px;
           white-space: normal;
         }
 
+        /* 勾选文字：深色 #0F172A，字号 13.5px，加粗 600 */
         .agreement-label-text {
-          font-size: 13px;
-          font-weight: 500;
-          color: #334155;
+          font-size: 13.5px;
+          font-weight: 600;
+          color: #0F172A;
           line-height: 1.4;
         }
       }
@@ -664,7 +666,7 @@ const handleConfirm = () => {
           border-radius: 6px;
           color: #1D4ED8;
           font-size: 12px;
-          font-weight: 600;
+          font-weight: 700;
           font-variant-numeric: tabular-nums;
 
           .timer-clock-icon {
@@ -672,22 +674,23 @@ const handleConfirm = () => {
           }
         }
 
+        /* 提示请勾选：清晰蓝底深蓝字，告别模糊灰框 */
         .ready-hint-pill {
           display: inline-flex;
           align-items: center;
-          padding: 2px 7px;
-          background: #F8FAFC;
-          border: 1px solid #E2E8F0;
+          padding: 2px 8px;
+          background: #EFF6FF;
+          border: 1px solid #BFDBFE;
           border-radius: 6px;
-          color: #64748B;
-          font-size: 11px;
-          font-weight: 500;
+          color: #165DFF;
+          font-size: 11.5px;
+          font-weight: 600;
         }
       }
     }
   }
 
-  /* 底部按钮：高度调整为 44px 紧凑度 */
+  /* 底部按钮：未激活态高对比度文字 */
   .dialog-footer {
     display: flex;
     justify-content: center;
@@ -710,7 +713,7 @@ const handleConfirm = () => {
 
       .btn-countdown-suffix {
         font-size: 13.5px;
-        opacity: 0.88;
+        opacity: 0.9;
         font-variant-numeric: tabular-nums;
       }
 
@@ -724,10 +727,11 @@ const handleConfirm = () => {
         transform: scale(0.99);
       }
 
+      /* 未激活状态：边框微深、文字改用 #475569（极高可读性，不再发白发灰） */
       &:disabled {
         background: #F1F5F9;
-        border: 1px solid #E2E8F0;
-        color: #94A3B8;
+        border: 1px solid #CBD5E1;
+        color: #475569;
         box-shadow: none;
         cursor: not-allowed;
       }
@@ -840,7 +844,7 @@ const handleConfirm = () => {
       }
 
       .header-desc {
-        font-size: 11.5px;
+        font-size: 12px;
         margin-top: 5px;
       }
     }
@@ -866,8 +870,8 @@ const handleConfirm = () => {
           }
 
           .notice-content-area .notice-text-main {
-            font-size: 12.5px;
-            line-height: 1.45;
+            font-size: 13px;
+            line-height: 1.4;
           }
         }
       }
