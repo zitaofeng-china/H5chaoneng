@@ -14,7 +14,7 @@
       :close-on-click-modal="false"
       :close-on-press-escape="false"
       :show-close="false"
-      :width="isMobile ? '100%' : '520px'"
+      :width="isMobile ? '100%' : '470px'"
       class="welcome-dialog"
       :style="dialogDynamicStyle"
       :lock-scroll="true"
@@ -37,7 +37,7 @@
           <!-- 头部主行：左侧盾牌与标题，右侧语言切换选择器 -->
           <div class="header-main-row">
             <div class="header-branding">
-              <!-- Web3 安全护盾徽章 (适度圆角 8px) -->
+              <!-- Web3 安全护盾徽章 -->
               <div class="security-badge-icon" aria-hidden="true">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path
@@ -63,11 +63,11 @@
                 </svg>
               </div>
 
-              <!-- 主标题（已彻底移除硬编码英文 Safety Protocol） -->
+              <!-- 主标题 -->
               <h3 class="header-title">{{ t('welcome.importantNotice') }}</h3>
             </div>
 
-            <!-- 右侧语言/文字切换选择器（加入地球图标与 8px 现代微圆角） -->
+            <!-- 右侧语言/文字切换选择器 -->
             <div class="header-lang-action">
               <el-select
                 v-model="currentLanguage"
@@ -93,7 +93,7 @@
             </div>
           </div>
 
-          <!-- 下方完整说明文字：独占整行，彻底解决文字被省略号截断隐藏的问题 -->
+          <!-- 下方说明文字 -->
           <p class="header-desc">{{ headerDescText }}</p>
         </div>
       </template>
@@ -105,7 +105,7 @@
         @touchend="onTouchEnd"
         @touchcancel="onTouchEnd"
       >
-        <!-- 4 条安全须知：精炼微圆角（8px）科技卡片流 -->
+        <!-- 4 条安全须知：卡片流式紧凑布局 -->
         <div class="notice-card-list">
           <div
             v-for="(notice, index) in notices"
@@ -127,7 +127,7 @@
           </div>
         </div>
 
-        <!-- 协议勾选与阅读状态条（8px 圆角，优化右侧状态避免重复 checkmark） -->
+        <!-- 协议勾选与阅读状态条 -->
         <div
           class="agreement-box"
           :class="{ 'is-active': userAgreed }"
@@ -373,12 +373,11 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog) {
-    /* 整体圆角减少：由 20px 缩减至 12px 现代精炼直角感 */
     border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 20px 50px -12px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(226, 232, 240, 0.85);
+    box-shadow: 0 16px 40px -12px rgba(15, 23, 42, 0.16), 0 0 0 1px rgba(226, 232, 240, 0.85);
     border: none;
-    background: radial-gradient(100% 100px at 50% 0%, rgba(22, 93, 255, 0.04) 0%, transparent 100%), #FFFFFF;
+    background: radial-gradient(100% 80px at 50% 0%, rgba(22, 93, 255, 0.04) 0%, transparent 100%), #FFFFFF;
     transition: transform 0.24s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.24s ease;
   }
 
@@ -388,8 +387,9 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__body) {
-    padding: 0 24px 16px;
-    max-height: calc(85vh - 170px);
+    /* 紧凑边距：左右 18px，底部 10px */
+    padding: 0 18px 10px;
+    max-height: calc(85vh - 150px);
     overflow-y: auto;
     background: transparent;
 
@@ -413,7 +413,8 @@ const handleConfirm = () => {
   }
 
   :deep(.el-dialog__footer) {
-    padding: 0 24px 22px;
+    /* 紧凑边距：左右 18px，底部 18px */
+    padding: 0 18px 18px;
     background: transparent;
   }
 
@@ -421,9 +422,9 @@ const handleConfirm = () => {
     display: none !important;
   }
 
-  /* 头部设计 */
+  /* 头部设计：边距更紧致 */
   .dialog-header {
-    padding: 20px 24px 14px;
+    padding: 18px 18px 10px;
     position: relative;
 
     .header-main-row {
@@ -444,7 +445,6 @@ const handleConfirm = () => {
         width: 36px;
         height: 36px;
         flex-shrink: 0;
-        /* 圆角减少至 8px */
         border-radius: 8px;
         background: linear-gradient(135deg, rgba(22, 93, 255, 0.08) 0%, rgba(22, 93, 255, 0.02) 100%);
         border: 1px solid rgba(22, 93, 255, 0.14);
@@ -464,7 +464,7 @@ const handleConfirm = () => {
       }
     }
 
-    /* 语言/文字选择器容器（圆角减少至 8px） */
+    /* 语言/文字选择器容器 */
     .header-lang-action {
       flex-shrink: 0;
 
@@ -475,7 +475,6 @@ const handleConfirm = () => {
           background: #F8FAFC;
           border: 1px solid #E2E8F0;
           box-shadow: none !important;
-          /* 圆角减少至 8px */
           border-radius: 8px;
           padding: 0 8px;
           height: 32px;
@@ -512,9 +511,9 @@ const handleConfirm = () => {
       }
     }
 
-    /* 说明文字独占行：彻底取消任何 nowrap 与省略号截断 */
+    /* 说明文字紧凑上间距 */
     .header-desc {
-      margin: 8px 0 0;
+      margin: 6px 0 0;
       font-size: 12.5px;
       color: #64748B;
       line-height: 1.5;
@@ -525,25 +524,24 @@ const handleConfirm = () => {
     }
   }
 
-  /* 内容区卡片流 */
+  /* 内容区卡片流：边距缩紧 */
   .dialog-content {
     .notice-card-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-bottom: 14px;
+      gap: 6px;
+      margin-bottom: 10px;
 
       .notice-card-item {
         display: flex;
         align-items: center;
-        gap: 12px;
-        padding: 11px 14px;
+        gap: 10px;
+        padding: 9px 12px;
         background: #FFFFFF;
         border: 1px solid #EEF2F6;
-        /* 圆角减少至 8px */
         border-radius: 8px;
         box-shadow: 0 1px 3px rgba(15, 23, 42, 0.02);
-        transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 
         &:hover {
           background: #F8FAFC;
@@ -556,7 +554,6 @@ const handleConfirm = () => {
           width: 24px;
           height: 24px;
           flex-shrink: 0;
-          /* 圆角减少至 6px */
           border-radius: 6px;
           background: #F1F5F9;
           display: flex;
@@ -593,20 +590,19 @@ const handleConfirm = () => {
       }
     }
 
-    /* 协议勾选卡片（圆角减少至 8px） */
+    /* 协议勾选卡片：紧凑边距 */
     .agreement-box {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 10px;
+      padding: 10px 12px;
       background: #F8FAFC;
       border: 1px solid #E2E8F0;
-      /* 圆角减少至 8px */
       border-radius: 8px;
       cursor: pointer;
       user-select: none;
-      transition: all 0.22s ease;
+      transition: all 0.2s ease;
 
       &:hover {
         background: #F1F5F9;
@@ -631,7 +627,6 @@ const handleConfirm = () => {
         :deep(.el-checkbox__inner) {
           width: 18px;
           height: 18px;
-          /* 圆角减少至 4px */
           border-radius: 4px;
           border: 1.5px solid #CBD5E1;
           transition: all 0.2s ease;
@@ -663,10 +658,9 @@ const handleConfirm = () => {
           display: inline-flex;
           align-items: center;
           gap: 4px;
-          padding: 3px 8px;
+          padding: 2px 8px;
           background: #EFF6FF;
           border: 1px solid #BFDBFE;
-          /* 圆角减少至 6px */
           border-radius: 6px;
           color: #1D4ED8;
           font-size: 12px;
@@ -693,22 +687,21 @@ const handleConfirm = () => {
     }
   }
 
-  /* 底部按钮（圆角减少至 8px） */
+  /* 底部按钮：高度调整为 44px 紧凑度 */
   .dialog-footer {
     display: flex;
     justify-content: center;
 
     .submit-confirm-btn {
       width: 100%;
-      height: 46px;
+      height: 44px;
       font-size: 15px;
       font-weight: 600;
-      /* 圆角减少至 8px */
       border-radius: 8px;
       background: linear-gradient(135deg, #165DFF 0%, #0E42D2 100%);
       border: none;
       color: #FFFFFF;
-      box-shadow: 0 6px 16px -2px rgba(22, 93, 255, 0.35);
+      box-shadow: 0 4px 14px -2px rgba(22, 93, 255, 0.35);
       transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
       display: inline-flex;
       align-items: center;
@@ -723,7 +716,7 @@ const handleConfirm = () => {
 
       &:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 8px 20px -2px rgba(22, 93, 255, 0.45);
+        box-shadow: 0 6px 18px -2px rgba(22, 93, 255, 0.45);
         background: linear-gradient(135deg, #1E6BFF 0%, #1048DE 100%);
       }
 
@@ -772,7 +765,6 @@ const handleConfirm = () => {
       width: 100% !important;
       max-width: 100% !important;
       margin: 0 !important;
-      /* 移动端顶部圆角由 20px 缩减至 14px */
       border-radius: 14px 14px 0 0 !important;
       border-bottom-left-radius: 0 !important;
       border-bottom-right-radius: 0 !important;
@@ -784,25 +776,25 @@ const handleConfirm = () => {
     }
 
     :deep(.el-dialog__body) {
-      padding: 0 16px 14px;
-      max-height: calc(88vh - 180px);
+      padding: 0 14px 10px;
+      max-height: calc(88vh - 160px);
       flex: 1;
     }
 
     :deep(.el-dialog__footer) {
-      padding: 0 16px calc(14px + env(safe-area-inset-bottom, 0px));
+      padding: 0 14px calc(12px + env(safe-area-inset-bottom, 0px));
       flex-shrink: 0;
     }
 
     .dialog-header {
-      padding: 8px 16px 12px;
+      padding: 8px 14px 10px;
       flex-shrink: 0;
 
       .sheet-pull-bar-wrap {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding-bottom: 8px;
+        padding-bottom: 6px;
         touch-action: pan-y;
 
         .sheet-pull-bar {
@@ -836,7 +828,7 @@ const handleConfirm = () => {
           width: 104px;
 
           :deep(.el-input__wrapper) {
-            height: 30px;
+            height: 28px;
             padding: 0 6px;
             border-radius: 6px;
           }
@@ -849,18 +841,18 @@ const handleConfirm = () => {
 
       .header-desc {
         font-size: 11.5px;
-        margin-top: 6px;
+        margin-top: 5px;
       }
     }
 
     .dialog-content {
       .notice-card-list {
-        gap: 6px;
-        margin-bottom: 12px;
+        gap: 5px;
+        margin-bottom: 8px;
 
         .notice-card-item {
-          padding: 9px 12px;
-          gap: 10px;
+          padding: 8px 10px;
+          gap: 8px;
           border-radius: 6px;
 
           .notice-index-badge {
@@ -881,7 +873,7 @@ const handleConfirm = () => {
       }
 
       .agreement-box {
-        padding: 9px 12px;
+        padding: 8px 10px;
         border-radius: 6px;
 
         .custom-agreement-checkbox .agreement-label-text {
@@ -906,7 +898,7 @@ const handleConfirm = () => {
 
     .dialog-footer {
       .submit-confirm-btn {
-        height: 44px;
+        height: 42px;
         font-size: 14px;
         border-radius: 6px;
       }
